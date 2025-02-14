@@ -1,0 +1,66 @@
+<div class="music-player">
+  <div class="player-container">
+    <!-- Error message -->
+    <div class="error-message" *ngIf="error">{{error}}</div>
+    
+    <!-- Loading indicator -->
+    <div class="loading-indicator" *ngIf="isLoading">Loading...</div>
+    
+    <!-- Track info -->
+    <div class="track-info" *ngIf="currentTrack">
+      {{ getTrackName(currentTrack) }}
+    </div>
+
+    <!-- Time and progress -->
+    <div class="time-info" [class.disabled]="isLoading">
+      <span class="current-time">{{formatTime(currentTime)}}</span>
+      <span class="duration">{{formatTime(duration)}}</span>
+    </div>
+    
+    <div class="progress-bar" [class.disabled]="isLoading">
+      <input 
+        type="range" 
+        [min]="0" 
+        [max]="duration" 
+        [step]="0.01"
+        [value]="currentTime"
+        (input)="seek($any($event.target).value)"
+        class="progress-slider"
+        [disabled]="isLoading"
+      >
+    </div>
+
+    <div class="controls" [class.disabled]="isLoading">
+      <div class="volume-control">
+        <input 
+          type="range" 
+          [min]="0" 
+          [max]="1" 
+          [step]="0.01"
+          [value]="volume"
+          (input)="setVolume($any($event.target).value)"
+          class="volume-slider"
+          [disabled]="isLoading"
+        >
+      </div>
+
+      <div class="playback-controls">
+        <button class="control-button previous" (click)="previousTrack()" [disabled]="isLoading">
+          <span>⏮</span>
+        </button>
+        <button 
+          class="control-button play-button" 
+          (click)="togglePlay()"
+          [class.playing]="isPlaying"
+          [disabled]="isLoading"
+        >
+          <span class="play-icon" *ngIf="!isPlaying">▶</span>
+          <span class="pause-icon" *ngIf="isPlaying">⏸</span>
+        </button>
+        <button class="control-button next" (click)="nextTrack()" [disabled]="isLoading">
+          <span>⏭</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

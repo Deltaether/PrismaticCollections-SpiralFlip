@@ -9,13 +9,18 @@
 
 html, body {
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  position: relative;
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #333;
+  background: #fff;
 }
 
 /* Custom Scrollbar Styles */
@@ -23,21 +28,15 @@ body {
   width: 10px;
   height: 10px;
   background: transparent;
-  position: absolute;
-  z-index: 9999;
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
-  position: absolute;
-  z-index: 9999;
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 0, 0, 0.3);
   border-radius: 10px;
-  position: absolute;
-  z-index: 9999;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 0, 0, 0.2);
@@ -68,7 +67,28 @@ body {
 /* Ensure app-root takes full height */
 app-root {
   display: block;
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
+  position: relative;
+}
+
+/* Page styles */
+.page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section styles */
+section {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }

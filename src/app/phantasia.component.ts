@@ -5,6 +5,8 @@ import { DiscOneComponent } from './pages/disc-one/disc-one.component';
 import { DiscTwoComponent } from './pages/disc-two/disc-two.component';
 import { PvComponent } from './pages/pv/pv.component';
 import { InformationComponent } from './pages/information/information.component';
+import { MusicPlayerComponent } from './tools/music-player/music-player.component';
+import { AudioService } from './tools/music-player/audio.service';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,8 @@ import { InformationComponent } from './pages/information/information.component'
     DiscOneComponent,
     DiscTwoComponent,
     PvComponent,
-    InformationComponent
+    InformationComponent,
+    MusicPlayerComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']
@@ -30,10 +33,18 @@ export class PhantasiaComponent implements AfterViewInit {
   lastScrollTime = 0;
   scrollCooldown = 1000;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    private audioService: AudioService
+  ) {}
 
   ngAfterViewInit() {
     this.detectCurrentSection();
+    this.updateAudioTrack(this.currentSection);
+  }
+
+  private updateAudioTrack(section: string) {
+    this.audioService.setTrackForSection(section);
   }
 
   scrollTo(section: string) {
@@ -41,6 +52,7 @@ export class PhantasiaComponent implements AfterViewInit {
     if (element && !this.isAnimating) {
       this.isAnimating = true;
       this.currentSection = section;
+      this.updateAudioTrack(section);
       element.scrollIntoView({ behavior: 'smooth' });
       
       setTimeout(() => {
@@ -49,11 +61,12 @@ export class PhantasiaComponent implements AfterViewInit {
     }
   }
 
+  @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
     event.preventDefault();
     
     const now = Date.now();
-    if (now - this.lastScrollTime < 50) return; // Minimal debounce to prevent rapid-fire
+    if (now - this.lastScrollTime < this.scrollCooldown) return;
     
     const direction = event.deltaY > 0 ? 1 : -1;
     const currentIndex = this.sections.indexOf(this.currentSection);
@@ -87,6 +100,7 @@ export class PhantasiaComponent implements AfterViewInit {
 
     if (closestSection !== this.currentSection) {
       this.currentSection = closestSection;
+      this.updateAudioTrack(closestSection);
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, HostListener, ElementRef } from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IntroductionComponent } from './pages/introduction/introduction.component';
 import { DiscOneComponent } from './pages/disc-one/disc-one.component';
@@ -20,34 +20,83 @@ import { InformationComponent } from './pages/information/information.component'
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']
 })
-export class PhantasiaComponent {
+export class PhantasiaComponent implements AfterViewInit {
+  @ViewChild('mainContent') mainContent!: ElementRef;
+  
   title = 'Project Phantasia';
   currentSection = 'introduction';
   sections = ['introduction', 'disc-1', 'disc-2', 'pv', 'information'];
+  isScrolling = false;
+  lastScrollTime = 0;
+  scrollCooldown = 800; // ms between scroll actions
 
   constructor(private elementRef: ElementRef) {}
 
+  ngAfterViewInit() {
+    // Initial section detection
+    this.detectCurrentSection();
+  }
+
   scrollTo(section: string) {
     const element = document.getElementById(section);
-    if (element) {
+    if (element && !this.isScrolling) {
+      this.isScrolling = true;
       element.scrollIntoView({ behavior: 'smooth' });
+      this.currentSection = section;
+      setTimeout(() => {
+        this.isScrolling = false;
+      }, this.scrollCooldown);
     }
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onScroll() {
-    const mainElement = this.elementRef.nativeElement.querySelector('main');
+  onWheel(event: WheelEvent) {
+    event.preventDefault();
+    
+    const now = Date.now();
+    if (this.isScrolling || now - this.lastScrollTime < this.scrollCooldown) {
+      return;
+    }
+    
+    const direction = event.deltaY > 0 ? 1 : -1;
+    const currentIndex = this.sections.indexOf(this.currentSection);
+    const nextIndex = currentIndex + direction;
+    
+    if (nextIndex >= 0 && nextIndex < this.sections.length) {
+      this.lastScrollTime = now;
+      this.scrollTo(this.sections[nextIndex]);
+    }
+  }
+
+  detectCurrentSection() {
+    const mainElement = this.mainContent?.nativeElement;
     if (!mainElement) return;
+
+    const viewportHeight = window.innerHeight;
+    let closestSection = this.currentSection;
+    let minDistance = Infinity;
 
     for (const section of this.sections) {
       const element = document.getElementById(section);
       if (!element) continue;
 
       const rect = element.getBoundingClientRect();
-      if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-        this.currentSection = section;
-        break;
+      const distance = Math.abs(rect.top);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestSection = section;
       }
+    }
+
+    if (closestSection !== this.currentSection) {
+      this.currentSection = closestSection;
+    }
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onScroll() {
+    if (!this.isScrolling) {
+      this.detectCurrentSection();
     }
   }
 }

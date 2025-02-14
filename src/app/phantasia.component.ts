@@ -26,25 +26,25 @@ export class PhantasiaComponent implements AfterViewInit {
   title = 'Project Phantasia';
   currentSection = 'introduction';
   sections = ['introduction', 'disc-1', 'disc-2', 'pv', 'information'];
-  isScrolling = false;
+  isAnimating = false;
   lastScrollTime = 0;
-  scrollCooldown = 800; // ms between scroll actions
+  scrollCooldown = 1000;
 
   constructor(private elementRef: ElementRef) {}
 
   ngAfterViewInit() {
-    // Initial section detection
     this.detectCurrentSection();
   }
 
   scrollTo(section: string) {
     const element = document.getElementById(section);
-    if (element && !this.isScrolling) {
-      this.isScrolling = true;
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (element && !this.isAnimating) {
+      this.isAnimating = true;
       this.currentSection = section;
+      element.scrollIntoView({ behavior: 'smooth' });
+      
       setTimeout(() => {
-        this.isScrolling = false;
+        this.isAnimating = false;
       }, this.scrollCooldown);
     }
   }
@@ -53,9 +53,7 @@ export class PhantasiaComponent implements AfterViewInit {
     event.preventDefault();
     
     const now = Date.now();
-    if (this.isScrolling || now - this.lastScrollTime < this.scrollCooldown) {
-      return;
-    }
+    if (now - this.lastScrollTime < 50) return; // Minimal debounce to prevent rapid-fire
     
     const direction = event.deltaY > 0 ? 1 : -1;
     const currentIndex = this.sections.indexOf(this.currentSection);
@@ -71,7 +69,6 @@ export class PhantasiaComponent implements AfterViewInit {
     const mainElement = this.mainContent?.nativeElement;
     if (!mainElement) return;
 
-    const viewportHeight = window.innerHeight;
     let closestSection = this.currentSection;
     let minDistance = Infinity;
 
@@ -95,7 +92,7 @@ export class PhantasiaComponent implements AfterViewInit {
 
   @HostListener('window:scroll', ['$event'])
   onScroll() {
-    if (!this.isScrolling) {
+    if (!this.isAnimating) {
       this.detectCurrentSection();
     }
   }

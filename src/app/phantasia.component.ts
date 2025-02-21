@@ -6,6 +6,8 @@ import { DiscTwoComponent } from './pages/disc-two/disc-two.component';
 import { PvComponent } from './pages/pv/pv.component';
 import { InformationComponent } from './pages/information/information.component';
 import { MusicPlayerComponent } from './tools/music-player/music-player.component';
+// import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
+import { CDCasesTreeComponent } from './tools/cd-cases-canon/components/tree/cd-cases-tree.component';
 import { AudioService } from './tools/music-player/audio.service';
 
 @Component({
@@ -18,7 +20,9 @@ import { AudioService } from './tools/music-player/audio.service';
     DiscTwoComponent,
     PvComponent,
     InformationComponent,
-    MusicPlayerComponent
+    MusicPlayerComponent,
+    // CDCasesComponent
+    CDCasesTreeComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']
@@ -109,5 +113,11 @@ export class PhantasiaComponent implements AfterViewInit {
     if (!this.isAnimating) {
       this.detectCurrentSection();
     }
+  }
+
+  @HostListener('document:contextmenu', ['$event'])
+  onContextMenu(event: Event) {
+    event.preventDefault();
+    return false;
   }
 }

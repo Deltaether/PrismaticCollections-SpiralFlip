@@ -13,4 +13,8 @@ export interface CDCase {
   tilt: Vector2D;
   zIndex: number;
   elevation: number;
+  depth: number;
+  fallSpeed: number;
+  isFlipped: boolean;
+  bounceCount: number;
 } 

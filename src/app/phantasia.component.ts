@@ -7,7 +7,7 @@ import { PvComponent } from './pages/pv/pv.component';
 import { InformationComponent } from './pages/information/information.component';
 import { MusicPlayerComponent } from './tools/music-player/music-player.component';
 // import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
-import { CDCasesTreeComponent } from './tools/cd-cases-canon/components/tree/cd-cases-tree.component';
+import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
 
 @Component({
@@ -22,7 +22,7 @@ import { AudioService } from './tools/music-player/audio.service';
     InformationComponent,
     MusicPlayerComponent,
     // CDCasesComponent
-    CDCasesTreeComponent
+    CDCasesComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']

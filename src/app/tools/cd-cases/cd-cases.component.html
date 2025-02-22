@@ -1,19 +1,4 @@
-<div class="cd-container" #cdContainer>
-  <div 
-    *ngFor="let cd of cdCases" 
-    class="cd-case"
-    [style.transform]="getTransform(cd)"
-    [style.zIndex]="cd.zIndex"
-    (mousedown)="onMouseDown($event, cd)"
-  >
-    <div class="cd-cover">
-      <img [src]="cd.imageUrl" [alt]="cd.title">
-    </div>
-    <div class="cd-spine"></div>
-    <div class="cd-back"></div>
-    <div class="cd-info">
-      <h3>{{ cd.title }}</h3>
-      <p>{{ cd.artist }}</p>
-    </div>
-  </div>
+<div class="cd-container">
+  <canvas #canvas></canvas>
+  <div class="loading" *ngIf="!cdCases.length">Loading 3D Models...</div>
 </div> 

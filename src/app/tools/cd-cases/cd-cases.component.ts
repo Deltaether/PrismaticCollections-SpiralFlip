@@ -98,9 +98,16 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private fillLight!: THREE.DirectionalLight;
   private backLight!: THREE.DirectionalLight;
 
+  private gridHelper!: THREE.GridHelper;
+  private axesHelper!: THREE.AxesHelper;
+  private mainLightHelper!: THREE.DirectionalLightHelper;
+  private fillLightHelper!: THREE.DirectionalLightHelper;
+  private backLightHelper!: THREE.DirectionalLightHelper;
+
   constructor() {
     this.initScene();
     this.initCaseSettings();
+    this.initHelpers();
   }
 
   private initCaseSettings(): void {
@@ -124,6 +131,19 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set(position.x, position.y, position.z);
     this.camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
+  }
+
+  private initHelpers(): void {
+    // Grid helper
+    this.gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+    this.gridHelper.position.y = this.config.sceneSettings.ground.y;
+    this.scene.add(this.gridHelper);
+
+    // Axes helper (RGB = XYZ)
+    this.axesHelper = new THREE.AxesHelper(5);
+    this.scene.add(this.axesHelper);
+
+    // Light helpers will be added after lights are created
   }
 
   private async loadModels(): Promise<void> {
@@ -230,6 +250,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         lighting.back.position.y,
         lighting.back.position.z
       );
+
+      // Add light helpers
+      this.mainLightHelper = new THREE.DirectionalLightHelper(this.mainLight, 1);
+      this.fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 1);
+      this.backLightHelper = new THREE.DirectionalLightHelper(this.backLight, 1);
+      this.scene.add(this.mainLightHelper, this.fillLightHelper, this.backLightHelper);
 
       // Set up ground from config
       const { ground } = this.config.sceneSettings;
@@ -450,11 +476,16 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Update controls
     this.controls.update();
 
+    // Update light helpers
+    this.mainLightHelper.update();
+    this.fillLightHelper.update();
+    this.backLightHelper.update();
+
     // Apply physics and momentum
     this.cdCases.forEach(cdCase => {
       if (!cdCase.isDragging && (cdCase.momentum.x !== 0 || cdCase.momentum.y !== 0)) {
         cdCase.position.x += cdCase.momentum.x;
-        cdCase.position.z += cdCase.momentum.y; // Use Z instead of Y for table-like movement
+        cdCase.position.z += cdCase.momentum.y;
         cdCase.model.position.copy(cdCase.position);
         
         cdCase.momentum.multiplyScalar(0.95);
@@ -462,7 +493,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           cdCase.momentum.set(0, 0);
         }
 
-        // Check for collisions after movement
         this.checkCollisions(cdCase);
       }
     });
@@ -487,6 +517,11 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   public updateLighting(): void {
     this.ambientLight.intensity = this.sceneSettings.ambientIntensity;
     this.mainLight.intensity = this.sceneSettings.mainLightIntensity;
+    
+    // Update light helpers
+    this.mainLightHelper.update();
+    this.fillLightHelper.update();
+    this.backLightHelper.update();
   }
 
   public updateRenderer(): void {
@@ -584,6 +619,13 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         }
       });
     });
+
+    // Clean up helpers
+    this.scene.remove(this.gridHelper);
+    this.scene.remove(this.axesHelper);
+    this.scene.remove(this.mainLightHelper);
+    this.scene.remove(this.fillLightHelper);
+    this.scene.remove(this.backLightHelper);
 
     this.renderer.dispose();
   }

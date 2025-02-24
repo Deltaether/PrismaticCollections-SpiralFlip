@@ -14,6 +14,9 @@ export interface CDCase {
   mixer?: THREE.AnimationMixer;
   animations?: THREE.AnimationClip[];
   openAction?: THREE.AnimationAction;
+  armature?: THREE.Object3D | null;
+  isOpen: boolean;
+  glowMaterial?: THREE.MeshBasicMaterial;
 }
 
 export interface Vector3Config {
@@ -46,6 +49,7 @@ export interface SceneConfig {
   camera: {
     position: Vector3Config;
     lookAt: Vector3Config;
+    lockControls: boolean;
   };
   lighting: {
     ambient: {

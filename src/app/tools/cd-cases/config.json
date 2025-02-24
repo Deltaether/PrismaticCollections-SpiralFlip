@@ -2,15 +2,16 @@
   "sceneSettings": {
     "camera": {
       "position": {
-        "x": 0,
-        "y": 6,
-        "z": 12
+        "x": -2,
+        "y": 4.7,
+        "z": 0
       },
       "lookAt": {
         "x": 0,
-        "y": -1,
+        "y": 0,
         "z": 0
-      }
+      },
+      "lockControls": false
     },
     "lighting": {
       "ambient": {
@@ -19,25 +20,25 @@
       "main": {
         "intensity": 1.2,
         "position": {
-          "x": 5,
-          "y": 5,
+          "x": 3,
+          "y": 3,
           "z": 5
         }
       },
       "fill": {
         "intensity": 0.6,
         "position": {
-          "x": -5,
-          "y": 3,
-          "z": 0
+          "x": 5,
+          "y": 8,
+          "z": -2
         }
       },
       "back": {
         "intensity": 0.5,
         "position": {
-          "x": 0,
+          "x": -4,
           "y": 2,
-          "z": -5
+          "z": -3
         }
       }
     },
@@ -45,8 +46,8 @@
       "exposure": 1.2
     },
     "orbitControls": {
-      "minPolarAngle": 0.7853981633974483,
-      "maxPolarAngle": 1.4289009787645662,
+      "minPolarAngle": 0,
+      "maxPolarAngle": 3.14159,
       "minDistance": 5,
       "maxDistance": 20,
       "dampingFactor": 0.05,
@@ -55,7 +56,7 @@
       "enablePan": true
     },
     "ground": {
-      "y": -2,
+      "y": 0,
       "opacity": 0.3,
       "size": 20
     }
@@ -66,14 +67,14 @@
       "title": "Disc One",
       "artist": "An × Feryquitous",
       "position": {
-        "x": -2,
-        "y": -1,
-        "z": 0
+        "x": -1,
+        "y": 0.2,
+        "z": -1.5
       },
       "rotation": {
-        "x": -0.6283185307179586,
-        "y": 0.3141592653589793,
-        "z": 0
+        "x": -3.1,
+        "y": 0,
+        "z": -1.57
       },
       "materials": {
         "cd": [
@@ -102,12 +103,12 @@
       "artist": "An × Feryquitous",
       "position": {
         "x": 2,
-        "y": -1,
-        "z": 0
+        "y": 0,
+        "z": -1.5
       },
       "rotation": {
-        "x": -0.6283185307179586,
-        "y": 0.3141592653589793,
+        "x": 0,
+        "y": 0,
         "z": 0
       },
       "materials": {

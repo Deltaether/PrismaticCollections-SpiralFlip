@@ -10,6 +10,7 @@ import config from './config.json';
 import { CDCasesService } from './cd-cases.service';
 import { SceneService } from './scene.service';
 import { allCases, updateCasePositions } from './cases-data';
+import { PreloaderService } from '../../services/preloader.service';
 
 @Component({
   selector: 'app-cd-cases',
@@ -159,7 +160,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private cdCasesService: CDCasesService,
-    private sceneService: SceneService
+    private sceneService: SceneService,
+    private preloaderService: PreloaderService
   ) {
     // Load cases data
     this.config.cdCases = updateCasePositions(allCases);
@@ -257,10 +259,15 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.setupRenderer();
     this.setupControls();
     this.loadModels().then(() => {
-      // Add label renderer to DOM
+      // Signal that CD cases component is ready
+      this.preloaderService.setComponentReady(true);
+      
       this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
       this.animate();
       this.addEventListeners();
+    }).catch(error => {
+      console.error('Error initializing CD cases:', error);
+      // Handle error appropriately
     });
   }
 

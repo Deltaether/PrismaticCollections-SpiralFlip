@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, forkJoin, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, forkJoin, from, of } from 'rxjs';
+import { map, catchError, finalize } from 'rxjs/operators';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -10,6 +10,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 export class PreloaderService {
   private loadingProgress = new BehaviorSubject<number>(0);
   private loadingComplete = new BehaviorSubject<boolean>(false);
+  private componentReady = new BehaviorSubject<boolean>(false);
   private totalAssets = 0;
   private loadedAssets = 0;
 
@@ -17,6 +18,7 @@ export class PreloaderService {
   private textureCache: Map<string, THREE.Texture> = new Map();
   private modelCache: Map<string, THREE.Object3D> = new Map();
   private audioCache: Map<string, AudioBuffer> = new Map();
+  private htmlCache: Map<string, string> = new Map();
 
   constructor() {}
 
@@ -28,46 +30,83 @@ export class PreloaderService {
     return this.loadingComplete.asObservable();
   }
 
+  getComponentReady(): Observable<boolean> {
+    return this.componentReady.asObservable();
+  }
+
+  setComponentReady(ready: boolean) {
+    this.componentReady.next(ready);
+    this.checkAllComplete();
+  }
+
+  private checkAllComplete() {
+    const isComplete = this.loadedAssets === this.totalAssets && this.componentReady.value;
+    this.loadingComplete.next(isComplete);
+  }
+
   private updateProgress(): void {
     const progress = (this.loadedAssets / this.totalAssets) * 100;
     this.loadingProgress.next(progress);
-    if (this.loadedAssets === this.totalAssets) {
-      this.loadingComplete.next(true);
-    }
+    this.checkAllComplete();
   }
 
   preloadAssets(): Observable<boolean> {
     const assets = {
       textures: [
         'assets/graphic/composite.png',
-        // Add other textures here
+        'assets/graphic/jewel-case-_640.png',
       ],
       models: [
         'assets/3d/CD_Case/CD_Case.glb',
-        // Add other models here
       ],
       audio: [
-        // Add audio files here
-        'assets/audio/track1.mp3',
-        'assets/audio/track2.mp3'
+        'assets/audio/An - Incident.mp3',
+        'assets/audio/Feryquitous - i can avoid it.mp3',
+        'assets/audio/An - Quantum Resonance.mp3',
+        'assets/audio/Feryquitous - Neural Network.mp3',
+        'assets/audio/An × Feryquitous - Digital Entropy.mp3'
+      ],
+      components: [
+        'introduction',
+        'disc-one',
+        'disc-two',
+        'pv',
+        'information',
+        'music-player',
+        'cd-cases'
       ]
     };
 
+    // Count only required assets (textures, models, components)
     this.totalAssets = 
       assets.textures.length + 
       assets.models.length + 
-      assets.audio.length;
+      assets.components.length;
 
     const textureLoads = assets.textures.map(url => this.preloadTexture(url));
     const modelLoads = assets.models.map(url => this.preloadModel(url));
-    const audioLoads = assets.audio.map(url => this.preloadAudio(url));
+    const audioLoads = assets.audio.map(url => this.preloadAudio(url).pipe(
+      catchError(error => {
+        console.warn(`Audio file not found: ${url}`, error);
+        return of(null);
+      })
+    ));
+    const componentLoads = assets.components.map(component => this.preloadComponent(component));
+
+    // Log model loading progress
+    console.log('Starting model loading...');
 
     return forkJoin([
-      ...textureLoads,
-      ...modelLoads,
-      ...audioLoads
+      forkJoin(textureLoads),
+      forkJoin(modelLoads),
+      forkJoin(audioLoads),
+      forkJoin(componentLoads)
     ]).pipe(
-      map(() => true)
+      map(() => true),
+      catchError(error => {
+        console.error('Error during asset loading:', error);
+        return of(false);
+      })
     );
   }
 
@@ -85,6 +124,7 @@ export class PreloaderService {
       loader.load(
         url,
         (texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
           this.textureCache.set(url, texture);
           this.loadedAssets++;
           this.updateProgress();
@@ -110,20 +150,33 @@ export class PreloaderService {
         return;
       }
 
+      console.log(`Loading model: ${url}`);
       const loader = new GLTFLoader();
+      
       loader.load(
         url,
         (gltf) => {
-          this.modelCache.set(url, gltf.scene);
+          console.log(`Model loaded successfully: ${url}`);
+          this.modelCache.set(url, gltf.scene.clone());
           this.loadedAssets++;
           this.updateProgress();
           observer.next();
           observer.complete();
         },
-        undefined,
+        (progress) => {
+          // Log loading progress
+          if (progress.lengthComputable) {
+            const percentComplete = (progress.loaded / progress.total) * 100;
+            console.log(`Model loading progress: ${percentComplete.toFixed(2)}%`);
+          }
+        },
         (error) => {
           console.error('Error loading model:', error);
-          observer.error(error);
+          // Don't fail completely on model error, just log it
+          this.loadedAssets++;
+          this.updateProgress();
+          observer.next();
+          observer.complete();
         }
       );
     });
@@ -132,6 +185,36 @@ export class PreloaderService {
   private preloadAudio(url: string): Observable<void> {
     return new Observable(observer => {
       if (this.audioCache.has(url)) {
+        observer.next();
+        observer.complete();
+        return;
+      }
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+          return new AudioContext().decodeAudioData(arrayBuffer);
+        })
+        .then(audioBuffer => {
+          this.audioCache.set(url, audioBuffer);
+          observer.next();
+          observer.complete();
+        })
+        .catch(error => {
+          console.warn(`Audio loading failed for ${url}:`, error);
+          observer.error(error);
+        });
+    });
+  }
+
+  private preloadComponent(componentName: string): Observable<void> {
+    return new Observable(observer => {
+      if (this.htmlCache.has(componentName)) {
         this.loadedAssets++;
         this.updateProgress();
         observer.next();
@@ -139,22 +222,14 @@ export class PreloaderService {
         return;
       }
 
-      fetch(url)
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => {
-          return new AudioContext().decodeAudioData(arrayBuffer);
-        })
-        .then(audioBuffer => {
-          this.audioCache.set(url, audioBuffer);
-          this.loadedAssets++;
-          this.updateProgress();
-          observer.next();
-          observer.complete();
-        })
-        .catch(error => {
-          console.error('Error loading audio:', error);
-          observer.error(error);
-        });
+      // Simulate component preloading
+      setTimeout(() => {
+        this.htmlCache.set(componentName, 'loaded');
+        this.loadedAssets++;
+        this.updateProgress();
+        observer.next();
+        observer.complete();
+      }, 100);
     });
   }
 
@@ -164,10 +239,33 @@ export class PreloaderService {
   }
 
   getModel(url: string): THREE.Object3D | undefined {
-    return this.modelCache.get(url);
+    const model = this.modelCache.get(url);
+    return model ? model.clone() : undefined;
   }
 
   getAudio(url: string): AudioBuffer | undefined {
     return this.audioCache.get(url);
+  }
+
+  clearCache(): void {
+    // Dispose of all cached resources
+    this.textureCache.forEach(texture => texture.dispose());
+    this.modelCache.forEach(model => {
+      model.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach(material => material.dispose());
+          } else {
+            child.material.dispose();
+          }
+        }
+      });
+    });
+    
+    this.textureCache.clear();
+    this.modelCache.clear();
+    this.audioCache.clear();
+    this.htmlCache.clear();
   }
 } 

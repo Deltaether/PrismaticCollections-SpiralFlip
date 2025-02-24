@@ -60,16 +60,78 @@ export class CDCasesService {
   private setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer): void {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     new THREE.TextureLoader().load('assets/graphic/composite.png', (texture) => {
-      // Create a darker version of the texture using ToneMapping
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 0.5; // Reduce this value to make it darker
-      texture.colorSpace = THREE.SRGBColorSpace;
+      // Create a custom post-processing shader to add red tint
+      const tintShader = {
+        uniforms: {
+          tDiffuse: { value: texture },
+          tintColor: { value: new THREE.Color(1.1, 0.9, 0.9) }, // Subtle red tint
+          tintIntensity: { value: 0.3 } // Adjust intensity of the tint
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D tDiffuse;
+          uniform vec3 tintColor;
+          uniform float tintIntensity;
+          varying vec2 vUv;
+          
+          void main() {
+            vec4 texel = texture2D(tDiffuse, vUv);
+            vec3 tinted = mix(texel.rgb, texel.rgb * tintColor, tintIntensity);
+            gl_FragColor = vec4(tinted, texel.a);
+          }
+        `
+      };
+
+      // Create a temporary scene and camera for post-processing
+      const tempScene = new THREE.Scene();
+      const tempCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
       
-      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+      // Create a plane with the tinted shader
+      const material = new THREE.ShaderMaterial(tintShader);
+      const plane = new THREE.PlaneGeometry(2, 2);
+      const quad = new THREE.Mesh(plane, material);
+      tempScene.add(quad);
+
+      // Render to a target
+      const renderTarget = new THREE.WebGLRenderTarget(
+        texture.image.width,
+        texture.image.height,
+        {
+          format: THREE.RGBAFormat,
+          type: THREE.UnsignedByteType
+        }
+      );
+
+      // Render the tinted texture
+      renderer.setRenderTarget(renderTarget);
+      renderer.render(tempScene, tempCamera);
+      renderer.setRenderTarget(null);
+
+      // Create environment map from the tinted texture
+      const tintedTexture = renderTarget.texture;
+      tintedTexture.colorSpace = THREE.SRGBColorSpace;
+      
+      // Set up tone mapping
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.5;
+
+      // Generate environment map
+      const envMap = pmremGenerator.fromEquirectangular(tintedTexture).texture;
       envMap.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = envMap;
-      
+
+      // Clean up
       texture.dispose();
+      tintedTexture.dispose();
+      renderTarget.dispose();
+      material.dispose();
+      plane.dispose();
       pmremGenerator.dispose();
     });
   }

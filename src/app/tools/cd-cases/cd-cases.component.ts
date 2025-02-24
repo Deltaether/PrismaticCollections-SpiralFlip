@@ -211,18 +211,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private async loadModels(): Promise<void> {
     try {
+      console.log('Starting model loading...');
       this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
-      
-      // Set first case as active after 5 seconds
-      setTimeout(() => {
-        this.cdCasesService.setActiveCase(this.cdCases, 0);
-      }, 5000);
-
-      console.log('Loaded CD cases:', this.cdCases.map(c => ({
-        id: c.id,
-        modelName: c.model.name,
-        hasArmature: !!c.armature
-      })));
       
       // Set up lights from config
       const lights = this.sceneService.setupLights(this.scene, this.config);
@@ -250,24 +240,37 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Set up ground
       const groundMesh = this.sceneService.setupGround(this.scene, this.config);
 
+      // Set first case as active after everything is set up
+      setTimeout(() => {
+        this.cdCasesService.setActiveCase(this.cdCases, 0);
+      }, 5000);
+
+      console.log('Model loading and setup complete');
+      return Promise.resolve();
     } catch (error) {
       console.error('Error loading model:', error);
+      return Promise.reject(error);
     }
   }
 
   ngAfterViewInit(): void {
+    console.log('CD Cases component initialization starting...');
     this.setupRenderer();
     this.setupControls();
+    
     this.loadModels().then(() => {
-      // Signal that CD cases component is ready
-      this.preloaderService.setComponentReady(true);
-      
+      console.log('Models loaded, completing initialization...');
       this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
       this.animate();
       this.addEventListeners();
+      
+      // Signal ready immediately after setup
+      console.log('CD Cases component fully initialized, signaling ready');
+      this.preloaderService.setComponentReady(true);
     }).catch(error => {
-      console.error('Error initializing CD cases:', error);
-      // Handle error appropriately
+      console.error('Error during CD Cases initialization:', error);
+      // Signal ready even on error to prevent getting stuck
+      this.preloaderService.setComponentReady(true);
     });
   }
 

@@ -11,7 +11,6 @@ import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
 import { PreloaderService } from './services/preloader.service';
 import { PreloaderComponent } from './tools/preloader/preloader.component';
-import { DefaultValuePipe } from './pipes/default-value.pipe';
 import { combineLatest } from 'rxjs';
 
 @Component({
@@ -27,8 +26,7 @@ import { combineLatest } from 'rxjs';
     MusicPlayerComponent,
     // CDCasesComponent
     CDCasesComponent,
-    PreloaderComponent,
-    DefaultValuePipe
+    PreloaderComponent
   ],
   template: `
     <!-- Show preloader while loading -->

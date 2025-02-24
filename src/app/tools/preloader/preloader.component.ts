@@ -16,7 +16,7 @@ import { PreloaderService } from '../../services/preloader.service';
             <li [class.loaded]="progressValue >= 25">Initializing Components</li>
             <li [class.loaded]="progressValue >= 50">Loading 3D Models</li>
             <li [class.loaded]="progressValue >= 75">Preparing Audio</li>
-            <li [class.loaded]="progressValue >= 100 && componentReady">Finalizing Setup</li>
+            <li [class.loaded]="progressValue >= 100">Finalizing Setup</li>
           </ul>
         </div>
         <div class="loader-progress">

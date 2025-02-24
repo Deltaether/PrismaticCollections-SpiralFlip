@@ -20,6 +20,14 @@ export class PreloaderService {
   private audioCache: Map<string, AudioBuffer> = new Map();
   private htmlCache: Map<string, string> = new Map();
 
+  // Add tracking for loaded assets by type
+  private loadedByType = {
+    textures: new Set<string>(),
+    models: new Set<string>(),
+    audio: new Set<string>(),
+    components: new Set<string>()
+  };
+
   constructor() {}
 
   getLoadingProgress(): Observable<number> {
@@ -35,12 +43,25 @@ export class PreloaderService {
   }
 
   setComponentReady(ready: boolean) {
+    console.log(`Setting component ready state to: ${ready}`);
     this.componentReady.next(ready);
     this.checkAllComplete();
   }
 
   private checkAllComplete() {
-    const isComplete = this.loadedAssets === this.totalAssets && this.componentReady.value;
+    const assetsComplete = this.loadedAssets === this.totalAssets;
+    const isComponentReady = this.componentReady.value;
+    
+    console.log(`Checking completion status:
+      - Assets loaded: ${this.loadedAssets}/${this.totalAssets} (${assetsComplete ? 'Complete' : 'Incomplete'})
+      - Component ready: ${isComponentReady}
+      - Overall status: ${assetsComplete && isComponentReady ? 'Complete' : 'Incomplete'}`);
+    
+    // Update progress to include component readiness
+    const progress = assetsComplete ? 100 : (this.loadedAssets / this.totalAssets) * 100;
+    this.loadingProgress.next(progress);
+    
+    const isComplete = assetsComplete && isComponentReady;
     this.loadingComplete.next(isComplete);
   }
 
@@ -54,7 +75,6 @@ export class PreloaderService {
     const assets = {
       textures: [
         'assets/graphic/composite.png',
-        'assets/graphic/jewel-case-_640.png',
       ],
       models: [
         'assets/3d/CD_Case/CD_Case.glb',
@@ -77,24 +97,25 @@ export class PreloaderService {
       ]
     };
 
-    // Count only required assets (textures, models, components)
+    // Count assets EXCLUDING audio since they're optional
     this.totalAssets = 
       assets.textures.length + 
       assets.models.length + 
-      assets.components.length;
+      assets.components.length; // Remove audio from total count
 
     const textureLoads = assets.textures.map(url => this.preloadTexture(url));
     const modelLoads = assets.models.map(url => this.preloadModel(url));
     const audioLoads = assets.audio.map(url => this.preloadAudio(url).pipe(
       catchError(error => {
         console.warn(`Audio file not found: ${url}`, error);
+        // Don't increment loadedAssets since audio files are not counted in total
         return of(null);
       })
     ));
     const componentLoads = assets.components.map(component => this.preloadComponent(component));
 
-    // Log model loading progress
-    console.log('Starting model loading...');
+    console.log('Starting asset loading...');
+    console.log(`Total required assets to load: ${this.totalAssets} (excluding optional audio)`);
 
     return forkJoin([
       forkJoin(textureLoads),
@@ -113,6 +134,7 @@ export class PreloaderService {
   private preloadTexture(url: string): Observable<void> {
     return new Observable(observer => {
       if (this.textureCache.has(url)) {
+        this.loadedByType.textures.add(url);
         this.loadedAssets++;
         this.updateProgress();
         observer.next();
@@ -126,6 +148,7 @@ export class PreloaderService {
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
           this.textureCache.set(url, texture);
+          this.loadedByType.textures.add(url);
           this.loadedAssets++;
           this.updateProgress();
           observer.next();
@@ -143,6 +166,7 @@ export class PreloaderService {
   private preloadModel(url: string): Observable<void> {
     return new Observable(observer => {
       if (this.modelCache.has(url)) {
+        this.loadedByType.models.add(url);
         this.loadedAssets++;
         this.updateProgress();
         observer.next();
@@ -158,6 +182,7 @@ export class PreloaderService {
         (gltf) => {
           console.log(`Model loaded successfully: ${url}`);
           this.modelCache.set(url, gltf.scene.clone());
+          this.loadedByType.models.add(url);
           this.loadedAssets++;
           this.updateProgress();
           observer.next();
@@ -173,6 +198,7 @@ export class PreloaderService {
         (error) => {
           console.error('Error loading model:', error);
           // Don't fail completely on model error, just log it
+          this.loadedByType.models.add(url);
           this.loadedAssets++;
           this.updateProgress();
           observer.next();
@@ -185,6 +211,8 @@ export class PreloaderService {
   private preloadAudio(url: string): Observable<void> {
     return new Observable(observer => {
       if (this.audioCache.has(url)) {
+        // Don't increment loadedAssets since audio is optional
+        this.loadedByType.audio.add(url);
         observer.next();
         observer.complete();
         return;
@@ -202,6 +230,8 @@ export class PreloaderService {
         })
         .then(audioBuffer => {
           this.audioCache.set(url, audioBuffer);
+          this.loadedByType.audio.add(url);
+          // Don't increment loadedAssets since audio is optional
           observer.next();
           observer.complete();
         })
@@ -215,6 +245,7 @@ export class PreloaderService {
   private preloadComponent(componentName: string): Observable<void> {
     return new Observable(observer => {
       if (this.htmlCache.has(componentName)) {
+        this.loadedByType.components.add(componentName);
         this.loadedAssets++;
         this.updateProgress();
         observer.next();
@@ -225,6 +256,7 @@ export class PreloaderService {
       // Simulate component preloading
       setTimeout(() => {
         this.htmlCache.set(componentName, 'loaded');
+        this.loadedByType.components.add(componentName);
         this.loadedAssets++;
         this.updateProgress();
         observer.next();

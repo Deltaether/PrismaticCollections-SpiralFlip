@@ -1,4 +1,4 @@
-import { Component, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IntroductionComponent } from './pages/introduction/introduction.component';
 import { DiscOneComponent } from './pages/disc-one/disc-one.component';
@@ -9,6 +9,8 @@ import { MusicPlayerComponent } from './tools/music-player/music-player.componen
 // import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
+import { PreloaderService } from './services/preloader.service';
+import { PreloaderComponent } from './tools/preloader/preloader.component';
 
 @Component({
   selector: 'app-root',
@@ -22,12 +24,13 @@ import { AudioService } from './tools/music-player/audio.service';
     InformationComponent,
     MusicPlayerComponent,
     // CDCasesComponent
-    CDCasesComponent
+    CDCasesComponent,
+    PreloaderComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']
 })
-export class PhantasiaComponent implements AfterViewInit {
+export class PhantasiaComponent implements AfterViewInit, OnInit {
   @ViewChild('mainContent') mainContent!: ElementRef;
   
   title = 'Project Phantasia';
@@ -36,15 +39,29 @@ export class PhantasiaComponent implements AfterViewInit {
   isAnimating = false;
   lastScrollTime = 0;
   scrollCooldown = 1000;
+  isLoaded: boolean = false;
 
   constructor(
     private elementRef: ElementRef,
-    private audioService: AudioService
+    private audioService: AudioService,
+    private preloaderService: PreloaderService
   ) {}
 
   ngAfterViewInit() {
     this.detectCurrentSection();
     this.updateAudioTrack(this.currentSection);
+  }
+
+  ngOnInit() {
+    this.preloaderService.preloadAssets().subscribe(
+      () => {
+        this.isLoaded = true;
+      },
+      error => {
+        console.error('Error loading assets:', error);
+        // Handle error appropriately
+      }
+    );
   }
 
   private updateAudioTrack(section: string) {

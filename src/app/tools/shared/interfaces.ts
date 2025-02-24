@@ -17,6 +17,11 @@ export interface CDCase {
   armature?: THREE.Object3D | null;
   isOpen: boolean;
   glowMaterial?: THREE.MeshBasicMaterial;
+  carouselIndex: number;
+  targetPosition: THREE.Vector3;
+  isActive: boolean;
+  isDeactivating: boolean;
+  currentLerpAlpha: number;
 }
 
 export interface Vector3Config {

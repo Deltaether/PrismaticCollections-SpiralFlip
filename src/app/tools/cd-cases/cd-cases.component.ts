@@ -9,6 +9,7 @@ import { CDCase, CaseSettings, SceneSettings, Config } from '../shared/interface
 import config from './config.json';
 import { CDCasesService } from './cd-cases.service';
 import { SceneService } from './scene.service';
+import { allCases, updateCasePositions } from './cases-data';
 
 @Component({
   selector: 'app-cd-cases',
@@ -160,6 +161,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     private cdCasesService: CDCasesService,
     private sceneService: SceneService
   ) {
+    // Load cases data
+    this.config.cdCases = updateCasePositions(allCases);
+    
     this.initScene();
     this.initCaseSettings();
     this.initHelpers();
@@ -206,6 +210,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private async loadModels(): Promise<void> {
     try {
       this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
+      
+      // Set first case as active after 5 seconds
+      setTimeout(() => {
+        this.cdCasesService.setActiveCase(this.cdCases, 0);
+      }, 5000);
+
       console.log('Loaded CD cases:', this.cdCases.map(c => ({
         id: c.id,
         modelName: c.model.name,
@@ -545,5 +555,29 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
     // Clean up label renderer
     this.labelRenderer.domElement.remove();
+  }
+
+  // Add wheel event handler for changing active case
+  @HostListener('wheel', ['$event'])
+  onWheel(event: WheelEvent) {
+    if (this.config.sceneSettings.camera.lockControls) {
+      event.preventDefault();
+      
+      // Find current active case index
+      const currentActiveIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
+      
+      // Calculate new index based on scroll direction
+      let newIndex = currentActiveIndex;
+      if (event.deltaY > 0) { // Scrolling down
+        newIndex = Math.min(currentActiveIndex + 1, this.cdCases.length - 1);
+      } else { // Scrolling up
+        newIndex = Math.max(currentActiveIndex - 1, 0);
+      }
+      
+      // Update active case if index changed
+      if (newIndex !== currentActiveIndex) {
+        this.cdCasesService.setActiveCase(this.cdCases, newIndex);
+      }
+    }
   }
 } 

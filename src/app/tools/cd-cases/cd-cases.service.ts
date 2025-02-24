@@ -8,6 +8,9 @@ import { Injectable } from '@angular/core';
 })
 export class CDCasesService {
   private clock = new THREE.Clock();
+  private readonly ANIMATION_DURATION = 1.0; // seconds
+  private readonly ACTIVE_X_POSITION = 1;
+  private readonly INACTIVE_X_POSITION = 2;
 
   async loadModels(
     config: Config,
@@ -57,8 +60,15 @@ export class CDCasesService {
   private setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer): void {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     new THREE.TextureLoader().load('assets/graphic/composite.png', (texture) => {
+      // Create a darker version of the texture using ToneMapping
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.5; // Reduce this value to make it darker
+      texture.colorSpace = THREE.SRGBColorSpace;
+      
       const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+      envMap.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = envMap;
+      
       texture.dispose();
       pmremGenerator.dispose();
     });
@@ -79,7 +89,6 @@ export class CDCasesService {
     model.traverse((node: THREE.Object3D) => {
       if (node.name === 'Armature') {
         armature = node;
-        console.log('Found armature in case:', caseConfig.id);
       }
     });
     
@@ -94,12 +103,17 @@ export class CDCasesService {
       isFlipped: false,
       isDragging: false,
       isOpen: false,
+      isActive: false,
+      isDeactivating: false,
       position: new THREE.Vector3(position.x, position.y, position.z),
       rotation: new THREE.Euler(rotation.x, rotation.y, rotation.z),
       momentum: new THREE.Vector2(),
       mixer: new THREE.AnimationMixer(model),
       animations: gltf.animations.map((anim: THREE.AnimationClip) => anim.clone()),
-      armature: armature
+      armature: armature,
+      carouselIndex: caseConfig.id - 1,
+      targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+      currentLerpAlpha: 0
     };
 
     this.setupMaterials(model, caseConfig);
@@ -238,9 +252,76 @@ export class CDCasesService {
     console.log('Animation started for case:', cdCase.id);
   }
 
+  setActiveCase(cdCases: CDCase[], activeIndex: number): void {
+    cdCases.forEach((cdCase, index) => {
+      const wasActive = cdCase.isActive;
+      const willBeActive = index === activeIndex;
+
+      // If case was active and will become inactive, set it to deactivating
+      if (wasActive && !willBeActive) {
+        cdCase.isDeactivating = true;
+        cdCase.isActive = false;
+      } else if (!wasActive && willBeActive) {
+        cdCase.isActive = true;
+        cdCase.isDeactivating = false;
+      }
+      
+      if (wasActive !== cdCase.isActive || cdCase.isDeactivating) {
+        // Reset animation progress when state changes
+        cdCase.currentLerpAlpha = 0;
+        cdCase.targetPosition.copy(cdCase.position);
+        
+        if (cdCase.isActive) {
+          cdCase.targetPosition.x = this.ACTIVE_X_POSITION;
+        } else if (cdCase.isDeactivating) {
+          cdCase.targetPosition.x = this.INACTIVE_X_POSITION;
+        }
+      }
+    });
+  }
+
+  private updateCasePosition(cdCase: CDCase, deltaTime: number): void {
+    if (cdCase.currentLerpAlpha < 1) {
+      cdCase.currentLerpAlpha = Math.min(
+        cdCase.currentLerpAlpha + (deltaTime / this.ANIMATION_DURATION),
+        1
+      );
+
+      // Custom easing function (cubic bezier-like)
+      const ease = (t: number): number => {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      };
+
+      const alpha = ease(cdCase.currentLerpAlpha);
+
+      // Interpolate position
+      let targetX;
+      if (cdCase.isActive) {
+        targetX = this.ACTIVE_X_POSITION;
+      } else if (cdCase.isDeactivating) {
+        targetX = this.INACTIVE_X_POSITION;
+      } else {
+        targetX = this.INACTIVE_X_POSITION;
+      }
+
+      cdCase.position.x = THREE.MathUtils.lerp(cdCase.position.x, targetX, alpha);
+      cdCase.model.position.copy(cdCase.position);
+
+      // Reset deactivating state when animation completes
+      if (cdCase.isDeactivating && cdCase.currentLerpAlpha >= 1) {
+        cdCase.isDeactivating = false;
+      }
+    }
+  }
+
   updateAnimations(cdCases: CDCase[]): void {
     const delta = this.clock.getDelta();
+    
     cdCases.forEach(cdCase => {
+      // Update position animations
+      this.updateCasePosition(cdCase, delta);
+      
+      // Update existing animations
       if (cdCase.mixer) {
         cdCase.mixer.update(delta);
       }

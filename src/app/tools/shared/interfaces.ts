@@ -50,6 +50,17 @@ export interface CaseConfig {
   };
 }
 
+export interface RedPlaneConfig {
+  position: Vector3Config;
+  rotation: Vector3Config;
+  size: {
+    width: number;
+    height: number;
+  };
+  color: string;
+  opacity: number;
+}
+
 export interface SceneConfig {
   camera: {
     position: Vector3Config;
@@ -91,6 +102,7 @@ export interface SceneConfig {
     opacity: number;
     size: number;
   };
+  redPlane: RedPlaneConfig;
 }
 
 export interface Config {

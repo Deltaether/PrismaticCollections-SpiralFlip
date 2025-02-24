@@ -119,6 +119,54 @@ export class SceneService {
     return groundMesh;
   }
 
+  setupRedPlane(scene: THREE.Scene, config: Config): THREE.Mesh {
+    const { redPlane } = config.sceneSettings;
+    const planeGeometry = new THREE.PlaneGeometry(redPlane.size.width, redPlane.size.height);
+    
+    // Load the texture
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('assets/graphic/composite_bg.png');
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    
+    const planeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: redPlane.opacity,
+      side: THREE.DoubleSide,
+      map: texture,
+      emissive: 0xffffff,
+      emissiveMap: texture,
+      emissiveIntensity: 0.5,
+      metalness: 0.0,
+      roughness: 0.2,
+      depthWrite: true,
+      depthTest: true
+    });
+    
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.position.set(
+      redPlane.position.x,
+      redPlane.position.y,
+      redPlane.position.z
+    );
+    planeMesh.rotation.set(
+      redPlane.rotation.x,
+      redPlane.rotation.y,
+      redPlane.rotation.z
+    );
+
+    planeMesh.castShadow = true;
+    planeMesh.receiveShadow = true;
+    
+    scene.add(planeMesh);
+    return planeMesh;
+  }
+
   createLightLabel(text: string): CSS2DObject {
     const div = document.createElement('div');
     div.className = 'light-label';

@@ -10,7 +10,6 @@ import config from './config.json';
 import { CDCasesService } from './cd-cases.service';
 import { SceneService } from './scene.service';
 import { allCases, updateCasePositions } from './cases-data';
-import { PreloaderService } from '../../services/preloader.service';
 
 @Component({
   selector: 'app-cd-cases',
@@ -158,10 +157,14 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     contextMenu: (event: Event) => void;
   } | null = null;
 
+  // Add new properties for wheel control
+  private lastWheelTime = 0;
+  private wheelDebounceTime = 250; // ms between wheel events
+  private isTransitioning = false;
+
   constructor(
     private cdCasesService: CDCasesService,
-    private sceneService: SceneService,
-    private preloaderService: PreloaderService
+    private sceneService: SceneService
   ) {
     // Load cases data
     this.config.cdCases = updateCasePositions(allCases);
@@ -194,6 +197,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.labelRenderer.domElement.style.position = 'absolute';
     this.labelRenderer.domElement.style.top = '0';
     this.labelRenderer.domElement.style.pointerEvents = 'none';
+
+    // Add red plane
+    this.sceneService.setupRedPlane(this.scene, this.config);
   }
 
   private initHelpers(): void {
@@ -211,8 +217,18 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private async loadModels(): Promise<void> {
     try {
-      console.log('Starting model loading...');
       this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
+      
+      // Set first case as active after 3 seconds
+      setTimeout(() => {
+        this.cdCasesService.setActiveCase(this.cdCases, 0);
+      }, 3000);
+
+      console.log('Loaded CD cases:', this.cdCases.map(c => ({
+        id: c.id,
+        modelName: c.model.name,
+        hasArmature: !!c.armature
+      })));
       
       // Set up lights from config
       const lights = this.sceneService.setupLights(this.scene, this.config);
@@ -240,37 +256,19 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Set up ground
       const groundMesh = this.sceneService.setupGround(this.scene, this.config);
 
-      // Set first case as active after everything is set up
-      setTimeout(() => {
-        this.cdCasesService.setActiveCase(this.cdCases, 0);
-      }, 5000);
-
-      console.log('Model loading and setup complete');
-      return Promise.resolve();
     } catch (error) {
       console.error('Error loading model:', error);
-      return Promise.reject(error);
     }
   }
 
   ngAfterViewInit(): void {
-    console.log('CD Cases component initialization starting...');
     this.setupRenderer();
     this.setupControls();
-    
     this.loadModels().then(() => {
-      console.log('Models loaded, completing initialization...');
+      // Add label renderer to DOM
       this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
       this.animate();
       this.addEventListeners();
-      
-      // Signal ready immediately after setup
-      console.log('CD Cases component fully initialized, signaling ready');
-      this.preloaderService.setComponentReady(true);
-    }).catch(error => {
-      console.error('Error during CD Cases initialization:', error);
-      // Signal ready even on error to prevent getting stuck
-      this.preloaderService.setComponentReady(true);
     });
   }
 
@@ -572,22 +570,39 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   onWheel(event: WheelEvent) {
     if (this.config.sceneSettings.camera.lockControls) {
       event.preventDefault();
+      event.stopPropagation();
+      
+      const now = Date.now();
+      if (now - this.lastWheelTime < this.wheelDebounceTime || this.isTransitioning) {
+        return;
+      }
       
       // Find current active case index
       const currentActiveIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
       
-      // Calculate new index based on scroll direction
-      let newIndex = currentActiveIndex;
-      if (event.deltaY > 0) { // Scrolling down
-        newIndex = Math.min(currentActiveIndex + 1, this.cdCases.length - 1);
-      } else { // Scrolling up
-        newIndex = Math.max(currentActiveIndex - 1, 0);
+      // If no case is active, activate the first one
+      if (currentActiveIndex === -1) {
+        this.cdCasesService.setActiveCase(this.cdCases, 0);
+        return;
       }
       
-      // Update active case if index changed
-      if (newIndex !== currentActiveIndex) {
-        this.cdCasesService.setActiveCase(this.cdCases, newIndex);
+      // Calculate new index based on scroll direction
+      let newIndex = currentActiveIndex;
+      if (event.deltaY > 0) { // Scrolling down/forward
+        newIndex = (currentActiveIndex + 1) % this.cdCases.length;
+      } else { // Scrolling up/backward
+        newIndex = (currentActiveIndex - 1 + this.cdCases.length) % this.cdCases.length;
       }
+      
+      // Update active case and set transition state
+      this.isTransitioning = true;
+      this.lastWheelTime = now;
+      this.cdCasesService.setActiveCase(this.cdCases, newIndex);
+      
+      // Reset transition state after animation duration
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, this.wheelDebounceTime);
     }
   }
 } 

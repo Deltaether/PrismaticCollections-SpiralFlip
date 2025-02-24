@@ -1,13 +1,15 @@
 import { CaseConfig } from '../../shared/interfaces';
 import config from '../config.json';
-import { discOne } from './disc-one';
-import { discTwo } from './disc-two';
+import { createCaseConfig } from './template';
 
-export const allCases: CaseConfig[] = [
-  discOne,
-  discTwo,
-  // Add more cases here
-];
+// Create 8 test cases
+export const allCases: CaseConfig[] = Array.from({ length: 5 }, (_, i) => 
+  createCaseConfig(
+    i + 1,
+    `Disc ${i + 1}`,
+    "An × Feryquitous"
+  )
+);
 
 export const updateCasePositions = (cases: CaseConfig[]): CaseConfig[] => {
   return cases.map((caseConfig, index) => ({

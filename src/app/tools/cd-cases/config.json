@@ -11,7 +11,7 @@
         "y": 0,
         "z": 0
       },
-      "lockControls": false
+      "lockControls": true
     },
     "lighting": {
       "ambient": {
@@ -59,6 +59,24 @@
       "y": 0,
       "opacity": 0.3,
       "size": 20
+    },
+    "redPlane": {
+      "position": {
+        "x": -0.05,
+        "y": -3.5,
+        "z": 1.3
+      },
+      "rotation": {
+        "x": 1.5708,
+        "y": -0.23,
+        "z": 1.57
+      },
+      "size": {
+        "width": 7.5,
+        "height": 5.3
+      },
+      "color": "#e9dcd2",
+      "opacity": 1
     }
   },
   "caseSettings": {
@@ -72,7 +90,7 @@
       "y": 0,
       "z": 1.57
     },
-    "stackOffset": 0.4,
+    "stackOffset": 0.3,
     "materials": {
       "cd": [
         {

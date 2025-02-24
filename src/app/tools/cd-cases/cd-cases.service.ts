@@ -315,37 +315,44 @@ export class CDCasesService {
   }
 
   setActiveCase(cdCases: CDCase[], activeIndex: number): void {
-    cdCases.forEach((cdCase, index) => {
-      const wasActive = cdCase.isActive;
-      const willBeActive = index === activeIndex;
+    // First, find the currently active case
+    const currentActiveCase = cdCases.find(cdCase => cdCase.isActive);
+    const targetCase = cdCases[activeIndex];
 
-      // If case was active and will become inactive, set it to deactivating
-      if (wasActive && !willBeActive) {
-        cdCase.isDeactivating = true;
+    if (currentActiveCase === targetCase) return; // No change needed
+
+    // Deactivate current case if exists
+    if (currentActiveCase) {
+      currentActiveCase.isActive = false;
+      currentActiveCase.isDeactivating = true;
+      currentActiveCase.currentLerpAlpha = 0;
+      currentActiveCase.targetPosition.copy(currentActiveCase.position);
+      currentActiveCase.targetPosition.x = this.INACTIVE_X_POSITION;
+    }
+
+    // Cancel any other ongoing transitions
+    cdCases.forEach(cdCase => {
+      if (cdCase !== currentActiveCase && cdCase !== targetCase) {
         cdCase.isActive = false;
-      } else if (!wasActive && willBeActive) {
-        cdCase.isActive = true;
         cdCase.isDeactivating = false;
-      }
-      
-      if (wasActive !== cdCase.isActive || cdCase.isDeactivating) {
-        // Reset animation progress when state changes
-        cdCase.currentLerpAlpha = 0;
-        cdCase.targetPosition.copy(cdCase.position);
-        
-        if (cdCase.isActive) {
-          cdCase.targetPosition.x = this.ACTIVE_X_POSITION;
-        } else if (cdCase.isDeactivating) {
-          cdCase.targetPosition.x = this.INACTIVE_X_POSITION;
-        }
+        cdCase.currentLerpAlpha = 1; // Complete any ongoing animations
+        cdCase.position.x = this.INACTIVE_X_POSITION;
+        cdCase.model.position.copy(cdCase.position);
       }
     });
+
+    // Activate new case
+    targetCase.isActive = true;
+    targetCase.isDeactivating = false;
+    targetCase.currentLerpAlpha = 0;
+    targetCase.targetPosition.copy(targetCase.position);
+    targetCase.targetPosition.x = this.ACTIVE_X_POSITION;
   }
 
   private updateCasePosition(cdCase: CDCase, deltaTime: number): void {
     if (cdCase.currentLerpAlpha < 1) {
       cdCase.currentLerpAlpha = Math.min(
-        cdCase.currentLerpAlpha + (deltaTime / this.ANIMATION_DURATION),
+        cdCase.currentLerpAlpha + (deltaTime / (this.ANIMATION_DURATION * 0.5)), // Make animation twice as fast
         1
       );
 
@@ -357,15 +364,7 @@ export class CDCasesService {
       const alpha = ease(cdCase.currentLerpAlpha);
 
       // Interpolate position
-      let targetX;
-      if (cdCase.isActive) {
-        targetX = this.ACTIVE_X_POSITION;
-      } else if (cdCase.isDeactivating) {
-        targetX = this.INACTIVE_X_POSITION;
-      } else {
-        targetX = this.INACTIVE_X_POSITION;
-      }
-
+      const targetX = cdCase.isActive ? this.ACTIVE_X_POSITION : this.INACTIVE_X_POSITION;
       cdCase.position.x = THREE.MathUtils.lerp(cdCase.position.x, targetX, alpha);
       cdCase.model.position.copy(cdCase.position);
 

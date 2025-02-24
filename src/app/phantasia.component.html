@@ -1,6 +1,20 @@
 <!-- Background Container -->
 <div class="bg-container"></div>
 
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-content">
+    <div class="nav-logo">Project Phantasia</div>
+    <ul class="nav-links">
+      <li><a (click)="scrollTo('introduction')" [class.active]="currentSection === 'introduction'">Introduction</a></li>
+      <li><a (click)="scrollTo('disc-1')" [class.active]="currentSection === 'disc-1'">Disc 1</a></li>
+      <li><a (click)="scrollTo('disc-2')" [class.active]="currentSection === 'disc-2'">Disc 2</a></li>
+      <li><a (click)="scrollTo('pv')" [class.active]="currentSection === 'pv'">PV</a></li>
+      <li><a (click)="scrollTo('information')" [class.active]="currentSection === 'information'">Information</a></li>
+    </ul>
+  </div>
+</nav>
+
 <!-- Main Container -->
 <div class="main-container" (wheel)="onWheel($event)">
   <!-- Main Content Area -->
@@ -26,25 +40,11 @@
     </section>
   </main>
 
-  <!-- Navigation Bar -->
-  <nav class="nav-bar">
-    <div class="nav-content">
-      <div class="nav-logo">Project Phantasia</div>
-      <ul class="nav-links">
-        <li><a (click)="scrollTo('introduction')" [class.active]="currentSection === 'introduction'">Introduction</a></li>
-        <li><a (click)="scrollTo('disc-1')" [class.active]="currentSection === 'disc-1'">Disc 1</a></li>
-        <li><a (click)="scrollTo('disc-2')" [class.active]="currentSection === 'disc-2'">Disc 2</a></li>
-        <li><a (click)="scrollTo('pv')" [class.active]="currentSection === 'pv'">PV</a></li>
-        <li><a (click)="scrollTo('information')" [class.active]="currentSection === 'information'">Information</a></li>
-      </ul>
-    </div>
-  </nav>
-
   <!-- Music Player -->
   <app-music-player></app-music-player>
 
-  <!-- Draggable CD Cases -->
+  <!-- CD Cases -->
   <app-cd-cases></app-cd-cases>
-  </div>
+</div>
 
 

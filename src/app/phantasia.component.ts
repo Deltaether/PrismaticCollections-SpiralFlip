@@ -1,4 +1,4 @@
-import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IntroductionComponent } from './pages/introduction/introduction.component';
 import { DiscOneComponent } from './pages/disc-one/disc-one.component';
@@ -9,9 +9,6 @@ import { MusicPlayerComponent } from './tools/music-player/music-player.componen
 // import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
-import { PreloaderService } from './services/preloader.service';
-import { PreloaderComponent } from './tools/preloader/preloader.component';
-import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -25,66 +22,12 @@ import { combineLatest } from 'rxjs';
     InformationComponent,
     MusicPlayerComponent,
     // CDCasesComponent
-    CDCasesComponent,
-    PreloaderComponent
+    CDCasesComponent
   ],
-  template: `
-    <!-- Show preloader while loading -->
-    <app-preloader *ngIf="!isLoaded" 
-      [progress]="loadingProgress$ | async">
-    </app-preloader>
-
-    <!-- Show main content when loaded -->
-    <ng-container *ngIf="isLoaded">
-      <div class="bg-container"></div>
-      <div class="main-container" (wheel)="onWheel($event)">
-        <main #mainContent>
-          <section id="introduction">
-            <app-introduction></app-introduction>
-          </section>
-          
-          <section id="disc-1">
-            <app-disc-one></app-disc-one>
-          </section>
-          
-          <section id="disc-2">
-            <app-disc-two></app-disc-two>
-          </section>
-          
-          <section id="pv">
-            <app-pv></app-pv>
-          </section>
-          
-          <section id="information">
-            <app-information></app-information>
-          </section>
-        </main>
-
-        <!-- Navigation Bar -->
-        <nav class="nav-bar">
-          <div class="nav-content">
-            <div class="nav-logo">Project Phantasia</div>
-            <ul class="nav-links">
-              <li><a (click)="scrollTo('introduction')" [class.active]="currentSection === 'introduction'">Introduction</a></li>
-              <li><a (click)="scrollTo('disc-1')" [class.active]="currentSection === 'disc-1'">Disc 1</a></li>
-              <li><a (click)="scrollTo('disc-2')" [class.active]="currentSection === 'disc-2'">Disc 2</a></li>
-              <li><a (click)="scrollTo('pv')" [class.active]="currentSection === 'pv'">PV</a></li>
-              <li><a (click)="scrollTo('information')" [class.active]="currentSection === 'information'">Information</a></li>
-            </ul>
-          </div>
-        </nav>
-
-        <!-- Music Player -->
-        <app-music-player></app-music-player>
-
-        <!-- CD Cases -->
-        <app-cd-cases></app-cd-cases>
-      </div>
-    </ng-container>
-  `,
+  templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss']
 })
-export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
+export class PhantasiaComponent implements AfterViewInit, OnInit {
   @ViewChild('mainContent') mainContent!: ElementRef;
   
   title = 'Project Phantasia';
@@ -93,13 +36,10 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   isAnimating = false;
   lastScrollTime = 0;
   scrollCooldown = 1000;
-  isLoaded: boolean = false;
-  loadingProgress$ = this.preloaderService.getLoadingProgress();
 
   constructor(
     private elementRef: ElementRef,
-    private audioService: AudioService,
-    private preloaderService: PreloaderService
+    private audioService: AudioService
   ) {}
 
   ngAfterViewInit() {
@@ -108,33 +48,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Start preloading and wait for both assets and component
-    combineLatest([
-      this.preloaderService.preloadAssets(),
-      this.preloaderService.getComponentReady()
-    ]).subscribe(
-      ([assetsLoaded, componentReady]) => {
-        if (assetsLoaded && componentReady) {
-          this.isLoaded = true;
-          this.initializeServices();
-        }
-      },
-      error => {
-        console.error('Error during initialization:', error);
-        // Handle error appropriately
-      }
-    );
-  }
-
-  private initializeServices(): void {
-    // Initialize your services here after preloading is complete
-    this.audioService.initializeWithPreloadedAssets();
-    // Add other service initializations as needed
-  }
-
-  ngOnDestroy() {
-    // Clean up cached resources
-    this.preloaderService.clearCache();
+    // Initialize any required resources here
   }
 
   private updateAudioTrack(section: string) {

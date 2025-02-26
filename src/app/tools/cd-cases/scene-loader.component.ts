@@ -1,14 +1,25 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+interface RunePosition {
+  x: number;
+  y: number;
+  scale: number;
+  delay: number;
+  opacity: number;
+  moveX: number;
+  moveY: number;
+}
 
 @Component({
   selector: 'app-scene-loader',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="loader-container" [class.visible]="isVisible">
+    <div class="loader-container" [class.visible]="isVisible || devMode">
       <div class="magical-circle outer"></div>
       <div class="magical-circle"></div>
+      <div class="rune-effects"></div>
       <div class="decorative-elements">
         <div class="corner-line top-left"></div>
         <div class="corner-line top-right"></div>
@@ -26,15 +37,13 @@ import { CommonModule } from '@angular/common';
         <div class="beam beam-4"></div>
       </div>
       <div class="rune-circle">
-        <div class="rune" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32]" 
-             [style.--delay]="i * 0.2 + 's'"
-             [style.--float-x]="(i % 3 ? 30 : -30) + 'px'"
-             [style.--float-y]="(i % 2 ? 25 : -25) + 'px'"
-             [style.--float-x-alt]="(i % 2 ? -20 : 20) + 'px'"
-             [style.--float-y-alt]="(i % 3 ? -30 : 30) + 'px'"
-             [style.--color-shift]="i * 11.25 + 'deg'"
-             [style.--scale]="0.5 + (i % 5) * 0.2"
-             [style.--base-opacity]="0.3 + (i % 3) * 0.2">
+        <div class="rune" *ngFor="let rune of runes" 
+             [style.left]="rune.x + 'vw'"
+             [style.top]="rune.y + 'vh'"
+             [style.--move-x]="rune.moveX + 'px'"
+             [style.--move-y]="rune.moveY + 'px'"
+             [style.--scale]="rune.scale"
+             [style.--base-opacity]="rune.opacity">
         </div>
       </div>
       <div class="content">
@@ -209,24 +218,26 @@ import { CommonModule } from '@angular/common';
 
     .rune-circle {
       position: absolute;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .rune {
       position: absolute;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       background: linear-gradient(135deg, 
         rgba(255, 190, 110, 0.8), 
         rgba(255, 160, 70, 0.6)
       );
       clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-      animation: rune-float 12s infinite ease-in-out var(--delay),
-                 rune-pulse 3s infinite ease-in-out calc(var(--delay) + 1s),
-                 color-shift 6s infinite ease-in-out calc(var(--delay) + 2s);
+      transform-origin: center center;
+      transform: translate(0, 0) scale(var(--scale));
+      opacity: var(--base-opacity);
+      will-change: transform;
+      animation: rune-move 8s infinite linear;
 
       &::before {
         content: '';
@@ -235,18 +246,38 @@ import { CommonModule } from '@angular/common';
         height: 100%;
         background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.6));
         mix-blend-mode: screen;
+        animation: sparkle 4s infinite linear;
       }
 
-      @for $i from 1 through 32 {
-        &:nth-child(#{$i}) {
-          --x-pos: #{random(100)}vw;
-          --y-pos: #{random(100)}vh;
-          left: var(--x-pos);
-          top: var(--y-pos);
-          transform: scale(#{random(100) * 0.01 + 0.5});
-          opacity: #{random(60) * 0.01 + 0.2};
-        }
+      &::after {
+        content: '';
+        position: absolute;
+        width: 140%;
+        height: 140%;
+        top: -20%;
+        left: -20%;
+        background: radial-gradient(circle at center,
+          rgba(120, 200, 255, 0.15) 0%,
+          rgba(70, 150, 255, 0.1) 30%,
+          transparent 70%
+        );
+        mix-blend-mode: screen;
+        opacity: 0.5;
       }
+    }
+
+    .rune-effects {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      background: radial-gradient(circle at center,
+        transparent 0%,
+        rgba(60, 120, 255, 0.03) 50%,
+        transparent 100%
+      );
+      animation: effect-pulse 8s infinite ease-in-out;
     }
 
     .light-beams {
@@ -373,17 +404,22 @@ import { CommonModule } from '@angular/common';
       50% { opacity: 0.5; }
     }
 
-    @keyframes rune-float {
-      0% { transform: translate(0, 0) scale(var(--scale, 1)) rotate(0deg); }
-      25% { transform: translate(var(--float-x), var(--float-y)) scale(calc(var(--scale, 1) * 1.2)) rotate(90deg); }
-      50% { transform: translate(var(--float-x-alt), var(--float-y-alt)) scale(var(--scale, 1)) rotate(180deg); }
-      75% { transform: translate(calc(var(--float-x) * -0.5), calc(var(--float-y) * -0.5)) scale(calc(var(--scale, 1) * 1.1)) rotate(270deg); }
-      100% { transform: translate(0, 0) scale(var(--scale, 1)) rotate(360deg); }
-    }
-
-    @keyframes rune-pulse {
-      0%, 100% { opacity: calc(var(--base-opacity, 0.4) * 0.7); filter: blur(0px); }
-      50% { opacity: calc(var(--base-opacity, 0.4) * 1.3); filter: blur(1px); }
+    @keyframes rune-move {
+      0% {
+        transform: translate(0, 0) scale(var(--scale)) rotate(0deg);
+      }
+      25% {
+        transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(90deg);
+      }
+      50% {
+        transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(180deg);
+      }
+      75% {
+        transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(270deg);
+      }
+      100% {
+        transform: translate(0, 0) scale(var(--scale)) rotate(360deg);
+      }
     }
 
     @keyframes beam-rotate {
@@ -396,12 +432,48 @@ import { CommonModule } from '@angular/common';
       50% { opacity: 0.5; width: 120%; }
     }
 
-    @keyframes color-shift {
-      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
-      50% { filter: hue-rotate(var(--color-shift)) brightness(1.3); }
+    @keyframes sparkle {
+      0%, 100% {
+        opacity: 0.4;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes effect-pulse {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+      }
     }
   `]
 })
-export class SceneLoaderComponent {
+export class SceneLoaderComponent implements OnInit {
   @Input() isVisible = true;
+  @Input() devMode = false;
+  runes: RunePosition[] = [];
+
+  ngOnInit() {
+    this.generateRunePositions();
+  }
+
+  private generateRunePositions() {
+    const numRunes = 48;
+    this.runes = Array.from({ length: numRunes }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      scale: 0.6 + Math.random() * 1.4,
+      delay: 0,
+      opacity: 0.3 + Math.random() * 0.5,
+      moveX: 15 + Math.random() * 20,
+      moveY: 15 + Math.random() * 20
+    }));
+  }
 } 

@@ -10,17 +10,15 @@ import config from './config.json';
 import { CDCasesService } from './cd-cases.service';
 import { SceneService } from './scene.service';
 import { allCases, updateCasePositions } from './cases-data';
+import { SceneLoaderComponent } from './scene-loader.component';
 
 @Component({
   selector: 'app-cd-cases',
   standalone: true,
-  imports: [CommonModule, DebugMenuComponent],
+  imports: [CommonModule, DebugMenuComponent, SceneLoaderComponent],
   template: `
     <div class="cd-container">
-      <div class="loading-overlay" *ngIf="isLoading">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading Scene...</div>
-      </div>
+      <app-scene-loader [isVisible]="isLoading"></app-scene-loader>
       <canvas #canvas [style.opacity]="isLoading ? '0' : '1'"></canvas>
       <div #labelRenderer [style.opacity]="isLoading ? '0' : '1'"></div>
       <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'">
@@ -59,40 +57,6 @@ import { allCases, updateCasePositions } from './cases-data';
       width: 100%;
       height: 100%;
       z-index: 10;
-    }
-
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      transition: opacity 0.5s ease;
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    .loading-text {
-      color: white;
-      margin-top: 20px;
-      font-family: Arial, sans-serif;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     canvas {

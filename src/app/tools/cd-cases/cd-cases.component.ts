@@ -17,9 +17,13 @@ import { allCases, updateCasePositions } from './cases-data';
   imports: [CommonModule, DebugMenuComponent],
   template: `
     <div class="cd-container">
-      <canvas #canvas></canvas>
-      <div #labelRenderer></div>
-      <div class="case-indicators">
+      <div class="loading-overlay" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Scene...</div>
+      </div>
+      <canvas #canvas [style.opacity]="isLoading ? '0' : '1'"></canvas>
+      <div #labelRenderer [style.opacity]="isLoading ? '0' : '1'"></div>
+      <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'">
         <div *ngFor="let cdCase of cdCases" 
              class="case-indicator"
              [class.open]="cdCase.isOpen">
@@ -57,21 +61,45 @@ import { allCases, updateCasePositions } from './cases-data';
       z-index: 10;
     }
 
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    .loading-text {
+      color: white;
+      margin-top: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     canvas {
       width: 100%;
       height: 100%;
       display: block;
-    }
-
-    .light-label {
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-      padding: 2px 4px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 3px;
-      pointer-events: none;
-      user-select: none;
+      transition: opacity 0.5s ease;
     }
 
     .case-indicators {
@@ -82,6 +110,7 @@ import { allCases, updateCasePositions } from './cases-data';
       background: rgba(0, 0, 0, 0.7);
       padding: 10px;
       border-radius: 5px;
+      transition: opacity 0.5s ease;
     }
 
     .case-indicator {
@@ -116,6 +145,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private dragPlane = new THREE.Plane(this.planeNormal);
   private clock = new THREE.Clock();
   private config: Config = config;
+  private loadingPromises: Promise<void>[] = [];
+  public isLoading = true;
 
   // Convert config to legacy format for debug menu compatibility
   public sceneSettings: SceneSettings = {
@@ -217,59 +248,80 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private async loadModels(): Promise<void> {
     try {
-      this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
+      // Create a promise for loading CD cases
+      const casesPromise = this.cdCasesService.loadModels(this.config, this.scene, this.renderer)
+        .then(cases => {
+          this.cdCases = cases;
+          console.log('Loaded CD cases:', this.cdCases.map(c => ({
+            id: c.id,
+            modelName: c.model.name,
+            hasArmature: !!c.armature
+          })));
+        });
+      this.loadingPromises.push(casesPromise);
+
+      // Create a promise for loading environment map and setting up lights
+      const setupPromise = new Promise<void>(async (resolve) => {
+        // Set up lights from config
+        const lights = this.sceneService.setupLights(this.scene, this.config);
+        this.ambientLight = lights.ambientLight;
+        this.mainLight = lights.mainLight;
+        this.fillLight = lights.fillLight;
+        this.backLight = lights.backLight;
+
+        // Add light helpers with labels
+        this.mainLightHelper = new THREE.DirectionalLightHelper(this.mainLight, 1);
+        this.fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 1);
+        this.backLightHelper = new THREE.DirectionalLightHelper(this.backLight, 1);
+        
+        // Add labels to lights
+        const mainLabel = this.sceneService.createLightLabel('Main Light');
+        const fillLabel = this.sceneService.createLightLabel('Fill Light');
+        const backLabel = this.sceneService.createLightLabel('Back Light');
+        
+        this.mainLight.add(mainLabel);
+        this.fillLight.add(fillLabel);
+        this.backLight.add(backLabel);
+        
+        this.scene.add(this.mainLightHelper, this.fillLightHelper, this.backLightHelper);
+
+        // Set up ground
+        const groundMesh = this.sceneService.setupGround(this.scene, this.config);
+        resolve();
+      });
+      this.loadingPromises.push(setupPromise);
+
+      // Wait for all loading promises to complete
+      await Promise.all(this.loadingPromises);
       
-      // Set first case as active after 3 seconds
+      // Add label renderer to DOM and start animation
+      this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
+      this.animate();
+      this.addEventListeners();
+
+      // Ensure everything is rendered before showing
+      this.renderer.render(this.scene, this.camera);
+      this.labelRenderer.render(this.scene, this.camera);
+
+      // Hide loading screen first
+      this.isLoading = false;
+
+      // Wait for the scene to be visible and stable before activating the first case
       setTimeout(() => {
+        console.log('Scene is stable, activating first case');
         this.cdCasesService.setActiveCase(this.cdCases, 0);
-      }, 3000);
-
-      console.log('Loaded CD cases:', this.cdCases.map(c => ({
-        id: c.id,
-        modelName: c.model.name,
-        hasArmature: !!c.armature
-      })));
-      
-      // Set up lights from config
-      const lights = this.sceneService.setupLights(this.scene, this.config);
-      this.ambientLight = lights.ambientLight;
-      this.mainLight = lights.mainLight;
-      this.fillLight = lights.fillLight;
-      this.backLight = lights.backLight;
-
-      // Add light helpers with labels
-      this.mainLightHelper = new THREE.DirectionalLightHelper(this.mainLight, 1);
-      this.fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 1);
-      this.backLightHelper = new THREE.DirectionalLightHelper(this.backLight, 1);
-      
-      // Add labels to lights
-      const mainLabel = this.sceneService.createLightLabel('Main Light');
-      const fillLabel = this.sceneService.createLightLabel('Fill Light');
-      const backLabel = this.sceneService.createLightLabel('Back Light');
-      
-      this.mainLight.add(mainLabel);
-      this.fillLight.add(fillLabel);
-      this.backLight.add(backLabel);
-      
-      this.scene.add(this.mainLightHelper, this.fillLightHelper, this.backLightHelper);
-
-      // Set up ground
-      const groundMesh = this.sceneService.setupGround(this.scene, this.config);
+      }, 3000); // Full 3 second delay after loading is complete
 
     } catch (error) {
-      console.error('Error loading model:', error);
+      console.error('Error loading scene:', error);
+      this.isLoading = false;
     }
   }
 
   ngAfterViewInit(): void {
     this.setupRenderer();
     this.setupControls();
-    this.loadModels().then(() => {
-      // Add label renderer to DOM
-      this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
-      this.animate();
-      this.addEventListeners();
-    });
+    this.loadModels();
   }
 
   private setupRenderer(): void {

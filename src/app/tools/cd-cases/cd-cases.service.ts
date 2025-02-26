@@ -19,25 +19,41 @@ export class CDCasesService {
   ): Promise<CDCase[]> {
     const loader = new GLTFLoader();
     const cdCases: CDCase[] = [];
+    const loadingPromises: Promise<any>[] = [];
 
     try {
-      const gltf = await loader.loadAsync('assets/3d/CD_Case/CD_Case.glb');
+      // Load the GLTF model
+      const modelPromise = loader.loadAsync('assets/3d/CD_Case/CD_Case.glb');
+      loadingPromises.push(modelPromise);
+
+      // Load environment map
+      const envMapPromise = new Promise<void>((resolve) => {
+        new THREE.TextureLoader().load('assets/graphic/composite.png', (texture) => {
+          this.setupEnvironmentMap(scene, renderer, texture);
+          resolve();
+        });
+      });
+      loadingPromises.push(envMapPromise);
+
+      // Wait for model and environment map to load
+      const [gltf] = await Promise.all(loadingPromises);
       
       // Log loaded animations and bones
       console.log('Loaded animations:', gltf.animations);
       this.logBones(gltf.scene);
-      
-      // Create environment map
-      this.setupEnvironmentMap(scene, renderer);
 
       // Create CD cases from config
-      for (const caseConfig of config.cdCases) {
-        const cdCase = await this.createCDCase(gltf, caseConfig, scene);
-        cdCases.push(cdCase);
-      }
+      const casesPromises = config.cdCases.map(caseConfig => 
+        this.createCDCase(gltf, caseConfig, scene)
+      );
+      
+      // Wait for all CD cases to be created
+      const cases = await Promise.all(casesPromises);
+      cdCases.push(...cases);
 
     } catch (error) {
       console.error('Error loading model:', error);
+      throw error; // Re-throw to handle in component
     }
 
     return cdCases;
@@ -57,83 +73,82 @@ export class CDCasesService {
     });
   }
 
-  private setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer): void {
+  private setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer, texture: THREE.Texture): void {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    new THREE.TextureLoader().load('assets/graphic/composite.png', (texture) => {
-      // Create a custom post-processing shader to add red tint
-      const tintShader = {
-        uniforms: {
-          tDiffuse: { value: texture },
-          tintColor: { value: new THREE.Color(1.1, 0.9, 0.9) }, // Subtle red tint
-          tintIntensity: { value: 0.3 } // Adjust intensity of the tint
-        },
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          uniform sampler2D tDiffuse;
-          uniform vec3 tintColor;
-          uniform float tintIntensity;
-          varying vec2 vUv;
-          
-          void main() {
-            vec4 texel = texture2D(tDiffuse, vUv);
-            vec3 tinted = mix(texel.rgb, texel.rgb * tintColor, tintIntensity);
-            gl_FragColor = vec4(tinted, texel.a);
-          }
-        `
-      };
-
-      // Create a temporary scene and camera for post-processing
-      const tempScene = new THREE.Scene();
-      const tempCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-      
-      // Create a plane with the tinted shader
-      const material = new THREE.ShaderMaterial(tintShader);
-      const plane = new THREE.PlaneGeometry(2, 2);
-      const quad = new THREE.Mesh(plane, material);
-      tempScene.add(quad);
-
-      // Render to a target
-      const renderTarget = new THREE.WebGLRenderTarget(
-        texture.image.width,
-        texture.image.height,
-        {
-          format: THREE.RGBAFormat,
-          type: THREE.UnsignedByteType
+    
+    // Create a custom post-processing shader to add red tint
+    const tintShader = {
+      uniforms: {
+        tDiffuse: { value: texture },
+        tintColor: { value: new THREE.Color(1.1, 0.9, 0.9) }, // Subtle red tint
+        tintIntensity: { value: 0.3 } // Adjust intensity of the tint
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
-      );
+      `,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec3 tintColor;
+        uniform float tintIntensity;
+        varying vec2 vUv;
+        
+        void main() {
+          vec4 texel = texture2D(tDiffuse, vUv);
+          vec3 tinted = mix(texel.rgb, texel.rgb * tintColor, tintIntensity);
+          gl_FragColor = vec4(tinted, texel.a);
+        }
+      `
+    };
 
-      // Render the tinted texture
-      renderer.setRenderTarget(renderTarget);
-      renderer.render(tempScene, tempCamera);
-      renderer.setRenderTarget(null);
+    // Create a temporary scene and camera for post-processing
+    const tempScene = new THREE.Scene();
+    const tempCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    
+    // Create a plane with the tinted shader
+    const material = new THREE.ShaderMaterial(tintShader);
+    const plane = new THREE.PlaneGeometry(2, 2);
+    const quad = new THREE.Mesh(plane, material);
+    tempScene.add(quad);
 
-      // Create environment map from the tinted texture
-      const tintedTexture = renderTarget.texture;
-      tintedTexture.colorSpace = THREE.SRGBColorSpace;
-      
-      // Set up tone mapping
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 0.5;
+    // Render to a target
+    const renderTarget = new THREE.WebGLRenderTarget(
+      texture.image.width,
+      texture.image.height,
+      {
+        format: THREE.RGBAFormat,
+        type: THREE.UnsignedByteType
+      }
+    );
 
-      // Generate environment map
-      const envMap = pmremGenerator.fromEquirectangular(tintedTexture).texture;
-      envMap.mapping = THREE.EquirectangularReflectionMapping;
-      scene.environment = envMap;
+    // Render the tinted texture
+    renderer.setRenderTarget(renderTarget);
+    renderer.render(tempScene, tempCamera);
+    renderer.setRenderTarget(null);
 
-      // Clean up
-      texture.dispose();
-      tintedTexture.dispose();
-      renderTarget.dispose();
-      material.dispose();
-      plane.dispose();
-      pmremGenerator.dispose();
-    });
+    // Create environment map from the tinted texture
+    const tintedTexture = renderTarget.texture;
+    tintedTexture.colorSpace = THREE.SRGBColorSpace;
+    
+    // Set up tone mapping
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.5;
+
+    // Generate environment map
+    const envMap = pmremGenerator.fromEquirectangular(tintedTexture).texture;
+    envMap.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = envMap;
+
+    // Clean up
+    texture.dispose();
+    tintedTexture.dispose();
+    renderTarget.dispose();
+    material.dispose();
+    plane.dispose();
+    pmremGenerator.dispose();
   }
 
   private async createCDCase(

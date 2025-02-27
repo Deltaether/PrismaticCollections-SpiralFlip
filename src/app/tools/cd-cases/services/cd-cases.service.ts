@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { CDCase, Config } from '../shared/interfaces';
+import { CDCase, Config } from '../../shared/interfaces';
 import { Injectable } from '@angular/core';
 
 @Injectable({

@@ -1,16 +1,19 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { DebugMenuComponent } from '../debug-menu/debug-menu.component';
 import { CDCase, CaseSettings, SceneSettings, Config } from '../shared/interfaces';
 import config from './config.json';
-import { CDCasesService } from './cd-cases.service';
+import { CDCasesService } from './services/cd-cases.service';
 import { SceneService } from './scene.service';
 import { allCases, updateCasePositions } from './cases-data';
 import { SceneLoaderComponent } from './scene-loader.component';
+import { CDCasesEventsService } from './services/cd-cases-events.service';
+import { CDCasesAnimationService } from './services/cd-cases-animation.service';
+import { CDCasesDebugService } from './services/cd-cases-debug.service';
+import { CDCasesStateService } from './services/cd-cases-state.service';
 
 @Component({
   selector: 'app-cd-cases',
@@ -42,52 +45,7 @@ import { SceneLoaderComponent } from './scene-loader.component';
       [onResetToDefault]="resetToDefault.bind(this)"
     ></app-debug-menu>
   `,
-  styles: [`
-    :host {
-      display: block;
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .cd-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      transition: opacity 0.5s ease;
-    }
-
-    .case-indicators {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px;
-      border-radius: 5px;
-      transition: opacity 0.5s ease;
-    }
-
-    .case-indicator {
-      color: white;
-      margin: 5px 0;
-      font-family: Arial, sans-serif;
-      transition: color 0.3s ease;
-    }
-
-    .case-indicator.open {
-      color: #00ff00;
-    }
-  `]
+  styleUrls: ['./cd-cases.component.scss']
 })
 export class CDCasesComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -98,21 +56,24 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
-  private raycaster = new THREE.Raycaster();
-  private mouse = new THREE.Vector2();
   private animationId: number | null = null;
   public cdCases: CDCase[] = [];
-  private selectedCase: CDCase | null = null;
-  private dragStartPosition = new THREE.Vector2();
-  private dragOffset = new THREE.Vector3();
-  private planeNormal = new THREE.Vector3(0, 0, 1);
-  private dragPlane = new THREE.Plane(this.planeNormal);
-  private clock = new THREE.Clock();
   private config: Config = config;
   private loadingPromises: Promise<void>[] = [];
   public isLoading = true;
 
-  // Convert config to legacy format for debug menu compatibility
+  // Lights
+  private ambientLight!: THREE.AmbientLight;
+  private mainLight!: THREE.DirectionalLight;
+  private fillLight!: THREE.DirectionalLight;
+  private backLight!: THREE.DirectionalLight;
+
+  // Light helpers
+  private mainLightHelper!: THREE.DirectionalLightHelper;
+  private fillLightHelper!: THREE.DirectionalLightHelper;
+  private backLightHelper!: THREE.DirectionalLightHelper;
+
+  // Debug settings
   public sceneSettings: SceneSettings = {
     cameraX: this.config.sceneSettings.camera.position.x,
     cameraY: this.config.sceneSettings.camera.position.y,
@@ -134,152 +95,16 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   
   public caseSettings: CaseSettings = {};
 
-  private ambientLight!: THREE.AmbientLight;
-  private mainLight!: THREE.DirectionalLight;
-  private fillLight!: THREE.DirectionalLight;
-  private backLight!: THREE.DirectionalLight;
-
-  private gridHelper!: THREE.GridHelper;
-  private axesHelper!: THREE.AxesHelper;
-  private mainLightHelper!: THREE.DirectionalLightHelper;
-  private fillLightHelper!: THREE.DirectionalLightHelper;
-  private backLightHelper!: THREE.DirectionalLightHelper;
-
-  private _boundListeners: {
-    mouseDown: (event: MouseEvent) => void;
-    mouseMove: (event: MouseEvent) => void;
-    mouseUp: (event: MouseEvent) => void;
-    contextMenu: (event: Event) => void;
-  } | null = null;
-
-  // Add new properties for wheel control
-  private lastWheelTime = 0;
-  private wheelDebounceTime = 250; // ms between wheel events
-  private isTransitioning = false;
-
   constructor(
     private cdCasesService: CDCasesService,
-    private sceneService: SceneService
+    private sceneService: SceneService,
+    private eventsService: CDCasesEventsService,
+    private animationService: CDCasesAnimationService,
+    private debugService: CDCasesDebugService,
+    private stateService: CDCasesStateService
   ) {
     // Load cases data
     this.config.cdCases = updateCasePositions(allCases);
-    
-    this.initScene();
-    this.initCaseSettings();
-    this.initHelpers();
-  }
-
-  private initCaseSettings(): void {
-    this.config.cdCases.forEach(caseConfig => {
-      this.caseSettings[caseConfig.id] = {
-        positionX: caseConfig.position.x,
-        positionY: caseConfig.position.y,
-        positionZ: caseConfig.position.z,
-        rotationX: caseConfig.rotation.x,
-        rotationY: caseConfig.rotation.y,
-        rotationZ: caseConfig.rotation.z
-      };
-    });
-  }
-
-  private initScene(): void {
-    this.scene = this.sceneService.setupScene(this.config);
-    this.camera = this.sceneService.setupCamera(this.config);
-
-    // Initialize CSS2D renderer for labels
-    this.labelRenderer = new CSS2DRenderer();
-    this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    this.labelRenderer.domElement.style.position = 'absolute';
-    this.labelRenderer.domElement.style.top = '0';
-    this.labelRenderer.domElement.style.pointerEvents = 'none';
-
-    // Add red plane
-    this.sceneService.setupRedPlane(this.scene, this.config);
-  }
-
-  private initHelpers(): void {
-    // Grid helper
-    this.gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
-    this.gridHelper.position.y = this.config.sceneSettings.ground.y;
-    this.scene.add(this.gridHelper);
-
-    // Axes helper (RGB = XYZ)
-    this.axesHelper = new THREE.AxesHelper(5);
-    this.scene.add(this.axesHelper);
-
-    // Light helpers will be added after lights are created
-  }
-
-  private async loadModels(): Promise<void> {
-    try {
-      // Create a promise for loading CD cases
-      const casesPromise = this.cdCasesService.loadModels(this.config, this.scene, this.renderer)
-        .then(cases => {
-          this.cdCases = cases;
-          console.log('Loaded CD cases:', this.cdCases.map(c => ({
-            id: c.id,
-            modelName: c.model.name,
-            hasArmature: !!c.armature
-          })));
-        });
-      this.loadingPromises.push(casesPromise);
-
-      // Create a promise for loading environment map and setting up lights
-      const setupPromise = new Promise<void>(async (resolve) => {
-        // Set up lights from config
-        const lights = this.sceneService.setupLights(this.scene, this.config);
-        this.ambientLight = lights.ambientLight;
-        this.mainLight = lights.mainLight;
-        this.fillLight = lights.fillLight;
-        this.backLight = lights.backLight;
-
-        // Add light helpers with labels
-        this.mainLightHelper = new THREE.DirectionalLightHelper(this.mainLight, 1);
-        this.fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 1);
-        this.backLightHelper = new THREE.DirectionalLightHelper(this.backLight, 1);
-        
-        // Add labels to lights
-        const mainLabel = this.sceneService.createLightLabel('Main Light');
-        const fillLabel = this.sceneService.createLightLabel('Fill Light');
-        const backLabel = this.sceneService.createLightLabel('Back Light');
-        
-        this.mainLight.add(mainLabel);
-        this.fillLight.add(fillLabel);
-        this.backLight.add(backLabel);
-        
-        this.scene.add(this.mainLightHelper, this.fillLightHelper, this.backLightHelper);
-
-        // Set up ground
-        const groundMesh = this.sceneService.setupGround(this.scene, this.config);
-        resolve();
-      });
-      this.loadingPromises.push(setupPromise);
-
-      // Wait for all loading promises to complete
-      await Promise.all(this.loadingPromises);
-      
-      // Add label renderer to DOM and start animation
-      this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
-      this.animate();
-      this.addEventListeners();
-
-      // Ensure everything is rendered before showing
-      this.renderer.render(this.scene, this.camera);
-      this.labelRenderer.render(this.scene, this.camera);
-
-      // Hide loading screen first
-      this.isLoading = false;
-
-      // Wait for the scene to be visible and stable before activating the first case
-      setTimeout(() => {
-        console.log('Scene is stable, activating first case');
-        this.cdCasesService.setActiveCase(this.cdCases, 0);
-      }, 3000); // Full 3 second delay after loading is complete
-
-    } catch (error) {
-      console.error('Error loading scene:', error);
-      this.isLoading = false;
-    }
   }
 
   ngAfterViewInit(): void {
@@ -290,10 +115,138 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private setupRenderer(): void {
     this.renderer = this.sceneService.setupRenderer(this.canvasRef.nativeElement, this.config);
+    this.scene = this.sceneService.setupScene(this.config);
+    this.camera = this.sceneService.setupCamera(this.config);
+
+    // Initialize CSS2D renderer for labels
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0';
+    this.labelRenderer.domElement.style.pointerEvents = 'none';
+
+    // Set up lights
+    const lights = this.sceneService.setupLights(this.scene, this.config);
+    this.ambientLight = lights.ambientLight;
+    this.mainLight = lights.mainLight;
+    this.fillLight = lights.fillLight;
+    this.backLight = lights.backLight;
+
+    // Add light helpers with labels
+    this.mainLightHelper = new THREE.DirectionalLightHelper(this.mainLight, 1);
+    this.fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 1);
+    this.backLightHelper = new THREE.DirectionalLightHelper(this.backLight, 1);
+    
+    // Add labels to lights
+    const mainLabel = this.sceneService.createLightLabel('Main Light');
+    const fillLabel = this.sceneService.createLightLabel('Fill Light');
+    const backLabel = this.sceneService.createLightLabel('Back Light');
+    
+    this.mainLight.add(mainLabel);
+    this.fillLight.add(fillLabel);
+    this.backLight.add(backLabel);
+    
+    this.scene.add(this.mainLightHelper, this.fillLightHelper, this.backLightHelper);
+
+    // Set up ground
+    this.sceneService.setupGround(this.scene, this.config);
+
+    // Add red plane back
+    this.sceneService.setupRedPlane(this.scene, this.config);
   }
 
   private setupControls(): void {
     this.controls = this.sceneService.setupControls(this.camera, this.canvasRef.nativeElement, this.config);
+  }
+
+  private async loadModels(): Promise<void> {
+    try {
+      // Load CD cases
+      this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
+      
+      // Add label renderer to DOM and start animation
+      this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
+      this.animate();
+      this.addEventListeners();
+
+      // Ensure everything is rendered before showing
+      this.renderer.render(this.scene, this.camera);
+      this.labelRenderer.render(this.scene, this.camera);
+
+      // Hide loading screen
+      this.isLoading = false;
+
+      // Activate first case after scene is stable
+      setTimeout(() => {
+        this.stateService.setActiveCase(this.cdCases, 0);
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error loading scene:', error);
+      this.isLoading = false;
+    }
+  }
+
+  private addEventListeners(): void {
+    const canvas = this.canvasRef.nativeElement;
+    canvas.addEventListener('mousedown', (e) => this.eventsService.handleMouseDown(e, canvas, this.camera, this.cdCases));
+    canvas.addEventListener('mousemove', (e) => this.eventsService.handleMouseMove(e, canvas));
+    canvas.addEventListener('mouseup', () => this.eventsService.handleMouseUp());
+    canvas.addEventListener('contextmenu', (e) => this.eventsService.handleContextMenu(e, canvas, this.camera, this.cdCases));
+  }
+
+  private animate(): void {
+    this.animationId = requestAnimationFrame(this.animate.bind(this));
+    
+    // Update animations and physics
+    this.animationService.updateAnimations(this.cdCases);
+    
+    // Update controls and render
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+    this.labelRenderer.render(this.scene, this.camera);
+  }
+
+  // Debug menu methods
+  public updateCamera(): void {
+    this.debugService.updateCamera(this.camera, this.controls, this.sceneSettings);
+  }
+
+  public updateLighting(): void {
+    this.debugService.updateLighting(
+      this.ambientLight,
+      this.mainLight,
+      this.mainLightHelper,
+      this.fillLightHelper,
+      this.backLightHelper,
+      this.sceneSettings
+    );
+  }
+
+  public updateRenderer(): void {
+    this.debugService.updateRenderer(this.renderer, this.sceneSettings);
+  }
+
+  public updateOrbitControls(): void {
+    this.debugService.updateOrbitControls(this.controls, this.sceneSettings);
+  }
+
+  public updateGround(): void {
+    this.debugService.updateGround(this.scene, this.sceneSettings);
+  }
+
+  public updateCaseTransform(cdCase: CDCase): void {
+    this.debugService.updateCaseTransform(cdCase);
+  }
+
+  public resetToDefault(): void {
+    this.debugService.resetToDefault(this.sceneSettings, this.config, this.cdCases);
+    this.updateCamera();
+    this.updateLighting();
+    this.updateRenderer();
+    this.updateOrbitControls();
+    this.updateGround();
+    this.cdCases.forEach(cdCase => this.updateCaseTransform(cdCase));
   }
 
   @HostListener('window:resize')
@@ -302,250 +255,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  private addEventListeners(): void {
-    const canvas = this.canvasRef.nativeElement;
-    canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-    canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-    canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-    canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
-  }
-
-  private onMouseDown(event: MouseEvent): void {
-    if (event.button === 0) { // Left click
-      console.log('Left click detected');
-      this.updateMousePosition(event);
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-
-      // Create an array of all meshes in the CD cases
-      const surfacesToCheck: THREE.Object3D[] = [];
-      this.cdCases.forEach(cdCase => {
-        cdCase.model.traverse((child) => {
-          // Include any mesh that's part of the case
-          if (child instanceof THREE.Mesh) {
-            console.log('Found mesh:', child.name);
-            surfacesToCheck.push(child);
-          }
-        });
-      });
-
-      // Check intersections with all case surfaces
-      const intersects = this.raycaster.intersectObjects(surfacesToCheck, false);
-      console.log('Checking all case surfaces, intersected:', intersects.length);
-
-      if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
-        console.log('Clicked surface:', clickedObject.name);
-
-        // Find which CD case was clicked
-        const selectedCase = this.cdCases.find(cdCase => {
-          let isPartOfCase = false;
-          cdCase.model.traverse((child) => {
-            if (child === clickedObject) {
-              isPartOfCase = true;
-            }
-          });
-          return isPartOfCase;
-        });
-
-        if (selectedCase) {
-          console.log('Flipping case:', selectedCase.id);
-          this.cdCasesService.flipCase(selectedCase);
-        }
-      }
-    }
-  }
-
-  private onMouseMove(event: MouseEvent): void {
-    this.updateMousePosition(event);
-  }
-
-  private onMouseUp(): void {
-    // Keep only context menu related code if needed
-  }
-
-  private onContextMenu(event: Event): void {
-    event.preventDefault();
-    this.updateMousePosition(event as MouseEvent);
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-
-    // Create an array of all meshes in the CD cases
-    const surfacesToCheck: THREE.Object3D[] = [];
-    this.cdCases.forEach(cdCase => {
-      cdCase.model.traverse((child) => {
-        // Include any mesh that's part of the case
-        if (child instanceof THREE.Mesh) {
-          surfacesToCheck.push(child);
-        }
-      });
-    });
-
-    // Check intersections with all case surfaces
-    const intersects = this.raycaster.intersectObjects(surfacesToCheck, false);
-    console.log('Checking all case surfaces, intersected:', intersects.length);
-
-    if (intersects.length > 0) {
-      const clickedObject = intersects[0].object;
-      console.log('Clicked surface:', clickedObject.name);
-
-      // Find which CD case was clicked
-      const selectedCase = this.cdCases.find(cdCase => {
-        let isPartOfCase = false;
-        cdCase.model.traverse((child) => {
-          if (child === clickedObject) {
-            isPartOfCase = true;
-          }
-        });
-        return isPartOfCase;
-      });
-
-      if (selectedCase) {
-        console.log('Flipping case:', selectedCase.id);
-        this.cdCasesService.flipCase(selectedCase);
-      }
-    }
-  }
-
-  private updateMousePosition(event: MouseEvent): void {
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-  }
-
-  private animate(): void {
-    this.animationId = requestAnimationFrame(this.animate.bind(this));
-
-    // Update animation mixers
-    this.cdCasesService.updateAnimations(this.cdCases);
-
-    // Update controls
-    this.controls.update();
-
-    // Update light helpers
-    this.mainLightHelper.update();
-    this.fillLightHelper.update();
-    this.backLightHelper.update();
-
-    // Apply physics and momentum
-    this.cdCases.forEach(cdCase => {
-      if (!cdCase.isDragging && (cdCase.momentum.x !== 0 || cdCase.momentum.y !== 0)) {
-        cdCase.position.x += cdCase.momentum.x;
-        cdCase.position.z += cdCase.momentum.y;
-        cdCase.model.position.copy(cdCase.position);
-        
-        cdCase.momentum.multiplyScalar(0.95);
-        if (cdCase.momentum.length() < 0.001) {
-          cdCase.momentum.set(0, 0);
-        }
-
-        this.cdCasesService.checkCollisions(cdCase, this.cdCases);
-      }
-    });
-
-    // Render both the scene and labels
-    this.renderer.render(this.scene, this.camera);
-    this.labelRenderer.render(this.scene, this.camera);
-  }
-
-  public updateCamera(): void {
-    this.camera.position.set(
-      this.sceneSettings.cameraX,
-      this.sceneSettings.cameraY,
-      this.sceneSettings.cameraZ
-    );
-    this.controls.target.set(
-      this.sceneSettings.lookAtX,
-      this.sceneSettings.lookAtY,
-      this.sceneSettings.lookAtZ
-    );
-    this.controls.update();
-  }
-
-  public updateLighting(): void {
-    this.ambientLight.intensity = this.sceneSettings.ambientIntensity;
-    this.mainLight.intensity = this.sceneSettings.mainLightIntensity;
-    
-    // Update light helpers
-    this.mainLightHelper.update();
-    this.fillLightHelper.update();
-    this.backLightHelper.update();
-  }
-
-  public updateRenderer(): void {
-    this.renderer.toneMappingExposure = this.sceneSettings.exposure;
-  }
-
-  public updateOrbitControls(): void {
-    this.controls.minPolarAngle = this.sceneSettings.orbitMinPolarAngle;
-    this.controls.maxPolarAngle = this.sceneSettings.orbitMaxPolarAngle;
-    this.controls.minDistance = this.sceneSettings.orbitMinDistance;
-    this.controls.maxDistance = this.sceneSettings.orbitMaxDistance;
-    this.controls.dampingFactor = this.sceneSettings.orbitDampingFactor;
-    this.controls.update();
-  }
-
-  public updateGround(): void {
-    const ground = this.scene.children.find(child => 
-        child instanceof THREE.Mesh && 
-        child.geometry instanceof THREE.PlaneGeometry
-    ) as THREE.Mesh;
-    
-    if (ground && ground.material instanceof THREE.ShadowMaterial) {
-        ground.position.y = this.sceneSettings.groundY;
-        ground.material.opacity = this.sceneSettings.groundOpacity;
-        ground.material.needsUpdate = true;
-    }
-  }
-
-  public updateCaseTransform(cdCase: CDCase): void {
-    const settings = this.caseSettings[cdCase.id];
-    cdCase.position.set(settings.positionX, settings.positionY, settings.positionZ);
-    cdCase.rotation.set(settings.rotationX, settings.rotationY, settings.rotationZ);
-    cdCase.model.position.copy(cdCase.position);
-    cdCase.model.rotation.copy(cdCase.rotation);
-  }
-
-  public resetToDefault(): void {
-    // Reset scene settings
-    Object.assign(this.sceneSettings, {
-      cameraX: this.config.sceneSettings.camera.position.x,
-      cameraY: this.config.sceneSettings.camera.position.y,
-      cameraZ: this.config.sceneSettings.camera.position.z,
-      lookAtX: this.config.sceneSettings.camera.lookAt.x,
-      lookAtY: this.config.sceneSettings.camera.lookAt.y,
-      lookAtZ: this.config.sceneSettings.camera.lookAt.z,
-      ambientIntensity: this.config.sceneSettings.lighting.ambient.intensity,
-      mainLightIntensity: this.config.sceneSettings.lighting.main.intensity,
-      exposure: this.config.sceneSettings.renderer.exposure,
-      orbitMinPolarAngle: this.config.sceneSettings.orbitControls.minPolarAngle,
-      orbitMaxPolarAngle: this.config.sceneSettings.orbitControls.maxPolarAngle,
-      orbitMinDistance: this.config.sceneSettings.orbitControls.minDistance,
-      orbitMaxDistance: this.config.sceneSettings.orbitControls.maxDistance,
-      orbitDampingFactor: this.config.sceneSettings.orbitControls.dampingFactor,
-      groundY: this.config.sceneSettings.ground.y,
-      groundOpacity: this.config.sceneSettings.ground.opacity
-    });
-    
-    // Reset case settings
-    this.cdCases.forEach(cdCase => {
-      Object.assign(this.caseSettings[cdCase.id], {
-        positionX: cdCase.position.x,
-        positionY: cdCase.position.y,
-        positionZ: cdCase.position.z,
-        rotationX: cdCase.rotation.x,
-        rotationY: cdCase.rotation.y,
-        rotationZ: cdCase.rotation.z
-      });
-    });
-    
-    // Update everything
-    this.updateCamera();
-    this.updateLighting();
-    this.updateRenderer();
-    this.updateOrbitControls();
-    this.updateGround();
-    this.cdCases.forEach(cdCase => this.updateCaseTransform(cdCase));
   }
 
   ngOnDestroy(): void {
@@ -569,36 +278,26 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     });
 
     // Clean up helpers
-    this.scene.remove(this.gridHelper);
-    this.scene.remove(this.axesHelper);
     this.scene.remove(this.mainLightHelper);
     this.scene.remove(this.fillLightHelper);
     this.scene.remove(this.backLightHelper);
 
     this.renderer.dispose();
-
-    // Clean up label renderer
     this.labelRenderer.domElement.remove();
   }
 
-  // Add wheel event handler for changing active case
+  // Wheel event handler for changing active case
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
     if (this.config.sceneSettings.camera.lockControls) {
       event.preventDefault();
       event.stopPropagation();
       
-      const now = Date.now();
-      if (now - this.lastWheelTime < this.wheelDebounceTime || this.isTransitioning) {
-        return;
-      }
-      
-      // Find current active case index
       const currentActiveIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
       
       // If no case is active, activate the first one
       if (currentActiveIndex === -1) {
-        this.cdCasesService.setActiveCase(this.cdCases, 0);
+        this.stateService.setActiveCase(this.cdCases, 0);
         return;
       }
       
@@ -610,15 +309,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         newIndex = (currentActiveIndex - 1 + this.cdCases.length) % this.cdCases.length;
       }
       
-      // Update active case and set transition state
-      this.isTransitioning = true;
-      this.lastWheelTime = now;
-      this.cdCasesService.setActiveCase(this.cdCases, newIndex);
-      
-      // Reset transition state after animation duration
-      setTimeout(() => {
-        this.isTransitioning = false;
-      }, this.wheelDebounceTime);
+      this.stateService.setActiveCase(this.cdCases, newIndex);
     }
   }
 } 

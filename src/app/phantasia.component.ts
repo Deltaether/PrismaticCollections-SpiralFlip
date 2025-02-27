@@ -1,12 +1,6 @@
 import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IntroductionComponent } from './pages/introduction/introduction.component';
-import { DiscOneComponent } from './pages/disc-one/disc-one.component';
-import { DiscTwoComponent } from './pages/disc-two/disc-two.component';
-import { PvComponent } from './pages/pv/pv.component';
-import { InformationComponent } from './pages/information/information.component';
 import { MusicPlayerComponent } from './tools/music-player/music-player.component';
-// import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
 
@@ -15,13 +9,7 @@ import { AudioService } from './tools/music-player/audio.service';
   standalone: true,
   imports: [
     CommonModule,
-    IntroductionComponent,
-    DiscOneComponent,
-    DiscTwoComponent,
-    PvComponent,
-    InformationComponent,
     MusicPlayerComponent,
-    // CDCasesComponent
     CDCasesComponent
   ],
   templateUrl: './phantasia.component.html',

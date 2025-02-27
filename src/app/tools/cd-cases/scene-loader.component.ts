@@ -9,6 +9,8 @@ interface RunePosition {
   opacity: number;
   moveX: number;
   moveY: number;
+  rotationOffset: number;
+  clockwise: boolean;
 }
 
 @Component({
@@ -38,12 +40,16 @@ interface RunePosition {
       </div>
       <div class="rune-circle">
         <div class="rune" *ngFor="let rune of runes" 
+             [class.clockwise]="rune.clockwise"
+             [class.counter-clockwise]="!rune.clockwise"
              [style.left]="rune.x + 'vw'"
              [style.top]="rune.y + 'vh'"
              [style.--move-x]="rune.moveX + 'px'"
              [style.--move-y]="rune.moveY + 'px'"
              [style.--scale]="rune.scale"
-             [style.--base-opacity]="rune.opacity">
+             [style.--base-opacity]="rune.opacity"
+             [style.--rotation-offset]="rune.rotationOffset"
+             [style.--delay]="rune.delay">
         </div>
       </div>
       <div class="content">
@@ -234,10 +240,20 @@ interface RunePosition {
       );
       clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
       transform-origin: center center;
-      transform: translate(0, 0) scale(var(--scale));
+      transform: translate(0, 0) scale(var(--scale)) rotate(calc(var(--rotation-offset) * 1deg));
       opacity: var(--base-opacity);
       will-change: transform;
-      animation: rune-move 8s infinite linear;
+      animation: none;
+
+      &.clockwise {
+        animation: rune-move-clockwise 8s infinite linear;
+        animation-delay: calc(var(--delay) * -1s);
+      }
+
+      &.counter-clockwise {
+        animation: rune-move-counterclockwise 8s infinite linear;
+        animation-delay: calc(var(--delay) * -1s);
+      }
 
       &::before {
         content: '';
@@ -404,21 +420,39 @@ interface RunePosition {
       50% { opacity: 0.5; }
     }
 
-    @keyframes rune-move {
+    @keyframes rune-move-clockwise {
       0% {
-        transform: translate(0, 0) scale(var(--scale)) rotate(0deg);
+        transform: translate(0, 0) scale(var(--scale)) rotate(calc(var(--rotation-offset) * 1deg));
       }
       25% {
-        transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(90deg);
+        transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(calc((90 + var(--rotation-offset)) * 1deg));
       }
       50% {
-        transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(180deg);
+        transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(calc((180 + var(--rotation-offset)) * 1deg));
       }
       75% {
-        transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(270deg);
+        transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(calc((270 + var(--rotation-offset)) * 1deg));
       }
       100% {
-        transform: translate(0, 0) scale(var(--scale)) rotate(360deg);
+        transform: translate(0, 0) scale(var(--scale)) rotate(calc((360 + var(--rotation-offset)) * 1deg));
+      }
+    }
+
+    @keyframes rune-move-counterclockwise {
+      0% {
+        transform: translate(0, 0) scale(var(--scale)) rotate(calc(var(--rotation-offset) * 1deg));
+      }
+      25% {
+        transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 90) * 1deg));
+      }
+      50% {
+        transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 180) * 1deg));
+      }
+      75% {
+        transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 270) * 1deg));
+      }
+      100% {
+        transform: translate(0, 0) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 360) * 1deg));
       }
     }
 
@@ -470,10 +504,12 @@ export class SceneLoaderComponent implements OnInit {
       x: Math.random() * 100,
       y: Math.random() * 100,
       scale: 0.6 + Math.random() * 1.4,
-      delay: 0,
+      delay: Math.random() * 8,
       opacity: 0.3 + Math.random() * 0.5,
       moveX: 15 + Math.random() * 20,
-      moveY: 15 + Math.random() * 20
+      moveY: 15 + Math.random() * 20,
+      rotationOffset: Math.random() * 360,
+      clockwise: Math.random() < 0.5
     }));
   }
 } 

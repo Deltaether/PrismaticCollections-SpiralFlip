@@ -263,6 +263,14 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     // Add button to reset to default
     this.gui.add({ resetToDefault: () => this.onResetToDefault() }, 'resetToDefault').name('Reset to Default');
     
+    // Add camera lock control toggle below reset button for easy access
+    this.gui.add(this.sceneSettings, 'lockControls')
+      .name('Lock Camera Controls')
+      .onChange((value) => {
+        // Apply the update to orbit controls
+        this.onUpdateOrbitControls();
+      });
+    
     // Open the folders that were previously open
     if (this.isDebugVisible) {
       sceneFolder.open();

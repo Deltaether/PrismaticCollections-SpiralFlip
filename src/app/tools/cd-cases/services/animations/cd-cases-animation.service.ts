@@ -45,22 +45,6 @@ export class CDCasesAnimationService {
         cdCase.position.lerp(cdCase.targetPosition, cdCase.currentLerpAlpha);
         cdCase.model.position.copy(cdCase.position);
       }
-
-      // Apply physics and momentum
-      if (!cdCase.isDragging && (cdCase.momentum.x !== 0 || cdCase.momentum.y !== 0)) {
-        const oldMomentum = cdCase.momentum.length();
-        cdCase.position.x += cdCase.momentum.x;
-        cdCase.position.z += cdCase.momentum.y;
-        cdCase.model.position.copy(cdCase.position);
-        
-        cdCase.momentum.multiplyScalar(0.95);
-        if (cdCase.momentum.length() < 0.001) {
-          if (oldMomentum > 0.001) {
-            console.log(`Case ${cdCase.id} momentum stopped`);
-          }
-          cdCase.momentum.set(0, 0);
-        }
-      }
     });
   }
 

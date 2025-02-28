@@ -60,7 +60,7 @@ export class SceneService {
     const { orbitControls } = config.sceneSettings;
     const controls = new OrbitControls(camera, canvas);
     
-    // Apply control settings
+    // First set up base orbit control properties
     controls.enableDamping = orbitControls.enableDamping;
     controls.dampingFactor = orbitControls.dampingFactor;
     controls.minDistance = orbitControls.minDistance;
@@ -68,23 +68,33 @@ export class SceneService {
     controls.minPolarAngle = orbitControls.minPolarAngle;
     controls.maxPolarAngle = orbitControls.maxPolarAngle;
     
-    // Lock controls if specified in config
-    if (config.sceneSettings.camera.lockControls) {
+    // Then apply lock controls setting
+    const lockControls = config.sceneSettings.camera.lockControls;
+    
+    // Set master control
+    controls.enabled = !lockControls;
+    
+    // Set individual control properties to match
+    if (lockControls) {
+      // Disable all individual controls
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.enableRotate = false;
     } else {
+      // Enable individual controls based on config
       controls.enableZoom = orbitControls.enableZoom;
       controls.enablePan = orbitControls.enablePan;
       controls.enableRotate = true;
     }
 
+    // Set look target
     controls.target.set(
       config.sceneSettings.camera.lookAt.x,
       config.sceneSettings.camera.lookAt.y,
       config.sceneSettings.camera.lookAt.z
     );
 
+    controls.update();
     return controls;
   }
 

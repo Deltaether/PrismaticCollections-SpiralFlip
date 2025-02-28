@@ -106,25 +106,26 @@ export class CDCaseLoadingService {
 
         const cdCase: CDCase = {
           id: caseConfig.id,
-          title: caseConfig.title,
-          artist: caseConfig.artist,
+          title: caseConfig.title || `CD Case ${caseConfig.id}`,
+          artist: caseConfig.artist || 'Unknown Artist',
           imageUrl: '',
           model,
           isFlipped: false,
-          isDragging: false,
+          position: new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z),
+          rotation: new THREE.Euler(rotation.x, rotation.y, rotation.z),
+          mixer: mixer,
+          animations: gltf.animations,
+          openAction: undefined,
+          closeAction: undefined,
+          armature: armature,
           isOpen: false,
+          glowMaterial: undefined,
+          carouselIndex: caseConfig.id - 1,
+          targetPosition: new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z),
           isActive: false,
           isDeactivating: false,
-          position: initialPosition.clone(),
-          rotation,
-          momentum: new THREE.Vector2(),
-          mixer,
-          animations,
-          armature,
-          carouselIndex: caseConfig.id - 1,
-          targetPosition: initialPosition.clone(),
           currentLerpAlpha: 0,
-          initialPosition: initialPosition.clone()
+          initialPosition: new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z)
         };
 
         // Set up animations

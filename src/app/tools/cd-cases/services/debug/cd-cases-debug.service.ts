@@ -52,11 +52,27 @@ export class CDCasesDebugService {
     controls: OrbitControls,
     settings: SceneSettings
   ): void {
+    // Set basic orbit control properties
     controls.minPolarAngle = settings.orbitMinPolarAngle;
     controls.maxPolarAngle = settings.orbitMaxPolarAngle;
     controls.minDistance = settings.orbitMinDistance;
     controls.maxDistance = settings.orbitMaxDistance;
     controls.dampingFactor = settings.orbitDampingFactor;
+    
+    // Handle camera controls locking - master control
+    controls.enabled = !settings.lockControls;
+    
+    // Also set individual control properties to match
+    if (settings.lockControls) {
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.enableRotate = false;
+    } else {
+      controls.enableZoom = true;
+      controls.enablePan = true;
+      controls.enableRotate = true;
+    }
+    
     controls.update();
   }
 
@@ -103,7 +119,8 @@ export class CDCasesDebugService {
       orbitMaxDistance: config.sceneSettings.orbitControls.maxDistance,
       orbitDampingFactor: config.sceneSettings.orbitControls.dampingFactor,
       groundY: config.sceneSettings.ground.y,
-      groundOpacity: config.sceneSettings.ground.opacity
+      groundOpacity: config.sceneSettings.ground.opacity,
+      lockControls: config.sceneSettings.camera.lockControls
     });
     
     // Reset case positions and rotations

@@ -8,7 +8,7 @@ import { CDCaseAnimationsService } from '../animations/cd-case-animations.servic
 })
 export class CDCasesStateService {
   private readonly Z_OFFSET = 1.0;
-  private readonly DEACTIVATED_Z_OFFSET = 0.0;
+  private readonly DEACTIVATED_Z_OFFSET = -3.0;
   private readonly POSITION_LERP_FACTOR = 0.1; // Smoothing factor for position transitions
 
   constructor(private animationsService: CDCaseAnimationsService) {}

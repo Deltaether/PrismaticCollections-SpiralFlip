@@ -7,10 +7,8 @@ export interface CDCase {
   imageUrl: string;
   model: THREE.Group;
   isFlipped: boolean;
-  isDragging: boolean;
   position: THREE.Vector3;
   rotation: THREE.Euler;
-  momentum: THREE.Vector2;
   mixer?: THREE.AnimationMixer;
   animations?: THREE.AnimationClip[];
   openAction?: THREE.AnimationAction;
@@ -151,7 +149,108 @@ export interface SceneConfig {
 }
 
 export interface Config {
-  sceneSettings: SceneConfig;
+  sceneSettings: {
+    camera: {
+      position: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      lookAt: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      lockControls: boolean;
+    };
+    lighting: {
+      ambient: {
+        intensity: number;
+      };
+      main: {
+        intensity: number;
+        position: {
+          x: number;
+          y: number;
+          z: number;
+        };
+      };
+      fill: {
+        intensity: number;
+        position: {
+          x: number;
+          y: number;
+          z: number;
+        };
+      };
+      back: {
+        intensity: number;
+        position: {
+          x: number;
+          y: number;
+          z: number;
+        };
+      };
+    };
+    renderer: {
+      exposure: number;
+    };
+    orbitControls: {
+      minPolarAngle: number;
+      maxPolarAngle: number;
+      minDistance: number;
+      maxDistance: number;
+      dampingFactor: number;
+      enableDamping: boolean;
+      enableZoom: boolean;
+      enablePan: boolean;
+    };
+    ground: {
+      y: number;
+      opacity: number;
+      size: number;
+    };
+    videoPlane: {
+      position: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      rotation: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      size: {
+        width: number;
+        height: number;
+      };
+      color: string;
+      opacity: number;
+    };
+    backgroundPlane: {
+      position: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      rotation: {
+        x: number;
+        y: number;
+        z: number;
+      };
+      size: {
+        width: number;
+        height: number;
+      };
+      colors: {
+        gold: string;
+        darkGold: string;
+        orange: string;
+        brown: string;
+      };
+    };
+  };
   caseSettings: {
     basePosition: {
       x: number;
@@ -175,12 +274,36 @@ export interface Config {
       }>;
     };
   };
-  silhouette: SilhouetteConfig;
-  cdCases: Array<{
-    id: number;
-    title: string;
-    artist: string;
-  }>;
+  silhouette: {
+    size: {
+      scale: number;
+      widthScale?: number;
+      heightScale?: number;
+      depthScale?: number;
+    };
+    appearance: {
+      color: string;
+      intensity: number;
+      opacity: number;
+    };
+    position: {
+      offsetX: number;
+      offsetY: number;
+      offsetZ: number;
+    };
+    rotation: {
+      offsetX: number;
+      offsetY: number;
+      offsetZ: number;
+    };
+    animation: {
+      fastPulseSpeed: number;
+      slowPulseSpeed: number;
+      fastPulseAmount: number;
+      slowPulseAmount: number;
+    };
+  };
+  cdCases: CaseConfig[];
 }
 
 // Legacy interfaces kept for compatibility with debug menu
@@ -214,4 +337,5 @@ export interface SceneSettings {
   orbitDampingFactor: number;
   groundY: number;
   groundOpacity: number;
+  lockControls: boolean;
 } 

@@ -11,7 +11,7 @@
         "y": 0,
         "z": 0
       },
-      "lockControls": false
+      "lockControls": true
     },
     "lighting": {
       "ambient": {
@@ -136,7 +136,10 @@
   },
   "silhouette": {
     "size": {
-      "scale": 1.08
+      "scale": 1,
+      "widthScale": 0.98,
+      "heightScale": 0.8,
+      "depthScale": 0.98
     },
     "appearance": {
       "color": "#FFD700",
@@ -144,14 +147,14 @@
       "opacity": 0.9
     },
     "position": {
-      "offsetX": 0.0,
+      "offsetX": -0.77,
       "offsetY": 0.0,
-      "offsetZ": 0.0
+      "offsetZ": 1.25
     },
     "rotation": {
       "offsetX": 0.0,
-      "offsetY": 0.0,
-      "offsetZ": -1.5708
+      "offsetY": 0,
+      "offsetZ": -1.59
     },
     "animation": {
       "fastPulseSpeed": 5.0,

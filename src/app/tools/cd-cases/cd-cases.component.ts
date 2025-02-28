@@ -90,7 +90,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     orbitMaxDistance: this.config.sceneSettings.orbitControls.maxDistance,
     orbitDampingFactor: this.config.sceneSettings.orbitControls.dampingFactor,
     groundY: this.config.sceneSettings.ground.y,
-    groundOpacity: this.config.sceneSettings.ground.opacity
+    groundOpacity: this.config.sceneSettings.ground.opacity,
+    lockControls: this.config.sceneSettings.camera.lockControls
   };
   
   public caseSettings: CaseSettings = {};
@@ -179,6 +180,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private setupControls(): void {
     this.controls = this.sceneService.setupControls(this.camera, this.canvasRef.nativeElement, this.config);
+    
+    // Make sure controls match sceneSettings after initialization
+    this.updateOrbitControls();
   }
 
   private async loadModels(): Promise<void> {
@@ -260,7 +264,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     }
   }
   
-  // Add method to create pulsating silhouette for active case
+  // Method to create pulsating silhouette for active case
   private createActiveCaseSilhouette(cdCase: CDCase): void {
     // Remove existing silhouette if any
     if (this.silhouetteMesh) {
@@ -273,141 +277,51 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       }
     }
     
-    console.log('Creating silhouette for case:', cdCase.id);
-    
     // Get silhouette config
     const silhouetteConfig = this.config.silhouette;
     
-    // Get the bounding box of the CD case
-    const bbox = new THREE.Box3().setFromObject(cdCase.model);
-    const size = new THREE.Vector3();
-    bbox.getSize(size);
+    // Store reference to the CD case model
+    const caseModel = cdCase.model;
     
-    // Create a slightly larger box geometry for the silhouette
-    const silhouetteGeometry = new THREE.BoxGeometry(
-      size.x * silhouetteConfig.size.scale, 
-      size.y * silhouetteConfig.size.scale, 
-      size.z * silhouetteConfig.size.scale
-    );
-    
+    // If we have an active case, create an outline effect by applying a custom shader directly to the case
     // Parse color from config hex
     const colorHex = silhouetteConfig.appearance.color;
     const color = new THREE.Color(colorHex);
     
-    // Create shader material for pulsating effect with config parameters
-    this.silhouetteMaterial = new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0.0 },
-        color: { value: new THREE.Vector3(color.r, color.g, color.b) },
-        intensity: { value: silhouetteConfig.appearance.intensity },
-        opacity: { value: silhouetteConfig.appearance.opacity },
-        fastPulseSpeed: { value: silhouetteConfig.animation.fastPulseSpeed },
-        slowPulseSpeed: { value: silhouetteConfig.animation.slowPulseSpeed },
-        fastPulseAmount: { value: silhouetteConfig.animation.fastPulseAmount },
-        slowPulseAmount: { value: silhouetteConfig.animation.slowPulseAmount }
-      },
-      vertexShader: `
-        varying vec3 vPosition;
-        varying vec3 vNormal;
-        varying vec2 vUv;
-        
-        void main() {
-          vPosition = position;
-          vNormal = normal;
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    // Create the outline effect by applying emissive materials to the CD case's existing geometry
+    caseModel.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        // Store original material to restore later
+        if (!child.userData['originalMaterial']) {
+          child.userData['originalMaterial'] = child.material.clone();
         }
-      `,
-      fragmentShader: `
-        uniform float time;
-        uniform vec3 color;
-        uniform float intensity;
-        uniform float opacity;
-        uniform float fastPulseSpeed;
-        uniform float slowPulseSpeed;
-        uniform float fastPulseAmount;
-        uniform float slowPulseAmount;
         
-        varying vec3 vPosition;
-        varying vec3 vNormal;
-        varying vec2 vUv;
-        
-        void main() {
-          // Calculate fresnel effect for edge glow
-          vec3 viewDirection = normalize(cameraPosition - vPosition);
-          float fresnel = dot(viewDirection, vNormal);
-          fresnel = 1.0 - clamp(fresnel, 0.0, 1.0);
-          
-          // Configurable pulsing effect
-          float fastPulse = (1.0 - fastPulseAmount) + fastPulseAmount * sin(time * fastPulseSpeed);
-          float slowPulse = (1.0 - slowPulseAmount) + slowPulseAmount * sin(time * slowPulseSpeed);
-          float pulse = fastPulse * slowPulse;
-          
-          // Edge glow with pulse
-          float edgeGlow = pow(fresnel, 2.0) * intensity * pulse;
-          
-          // Add slight internal glow
-          float innerGlow = 0.1 * pulse;
-          
-          // Final color with stronger glow
-          vec3 glowColor = color * (edgeGlow + innerGlow);
-          
-          gl_FragColor = vec4(glowColor, (edgeGlow + innerGlow) * opacity);
-        }
-      `,
-      transparent: true,
-      side: THREE.FrontSide,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
-    });
-    
-    this.silhouetteMesh = new THREE.Mesh(silhouetteGeometry, this.silhouetteMaterial);
-    
-    // Position the silhouette at the CD case's position with configurable offsets
-    this.silhouetteMesh.position.copy(cdCase.model.position);
-    this.silhouetteMesh.position.x += silhouetteConfig.position.offsetX;
-    this.silhouetteMesh.position.y += silhouetteConfig.position.offsetY;
-    this.silhouetteMesh.position.z += silhouetteConfig.position.offsetZ;
-    
-    // Apply the base rotation from the CD case
-    this.silhouetteMesh.rotation.copy(cdCase.model.rotation);
-    
-    // Apply additional rotation offsets from config
-    this.silhouetteMesh.rotation.x += silhouetteConfig.rotation.offsetX;
-    this.silhouetteMesh.rotation.y += silhouetteConfig.rotation.offsetY;
-    this.silhouetteMesh.rotation.z += silhouetteConfig.rotation.offsetZ;
-    
-    // Add the silhouette to the scene
-    this.scene.add(this.silhouetteMesh);
-    
-    console.log('Silhouette created with position/rotation offsets:', {
-      position: {
-        base: {
-          x: cdCase.model.position.x,
-          y: cdCase.model.position.y,
-          z: cdCase.model.position.z
-        },
-        offset: silhouetteConfig.position,
-        final: {
-          x: this.silhouetteMesh.position.x,
-          y: this.silhouetteMesh.position.y,
-          z: this.silhouetteMesh.position.z
-        }
-      },
-      rotation: {
-        base: {
-          x: cdCase.model.rotation.x,
-          y: cdCase.model.rotation.y,
-          z: cdCase.model.rotation.z
-        },
-        offset: silhouetteConfig.rotation,
-        final: {
-          x: this.silhouetteMesh.rotation.x,
-          y: this.silhouetteMesh.rotation.y,
-          z: this.silhouetteMesh.rotation.z
+        // Create a new material based on the original but with emissive properties
+        if (child.material) {
+          // Handle array of materials
+          if (Array.isArray(child.material)) {
+            child.material = child.material.map(mat => {
+              const newMat = mat.clone();
+              newMat.emissive = color;
+              newMat.emissiveIntensity = silhouetteConfig.appearance.intensity;
+              return newMat;
+            });
+          } else {
+            // Single material
+            const newMaterial = child.material.clone();
+            newMaterial.emissive = color;
+            newMaterial.emissiveIntensity = silhouetteConfig.appearance.intensity;
+            child.material = newMaterial;
+          }
         }
       }
     });
+    
+    // For now, store a reference to the active case for pulsing
+    this.silhouetteMaterial = null;
+    this.silhouetteMesh = null; // Not storing mesh reference anymore, we'll work directly with the case model
+    
+    console.log('Silhouette effect applied directly to CD case:', cdCase.id);
   }
 
   private animate(): void {
@@ -419,33 +333,50 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Update case positions
     this.stateService.updatePositions(this.cdCases);
     
-    // Update silhouette animation and make sure it follows the active case
-    if (this.silhouetteMaterial && this.silhouetteMesh) {
-      // Update the time uniform for pulsation
-      this.silhouetteMaterial.uniforms['time'].value = this.clock.getElapsedTime();
+    // Update silhouette animation for active case
+    const activeCase = this.cdCases.find(cdCase => cdCase.isActive && !cdCase.isOpen);
+    if (activeCase && !this.hasOpenedCase) {
+      const elapsedTime = this.clock.getElapsedTime();
+      const silhouetteConfig = this.config.silhouette;
       
-      // Find active case and update silhouette position if needed
-      const activeCase = this.cdCases.find(cdCase => cdCase.isActive && !cdCase.isOpen);
-      if (activeCase && !this.hasOpenedCase) {
-        const silhouetteConfig = this.config.silhouette;
-        
-        // Apply base position from active case
-        this.silhouetteMesh.position.copy(activeCase.model.position);
-        
-        // Apply position offsets from config
-        this.silhouetteMesh.position.x += silhouetteConfig.position.offsetX;
-        this.silhouetteMesh.position.y += silhouetteConfig.position.offsetY;
-        this.silhouetteMesh.position.z += silhouetteConfig.position.offsetZ;
-        
-        // Apply base rotation from active case
-        this.silhouetteMesh.rotation.copy(activeCase.model.rotation);
-        
-        // Apply rotation offsets from config
-        this.silhouetteMesh.rotation.x += silhouetteConfig.rotation.offsetX;
-        this.silhouetteMesh.rotation.y += silhouetteConfig.rotation.offsetY;
-        this.silhouetteMesh.rotation.z += silhouetteConfig.rotation.offsetZ;
-      }
+      // Create pulsating effect by modulating emissive intensity
+      const fastPulse = (1.0 - silhouetteConfig.animation.fastPulseAmount) + 
+                        silhouetteConfig.animation.fastPulseAmount * 
+                        Math.sin(elapsedTime * silhouetteConfig.animation.fastPulseSpeed);
+      const slowPulse = (1.0 - silhouetteConfig.animation.slowPulseAmount) + 
+                        silhouetteConfig.animation.slowPulseAmount * 
+                        Math.sin(elapsedTime * silhouetteConfig.animation.slowPulseSpeed);
+      const pulseIntensity = fastPulse * slowPulse * silhouetteConfig.appearance.intensity;
+      
+      // Apply pulsating intensity to the active case material
+      activeCase.model.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(mat => {
+              if (mat.emissive) {
+                mat.emissiveIntensity = pulseIntensity;
+              }
+            });
+          } else if (child.material && child.material.emissive) {
+            child.material.emissiveIntensity = pulseIntensity;
+          }
+        }
+      });
     }
+    
+    // Restore original materials when case is no longer active
+    this.cdCases.forEach(cdCase => {
+      if (!cdCase.isActive && cdCase.model) {
+        cdCase.model.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.userData['originalMaterial']) {
+            // Restore original material
+            child.material = child.userData['originalMaterial'];
+            // Clear the stored material reference
+            delete child.userData['originalMaterial'];
+          }
+        });
+      }
+    });
     
     // Only update background animations if background is visible
     if (this.backgroundPlane && this.backgroundPlane.visible) {
@@ -543,7 +474,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   // Wheel event handler for changing active case
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
-    if (this.config.sceneSettings.camera.lockControls) {
+    // If controls are locked, handle CD case navigation
+    if (this.sceneSettings.lockControls) {
       // Check if any animations are currently running
       if (this.animationService.hasAnyActiveAnimations(this.cdCases)) {
         event.preventDefault();
@@ -584,5 +516,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         this.createActiveCaseSilhouette(activeCase);
       }
     }
+    // If controls are not locked, the event will propagate to OrbitControls naturally
   }
 } 

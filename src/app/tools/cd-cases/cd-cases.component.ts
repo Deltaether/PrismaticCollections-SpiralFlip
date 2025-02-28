@@ -95,6 +95,18 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   
   public caseSettings: CaseSettings = {};
 
+  // Add properties to store references
+  private videoPlane!: THREE.Mesh;
+  private backgroundPlane!: THREE.Mesh;
+  private videoPlay!: () => void;
+  
+  // Add property to track if case has been opened
+  private hasOpenedCase = false;
+  
+  // Add property for pulsating silhouette
+  private silhouetteMaterial: THREE.ShaderMaterial | null = null;
+  private silhouetteMesh: THREE.Mesh | null = null;
+
   constructor(
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
@@ -151,11 +163,18 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Set up ground
     this.sceneService.setupGround(this.scene, this.config);
 
-    // Add background plane (behind video plane)
-    this.sceneService.setupBackgroundPlane(this.scene, this.config);
+    // Add video plane (formerly red plane) - INITIALLY INVISIBLE
+    const videoPlaneResult = this.sceneService.setupVideoPlane(this.scene, this.config);
+    videoPlaneResult.mesh.visible = false; // Hide initially
     
-    // Add video plane (formerly red plane)
-    this.sceneService.setupVideoPlane(this.scene, this.config);
+    // Add background plane behind video plane - INITIALLY INVISIBLE
+    const backgroundPlane = this.sceneService.setupBackgroundPlane(this.scene, this.config, videoPlaneResult.videoTexture);
+    backgroundPlane.visible = false; // Hide initially
+    
+    // Store references for later use
+    this.videoPlane = videoPlaneResult.mesh;
+    this.backgroundPlane = backgroundPlane;
+    this.videoPlay = videoPlaneResult.play;
   }
 
   private setupControls(): void {
@@ -184,6 +203,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
       // Activate first case after ensuring all cases are in their initial positions
       this.stateService.setActiveCase(this.cdCases, 0);
+      
+      // Create silhouette for active case
+      const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+      if (activeCase) {
+        this.createActiveCaseSilhouette(activeCase);
+      }
 
     } catch (error) {
       console.error('Error loading scene:', error);
@@ -193,10 +218,196 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   private addEventListeners(): void {
     const canvas = this.canvasRef.nativeElement;
-    canvas.addEventListener('mousedown', (e) => this.eventsService.handleMouseDown(e, canvas, this.camera, this.cdCases));
+    
+    // Modified event handler to handle case click for opening
+    canvas.addEventListener('mousedown', (e) => {
+      // Check if click is on active case
+      const clickedCase = this.eventsService.handleMouseDown(e, canvas, this.camera, this.cdCases);
+      
+      // If active case is clicked and not already opened
+      if (clickedCase && clickedCase.isActive && !clickedCase.isOpen && !this.hasOpenedCase) {
+        // Play open animation when clicked
+        this.animationService.openCase(clickedCase);
+        
+        // After animation completes, show video and background planes
+        setTimeout(() => {
+          this.revealVideoAndBackground();
+          this.hasOpenedCase = true;
+          
+          // Remove silhouette when case is opened
+          if (this.silhouetteMesh) {
+            this.scene.remove(this.silhouetteMesh);
+            this.silhouetteMesh = null;
+          }
+        }, 1000); // Assuming 1 second for animation duration as fallback
+      }
+    });
+    
     canvas.addEventListener('mousemove', (e) => this.eventsService.handleMouseMove(e, canvas));
     canvas.addEventListener('mouseup', () => this.eventsService.handleMouseUp());
     canvas.addEventListener('contextmenu', (e) => this.eventsService.handleContextMenu(e, canvas, this.camera, this.cdCases));
+  }
+  
+  // Method to reveal video and background planes
+  private revealVideoAndBackground(): void {
+    if (this.videoPlane && this.backgroundPlane) {
+      // Make planes visible
+      this.videoPlane.visible = true;
+      this.backgroundPlane.visible = true;
+      
+      // Start video playback
+      this.videoPlay();
+    }
+  }
+  
+  // Add method to create pulsating silhouette for active case
+  private createActiveCaseSilhouette(cdCase: CDCase): void {
+    // Remove existing silhouette if any
+    if (this.silhouetteMesh) {
+      this.scene.remove(this.silhouetteMesh);
+      this.silhouetteMesh = null;
+      
+      // Dispose of old geometry and material
+      if (this.silhouetteMaterial) {
+        this.silhouetteMaterial.dispose();
+      }
+    }
+    
+    console.log('Creating silhouette for case:', cdCase.id);
+    
+    // Get silhouette config
+    const silhouetteConfig = this.config.silhouette;
+    
+    // Get the bounding box of the CD case
+    const bbox = new THREE.Box3().setFromObject(cdCase.model);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+    
+    // Create a slightly larger box geometry for the silhouette
+    const silhouetteGeometry = new THREE.BoxGeometry(
+      size.x * silhouetteConfig.size.scale, 
+      size.y * silhouetteConfig.size.scale, 
+      size.z * silhouetteConfig.size.scale
+    );
+    
+    // Parse color from config hex
+    const colorHex = silhouetteConfig.appearance.color;
+    const color = new THREE.Color(colorHex);
+    
+    // Create shader material for pulsating effect with config parameters
+    this.silhouetteMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0.0 },
+        color: { value: new THREE.Vector3(color.r, color.g, color.b) },
+        intensity: { value: silhouetteConfig.appearance.intensity },
+        opacity: { value: silhouetteConfig.appearance.opacity },
+        fastPulseSpeed: { value: silhouetteConfig.animation.fastPulseSpeed },
+        slowPulseSpeed: { value: silhouetteConfig.animation.slowPulseSpeed },
+        fastPulseAmount: { value: silhouetteConfig.animation.fastPulseAmount },
+        slowPulseAmount: { value: silhouetteConfig.animation.slowPulseAmount }
+      },
+      vertexShader: `
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        
+        void main() {
+          vPosition = position;
+          vNormal = normal;
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform vec3 color;
+        uniform float intensity;
+        uniform float opacity;
+        uniform float fastPulseSpeed;
+        uniform float slowPulseSpeed;
+        uniform float fastPulseAmount;
+        uniform float slowPulseAmount;
+        
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+        varying vec2 vUv;
+        
+        void main() {
+          // Calculate fresnel effect for edge glow
+          vec3 viewDirection = normalize(cameraPosition - vPosition);
+          float fresnel = dot(viewDirection, vNormal);
+          fresnel = 1.0 - clamp(fresnel, 0.0, 1.0);
+          
+          // Configurable pulsing effect
+          float fastPulse = (1.0 - fastPulseAmount) + fastPulseAmount * sin(time * fastPulseSpeed);
+          float slowPulse = (1.0 - slowPulseAmount) + slowPulseAmount * sin(time * slowPulseSpeed);
+          float pulse = fastPulse * slowPulse;
+          
+          // Edge glow with pulse
+          float edgeGlow = pow(fresnel, 2.0) * intensity * pulse;
+          
+          // Add slight internal glow
+          float innerGlow = 0.1 * pulse;
+          
+          // Final color with stronger glow
+          vec3 glowColor = color * (edgeGlow + innerGlow);
+          
+          gl_FragColor = vec4(glowColor, (edgeGlow + innerGlow) * opacity);
+        }
+      `,
+      transparent: true,
+      side: THREE.FrontSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    
+    this.silhouetteMesh = new THREE.Mesh(silhouetteGeometry, this.silhouetteMaterial);
+    
+    // Position the silhouette at the CD case's position with configurable offsets
+    this.silhouetteMesh.position.copy(cdCase.model.position);
+    this.silhouetteMesh.position.x += silhouetteConfig.position.offsetX;
+    this.silhouetteMesh.position.y += silhouetteConfig.position.offsetY;
+    this.silhouetteMesh.position.z += silhouetteConfig.position.offsetZ;
+    
+    // Apply the base rotation from the CD case
+    this.silhouetteMesh.rotation.copy(cdCase.model.rotation);
+    
+    // Apply additional rotation offsets from config
+    this.silhouetteMesh.rotation.x += silhouetteConfig.rotation.offsetX;
+    this.silhouetteMesh.rotation.y += silhouetteConfig.rotation.offsetY;
+    this.silhouetteMesh.rotation.z += silhouetteConfig.rotation.offsetZ;
+    
+    // Add the silhouette to the scene
+    this.scene.add(this.silhouetteMesh);
+    
+    console.log('Silhouette created with position/rotation offsets:', {
+      position: {
+        base: {
+          x: cdCase.model.position.x,
+          y: cdCase.model.position.y,
+          z: cdCase.model.position.z
+        },
+        offset: silhouetteConfig.position,
+        final: {
+          x: this.silhouetteMesh.position.x,
+          y: this.silhouetteMesh.position.y,
+          z: this.silhouetteMesh.position.z
+        }
+      },
+      rotation: {
+        base: {
+          x: cdCase.model.rotation.x,
+          y: cdCase.model.rotation.y,
+          z: cdCase.model.rotation.z
+        },
+        offset: silhouetteConfig.rotation,
+        final: {
+          x: this.silhouetteMesh.rotation.x,
+          y: this.silhouetteMesh.rotation.y,
+          z: this.silhouetteMesh.rotation.z
+        }
+      }
+    });
   }
 
   private animate(): void {
@@ -208,14 +419,47 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Update case positions
     this.stateService.updatePositions(this.cdCases);
     
-    // Update background animations
-    this.sceneService.updateBackgroundAnimations();
+    // Update silhouette animation and make sure it follows the active case
+    if (this.silhouetteMaterial && this.silhouetteMesh) {
+      // Update the time uniform for pulsation
+      this.silhouetteMaterial.uniforms['time'].value = this.clock.getElapsedTime();
+      
+      // Find active case and update silhouette position if needed
+      const activeCase = this.cdCases.find(cdCase => cdCase.isActive && !cdCase.isOpen);
+      if (activeCase && !this.hasOpenedCase) {
+        const silhouetteConfig = this.config.silhouette;
+        
+        // Apply base position from active case
+        this.silhouetteMesh.position.copy(activeCase.model.position);
+        
+        // Apply position offsets from config
+        this.silhouetteMesh.position.x += silhouetteConfig.position.offsetX;
+        this.silhouetteMesh.position.y += silhouetteConfig.position.offsetY;
+        this.silhouetteMesh.position.z += silhouetteConfig.position.offsetZ;
+        
+        // Apply base rotation from active case
+        this.silhouetteMesh.rotation.copy(activeCase.model.rotation);
+        
+        // Apply rotation offsets from config
+        this.silhouetteMesh.rotation.x += silhouetteConfig.rotation.offsetX;
+        this.silhouetteMesh.rotation.y += silhouetteConfig.rotation.offsetY;
+        this.silhouetteMesh.rotation.z += silhouetteConfig.rotation.offsetZ;
+      }
+    }
+    
+    // Only update background animations if background is visible
+    if (this.backgroundPlane && this.backgroundPlane.visible) {
+      this.sceneService.updateBackgroundAnimations();
+    }
     
     // Update controls and render
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
     this.labelRenderer.render(this.scene, this.camera);
   }
+  
+  // Add clock for animations
+  private clock = new THREE.Clock();
 
   // Debug menu methods
   public updateCamera(): void {
@@ -315,6 +559,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // If no case is active, activate the first one
       if (currentActiveIndex === -1) {
         this.stateService.setActiveCase(this.cdCases, 0);
+        
+        // Create silhouette for new active case
+        const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+        if (activeCase) {
+          this.createActiveCaseSilhouette(activeCase);
+        }
         return;
       }
       
@@ -327,6 +577,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       }
       
       this.stateService.setActiveCase(this.cdCases, newIndex);
+      
+      // Create silhouette for new active case
+      const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+      if (activeCase) {
+        this.createActiveCaseSilhouette(activeCase);
+      }
     }
   }
 } 

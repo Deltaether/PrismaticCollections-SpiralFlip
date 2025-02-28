@@ -41,6 +41,33 @@ export interface MaterialConfig {
   clearcoatRoughness?: number;
 }
 
+export interface SilhouetteConfig {
+  size: {
+    scale: number;  // Scale multiplier for the silhouette size relative to the CD case
+  };
+  appearance: {
+    color: string;   // Hex color for the silhouette glow
+    intensity: number; // Base intensity of the glow
+    opacity: number;  // Maximum opacity of the glow
+  };
+  position: {
+    offsetX: number; // Offset from the CD case position on X axis
+    offsetY: number; // Offset from the CD case position on Y axis
+    offsetZ: number; // Offset from the CD case position on Z axis
+  };
+  rotation: {
+    offsetX: number; // Additional rotation around X axis in radians
+    offsetY: number; // Additional rotation around Y axis in radians
+    offsetZ: number; // Additional rotation around Z axis in radians
+  };
+  animation: {
+    fastPulseSpeed: number;  // Speed of the fast pulse animation
+    slowPulseSpeed: number;  // Speed of the slow pulse animation
+    fastPulseAmount: number; // Amount of variation in the fast pulse (0-1)
+    slowPulseAmount: number; // Amount of variation in the slow pulse (0-1)
+  };
+}
+
 export interface CaseConfig {
   id: number;
   title: string;
@@ -148,6 +175,7 @@ export interface Config {
       }>;
     };
   };
+  silhouette: SilhouetteConfig;
   cdCases: Array<{
     id: number;
     title: string;

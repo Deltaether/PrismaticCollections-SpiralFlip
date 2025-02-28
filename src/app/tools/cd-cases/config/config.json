@@ -80,7 +80,7 @@
     },
     "backgroundPlane": {
       "position": {
-        "x": 0.8,
+        "x": 0.7,
         "y": -1.4,
         "z": 0
       },
@@ -132,6 +132,32 @@
           "clearcoatRoughness": 0.2
         }
       ]
+    }
+  },
+  "silhouette": {
+    "size": {
+      "scale": 1.08
+    },
+    "appearance": {
+      "color": "#FFD700",
+      "intensity": 1.0,
+      "opacity": 0.9
+    },
+    "position": {
+      "offsetX": 0.0,
+      "offsetY": 0.0,
+      "offsetZ": 0.0
+    },
+    "rotation": {
+      "offsetX": 0.0,
+      "offsetY": 0.0,
+      "offsetZ": -1.5708
+    },
+    "animation": {
+      "fastPulseSpeed": 5.0,
+      "slowPulseSpeed": 2.0,
+      "fastPulseAmount": 0.3,
+      "slowPulseAmount": 0.4
     }
   },
   "cdCases": []

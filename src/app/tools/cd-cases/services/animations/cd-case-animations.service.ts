@@ -341,7 +341,7 @@ export class CDCaseAnimationsService {
     this.targetStates.set(cdCase.id, cdCase.isOpen);
   }
 
-  isAnimating(cdCase: CDCase): boolean {
+  private isAnimating(cdCase: CDCase): boolean {
     return this.activeAnimations.get(cdCase.id) || false;
   }
 
@@ -360,5 +360,205 @@ export class CDCaseAnimationsService {
   // New method to check if any case is currently animating
   hasAnyActiveAnimations(cdCases: CDCase[]): boolean {
     return cdCases.some(cdCase => this.isAnimating(cdCase));
+  }
+
+  /**
+   * Opens a specific CD case with animation
+   */
+  openCase(cdCase: CDCase): void {
+    if (cdCase.isOpen) return;
+    
+    console.group('Opening CD case:', cdCase.id);
+    
+    // Set duration for the animation
+    const duration = 1000; // 1 second in ms
+    
+    // Mark as open
+    cdCase.isOpen = true;
+    
+    // Check for animations in the model
+    if (cdCase.animations) {
+      console.log(`Model has ${cdCase.animations.length} animation clips:`, 
+        cdCase.animations.map(clip => clip.name).join(', '));
+    }
+    
+    // Priority 1: Try to use the built-in animation action if available
+    if (cdCase.openAction && cdCase.mixer) {
+      console.log('Using built-in OPEN animation action');
+      
+      // Reset and play the animation
+      cdCase.mixer.stopAllAction();
+      cdCase.openAction.reset();
+      cdCase.openAction.setLoop(THREE.LoopOnce, 1);
+      cdCase.openAction.clampWhenFinished = true;
+      cdCase.openAction.play();
+      
+      // Mark as animating
+      this.activeAnimations.set(cdCase.id, true);
+      
+      // Schedule animation end
+      setTimeout(() => {
+        this.activeAnimations.set(cdCase.id, false);
+        console.log('Animation completed via mixer');
+      }, duration);
+      
+      console.groupEnd();
+      return;
+    }
+    
+    // Priority 2: Try to find and play the animation clip by name
+    if (cdCase.animations && cdCase.animations.length > 0 && cdCase.mixer) {
+      // Look for animation clips with 'open' in their name
+      const openAnimClip = cdCase.animations.find(clip => 
+        clip.name.toLowerCase().includes('open') || 
+        clip.name.toLowerCase().includes('lid') ||
+        clip.name.toLowerCase().includes('top')
+      );
+      
+      if (openAnimClip) {
+        console.log(`Found suitable animation clip: ${openAnimClip.name}`);
+        
+        // Create and play the action
+        cdCase.mixer.stopAllAction();
+        const openAction = cdCase.mixer.clipAction(openAnimClip);
+        openAction.setLoop(THREE.LoopOnce, 1);
+        openAction.clampWhenFinished = true;
+        openAction.reset().play();
+        
+        // Mark as animating
+        this.activeAnimations.set(cdCase.id, true);
+        
+        // Schedule animation end
+        setTimeout(() => {
+          this.activeAnimations.set(cdCase.id, false);
+          console.log(`Animation completed using clip: ${openAnimClip.name}`);
+        }, duration);
+        
+        console.groupEnd();
+        return;
+      }
+    }
+    
+    // Last resort: Fallback to manual lid rotation if animation not available
+    console.log('No suitable animation found - falling back to manual lid rotation');
+    
+    // Log all parts of the model to help identify the lid
+    console.log('Model structure:');
+    cdCase.model.traverse((child: THREE.Object3D) => {
+      console.log(`- ${child.name} (type: ${child.type})`);
+    });
+    
+    // Find the lid part in the model using traversal
+    let lidObj: THREE.Object3D | null = null;
+    
+    // First look for parts with exact "lid" name
+    cdCase.model.traverse((child: THREE.Object3D) => {
+      if (child.name.toLowerCase() === 'lid' || 
+          child.name.toLowerCase() === 'top' || 
+          child.name.toLowerCase().includes('_lid') ||
+          child.name.toLowerCase().includes('lid_')) {
+        lidObj = child;
+        console.log(`Found lid by exact name: ${child.name}`);
+      }
+    });
+    
+    // If not found, try with includes
+    if (!lidObj) {
+      cdCase.model.traverse((child: THREE.Object3D) => {
+        if (child.name.toLowerCase().includes('lid') || 
+            child.name.toLowerCase().includes('top') ||
+            child.name.toLowerCase().includes('cover')) {
+          lidObj = child;
+          console.log(`Found lid by partial name: ${child.name}`);
+        }
+      });
+    }
+    
+    if (!lidObj) {
+      console.warn('Could not find lid component in CD case:', cdCase.id);
+      console.log('Trying to find the parent node for rotation instead');
+      
+      // Last resort: Just find the first rotatable child
+      cdCase.model.traverse((child: THREE.Object3D) => {
+        if (child instanceof THREE.Mesh && !lidObj) {
+          lidObj = child;
+          console.log(`Using first mesh as fallback: ${child.name}`);
+        }
+      });
+      
+      if (!lidObj) {
+        console.error('Could not find any suitable object to animate');
+        console.groupEnd();
+        return;
+      }
+    }
+    
+    // Use type assertion to ensure TypeScript recognizes the rotation property
+    const lid = lidObj as THREE.Object3D;
+    
+    // Store initial rotation
+    const initialRotation = {
+      x: lid.rotation.x,
+      y: lid.rotation.y,
+      z: lid.rotation.z
+    };
+    
+    // Try different rotation axis based on model orientation
+    const rotationAxis = 'z'; // Default to Z-axis rotation
+    
+    // Set target rotation (try different axes)
+    const targetRotation = {
+      x: initialRotation.x,
+      y: initialRotation.y,
+      z: initialRotation.z + Math.PI * 0.8 // 80% of 180 degrees around Z
+    };
+    
+    console.log('Animation details:', {
+      lidName: lid.name,
+      initialRotation,
+      targetRotation,
+      rotationAxis,
+      duration
+    });
+    
+    // Start animation
+    const startTime = Date.now();
+    
+    // Define an update function for the animation
+    const updateAnimation = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Use easing for smooth animation
+      const easedProgress = this.easeOutBack(progress);
+      
+      // Update rotation (try all axes to see which works)
+      lid.rotation.z = initialRotation.z + (targetRotation.z - initialRotation.z) * easedProgress;
+      
+      // If animation is still running, request next frame
+      if (progress < 1) {
+        requestAnimationFrame(updateAnimation);
+        // Mark as animating
+        this.activeAnimations.set(cdCase.id, true);
+      } else {
+        // Animation complete
+        this.activeAnimations.set(cdCase.id, false);
+        console.log('Manual animation completed successfully');
+      }
+    };
+    
+    // Start the animation
+    requestAnimationFrame(updateAnimation);
+    // Mark as animating
+    this.activeAnimations.set(cdCase.id, true);
+    
+    console.groupEnd();
+  }
+  
+  // Add easing function for smooth animation
+  private easeOutBack(x: number): number {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
   }
 } 

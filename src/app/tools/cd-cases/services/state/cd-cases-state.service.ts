@@ -7,26 +7,26 @@ import { CDCaseAnimationsService } from '../animations/cd-case-animations.servic
   providedIn: 'root'
 })
 export class CDCasesStateService {
-  private readonly Z_OFFSET = 1; // Units to move in positive Z axis when active
-  private readonly DEACTIVATED_Z_OFFSET = -3; // Units to move in negative Z axis when deactivated
+  private readonly Z_OFFSET = 1.0;
+  private readonly DEACTIVATED_Z_OFFSET = 0.0;
   private readonly POSITION_LERP_FACTOR = 0.1; // Smoothing factor for position transitions
 
   constructor(private animationsService: CDCaseAnimationsService) {}
 
-  setActiveCase(cdCases: CDCase[], activeIndex: number): void {
-    console.group('Setting active case:', activeIndex);
+  setActiveCase(cdCases: CDCase[], index: number): void {
+    console.group('Setting active case:', index);
     
     const currentActiveCase = cdCases.find(cdCase => cdCase.isActive);
-    const targetCase = cdCases[activeIndex];
+    const targetCase = cdCases[index];
 
     if (!targetCase) {
-      console.error('Target case not found for index:', activeIndex);
+      console.error('Target case not found for index:', index);
       console.groupEnd();
       return;
     }
 
     if (currentActiveCase === targetCase) {
-      console.log('Case already active:', activeIndex);
+      console.log('Case already active:', index);
       console.groupEnd();
       return;
     }
@@ -64,12 +64,11 @@ export class CDCasesStateService {
     console.log('Activating case:', targetCase.id);
     targetCase.isActive = true;
     
-    // Set target position for active case
+    // Set target position for active case - bring it forward
     targetCase.targetPosition.copy(targetCase.initialPosition);
     targetCase.targetPosition.z += this.Z_OFFSET;
     
-    // Queue the open animation
-    this.animationsService.queueAnimation(targetCase, 'open');
+    // REMOVED: Do not queue the open animation - will be handled by click
     
     console.groupEnd();
   }

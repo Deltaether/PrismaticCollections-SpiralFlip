@@ -16,8 +16,8 @@ export class SceneService {
   
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x551919);
-    scene.fog = new THREE.Fog(0x551919, 10, 50);
+    scene.background = new THREE.Color(0x1a1a4f);
+    scene.fog = new THREE.Fog(0x1a1a4f, 10, 50);
 
     // Add AxesHelper for orientation
     const axesHelper = new THREE.AxesHelper(5);
@@ -138,7 +138,7 @@ export class SceneService {
   }
 
   // Renamed from setupRedPlane to setupVideoPlane
-  setupVideoPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void } {
+  setupVideoPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void, videoTexture: THREE.VideoTexture } {
     const { videoPlane } = config.sceneSettings;
     const planeGeometry = new THREE.PlaneGeometry(videoPlane.size.width, videoPlane.size.height);
     
@@ -179,33 +179,35 @@ export class SceneService {
     
     scene.add(planeMesh);
     
-    // Return both the mesh and a play function
+    // Return the mesh, play function, and the videoTexture for use in other shaders
     return {
       mesh: planeMesh,
-      play: () => video.play().catch(e => console.warn('Video play failed:', e))
+      play: () => video.play().catch(e => console.warn('Video play failed:', e)),
+      videoTexture: videoTexture
     };
   }
 
-  setupBackgroundPlane(scene: THREE.Scene, config: Config): THREE.Mesh {
+  setupBackgroundPlane(scene: THREE.Scene, config: Config, videoTexture?: THREE.VideoTexture): THREE.Mesh {
     const { backgroundPlane } = config.sceneSettings;
     // Create a background plane with config dimensions
     const planeGeometry = new THREE.PlaneGeometry(backgroundPlane.size.width, backgroundPlane.size.height);
     
-    // Parse color values from config
-    const gold = new THREE.Color(backgroundPlane.colors.gold);
-    const darkGold = new THREE.Color(backgroundPlane.colors.darkGold);
-    const orange = new THREE.Color(backgroundPlane.colors.orange);
-    const brown = new THREE.Color(backgroundPlane.colors.brown);
+    // Define colors for medieval fantasy theme with gold and brown/orange tones
+    const goldColor = new THREE.Color(0xd4af37);      // Rich gold
+    const darkGoldColor = new THREE.Color(0x8b6914);  // Dark gold/bronze
+    const orangeColor = new THREE.Color(0xc86400);    // Deep orange
+    const brownColor = new THREE.Color(0x4d2800);     // Dark brown
     
-    // Create a shader material for dynamic background
+    // Create a shader material for medieval fantasy style background with video influence
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0.0 },
         resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        goldColor: { value: new THREE.Vector3(gold.r, gold.g, gold.b) },
-        darkGoldColor: { value: new THREE.Vector3(darkGold.r, darkGold.g, darkGold.b) },
-        orangeColor: { value: new THREE.Vector3(orange.r, orange.g, orange.b) },
-        brownColor: { value: new THREE.Vector3(brown.r, brown.g, brown.b) }
+        goldColor: { value: new THREE.Vector3(goldColor.r, goldColor.g, goldColor.b) },
+        darkGoldColor: { value: new THREE.Vector3(darkGoldColor.r, darkGoldColor.g, darkGoldColor.b) },
+        orangeColor: { value: new THREE.Vector3(orangeColor.r, orangeColor.g, orangeColor.b) },
+        brownColor: { value: new THREE.Vector3(brownColor.r, brownColor.g, brownColor.b) },
+        videoTexture: { value: videoTexture || null }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -221,61 +223,201 @@ export class SceneService {
         uniform vec3 darkGoldColor;
         uniform vec3 orangeColor;
         uniform vec3 brownColor;
+        uniform sampler2D videoTexture;
         varying vec2 vUv;
 
-        // Noise function for organic patterns
-        float noise(vec2 p) {
+        // Hash function for pseudo-random values
+        float hash(vec2 p) {
           return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
         }
-
-        // Smooth noise for more natural patterns
-        float smoothNoise(vec2 p) {
+        
+        // Improved noise function for organic patterns
+        float noise(vec2 p) {
           vec2 i = floor(p);
           vec2 f = fract(p);
-          f = f * f * (3.0 - 2.0 * f);
+          f = f * f * (3.0 - 2.0 * f); // Smooth interpolation
           
-          float a = noise(i);
-          float b = noise(i + vec2(1.0, 0.0));
-          float c = noise(i + vec2(0.0, 1.0));
-          float d = noise(i + vec2(1.0, 1.0));
+          float a = hash(i);
+          float b = hash(i + vec2(1.0, 0.0));
+          float c = hash(i + vec2(0.0, 1.0));
+          float d = hash(i + vec2(1.0, 1.0));
           
           return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
         }
-
-        void main() {
-          // Create flowing pattern based on time
-          vec2 uv = vUv;
-          float speed = 0.1;
+        
+        // Fractal Brownian Motion for rich texture
+        float fbm(vec2 p) {
+          float sum = 0.0;
+          float amp = 0.5;
+          float freq = 1.0;
           
-          // Multiple layers of noise for rich effect
-          float n1 = smoothNoise(uv * 6.0 + time * speed);
-          float n2 = smoothNoise(uv * 12.0 - time * speed * 0.7);
-          float n3 = smoothNoise(uv * 3.0 + time * speed * 0.3);
-          
-          // Combine noise layers
-          float n = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
-          
-          // Create flowing streaks
-          float streak = sin(uv.x * 20.0 + time * 0.5) * 0.5 + 0.5;
-          streak *= sin(uv.y * 15.0 - time * 0.3) * 0.5 + 0.5;
-          
-          // Blend between colors based on noise using uniform colors
-          vec3 color;
-          if (n < 0.3) {
-            color = mix(brownColor, darkGoldColor, n / 0.3);
-          } else if (n < 0.7) {
-            color = mix(darkGoldColor, goldColor, (n - 0.3) / 0.4);
-          } else {
-            color = mix(goldColor, orangeColor, (n - 0.7) / 0.3);
+          for(int i = 0; i < 6; i++) {
+            sum += noise(p * freq) * amp;
+            amp *= 0.5;
+            freq *= 2.0;
           }
           
-          // Add streaks and glow
-          color += streak * 0.15 * orangeColor;
+          return sum;
+        }
+        
+        // Create flowing wave pattern
+        float flowPattern(vec2 uv, float scale, float speed) {
+          float t = time * speed;
+          vec2 dir = vec2(1.0, 0.5);
+          float pattern = fbm(uv * scale + dir * t);
+          pattern = smoothstep(0.2, 0.8, pattern);
+          return pattern;
+        }
+        
+        // Create elegant curves
+        float elegantCurve(vec2 uv, float scale, float thickness, float offset) {
+          // Distorted sine wave pattern
+          float distortion = fbm(uv * 2.0 + time * 0.05) * 0.2;
+          float wave = sin(uv.x * scale + uv.y * scale * 0.5 + offset + distortion);
+          return smoothstep(1.0 - thickness, 1.0, wave + 1.0);
+        }
+        
+        // Create modern light beam effect
+        float lightBeam(vec2 uv, float angle, float width, float softness) {
+          // Rotate space
+          float s = sin(angle);
+          float c = cos(angle);
+          vec2 rotatedUV = vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
           
-          // Vignette effect
-          float vignette = 1.0 - length((uv - 0.5) * 1.5);
-          vignette = smoothstep(0.0, 0.8, vignette);
-          color *= vignette;
+          // Create beam with soft edges
+          float beam = smoothstep(width, width + softness, abs(rotatedUV.y));
+          return 1.0 - beam;
+        }
+        
+        // Create decorative swirl
+        float swirl(vec2 uv, vec2 center, float radius, float thickness, float rotation) {
+          vec2 toCenter = uv - center;
+          float dist = length(toCenter);
+          
+          // Calculate angle with rotation
+          float angle = atan(toCenter.y, toCenter.x) + rotation + dist * 3.0;
+          
+          // Create swirl pattern
+          float swirl = sin(angle * 3.0);
+          return smoothstep(thickness, thickness + 0.01, swirl) * 
+                 smoothstep(radius + 0.1, radius, dist) * 
+                 smoothstep(0.0, radius - 0.2, dist);
+        }
+        
+        // Sample video with blur and offset
+        vec4 sampleVideoBlurred(vec2 uv, float blurAmount, vec2 offset) {
+          // Apply offset and scaling to create interesting sampling area
+          vec2 videoUV = uv * 0.8 + 0.1 + offset;
+          
+          // Multi-sample blur
+          vec4 blurredColor = vec4(0.0);
+          float total = 0.0;
+          
+          // 9-tap gaussian-like blur
+          for(float x = -2.0; x <= 2.0; x += 1.0) {
+            for(float y = -2.0; y <= 2.0; y += 1.0) {
+              float weight = 1.0 - length(vec2(x, y)) / 3.0;
+              if(weight > 0.0) {
+                vec2 sampleUV = videoUV + vec2(x, y) * blurAmount / resolution;
+                blurredColor += texture2D(videoTexture, sampleUV) * weight;
+                total += weight;
+              }
+            }
+          }
+          
+          return blurredColor / total;
+        }
+
+        void main() {
+          // Base coordinates
+          vec2 uv = vUv;
+          
+          // Sample video for reactive elements
+          vec4 blurredVideo1 = sampleVideoBlurred(uv, 0.1, vec2(sin(time * 0.3) * 0.05, cos(time * 0.2) * 0.05));
+          vec4 blurredVideo2 = sampleVideoBlurred(uv + 0.2, 0.15, vec2(cos(time * 0.2) * 0.05, sin(time * 0.3) * 0.05));
+          
+          // Extract luminance and motion from video
+          float vidLuma1 = dot(blurredVideo1.rgb, vec3(0.2126, 0.7152, 0.0722));
+          float vidLuma2 = dot(blurredVideo2.rgb, vec3(0.2126, 0.7152, 0.0722));
+          float videoMotion = abs(vidLuma1 - vidLuma2) * 5.0; // Motion detection
+          
+          // Base flowing pattern influenced by video
+          float flow = flowPattern(uv, 3.0, 0.1 + videoMotion * 0.2);
+          
+          // Create layered elegant curves
+          float curvePattern = 0.0;
+          for (int i = 0; i < 3; i++) {
+            float offset = float(i) * 2.0 + time * 0.2;
+            curvePattern += elegantCurve(uv, 10.0 + float(i) * 5.0, 0.1, offset) * (0.5 - float(i) * 0.1);
+          }
+          
+          // Create dynamic light beams
+          float beams = 0.0;
+          for (int i = 0; i < 4; i++) {
+            float angle = time * 0.1 + float(i) * 1.57; // 90 degrees apart, slowly rotating
+            beams += lightBeam(uv - 0.5, angle, 0.1 + vidLuma1 * 0.1, 0.05) * 0.2;
+          }
+          
+          // Create decorative swirls
+          float swirlPattern = 0.0;
+          vec2 swirlCenter1 = vec2(0.25 + sin(time * 0.2) * 0.1, 0.25 + cos(time * 0.3) * 0.1);
+          vec2 swirlCenter2 = vec2(0.75 + cos(time * 0.25) * 0.1, 0.75 + sin(time * 0.35) * 0.1);
+          
+          swirlPattern += swirl(uv, swirlCenter1, 0.15 + vidLuma1 * 0.05, 0.5, time * 0.5);
+          swirlPattern += swirl(uv, swirlCenter2, 0.15 + vidLuma2 * 0.05, 0.5, -time * 0.5);
+          
+          // Use video content to create reactive highlight nodes
+          float videoNodes = 0.0;
+          for (int i = 0; i < 6; i++) {
+            float t = time * 0.2 + float(i);
+            vec2 nodePos = vec2(
+              0.5 + sin(t) * 0.4 * sin(t * 0.5),
+              0.5 + cos(t) * 0.4 * sin(t * 0.7)
+            );
+            float nodeBrightness = 0.3 + 0.7 * sin(t * 0.5);
+            
+            float distToNode = length(uv - nodePos);
+            float nodeSize = 0.03 + vidLuma1 * 0.02;
+            
+            videoNodes += smoothstep(nodeSize, nodeSize * 0.5, distToNode) * nodeBrightness;
+          }
+          
+          // Blend different pattern elements
+          float combinedPattern = flow * 0.3 + curvePattern * 0.4 + beams * (0.3 + videoMotion) + swirlPattern * 0.5;
+          
+          // Base color from warm gold to dark gold with flow pattern
+          vec3 baseColor = mix(darkGoldColor, goldColor, flow);
+          
+          // Apply layered visual elements
+          vec3 color = baseColor;
+          
+          // Add curvature highlights
+          color = mix(color, goldColor * 1.2, curvePattern * 0.8);
+          
+          // Add light beams with video influence
+          color = mix(color, orangeColor, beams * (0.5 + vidLuma1 * 0.5));
+          
+          // Add swirl pattern
+          color = mix(color, goldColor * 1.5, swirlPattern * 0.7);
+          
+          // Add nodes with video influence
+          color = mix(color, goldColor * 1.8, videoNodes * (0.4 + videoMotion));
+          
+          // Subtle video color influence (tinted to match palette)
+          vec3 tintedVideoColor = blurredVideo1.rgb * vec3(1.3, 1.0, 0.6); // Warm gold tint
+          color = mix(color, tintedVideoColor, videoMotion * 0.15);
+          
+          // Add subtle glow based on video motion
+          color += goldColor * videoMotion * 0.1;
+          
+          // Add subtle film grain for texture
+          float grain = hash(uv + time) * 0.03;
+          color = mix(color, brownColor, grain);
+          
+          // Vignette effect - darker at the edges
+          float vignette = 1.0 - length((uv - 0.5) * 1.3);
+          vignette = smoothstep(0.0, 0.7, vignette);
+          color = mix(brownColor, color, vignette);
           
           gl_FragColor = vec4(color, 1.0);
         }

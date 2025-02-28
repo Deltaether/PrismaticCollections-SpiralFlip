@@ -14,6 +14,7 @@ export interface CDCase {
   mixer?: THREE.AnimationMixer;
   animations?: THREE.AnimationClip[];
   openAction?: THREE.AnimationAction;
+  closeAction?: THREE.AnimationAction;
   armature?: THREE.Object3D | null;
   isOpen: boolean;
   glowMaterial?: THREE.MeshBasicMaterial;
@@ -107,7 +108,34 @@ export interface SceneConfig {
 
 export interface Config {
   sceneSettings: SceneConfig;
-  cdCases: CaseConfig[];
+  caseSettings: {
+    basePosition: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    baseRotation: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    stackOffset: number;
+    materials: {
+      cd: Array<{
+        name: string;
+        metalness: number;
+        roughness: number;
+        envMapIntensity: number;
+        clearcoat: number;
+        clearcoatRoughness: number;
+      }>;
+    };
+  };
+  cdCases: Array<{
+    id: number;
+    title: string;
+    artist: string;
+  }>;
 }
 
 // Legacy interfaces kept for compatibility with debug menu

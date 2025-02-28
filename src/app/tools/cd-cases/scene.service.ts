@@ -10,7 +10,19 @@ import { Config } from '../shared/interfaces';
 export class SceneService {
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
-    scene.background = null;
+    scene.background = new THREE.Color(0x551919);
+    scene.fog = new THREE.Fog(0x551919, 10, 50);
+
+    // Add AxesHelper for orientation
+    const axesHelper = new THREE.AxesHelper(5);
+    // Red is X, Green is Y, Blue is Z
+    axesHelper.setColors(
+      new THREE.Color(0xff0000), // X axis - Red
+      new THREE.Color(0x00ff00), // Y axis - Green
+      new THREE.Color(0x0000ff)  // Z axis - Blue
+    );
+    scene.add(axesHelper);
+
     return scene;
   }
 
@@ -144,8 +156,10 @@ export class SceneService {
       emissiveIntensity: 0.5,
       metalness: 0.0,
       roughness: 0.2,
-      depthWrite: true,
-      depthTest: true
+      depthWrite: false,  // Disable depth writing
+      depthTest: true,
+      alphaTest: 0.1,    // Add alpha test to help with transparency
+      blending: THREE.NormalBlending
     });
     
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -160,8 +174,8 @@ export class SceneService {
       redPlane.rotation.z
     );
 
-    planeMesh.castShadow = true;
-    planeMesh.receiveShadow = true;
+    // Set a negative renderOrder to ensure it renders first
+    planeMesh.renderOrder = -1;
     
     scene.add(planeMesh);
     return planeMesh;

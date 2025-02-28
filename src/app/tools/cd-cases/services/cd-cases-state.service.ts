@@ -13,14 +13,34 @@ export class CDCasesStateService {
   constructor(private animationService: CDCasesAnimationService) {}
 
   setActiveCase(cdCases: CDCase[], activeIndex: number): void {
+    console.log('Setting active case:', activeIndex, 'Total cases:', cdCases.length);
+    
     // First, find the currently active case
     const currentActiveCase = cdCases.find(cdCase => cdCase.isActive);
     const targetCase = cdCases[activeIndex];
 
-    if (currentActiveCase === targetCase) return; // No change needed
+    if (!targetCase) {
+      console.error('Target case not found for index:', activeIndex);
+      return;
+    }
+
+    if (currentActiveCase === targetCase) {
+      console.log('Case already active:', activeIndex);
+      return;
+    }
 
     // Deactivate current case if exists
     if (currentActiveCase) {
+      console.log('Deactivating case:', currentActiveCase.id, {
+        position: currentActiveCase.position.toArray(),
+        targetPosition: currentActiveCase.targetPosition.toArray()
+      });
+      
+      // Close the current case if it's open
+      if (currentActiveCase.isOpen) {
+        this.flipCase(currentActiveCase);
+      }
+      
       currentActiveCase.isActive = false;
       currentActiveCase.isDeactivating = true;
       currentActiveCase.currentLerpAlpha = 0;
@@ -31,20 +51,38 @@ export class CDCasesStateService {
     // Cancel any other ongoing transitions
     cdCases.forEach(cdCase => {
       if (cdCase !== currentActiveCase && cdCase !== targetCase) {
+        // Close any open cases
+        if (cdCase.isOpen) {
+          this.flipCase(cdCase);
+        }
+        
         cdCase.isActive = false;
         cdCase.isDeactivating = false;
-        cdCase.currentLerpAlpha = 1; // Complete any ongoing animations
+        cdCase.currentLerpAlpha = 1;
         cdCase.position.x = this.INACTIVE_X_POSITION;
         cdCase.model.position.copy(cdCase.position);
       }
     });
 
     // Activate new case
+    console.log('Activating case:', targetCase.id, {
+      position: targetCase.position.toArray(),
+      targetPosition: targetCase.targetPosition.toArray()
+    });
+    
     targetCase.isActive = true;
     targetCase.isDeactivating = false;
     targetCase.currentLerpAlpha = 0;
     targetCase.targetPosition.copy(targetCase.position);
     targetCase.targetPosition.x = this.ACTIVE_X_POSITION;
+
+    // Open the newly active case after a short delay
+    setTimeout(() => {
+      if (targetCase.isActive && !targetCase.isOpen) {
+        console.log('Opening newly activated case:', targetCase.id);
+        this.flipCase(targetCase);
+      }
+    }, 500); // Wait for the case to move into position
   }
 
   flipCase(cdCase: CDCase): void {

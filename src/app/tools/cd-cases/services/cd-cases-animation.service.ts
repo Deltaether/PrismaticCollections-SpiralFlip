@@ -21,12 +21,25 @@ export class CDCasesAnimationService {
 
       // Update position lerping for active/inactive transitions
       if (cdCase.isActive || cdCase.isDeactivating) {
+        const oldAlpha = cdCase.currentLerpAlpha;
         cdCase.currentLerpAlpha += this.LERP_SPEED;
+        
         if (cdCase.currentLerpAlpha > 1) {
           cdCase.currentLerpAlpha = 1;
           if (cdCase.isDeactivating) {
+            console.log('Case deactivation complete:', cdCase.id);
             cdCase.isDeactivating = false;
           }
+        }
+
+        // Only log if there's significant movement
+        if (Math.abs(oldAlpha - cdCase.currentLerpAlpha) > 0.1) {
+          console.log(`Case ${cdCase.id} lerp update:`, {
+            isActive: cdCase.isActive,
+            isDeactivating: cdCase.isDeactivating,
+            alpha: cdCase.currentLerpAlpha,
+            position: cdCase.position.toArray()
+          });
         }
 
         cdCase.position.lerp(cdCase.targetPosition, cdCase.currentLerpAlpha);
@@ -35,12 +48,16 @@ export class CDCasesAnimationService {
 
       // Apply physics and momentum
       if (!cdCase.isDragging && (cdCase.momentum.x !== 0 || cdCase.momentum.y !== 0)) {
+        const oldMomentum = cdCase.momentum.length();
         cdCase.position.x += cdCase.momentum.x;
         cdCase.position.z += cdCase.momentum.y;
         cdCase.model.position.copy(cdCase.position);
         
         cdCase.momentum.multiplyScalar(0.95);
         if (cdCase.momentum.length() < 0.001) {
+          if (oldMomentum > 0.001) {
+            console.log(`Case ${cdCase.id} momentum stopped`);
+          }
           cdCase.momentum.set(0, 0);
         }
       }
@@ -48,16 +65,40 @@ export class CDCasesAnimationService {
   }
 
   setupAnimation(cdCase: CDCase): void {
-    const openAnim = cdCase.animations?.find(a => 
-      a.name.toLowerCase().includes('open') || 
-      a.name.toLowerCase().includes('armature')
-    );
+    if (!cdCase.animations || !cdCase.mixer) {
+      console.warn('No animations or mixer available for case:', cdCase.id);
+      return;
+    }
+
+    // Find both open and close animations
+    const openAnim = cdCase.animations.find(a => a.name === 'Open Lid.001');
+    const closeAnim = cdCase.animations.find(a => a.name === 'Close Lid');
     
-    if (openAnim && cdCase.mixer) {
-      console.log('Setting up animation:', openAnim.name);
+    console.log('Found animations for case:', cdCase.id, {
+      openAnim: openAnim?.name,
+      closeAnim: closeAnim?.name
+    });
+
+    if (openAnim && closeAnim) {
+      // Create actions for both animations
       cdCase.openAction = cdCase.mixer.clipAction(openAnim);
+      cdCase.closeAction = cdCase.mixer.clipAction(closeAnim);
+
+      // Configure the animations
       cdCase.openAction.setLoop(THREE.LoopOnce, 1);
       cdCase.openAction.clampWhenFinished = true;
+      cdCase.openAction.timeScale = 1;
+      
+      cdCase.closeAction.setLoop(THREE.LoopOnce, 1);
+      cdCase.closeAction.clampWhenFinished = true;
+      cdCase.closeAction.timeScale = 1;
+
+      // Start with lid closed
+      cdCase.closeAction.play();
+      cdCase.closeAction.paused = true;
+      cdCase.closeAction.time = closeAnim.duration;
+    } else {
+      console.warn('Could not find required animations for case:', cdCase.id);
     }
   }
 
@@ -67,40 +108,28 @@ export class CDCasesAnimationService {
       return;
     }
 
-    let lidBone: THREE.Object3D | THREE.Bone | null = null;
-    cdCase.armature.traverse((node: THREE.Object3D) => {
-      if (node.name === 'Front_Case_Bone') {
-        lidBone = node;
-      }
-    });
-
-    if (!lidBone) {
-      console.warn('No lid bone found in armature for case:', cdCase.id);
+    if (!cdCase.openAction || !cdCase.closeAction) {
+      console.warn('No animation actions found for case:', cdCase.id);
       return;
     }
 
-    if (!cdCase.mixer) {
-      cdCase.mixer = new THREE.AnimationMixer(cdCase.model);
+    // Stop any current animations
+    cdCase.mixer?.stopAllAction();
+
+    console.log(`Playing ${isOpening ? 'open' : 'close'} animation for case:`, cdCase.id);
+    
+    if (isOpening) {
+      cdCase.openAction.reset();
+      cdCase.openAction.setLoop(THREE.LoopOnce, 1);
+      cdCase.openAction.clampWhenFinished = true;
+      cdCase.openAction.timeScale = 1;
+      cdCase.openAction.play();
+    } else {
+      cdCase.closeAction.reset();
+      cdCase.closeAction.setLoop(THREE.LoopOnce, 1);
+      cdCase.closeAction.clampWhenFinished = true;
+      cdCase.closeAction.timeScale = 1;
+      cdCase.closeAction.play();
     }
-
-    const times = [0, this.ANIMATION_DURATION];
-    const values = isOpening ? 
-      [0, Math.PI * 0.8] :  // Opening animation
-      [Math.PI * 0.8, 0];   // Closing animation
-
-    const trackName = `.${(lidBone as THREE.Object3D).name}.rotation[x]`;
-    const rotationTrack = new THREE.NumberKeyframeTrack(
-      trackName,
-      times,
-      values
-    );
-
-    const clip = new THREE.AnimationClip('flip', this.ANIMATION_DURATION, [rotationTrack]);
-    cdCase.mixer.stopAllAction();
-
-    const action = cdCase.mixer.clipAction(clip);
-    action.setLoop(THREE.LoopOnce, 1);
-    action.clampWhenFinished = true;
-    action.play();
   }
 } 

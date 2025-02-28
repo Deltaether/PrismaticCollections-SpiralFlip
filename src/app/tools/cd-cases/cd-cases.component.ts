@@ -201,6 +201,21 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Update animations and physics
     this.animationService.updateAnimations(this.cdCases);
     
+    // Log animation states periodically (every 60 frames to avoid console spam)
+    if (Math.random() < 0.016) { // ~once per second at 60fps
+      this.cdCases.forEach(cdCase => {
+        if (cdCase.isActive || cdCase.isOpen) {
+          console.log(`Case ${cdCase.id} state:`, {
+            isActive: cdCase.isActive,
+            isOpen: cdCase.isOpen,
+            position: cdCase.position.toArray(),
+            hasActiveAnimations: !!(cdCase.openAction?.isRunning() || cdCase.closeAction?.isRunning()),
+            currentLerpAlpha: cdCase.currentLerpAlpha
+          });
+        }
+      });
+    }
+    
     // Update controls and render
     this.controls.update();
     this.renderer.render(this.scene, this.camera);

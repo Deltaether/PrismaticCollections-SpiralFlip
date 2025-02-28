@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { CDCase, Config } from '../../shared/interfaces';
 import { Injectable } from '@angular/core';
 
@@ -18,6 +19,10 @@ export class CDCasesService {
     renderer: THREE.WebGLRenderer
   ): Promise<CDCase[]> {
     const loader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('assets/draco/');
+    loader.setDRACOLoader(dracoLoader);
+
     const cdCases: CDCase[] = [];
     const loadingPromises: Promise<any>[] = [];
 
@@ -43,20 +48,78 @@ export class CDCasesService {
       this.logBones(gltf.scene);
 
       // Create CD cases from config
-      const casesPromises = config.cdCases.map(caseConfig => 
-        this.createCDCase(gltf, caseConfig, scene)
-      );
+      const casesPromises = config.cdCases.map(caseConfig => {
+        const model = gltf.scene.clone(true);
+        
+        // Only change: Apply 80% scale to the model
+        model.scale.set(0.7, 0.7, 0.7);
+        
+        // Use exact position from config with Y-axis stacking
+        const position = new THREE.Vector3(
+          config.caseSettings.basePosition.x,
+          config.caseSettings.basePosition.y + (caseConfig.id * config.caseSettings.stackOffset), // Stack along Y axis
+          config.caseSettings.basePosition.z
+        );
+        model.position.copy(position);
+
+        // Use exact rotation from config
+        const rotation = new THREE.Euler(
+          config.caseSettings.baseRotation.x,
+          config.caseSettings.baseRotation.y,
+          config.caseSettings.baseRotation.z
+        );
+        model.rotation.copy(rotation);
+        
+        let armature: THREE.Object3D | null = null;
+        model.traverse((node: THREE.Object3D) => {
+          if (node.name === 'Armature') {
+            armature = node;
+          }
+        });
+        
+        const mixer = new THREE.AnimationMixer(model);
+        const animations = gltf.animations.map((anim: THREE.AnimationClip) => anim.clone());
+
+        // Set up materials
+        this.setupMaterials(model, config.caseSettings);
+
+        const cdCase: CDCase = {
+          id: caseConfig.id,
+          title: caseConfig.title,
+          artist: caseConfig.artist,
+          imageUrl: '',
+          model,
+          isFlipped: false,
+          isDragging: false,
+          isOpen: false,
+          isActive: false,
+          isDeactivating: false,
+          position,
+          rotation,
+          momentum: new THREE.Vector2(),
+          mixer,
+          animations,
+          armature,
+          carouselIndex: caseConfig.id - 1,
+          targetPosition: position.clone(),
+          currentLerpAlpha: 0
+        };
+
+        // Set up animations
+        this.setupAnimation(cdCase);
+
+        scene.add(model);
+        return cdCase;
+      });
       
-      // Wait for all CD cases to be created
       const cases = await Promise.all(casesPromises);
       cdCases.push(...cases);
 
+      return cdCases;
     } catch (error) {
       console.error('Error loading model:', error);
-      throw error; // Re-throw to handle in component
+      throw error;
     }
-
-    return cdCases;
   }
 
   private logBones(scene: THREE.Object3D): void {
@@ -151,54 +214,6 @@ export class CDCasesService {
     pmremGenerator.dispose();
   }
 
-  private async createCDCase(
-    gltf: any,
-    caseConfig: any,
-    scene: THREE.Scene
-  ): Promise<CDCase> {
-    const model = gltf.scene.clone(true);
-    const { position, rotation } = caseConfig;
-    
-    model.position.set(position.x, position.y, position.z);
-    model.rotation.set(rotation.x, rotation.y, rotation.z);
-    
-    let armature: THREE.Object3D | null = null;
-    model.traverse((node: THREE.Object3D) => {
-      if (node.name === 'Armature') {
-        armature = node;
-      }
-    });
-    
-    scene.add(model);
-
-    const cdCase: CDCase = {
-      id: caseConfig.id,
-      title: caseConfig.title,
-      artist: caseConfig.artist,
-      imageUrl: '',
-      model,
-      isFlipped: false,
-      isDragging: false,
-      isOpen: false,
-      isActive: false,
-      isDeactivating: false,
-      position: new THREE.Vector3(position.x, position.y, position.z),
-      rotation: new THREE.Euler(rotation.x, rotation.y, rotation.z),
-      momentum: new THREE.Vector2(),
-      mixer: new THREE.AnimationMixer(model),
-      animations: gltf.animations.map((anim: THREE.AnimationClip) => anim.clone()),
-      armature: armature,
-      carouselIndex: caseConfig.id - 1,
-      targetPosition: new THREE.Vector3(position.x, position.y, position.z),
-      currentLerpAlpha: 0
-    };
-
-    this.setupMaterials(model, caseConfig);
-    this.setupAnimation(cdCase);
-
-    return cdCase;
-  }
-
   private setupMaterials(model: THREE.Object3D, caseConfig: any): void {
     model.traverse((node: THREE.Object3D) => {
       if (node instanceof THREE.Mesh && node.name === 'CD') {
@@ -224,16 +239,64 @@ export class CDCasesService {
   }
 
   private setupAnimation(cdCase: CDCase): void {
-    const openAnim = cdCase.animations?.find(a => 
-      a.name.toLowerCase().includes('open') || 
-      a.name.toLowerCase().includes('armature')
-    );
-    
-    if (openAnim && cdCase.mixer) {
-      console.log('Setting up animation:', openAnim.name);
-      cdCase.openAction = cdCase.mixer.clipAction(openAnim);
-      cdCase.openAction.setLoop(THREE.LoopOnce, 1);
-      cdCase.openAction.clampWhenFinished = true;
+    if (!cdCase.mixer || !cdCase.animations) {
+        console.warn('No mixer or animations available for case:', cdCase.id);
+        return;
+    }
+
+    // Log all available animations
+    console.log('Available animations for case', cdCase.id, ':', 
+        cdCase.animations.map(a => ({ name: a.name, duration: a.duration })));
+
+    // Find the open and close animations
+    const openAnim = cdCase.animations.find(a => a.name === 'Open Lid.001');
+    const closeAnim = cdCase.animations.find(a => a.name === 'Close Lid');
+
+    console.log('Found animations for case', cdCase.id, ':', {
+        openAnim: openAnim?.name,
+        closeAnim: closeAnim?.name
+    });
+
+    if (openAnim && closeAnim) {
+        // Create actions for both animations
+        const openAction = cdCase.mixer.clipAction(openAnim);
+        const closeAction = cdCase.mixer.clipAction(closeAnim);
+
+        // Configure the animations
+        openAction.setLoop(THREE.LoopOnce, 1);
+        openAction.clampWhenFinished = true;
+        openAction.timeScale = 1;
+        
+        closeAction.setLoop(THREE.LoopOnce, 1);
+        closeAction.clampWhenFinished = true;
+        closeAction.timeScale = 1;
+
+        // Store the actions in the cdCase object
+        cdCase.openAction = openAction;
+        cdCase.closeAction = closeAction;
+
+        // Start with lid closed
+        closeAction.play();
+        closeAction.paused = true;
+        closeAction.time = closeAnim.duration;
+
+        console.log('Animation actions created and configured for case', cdCase.id, {
+            openAction: {
+                isRunning: openAction.isRunning(),
+                paused: openAction.paused,
+                timeScale: openAction.timeScale,
+                time: openAction.time
+            },
+            closeAction: {
+                isRunning: closeAction.isRunning(),
+                paused: closeAction.paused,
+                timeScale: closeAction.timeScale,
+                time: closeAction.time
+            }
+        });
+    } else {
+        console.warn('Could not find Open Lid.001 or Close Lid animations:', 
+            cdCase.animations.map(a => a.name));
     }
   }
 
@@ -272,96 +335,123 @@ export class CDCasesService {
   }
 
   flipCase(cdCase: CDCase): void {
-    console.log('Attempting to flip case:', cdCase.id);
-    
-    if (!cdCase.armature) {
-      console.warn('No armature found for case:', cdCase.id);
-      return;
-    }
-
-    let lidBone: THREE.Object3D | THREE.Bone | null = null;
-    cdCase.armature.traverse((node: THREE.Object3D) => {
-      console.log('Checking node:', node.name, 'Type:', node.type);
-      if (node.name === 'Front_Case_Bone') {
-        lidBone = node;
-        console.log('Found lid bone:', node.name);
-      }
+    console.log('Attempting to flip case:', cdCase.id, {
+        hasOpenAction: !!cdCase.openAction,
+        hasCloseAction: !!cdCase.closeAction,
+        currentState: cdCase.isOpen ? 'Open' : 'Closed'
     });
-
-    if (!lidBone) {
-      console.warn('No lid bone found in armature for case:', cdCase.id);
-      return;
-    }
-
-    if (!cdCase.mixer) {
-      cdCase.mixer = new THREE.AnimationMixer(cdCase.model);
+    
+    if (!cdCase.openAction || !cdCase.closeAction) {
+        console.warn('No animations found for case:', cdCase.id);
+        return;
     }
 
     // Toggle the open state
     cdCase.isOpen = !cdCase.isOpen;
     console.log('Case state toggled to:', cdCase.isOpen ? 'Open' : 'Closed');
 
-    const times = [0, 1];
-    const values = cdCase.isOpen ? 
-      [0, Math.PI * 0.8] :  // Opening animation
-      [Math.PI * 0.8, 0];   // Closing animation
+    // Stop any current animations
+    cdCase.mixer?.stopAllAction();
 
-    const trackName = `.${(lidBone as THREE.Object3D).name}.rotation[x]`;
-    console.log('Creating animation track:', trackName);
-    
-    const rotationTrack = new THREE.NumberKeyframeTrack(
-      trackName,
-      times,
-      values
-    );
-
-    const clip = new THREE.AnimationClip('flip', 1, [rotationTrack]);
-    cdCase.mixer.stopAllAction();
-
-    const action = cdCase.mixer.clipAction(clip);
-    action.setLoop(THREE.LoopOnce, 1);
-    action.clampWhenFinished = true;
-    action.play();
+    if (cdCase.isOpen) {
+        // Reset and play the open animation
+        cdCase.openAction.reset();
+        cdCase.openAction.timeScale = 1;
+        cdCase.openAction.setLoop(THREE.LoopOnce, 1);
+        cdCase.openAction.clampWhenFinished = true;
+        cdCase.openAction.play();
+        console.log('Playing Open Lid.001 animation', {
+            isRunning: cdCase.openAction.isRunning(),
+            paused: cdCase.openAction.paused,
+            timeScale: cdCase.openAction.timeScale,
+            time: cdCase.openAction.time
+        });
+    } else {
+        // Reset and play the close animation
+        cdCase.closeAction.reset();
+        cdCase.closeAction.timeScale = 1;
+        cdCase.closeAction.setLoop(THREE.LoopOnce, 1);
+        cdCase.closeAction.clampWhenFinished = true;
+        cdCase.closeAction.play();
+        console.log('Playing Close Lid animation', {
+            isRunning: cdCase.closeAction.isRunning(),
+            paused: cdCase.closeAction.paused,
+            timeScale: cdCase.closeAction.timeScale,
+            time: cdCase.closeAction.time
+        });
+    }
 
     // Update the glow effect
     this.updateGlowEffect(cdCase);
-    
-    console.log('Animation started for case:', cdCase.id);
   }
 
   setActiveCase(cdCases: CDCase[], activeIndex: number): void {
+    console.log('Setting active case:', activeIndex);
+    
     // First, find the currently active case
     const currentActiveCase = cdCases.find(cdCase => cdCase.isActive);
     const targetCase = cdCases[activeIndex];
 
-    if (currentActiveCase === targetCase) return; // No change needed
+    if (currentActiveCase === targetCase) {
+        console.log('Case already active:', activeIndex);
+        return;
+    }
 
     // Deactivate current case if exists
     if (currentActiveCase) {
-      currentActiveCase.isActive = false;
-      currentActiveCase.isDeactivating = true;
-      currentActiveCase.currentLerpAlpha = 0;
-      currentActiveCase.targetPosition.copy(currentActiveCase.position);
-      currentActiveCase.targetPosition.x = this.INACTIVE_X_POSITION;
+        console.log('Deactivating case:', currentActiveCase.id);
+        currentActiveCase.isActive = false;
+        currentActiveCase.isDeactivating = true;
+        currentActiveCase.currentLerpAlpha = 0;
+        currentActiveCase.targetPosition.copy(currentActiveCase.position);
+        currentActiveCase.targetPosition.x = this.INACTIVE_X_POSITION;
+        
+        // Close the current active case
+        if (currentActiveCase.isOpen) {
+            this.flipCase(currentActiveCase);
+        }
     }
 
     // Cancel any other ongoing transitions
     cdCases.forEach(cdCase => {
-      if (cdCase !== currentActiveCase && cdCase !== targetCase) {
-        cdCase.isActive = false;
-        cdCase.isDeactivating = false;
-        cdCase.currentLerpAlpha = 1; // Complete any ongoing animations
-        cdCase.position.x = this.INACTIVE_X_POSITION;
-        cdCase.model.position.copy(cdCase.position);
-      }
+        if (cdCase !== currentActiveCase && cdCase !== targetCase) {
+            cdCase.isActive = false;
+            cdCase.isDeactivating = false;
+            cdCase.currentLerpAlpha = 1;
+            cdCase.position.x = this.INACTIVE_X_POSITION;
+            cdCase.model.position.copy(cdCase.position);
+            
+            // Ensure all other cases are closed
+            if (cdCase.isOpen) {
+                this.flipCase(cdCase);
+            }
+        }
     });
 
     // Activate new case
+    console.log('Activating case:', targetCase.id);
     targetCase.isActive = true;
     targetCase.isDeactivating = false;
     targetCase.currentLerpAlpha = 0;
     targetCase.targetPosition.copy(targetCase.position);
     targetCase.targetPosition.x = this.ACTIVE_X_POSITION;
+    
+    // Ensure the mixer is properly initialized
+    if (!targetCase.mixer) {
+        console.warn('No mixer found for case:', targetCase.id);
+        return;
+    }
+
+    // Force stop any running animations
+    targetCase.mixer.stopAllAction();
+    
+    // Open the newly active case with a slight delay to ensure position transition has started
+    setTimeout(() => {
+        console.log('Opening case after delay:', targetCase.id);
+        if (!targetCase.isOpen) {
+            this.flipCase(targetCase);
+        }
+    }, 100);
   }
 
   private updateCasePosition(cdCase: CDCase, deltaTime: number): void {

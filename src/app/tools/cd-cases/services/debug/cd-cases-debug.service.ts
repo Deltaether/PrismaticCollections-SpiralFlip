@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { CDCase, SceneSettings, Config } from '../../shared/interfaces';
+import { CDCase, SceneSettings, Config } from '../../../shared/interfaces';
 
 @Injectable({
   providedIn: 'root'

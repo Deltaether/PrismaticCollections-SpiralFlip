@@ -58,8 +58,8 @@ export class CDCaseAnimationsService {
     this.animationLocks.set(cdCase.id, false);
 
     // Find the open and close animations
-    const openAnim = cdCase.animations.find(a => a.name === this.MOVEMENTS.OPEN_LID);
-    const closeAnim = cdCase.animations.find(a => a.name === this.MOVEMENTS.CLOSE_LID);
+    const openAnim = cdCase.animations.find((a: THREE.AnimationClip) => a.name === this.MOVEMENTS.OPEN_LID);
+    const closeAnim = cdCase.animations.find((a: THREE.AnimationClip) => a.name === this.MOVEMENTS.CLOSE_LID);
 
     if (openAnim && closeAnim) {
       console.log(`🔧 [Setup] Found animations for case ${cdCase.id}:`, {

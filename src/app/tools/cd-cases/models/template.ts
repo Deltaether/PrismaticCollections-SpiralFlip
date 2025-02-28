@@ -1,5 +1,5 @@
 import { CaseConfig } from '../../shared/interfaces';
-import config from '../config.json';
+import config from '../config/config.json';
 
 export const createCaseConfig = (
   id: number,

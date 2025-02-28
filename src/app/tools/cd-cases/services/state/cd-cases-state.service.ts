@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
-import { CDCase } from '../../shared/interfaces';
-import { CDCaseAnimationsService } from './animations/cd-case-animations.service';
+import { CDCase } from '../../../shared/interfaces';
+import { CDCaseAnimationsService } from '../animations/cd-case-animations.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CDCasesStateService {
-  private readonly Z_OFFSET = 2; // Units to move in Z axis when active
+  private readonly Z_OFFSET = 1; // Units to move in positive Z axis when active
+  private readonly DEACTIVATED_Z_OFFSET = -3; // Units to move in negative Z axis when deactivated
+  private readonly POSITION_LERP_FACTOR = 0.1; // Smoothing factor for position transitions
 
   constructor(private animationsService: CDCaseAnimationsService) {}
 
@@ -34,19 +36,23 @@ export class CDCasesStateService {
       console.log('Deactivating case:', currentActiveCase.id);
       currentActiveCase.isActive = false;
       
-      // Move back to initial position and close
+      // Set target position for deactivated state
       currentActiveCase.targetPosition.copy(currentActiveCase.initialPosition);
+      currentActiveCase.targetPosition.z += this.DEACTIVATED_Z_OFFSET;
+      
       if (currentActiveCase.isOpen) {
         this.animationsService.queueAnimation(currentActiveCase, 'close');
       }
     }
 
-    // Ensure all other cases are closed and at initial positions
+    // Update all other cases
     cdCases.forEach(cdCase => {
       if (cdCase !== currentActiveCase && cdCase !== targetCase) {
         cdCase.isActive = false;
-        cdCase.position.copy(cdCase.initialPosition);
-        cdCase.model.position.copy(cdCase.initialPosition);
+        
+        // Set target position for inactive cases
+        cdCase.targetPosition.copy(cdCase.initialPosition);
+        cdCase.targetPosition.z += this.DEACTIVATED_Z_OFFSET;
         
         if (cdCase.isOpen) {
           this.animationsService.queueAnimation(cdCase, 'close');
@@ -58,7 +64,7 @@ export class CDCasesStateService {
     console.log('Activating case:', targetCase.id);
     targetCase.isActive = true;
     
-    // Move forward in Z
+    // Set target position for active case
     targetCase.targetPosition.copy(targetCase.initialPosition);
     targetCase.targetPosition.z += this.Z_OFFSET;
     
@@ -66,6 +72,15 @@ export class CDCasesStateService {
     this.animationsService.queueAnimation(targetCase, 'open');
     
     console.groupEnd();
+  }
+
+  // Update positions of all cases (should be called in animation loop)
+  updatePositions(cdCases: CDCase[]): void {
+    cdCases.forEach(cdCase => {
+      // Smoothly interpolate current position to target position
+      cdCase.position.lerp(cdCase.targetPosition, this.POSITION_LERP_FACTOR);
+      cdCase.model.position.copy(cdCase.position);
+    });
   }
 
   flipCase(cdCase: CDCase): void {

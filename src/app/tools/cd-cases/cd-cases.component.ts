@@ -5,15 +5,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { DebugMenuComponent } from '../debug-menu/debug-menu.component';
 import { CDCase, CaseSettings, SceneSettings, Config } from '../shared/interfaces';
-import config from './config.json';
+import config from './config/config.json';
 import { CDCasesService } from './services/cd-cases.service';
-import { SceneService } from './scene.service';
-import { allCases, updateCasePositions } from './cases-data';
-import { SceneLoaderComponent } from './scene-loader.component';
-import { CDCasesEventsService } from './services/cd-cases-events.service';
+import { SceneService } from './services/scene/scene.service';
+import { allCases, updateCasePositions } from './models';
+import { SceneLoaderComponent } from './scene-loader/scene-loader.component';
+import { CDCasesEventsService } from './services/events/cd-cases-events.service';
 import { CDCaseAnimationsService } from './services/animations/cd-case-animations.service';
-import { CDCasesDebugService } from './services/cd-cases-debug.service';
-import { CDCasesStateService } from './services/cd-cases-state.service';
+import { CDCasesDebugService } from './services/debug/cd-cases-debug.service';
+import { CDCasesStateService } from './services/state/cd-cases-state.service';
 
 @Component({
   selector: 'app-cd-cases',
@@ -201,6 +201,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     
     // Update animations and physics
     this.animationService.updateAnimations(this.cdCases);
+    
+    // Update case positions
+    this.stateService.updatePositions(this.cdCases);
     
     // Update controls and render
     this.controls.update();

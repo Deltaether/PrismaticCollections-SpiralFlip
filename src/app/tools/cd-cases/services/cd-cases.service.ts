@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { CDCase, Config } from '../../shared/interfaces';
 import { Injectable } from '@angular/core';
-import config from '../config.json';
+import config from '../config/config.json';
 import { CDCaseAnimationsService } from './animations/cd-case-animations.service';
 import { CDCaseEffectsService } from './effects/cd-case-effects.service';
 import { CDCaseLoadingService } from './loading/cd-case-loading.service';
@@ -183,8 +183,8 @@ export class CDCasesService {
     }
 
     // Find the open and close animations by their movement type
-    const openAnim = cdCase.animations.find(a => a.name === this.MOVEMENTS.OPEN_LID);
-    const closeAnim = cdCase.animations.find(a => a.name === this.MOVEMENTS.CLOSE_LID);
+    const openAnim = cdCase.animations.find((a: THREE.AnimationClip) => a.name === this.MOVEMENTS.OPEN_LID);
+    const closeAnim = cdCase.animations.find((a: THREE.AnimationClip) => a.name === this.MOVEMENTS.CLOSE_LID);
 
     if (openAnim && closeAnim) {
       // Configure opening animation

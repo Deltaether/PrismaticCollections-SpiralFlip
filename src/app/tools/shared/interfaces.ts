@@ -23,6 +23,7 @@ export interface CDCase {
   isActive: boolean;
   isDeactivating: boolean;
   currentLerpAlpha: number;
+  initialPosition: THREE.Vector3;
 }
 
 export interface Vector3Config {

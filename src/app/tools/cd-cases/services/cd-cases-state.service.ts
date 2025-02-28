@@ -1,88 +1,71 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { CDCase } from '../../shared/interfaces';
-import { CDCasesAnimationService } from './cd-cases-animation.service';
+import { CDCaseAnimationsService } from './animations/cd-case-animations.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CDCasesStateService {
-  private readonly ACTIVE_X_POSITION = 1;
-  private readonly INACTIVE_X_POSITION = 2;
+  private readonly Z_OFFSET = 2; // Units to move in Z axis when active
 
-  constructor(private animationService: CDCasesAnimationService) {}
+  constructor(private animationsService: CDCaseAnimationsService) {}
 
   setActiveCase(cdCases: CDCase[], activeIndex: number): void {
-    console.log('Setting active case:', activeIndex, 'Total cases:', cdCases.length);
+    console.group('Setting active case:', activeIndex);
     
-    // First, find the currently active case
     const currentActiveCase = cdCases.find(cdCase => cdCase.isActive);
     const targetCase = cdCases[activeIndex];
 
     if (!targetCase) {
       console.error('Target case not found for index:', activeIndex);
+      console.groupEnd();
       return;
     }
 
     if (currentActiveCase === targetCase) {
       console.log('Case already active:', activeIndex);
+      console.groupEnd();
       return;
     }
 
     // Deactivate current case if exists
     if (currentActiveCase) {
-      console.log('Deactivating case:', currentActiveCase.id, {
-        position: currentActiveCase.position.toArray(),
-        targetPosition: currentActiveCase.targetPosition.toArray()
-      });
-      
-      // Close the current case if it's open
-      if (currentActiveCase.isOpen) {
-        this.flipCase(currentActiveCase);
-      }
-      
+      console.log('Deactivating case:', currentActiveCase.id);
       currentActiveCase.isActive = false;
-      currentActiveCase.isDeactivating = true;
-      currentActiveCase.currentLerpAlpha = 0;
-      currentActiveCase.targetPosition.copy(currentActiveCase.position);
-      currentActiveCase.targetPosition.x = this.INACTIVE_X_POSITION;
+      
+      // Move back to initial position and close
+      currentActiveCase.targetPosition.copy(currentActiveCase.initialPosition);
+      if (currentActiveCase.isOpen) {
+        this.animationsService.queueAnimation(currentActiveCase, 'close');
+      }
     }
 
-    // Cancel any other ongoing transitions
+    // Ensure all other cases are closed and at initial positions
     cdCases.forEach(cdCase => {
       if (cdCase !== currentActiveCase && cdCase !== targetCase) {
-        // Close any open cases
-        if (cdCase.isOpen) {
-          this.flipCase(cdCase);
-        }
-        
         cdCase.isActive = false;
-        cdCase.isDeactivating = false;
-        cdCase.currentLerpAlpha = 1;
-        cdCase.position.x = this.INACTIVE_X_POSITION;
-        cdCase.model.position.copy(cdCase.position);
+        cdCase.position.copy(cdCase.initialPosition);
+        cdCase.model.position.copy(cdCase.initialPosition);
+        
+        if (cdCase.isOpen) {
+          this.animationsService.queueAnimation(cdCase, 'close');
+        }
       }
     });
 
     // Activate new case
-    console.log('Activating case:', targetCase.id, {
-      position: targetCase.position.toArray(),
-      targetPosition: targetCase.targetPosition.toArray()
-    });
-    
+    console.log('Activating case:', targetCase.id);
     targetCase.isActive = true;
-    targetCase.isDeactivating = false;
-    targetCase.currentLerpAlpha = 0;
-    targetCase.targetPosition.copy(targetCase.position);
-    targetCase.targetPosition.x = this.ACTIVE_X_POSITION;
-
-    // Open the newly active case after a short delay
-    setTimeout(() => {
-      if (targetCase.isActive && !targetCase.isOpen) {
-        console.log('Opening newly activated case:', targetCase.id);
-        this.flipCase(targetCase);
-      }
-    }, 500); // Wait for the case to move into position
+    
+    // Move forward in Z
+    targetCase.targetPosition.copy(targetCase.initialPosition);
+    targetCase.targetPosition.z += this.Z_OFFSET;
+    
+    // Queue the open animation
+    this.animationsService.queueAnimation(targetCase, 'open');
+    
+    console.groupEnd();
   }
 
   flipCase(cdCase: CDCase): void {
@@ -92,8 +75,8 @@ export class CDCasesStateService {
     cdCase.isOpen = !cdCase.isOpen;
     console.log('Case state toggled to:', cdCase.isOpen ? 'Open' : 'Closed');
 
-    // Create and play the flip animation
-    this.animationService.createFlipAnimation(cdCase, cdCase.isOpen);
+    // Queue the appropriate animation
+    this.animationsService.queueAnimation(cdCase, cdCase.isOpen ? 'open' : 'close');
   }
 
   setupMaterials(model: THREE.Object3D, caseConfig: any): void {

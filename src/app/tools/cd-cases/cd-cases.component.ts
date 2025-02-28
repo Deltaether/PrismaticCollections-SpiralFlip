@@ -11,7 +11,7 @@ import { SceneService } from './scene.service';
 import { allCases, updateCasePositions } from './cases-data';
 import { SceneLoaderComponent } from './scene-loader.component';
 import { CDCasesEventsService } from './services/cd-cases-events.service';
-import { CDCasesAnimationService } from './services/cd-cases-animation.service';
+import { CDCaseAnimationsService } from './services/animations/cd-case-animations.service';
 import { CDCasesDebugService } from './services/cd-cases-debug.service';
 import { CDCasesStateService } from './services/cd-cases-state.service';
 
@@ -99,7 +99,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
     private eventsService: CDCasesEventsService,
-    private animationService: CDCasesAnimationService,
+    private animationService: CDCaseAnimationsService,
     private debugService: CDCasesDebugService,
     private stateService: CDCasesStateService
   ) {
@@ -176,10 +176,11 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Hide loading screen
       this.isLoading = false;
 
-      // Activate first case after scene is stable
-      setTimeout(() => {
-        this.stateService.setActiveCase(this.cdCases, 0);
-      }, 3000);
+      // Wait for next frame to ensure all cases are properly positioned
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      // Activate first case after ensuring all cases are in their initial positions
+      this.stateService.setActiveCase(this.cdCases, 0);
 
     } catch (error) {
       console.error('Error loading scene:', error);
@@ -200,21 +201,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     
     // Update animations and physics
     this.animationService.updateAnimations(this.cdCases);
-    
-    // Log animation states periodically (every 60 frames to avoid console spam)
-    if (Math.random() < 0.016) { // ~once per second at 60fps
-      this.cdCases.forEach(cdCase => {
-        if (cdCase.isActive || cdCase.isOpen) {
-          console.log(`Case ${cdCase.id} state:`, {
-            isActive: cdCase.isActive,
-            isOpen: cdCase.isOpen,
-            position: cdCase.position.toArray(),
-            hasActiveAnimations: !!(cdCase.openAction?.isRunning() || cdCase.closeAction?.isRunning()),
-            currentLerpAlpha: cdCase.currentLerpAlpha
-          });
-        }
-      });
-    }
     
     // Update controls and render
     this.controls.update();
@@ -305,6 +291,13 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
     if (this.config.sceneSettings.camera.lockControls) {
+      // Check if any animations are currently running
+      if (this.animationService.hasAnyActiveAnimations(this.cdCases)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      
       event.preventDefault();
       event.stopPropagation();
       

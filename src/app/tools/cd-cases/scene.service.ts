@@ -131,54 +131,52 @@ export class SceneService {
     return groundMesh;
   }
 
-  setupRedPlane(scene: THREE.Scene, config: Config): THREE.Mesh {
+  setupRedPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void } {
     const { redPlane } = config.sceneSettings;
     const planeGeometry = new THREE.PlaneGeometry(redPlane.size.width, redPlane.size.height);
     
-    // Load the texture
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('assets/graphic/composite_bg.png');
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = THREE.ClampToEdgeWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
+    // Create video element
+    const video = document.createElement('video');
+    video.src = 'assets/3d/CD_Case/twitter_crossfade.mp4';
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = false;  // Disable autoplay
     
-    const planeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: redPlane.opacity,
-      side: THREE.DoubleSide,
-      map: texture,
-      emissive: 0xffffff,
-      emissiveMap: texture,
-      emissiveIntensity: 0.5,
-      metalness: 0.0,
-      roughness: 0.2,
-      depthWrite: false,  // Disable depth writing
-      depthTest: true,
-      alphaTest: 0.1,    // Add alpha test to help with transparency
-      blending: THREE.NormalBlending
+    // Create video texture
+    const videoTexture = new THREE.VideoTexture(video);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+    videoTexture.colorSpace = THREE.SRGBColorSpace;
+    
+    // Create simple material with video
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      map: videoTexture,
+      side: THREE.FrontSide
     });
     
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    
+    // Use the same position and rotation from config
     planeMesh.position.set(
       redPlane.position.x,
       redPlane.position.y,
       redPlane.position.z
     );
+    
     planeMesh.rotation.set(
       redPlane.rotation.x,
       redPlane.rotation.y,
       redPlane.rotation.z
     );
-
-    // Set a negative renderOrder to ensure it renders first
-    planeMesh.renderOrder = -1;
     
     scene.add(planeMesh);
-    return planeMesh;
+    
+    // Return both the mesh and a play function
+    return {
+      mesh: planeMesh,
+      play: () => video.play().catch(e => console.warn('Video play failed:', e))
+    };
   }
 
   createLightLabel(text: string): CSS2DObject {

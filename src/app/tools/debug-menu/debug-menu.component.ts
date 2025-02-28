@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -8,7 +8,13 @@ import { CDCase, CaseSettings, SceneSettings, CaseSettingsData } from '../shared
   selector: 'app-debug-menu',
   standalone: true,
   imports: [CommonModule],
-  template: '<div class="debug-container"></div>',
+  template: `
+    <div class="toggle-button" (click)="toggleDebugMenu()">
+      <span class="icon">{{ isDebugVisible ? '×' : '⚙' }}</span>
+      <span class="label" *ngIf="!isDebugVisible">Debug</span>
+    </div>
+    <div class="debug-container" [class.hidden]="!isDebugVisible"></div>
+  `,
   styles: [`
     .debug-container {
       position: fixed;
@@ -16,6 +22,56 @@ import { CDCase, CaseSettings, SceneSettings, CaseSettingsData } from '../shared
       right: 0;
       z-index: 1000;
       pointer-events: auto;
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      opacity: 1;
+    }
+
+    .debug-container.hidden {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      min-width: 40px;
+      height: 40px;
+      background-color: rgba(60, 60, 60, 0.7);
+      color: white;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      z-index: 1001;
+      pointer-events: auto;
+      user-select: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease-in-out;
+      backdrop-filter: blur(2px);
+      padding: 0 8px;
+    }
+
+    .toggle-button .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .toggle-button .label {
+      margin-left: 5px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    .toggle-button:hover {
+      background-color: rgba(80, 80, 80, 0.9);
+      transform: scale(1.05);
     }
 
     :host {
@@ -49,7 +105,7 @@ import { CDCase, CaseSettings, SceneSettings, CaseSettingsData } from '../shared
     }
   `]
 })
-export class DebugMenuComponent implements OnInit, OnDestroy {
+export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() sceneSettings!: SceneSettings;
   @Input() caseSettings!: CaseSettings;
   @Input() cdCases!: CDCase[];
@@ -61,9 +117,38 @@ export class DebugMenuComponent implements OnInit, OnDestroy {
   @Input() onUpdateCaseTransform!: (cdCase: CDCase) => void;
   @Input() onResetToDefault!: () => void;
 
+  isDebugVisible = true;
   private gui!: dat.GUI;
+  private debugContainer!: HTMLElement | null;
+
+  constructor(private elementRef: ElementRef) {}
+
+  toggleDebugMenu(): void {
+    this.isDebugVisible = !this.isDebugVisible;
+    localStorage.setItem('debugMenuVisible', this.isDebugVisible.toString());
+
+    // When hiding the menu, set pointer-events to none after animation
+    if (!this.isDebugVisible && this.debugContainer) {
+      setTimeout(() => {
+        if (!this.isDebugVisible && this.debugContainer) {
+          this.debugContainer.style.pointerEvents = 'none';
+        }
+      }, 300); // Match the transition duration
+    } else if (this.debugContainer) {
+      // When showing, immediately enable pointer events
+      this.debugContainer.style.pointerEvents = 'auto';
+    }
+  }
 
   ngOnInit(): void {
+    // First check if we have a saved visibility state
+    const savedVisibility = localStorage.getItem('debugMenuVisible');
+    if (savedVisibility !== null) {
+      this.isDebugVisible = savedVisibility === 'true';
+    }
+  }
+
+  ngAfterViewInit(): void {
     this.setupDebugUI();
   }
 
@@ -78,7 +163,8 @@ export class DebugMenuComponent implements OnInit, OnDestroy {
     
     // Ensure GUI is always on top and properly positioned
     const guiContainer = this.gui.domElement;
-    document.querySelector('.debug-container')?.appendChild(guiContainer);
+    this.debugContainer = this.elementRef.nativeElement.querySelector('.debug-container');
+    this.debugContainer?.appendChild(guiContainer);
     
     if (guiContainer.parentElement) {
       guiContainer.parentElement.style.zIndex = '1000';
@@ -86,6 +172,11 @@ export class DebugMenuComponent implements OnInit, OnDestroy {
       guiContainer.style.position = 'absolute';
       guiContainer.style.top = '0';
       guiContainer.style.right = '0';
+    }
+    
+    // Set initial pointer-events based on visibility
+    if (this.debugContainer) {
+      this.debugContainer.style.pointerEvents = this.isDebugVisible ? 'auto' : 'none';
     }
     
     // Scene settings folder
@@ -171,6 +262,11 @@ export class DebugMenuComponent implements OnInit, OnDestroy {
     
     // Add button to reset to default
     this.gui.add({ resetToDefault: () => this.onResetToDefault() }, 'resetToDefault').name('Reset to Default');
+    
+    // Open the folders that were previously open
+    if (this.isDebugVisible) {
+      sceneFolder.open();
+    }
   }
 
   private printCurrentSettings(): void {

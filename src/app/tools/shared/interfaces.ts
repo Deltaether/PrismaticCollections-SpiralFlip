@@ -52,7 +52,7 @@ export interface CaseConfig {
   };
 }
 
-export interface RedPlaneConfig {
+export interface VideoPlaneConfig {
   position: Vector3Config;
   rotation: Vector3Config;
   size: {
@@ -61,6 +61,21 @@ export interface RedPlaneConfig {
   };
   color: string;
   opacity: number;
+}
+
+export interface BackgroundPlaneConfig {
+  position: Vector3Config;
+  rotation: Vector3Config;
+  size: {
+    width: number;
+    height: number;
+  };
+  colors: {
+    gold: string;
+    darkGold: string;
+    orange: string;
+    brown: string;
+  };
 }
 
 export interface SceneConfig {
@@ -104,7 +119,8 @@ export interface SceneConfig {
     opacity: number;
     size: number;
   };
-  redPlane: RedPlaneConfig;
+  videoPlane: VideoPlaneConfig;
+  backgroundPlane: BackgroundPlaneConfig;
 }
 
 export interface Config {

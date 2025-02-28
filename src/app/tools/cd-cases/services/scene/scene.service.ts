@@ -8,6 +8,12 @@ import { Config } from '../../../shared/interfaces';
   providedIn: 'root'
 })
 export class SceneService {
+  // Clock for animations
+  private clock = new THREE.Clock();
+  
+  // Store instances of shaders for animations
+  private backgroundShaderMaterial: THREE.ShaderMaterial | null = null;
+  
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x551919);
@@ -131,9 +137,10 @@ export class SceneService {
     return groundMesh;
   }
 
-  setupRedPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void } {
-    const { redPlane } = config.sceneSettings;
-    const planeGeometry = new THREE.PlaneGeometry(redPlane.size.width, redPlane.size.height);
+  // Renamed from setupRedPlane to setupVideoPlane
+  setupVideoPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void } {
+    const { videoPlane } = config.sceneSettings;
+    const planeGeometry = new THREE.PlaneGeometry(videoPlane.size.width, videoPlane.size.height);
     
     // Create video element
     const video = document.createElement('video');
@@ -159,15 +166,15 @@ export class SceneService {
     
     // Use the same position and rotation from config
     planeMesh.position.set(
-      redPlane.position.x,
-      redPlane.position.y,
-      redPlane.position.z
+      videoPlane.position.x,
+      videoPlane.position.y,
+      videoPlane.position.z
     );
     
     planeMesh.rotation.set(
-      redPlane.rotation.x,
-      redPlane.rotation.y,
-      redPlane.rotation.z
+      videoPlane.rotation.x,
+      videoPlane.rotation.y,
+      videoPlane.rotation.z
     );
     
     scene.add(planeMesh);
@@ -177,6 +184,133 @@ export class SceneService {
       mesh: planeMesh,
       play: () => video.play().catch(e => console.warn('Video play failed:', e))
     };
+  }
+
+  setupBackgroundPlane(scene: THREE.Scene, config: Config): THREE.Mesh {
+    const { backgroundPlane } = config.sceneSettings;
+    // Create a background plane with config dimensions
+    const planeGeometry = new THREE.PlaneGeometry(backgroundPlane.size.width, backgroundPlane.size.height);
+    
+    // Parse color values from config
+    const gold = new THREE.Color(backgroundPlane.colors.gold);
+    const darkGold = new THREE.Color(backgroundPlane.colors.darkGold);
+    const orange = new THREE.Color(backgroundPlane.colors.orange);
+    const brown = new THREE.Color(backgroundPlane.colors.brown);
+    
+    // Create a shader material for dynamic background
+    const shaderMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0.0 },
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        goldColor: { value: new THREE.Vector3(gold.r, gold.g, gold.b) },
+        darkGoldColor: { value: new THREE.Vector3(darkGold.r, darkGold.g, darkGold.b) },
+        orangeColor: { value: new THREE.Vector3(orange.r, orange.g, orange.b) },
+        brownColor: { value: new THREE.Vector3(brown.r, brown.g, brown.b) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec3 goldColor;
+        uniform vec3 darkGoldColor;
+        uniform vec3 orangeColor;
+        uniform vec3 brownColor;
+        varying vec2 vUv;
+
+        // Noise function for organic patterns
+        float noise(vec2 p) {
+          return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        // Smooth noise for more natural patterns
+        float smoothNoise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          
+          float a = noise(i);
+          float b = noise(i + vec2(1.0, 0.0));
+          float c = noise(i + vec2(0.0, 1.0));
+          float d = noise(i + vec2(1.0, 1.0));
+          
+          return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+        }
+
+        void main() {
+          // Create flowing pattern based on time
+          vec2 uv = vUv;
+          float speed = 0.1;
+          
+          // Multiple layers of noise for rich effect
+          float n1 = smoothNoise(uv * 6.0 + time * speed);
+          float n2 = smoothNoise(uv * 12.0 - time * speed * 0.7);
+          float n3 = smoothNoise(uv * 3.0 + time * speed * 0.3);
+          
+          // Combine noise layers
+          float n = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
+          
+          // Create flowing streaks
+          float streak = sin(uv.x * 20.0 + time * 0.5) * 0.5 + 0.5;
+          streak *= sin(uv.y * 15.0 - time * 0.3) * 0.5 + 0.5;
+          
+          // Blend between colors based on noise using uniform colors
+          vec3 color;
+          if (n < 0.3) {
+            color = mix(brownColor, darkGoldColor, n / 0.3);
+          } else if (n < 0.7) {
+            color = mix(darkGoldColor, goldColor, (n - 0.3) / 0.4);
+          } else {
+            color = mix(goldColor, orangeColor, (n - 0.7) / 0.3);
+          }
+          
+          // Add streaks and glow
+          color += streak * 0.15 * orangeColor;
+          
+          // Vignette effect
+          float vignette = 1.0 - length((uv - 0.5) * 1.5);
+          vignette = smoothstep(0.0, 0.8, vignette);
+          color *= vignette;
+          
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `,
+      side: THREE.BackSide  // Use BackSide to show it behind the video plane
+    });
+    
+    // Store for animation updates
+    this.backgroundShaderMaterial = shaderMaterial;
+    
+    const planeMesh = new THREE.Mesh(planeGeometry, shaderMaterial);
+    
+    // Position based on config
+    planeMesh.position.set(
+      backgroundPlane.position.x,
+      backgroundPlane.position.y,
+      backgroundPlane.position.z
+    );
+    
+    planeMesh.rotation.set(
+      backgroundPlane.rotation.x,
+      backgroundPlane.rotation.y,
+      backgroundPlane.rotation.z
+    );
+    
+    scene.add(planeMesh);
+    return planeMesh;
+  }
+
+  // Add method to update shader animations
+  updateBackgroundAnimations(): void {
+    if (this.backgroundShaderMaterial) {
+      // Access uniforms with bracket notation to avoid TypeScript error
+      this.backgroundShaderMaterial.uniforms['time'].value = this.clock.getElapsedTime();
+    }
   }
 
   createLightLabel(text: string): CSS2DObject {

@@ -151,8 +151,11 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Set up ground
     this.sceneService.setupGround(this.scene, this.config);
 
-    // Add red plane back
-    this.sceneService.setupRedPlane(this.scene, this.config);
+    // Add background plane (behind video plane)
+    this.sceneService.setupBackgroundPlane(this.scene, this.config);
+    
+    // Add video plane (formerly red plane)
+    this.sceneService.setupVideoPlane(this.scene, this.config);
   }
 
   private setupControls(): void {
@@ -204,6 +207,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     
     // Update case positions
     this.stateService.updatePositions(this.cdCases);
+    
+    // Update background animations
+    this.sceneService.updateBackgroundAnimations();
     
     // Update controls and render
     this.controls.update();

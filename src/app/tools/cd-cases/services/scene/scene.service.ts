@@ -8,12 +8,21 @@ import { Config } from '../../../shared/interfaces';
   providedIn: 'root'
 })
 export class SceneService {
+  private readonly FOG_COLOR = 0x000000;
+  private readonly FOG_NEAR = 10;
+  private readonly FOG_FAR = 40;
+  
+  // Property to track if the video is currently playing
+  private isVideoPlaying = false;
+  
   // Clock for animations
   private clock = new THREE.Clock();
   
   // Store instances of shaders for animations
   private backgroundShaderMaterial: THREE.ShaderMaterial | null = null;
   
+  constructor() { }
+
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a1a4f);
@@ -148,7 +157,12 @@ export class SceneService {
   }
 
   // Renamed from setupRedPlane to setupVideoPlane
-  setupVideoPlane(scene: THREE.Scene, config: Config): { mesh: THREE.Mesh, play: () => void, videoTexture: THREE.VideoTexture } {
+  setupVideoPlane(scene: THREE.Scene, config: Config): { 
+    mesh: THREE.Mesh, 
+    play: () => void, 
+    videoTexture: THREE.VideoTexture,
+    updateVideoSource: (videoPath: string) => void 
+  } {
     const { videoPlane } = config.sceneSettings;
     const planeGeometry = new THREE.PlaneGeometry(videoPlane.size.width, videoPlane.size.height);
     
@@ -189,11 +203,34 @@ export class SceneService {
     
     scene.add(planeMesh);
     
-    // Return the mesh, play function, and the videoTexture for use in other shaders
+    // Function to update video source
+    const updateVideoSource = (videoPath: string) => {
+      // Pause current video if playing
+      if (!video.paused) {
+        video.pause();
+      }
+      
+      // Update video source
+      video.src = videoPath;
+      
+      // If video was playing before, restart it
+      if (this.isVideoPlaying) {
+        video.play().catch(e => console.warn('Video play failed after source update:', e));
+      }
+      
+      // Update texture
+      videoTexture.needsUpdate = true;
+    };
+    
+    // Return the mesh, play function, videoTexture, and update function
     return {
       mesh: planeMesh,
-      play: () => video.play().catch(e => console.warn('Video play failed:', e)),
-      videoTexture: videoTexture
+      play: () => {
+        this.isVideoPlaying = true;
+        return video.play().catch(e => console.warn('Video play failed:', e));
+      },
+      videoTexture: videoTexture,
+      updateVideoSource: updateVideoSource
     };
   }
 

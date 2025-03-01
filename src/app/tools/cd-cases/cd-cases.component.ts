@@ -100,9 +100,19 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private videoPlane!: THREE.Mesh;
   private backgroundPlane!: THREE.Mesh;
   private videoPlay!: () => void;
+  private updateVideoSource!: (videoPath: string) => void;
   
   // Add property to track if case has been opened
   private hasOpenedCase = false;
+  
+  // Array of video paths for each CD case
+  private videoPaths: string[] = [
+    'assets/3d/CD_Case/twitter_crossfade.mp4',
+    'assets/3d/CD_Case/twitter_crossfade2.mp4',
+    'assets/3d/CD_Case/twitter_crossfade3.mp4',
+    'assets/3d/CD_Case/twitter_crossfade4.mp4',
+    'assets/3d/CD_Case/twitter_crossfade5.mp4'
+  ];
   
   // Add property for pulsating silhouette
   private silhouetteMaterial: THREE.ShaderMaterial | null = null;
@@ -176,6 +186,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.videoPlane = videoPlaneResult.mesh;
     this.backgroundPlane = backgroundPlane;
     this.videoPlay = videoPlaneResult.play;
+    this.updateVideoSource = videoPlaneResult.updateVideoSource;
   }
 
   private setupControls(): void {
@@ -258,6 +269,13 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Make planes visible
       this.videoPlane.visible = true;
       this.backgroundPlane.visible = true;
+      
+      // Get active case index to load the appropriate video
+      const activeIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
+      if (activeIndex >= 0 && activeIndex < this.videoPaths.length) {
+        // Update video source to match active case
+        this.updateVideoSource(this.videoPaths[activeIndex]);
+      }
       
       // Start video playback
       this.videoPlay();
@@ -514,6 +532,14 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
       if (activeCase) {
         this.createActiveCaseSilhouette(activeCase);
+      }
+      
+      // If a case has been opened and video is showing, update the video
+      if (this.hasOpenedCase && this.videoPlane && this.videoPlane.visible) {
+        // Update video source to match new active case
+        if (newIndex >= 0 && newIndex < this.videoPaths.length) {
+          this.updateVideoSource(this.videoPaths[newIndex]);
+        }
       }
     }
     // If controls are not locked, the event will propagate to OrbitControls naturally

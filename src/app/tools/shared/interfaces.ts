@@ -304,6 +304,35 @@ export interface Config {
     };
   };
   cdCases: CaseConfig[];
+  videoPlane2Position?: {
+    offsetX: number;
+    offsetY: number;
+    offsetZ: number;
+  };
+  videoPlane2Rotation?: {
+    offsetX: number;
+    offsetY: number;
+    offsetZ: number;
+  };
+  menuAnimation?: {
+    duration: number;
+    bezierCurve: {
+      p1: number;
+      p2: number;
+      p3: number;
+      p4: number;
+    };
+  };
+  finalCasePosition?: {
+    offsetX: number;
+    offsetY: number;
+    offsetZ: number;
+  };
+  finalCaseRotation?: {
+    offsetX: number;
+    offsetY: number;
+    offsetZ: number;
+  };
 }
 
 // Legacy interfaces kept for compatibility with debug menu

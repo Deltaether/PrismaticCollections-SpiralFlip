@@ -13,6 +13,11 @@ export class CDCasesStateService {
 
   constructor(private animationsService: CDCaseAnimationsService) {}
 
+  // Getter to expose the position lerp factor
+  getPositionLerpFactor(): number {
+    return this.POSITION_LERP_FACTOR;
+  }
+
   setActiveCase(cdCases: CDCase[], index: number): void {
     console.group('Setting active case:', index);
     

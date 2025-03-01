@@ -15,6 +15,15 @@ export class SceneService {
   // Property to track if the video is currently playing
   private isVideoPlaying = false;
   
+  // Add getter and setter for isVideoPlaying
+  get videoPlaying(): boolean {
+    return this.isVideoPlaying;
+  }
+  
+  set videoPlaying(value: boolean) {
+    this.isVideoPlaying = value;
+  }
+  
   // Clock for animations
   private clock = new THREE.Clock();
   

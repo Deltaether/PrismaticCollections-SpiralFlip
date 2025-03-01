@@ -163,5 +163,34 @@
       "slowPulseAmount": 0.4
     }
   },
+  "videoPlane2Position": {
+    "offsetX": -1.0,
+    "offsetY": 0.2,
+    "offsetZ": 0.2
+  },
+  "videoPlane2Rotation": {
+    "offsetX": 3.14,
+    "offsetY": 0.0,
+    "offsetZ": 0.0
+  },
+  "menuAnimation": {
+    "duration": 0.5,
+    "bezierCurve": {
+      "p1": 0.25,
+      "p2": 0.1,
+      "p3": 0.25,
+      "p4": 1.0
+    }
+  },
+  "finalCasePosition": {
+    "offsetX": -1, 
+    "offsetY": 0.0,
+    "offsetZ": 2
+  },
+  "finalCaseRotation": {
+    "offsetX": 3.14,
+    "offsetY": 0.0,
+    "offsetZ": 0.0
+  },
   "cdCases": []
 } 

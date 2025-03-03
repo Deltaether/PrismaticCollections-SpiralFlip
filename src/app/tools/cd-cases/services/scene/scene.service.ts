@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Injectable } from '@angular/core';
-import { Config } from '../../../shared/interfaces';
+import { Config, SceneSettings } from '../../../shared/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,21 @@ export class SceneService {
   
   // Store instances of shaders for animations
   private backgroundShaderMaterial: THREE.ShaderMaterial | null = null;
+  
+  // Add effect toggle properties with default values
+  private effectToggles = {
+    continents: true,
+    mountains: true,
+    waves: true,
+    borders: true,
+    swirls: true,
+    lightRays: true,
+    particles: true,
+    videoInfluence: true,
+    bloom: true,
+    filmGrain: true,
+    vignette: true
+  };
   
   constructor() { }
 
@@ -278,7 +293,19 @@ export class SceneService {
         accentColor: { value: new THREE.Vector3(accentColor.r, accentColor.g, accentColor.b) },
         deepColor: { value: new THREE.Vector3(deepColor.r, deepColor.g, deepColor.b) },
         highlightColor: { value: new THREE.Vector3(highlightColor.r, highlightColor.g, highlightColor.b) },
-        videoTexture: { value: videoTexture || null }
+        videoTexture: { value: videoTexture || null },
+        // Add effect toggle uniforms with default values enabled
+        enableContinents: { value: this.effectToggles.continents ? 1.0 : 0.0 },
+        enableMountains: { value: this.effectToggles.mountains ? 1.0 : 0.0 },
+        enableWaves: { value: this.effectToggles.waves ? 1.0 : 0.0 },
+        enableBorders: { value: this.effectToggles.borders ? 1.0 : 0.0 },
+        enableSwirls: { value: this.effectToggles.swirls ? 1.0 : 0.0 },
+        enableLightRays: { value: this.effectToggles.lightRays ? 1.0 : 0.0 },
+        enableParticles: { value: this.effectToggles.particles ? 1.0 : 0.0 },
+        enableVideoInfluence: { value: this.effectToggles.videoInfluence ? 1.0 : 0.0 },
+        enableBloom: { value: this.effectToggles.bloom ? 1.0 : 0.0 },
+        enableFilmGrain: { value: this.effectToggles.filmGrain ? 1.0 : 0.0 },
+        enableVignette: { value: this.effectToggles.vignette ? 1.0 : 0.0 }
       },
       vertexShader: `
         varying vec2 vUv;
@@ -296,6 +323,20 @@ export class SceneService {
         uniform vec3 deepColor;
         uniform vec3 highlightColor;
         uniform sampler2D videoTexture;
+        
+        // Effect toggle uniforms
+        uniform float enableContinents;
+        uniform float enableMountains;
+        uniform float enableWaves;
+        uniform float enableBorders;
+        uniform float enableSwirls;
+        uniform float enableLightRays;
+        uniform float enableParticles;
+        uniform float enableVideoInfluence;
+        uniform float enableBloom;
+        uniform float enableFilmGrain;
+        uniform float enableVignette;
+        
         varying vec2 vUv;
 
         // Hash function for pseudo-random values
@@ -386,14 +427,129 @@ export class SceneService {
             return coast + details * 0.2;
         }
         
-        // Create elegant wave patterns
+        // Enhanced wave pattern for more realistic ocean waves
         float wavePattern(vec2 uv, float scale, float speed) {
+          // Use domain warping for more organic wave shapes
           vec2 warpedUV = warp(uv);
           float t = time * speed;
-          vec2 dir = vec2(0.8, 0.6);
-          float pattern = fbm(warpedUV * scale + dir * t);
-          pattern = smoothstep(0.2, 0.8, pattern);
-          return pattern;
+          
+          // Create circular/concentric wave patterns that expand outward
+          float concentricWaves = 0.0;
+          for (int i = 0; i < 3; i++) {
+            // Create multiple wave centers with offsets
+            vec2 waveCenter = vec2(
+              0.5 + 0.3 * sin(time * 0.1 + float(i) * 2.1),
+              0.5 + 0.3 * cos(time * 0.15 + float(i) * 1.7)
+            );
+            
+            // Distance from center creates circular patterns
+            float dist = length(warpedUV - waveCenter) * (2.0 + float(i) * 0.5);
+            
+            // Create rippling circles
+            float rings = 0.5 + 0.5 * sin(dist * scale - t * (0.5 + float(i) * 0.2));
+            
+            // Apply falloff with distance
+            float falloff = smoothstep(1.0, 0.2, length(warpedUV - waveCenter) * 2.0);
+            
+            concentricWaves += rings * falloff * (0.5 - float(i) * 0.1);
+          }
+          
+          // Add swirling vortex patterns
+          float vortex = 0.0;
+          vec2 vortexCenter = vec2(0.7, 0.3);
+          float vortexDist = length(warpedUV - vortexCenter);
+          float vortexAngle = atan(warpedUV.y - vortexCenter.y, warpedUV.x - vortexCenter.x);
+          vortex = 0.5 + 0.5 * sin(vortexAngle * 5.0 + vortexDist * 10.0 - t * 1.5);
+          vortex = smoothstep(0.0, 0.7, vortex) * smoothstep(0.8, 0.0, vortexDist);
+          
+          // Create cross-hatched wave lines
+          float waveLinesX = 0.5 + 0.5 * sin(warpedUV.x * scale * 2.0 + t);
+          float waveLinesY = 0.5 + 0.5 * sin(warpedUV.y * scale * 2.0 - t * 0.8);
+          float crossLines = smoothstep(0.4, 0.6, max(waveLinesX, waveLinesY));
+          
+          // Create geometric wave patterns
+          float geometricPattern = 0.0;
+          for (int i = 0; i < 3; i++) {
+            float phase = float(i) * 0.5;
+            // Hex grid-like pattern
+            vec2 hexUV = warpedUV * scale * (1.0 + float(i) * 0.5);
+            hexUV.y *= 1.73; // Sqrt(3) for hexagonal scaling
+            
+            vec2 gridPos = floor(hexUV);
+            vec2 gridFract = fract(hexUV);
+            
+            // Offset alternating rows
+            if (mod(gridPos.y, 2.0) == 1.0) {
+              gridFract.x = fract(gridFract.x + 0.5);
+            }
+            
+            // Create cell patterns
+            float cellPattern = length(gridFract - 0.5);
+            cellPattern = smoothstep(0.3 + 0.1 * sin(time + gridPos.x * 0.3 + gridPos.y * 0.5), 
+                                     0.5, 
+                                     cellPattern);
+            
+            geometricPattern += cellPattern * (0.5 - float(i) * 0.15);
+          }
+          
+          // Add some fractal noise detail
+          float noiseDetail = fbm(warpedUV * scale * 0.5 + vec2(t * 0.2, t * 0.1)) * 0.3;
+          
+          // Combine all patterns with different weights
+          float finalPattern = 
+            concentricWaves * 0.4 + 
+            vortex * 0.3 + 
+            crossLines * 0.25 + 
+            geometricPattern * 0.35 + 
+            noiseDetail;
+            
+          // Normalize to keep values in expected range
+          finalPattern = clamp(finalPattern, 0.0, 1.0);
+          
+          return finalPattern;
+        }
+        
+        // Replace light rays with magical ley lines
+        float leyLines(vec2 uv, float density, float speed) {
+          float result = 0.0;
+          
+          // Create several ley line paths with different properties
+          for(int i = 0; i < 5; i++) {
+            float lineIndex = float(i);
+            
+            // Create curved paths using sine waves
+            float curve = sin(uv.x * 2.0 + time * (0.1 + lineIndex * 0.05) + lineIndex * 3.1415) * 
+                          sin(uv.y * 2.0 + time * (0.15 + lineIndex * 0.03) + lineIndex * 1.5);
+            
+            // Create paths that connect important "nodes" on the map
+            vec2 nodeCenter = vec2(
+              0.3 + lineIndex * 0.15,
+              0.3 + sin(lineIndex * 0.8) * 0.4
+            );
+            
+            // Distance to the curved path
+            float dist = abs(uv.y - nodeCenter.y - curve * 0.2) / (density * (0.05 + 0.02 * sin(time * speed + lineIndex)));
+            
+            // Pulse effect along the ley lines
+            float pulse = 0.5 + 0.5 * sin(uv.x * 10.0 + time * (1.0 + lineIndex * 0.2));
+            
+            // Intensity falloff with distance from line center
+            float intensity = 0.03 / (dist + 0.001) * pulse;
+            
+            // Fade based on x position to create flowing energy
+            float xFade = smoothstep(0.0, 0.2, uv.x) * smoothstep(1.0, 0.8, uv.x);
+            intensity *= xFade;
+            
+            // Add glowing nodes at intersections
+            float node = smoothstep(0.05, 0.0, length(uv - nodeCenter)) * 2.0;
+            
+            // Add flickering effect
+            float flicker = 0.8 + 0.2 * sin(time * 5.0 + lineIndex * 10.0);
+            
+            result += intensity * flicker + node;
+          }
+          
+          return min(result, 1.0) * 0.6; // Cap and scale the effect
         }
         
         // Create soft gradient swirls
@@ -411,25 +567,6 @@ export class SceneService {
           float wave = 0.5 + 0.5 * sin(angle * 5.0);
           
           return radialGradient * wave;
-        }
-        
-        // Create subtle light rays
-        float lightRays(vec2 uv, float density, float speed) {
-          // Moving origin point
-          vec2 center = vec2(0.5 + 0.2 * sin(time * 0.2), 0.5 + 0.2 * cos(time * 0.2));
-          
-          // Direction to center
-          vec2 dir = normalize(uv - center);
-          
-          // Angle based rays with time animation
-          float angle = atan(dir.y, dir.x);
-          float rays = 0.5 + 0.5 * sin(angle * density + time * speed);
-          
-          // Fade with distance from center
-          float dist = length(uv - center);
-          rays *= smoothstep(1.0, 0.1, dist);
-          
-          return rays * 0.3; // Subtle effect
         }
         
         // Create floating particles effect
@@ -507,8 +644,8 @@ export class SceneService {
           float vidLuma2 = dot(blurredVideo2.rgb, vec3(0.2126, 0.7152, 0.0722));
           float videoMotion = abs(vidLuma1 - vidLuma2) * 3.0; // Motion detection
           
-          // Generate continent shapes
-          float continent = continentShape(uv);
+          // Generate continent shapes with toggle
+          float continent = enableContinents > 0.5 ? continentShape(uv) : 0.0;
           
           // Create subtle rotating and flowing terrain details
           vec2 rotatedUV = vec2(
@@ -517,34 +654,38 @@ export class SceneService {
           );
           float terrainDetail = fbm(continentWarp(rotatedUV * 5.0));
           
-          // Create mountain ridges and terrain variations
-          float mountains = terrainHeight(uv * 3.0 + time * 0.01) * continent;
+          // Create mountain ridges and terrain variations with toggle
+          float mountains = enableMountains > 0.5 ? terrainHeight(uv * 3.0 + time * 0.01) * continent : 0.0;
           
-          // Base wave pattern for water/oceans
-          float waves = wavePattern(uv, 2.5, 0.08 + videoMotion * 0.1) * (1.0 - continent * 0.7);
+          // Base wave pattern for water/oceans with toggle
+          float waves = enableWaves > 0.5 ? wavePattern(uv, 3.0, 0.05 + videoMotion * 0.1) * (1.0 - continent * 0.7) : 0.0;
           
-          // Create subtle "kingdom borders" or territory lines
+          // Create subtle "kingdom borders" or territory lines with toggle
           float borders = 0.0;
-          vec2 borderUV = continentWarp(uv * 2.0);
-          // Cellular-like patterns for territory divisions
-          float cellValue = fract(sin(borderUV.x * 12.0) * 43758.5453 + cos(borderUV.y * 13.0) * 93728.3462);
-          float territoryEdge = smoothstep(0.02, 0.0, abs(fract(cellValue * 3.0) - 0.5) - 0.2) * 0.4;
-          // Only show borders on land
-          borders = territoryEdge * continent;
+          if (enableBorders > 0.5) {
+            vec2 borderUV = continentWarp(uv * 2.0);
+            // Cellular-like patterns for territory divisions
+            float cellValue = fract(sin(borderUV.x * 12.0) * 43758.5453 + cos(borderUV.y * 13.0) * 93728.3462);
+            float territoryEdge = smoothstep(0.02, 0.0, abs(fract(cellValue * 3.0) - 0.5) - 0.2) * 0.4;
+            // Only show borders on land
+            borders = territoryEdge * continent;
+          }
           
-          // Create layered swirls for magical elements
+          // Create layered swirls for magical elements with toggle
           float swirlPattern = 0.0;
-          swirlPattern += swirl(uv, vec2(0.3, 0.3), 0.5, 3.0) * 0.3;
-          swirlPattern += swirl(uv, vec2(0.7, 0.7), 0.6, 2.0) * 0.2;
+          if (enableSwirls > 0.5) {
+            swirlPattern += swirl(uv, vec2(0.3, 0.3), 0.5, 3.0) * 0.3;
+            swirlPattern += swirl(uv, vec2(0.7, 0.7), 0.6, 2.0) * 0.2;
+          }
           
-          // Add light rays for mystical effect
-          float rays = lightRays(uv, 12.0, 0.1) * 0.6;
+          // Replace light rays with ley lines
+          float leyLineEffect = enableLightRays > 0.5 ? leyLines(uv, 15.0, 0.3) * 0.7 : 0.0;
           
-          // Add subtle particles for magical dust
-          float particleEffect = particles(uv) * (0.5 + continent * 0.5);
+          // Add subtle particles for magical dust with toggle
+          float particleEffect = enableParticles > 0.5 ? particles(uv) * (0.5 + continent * 0.5) : 0.0;
           
-          // Soft vignette
-          float vignette = smoothstep(0.0, 0.7, 1.0 - length((uv - 0.5) * 1.3));
+          // Soft vignette with toggle
+          float vignette = enableVignette > 0.5 ? smoothstep(0.0, 0.7, 1.0 - length((uv - 0.5) * 1.3)) : 1.0;
           
           // Base color gradient from deep to primary gold
           vec3 baseColor = mix(deepColor, primaryGold, vignette * 0.7);
@@ -560,22 +701,28 @@ export class SceneService {
           baseColor = mix(baseColor, highlightColor, borders);
           // Magical elements
           baseColor = mix(baseColor, mix(accentColor, highlightColor, 0.5), swirlPattern * 0.3);
-          baseColor = mix(baseColor, highlightColor, rays * 0.4);
+          baseColor = mix(baseColor, vec3(0.7, 0.9, 1.0), leyLineEffect * 0.5);
           baseColor = mix(baseColor, highlightColor, particleEffect * 0.4);
           
-          // Add subtle video influence for magical shimmer
-          vec3 videoColor = blurredVideo1.rgb;
-          float videoInfluence = videoMotion * 0.15;
-          baseColor = mix(baseColor, videoColor * vec3(1.2, 1.1, 0.8), videoInfluence * continent); 
+          // Add subtle video influence for magical shimmer with toggle
+          if (enableVideoInfluence > 0.5) {
+            vec3 videoColor = blurredVideo1.rgb;
+            float videoInfluence = videoMotion * 0.15;
+            baseColor = mix(baseColor, videoColor * vec3(1.2, 1.1, 0.8), videoInfluence * continent);
+          }
           
-          // Add subtle bloom to bright areas
-          float luminance = dot(baseColor, vec3(0.2126, 0.7152, 0.0722));
-          float bloom = smoothstep(0.7, 0.9, luminance);
-          baseColor += bloom * highlightColor * 0.3;
+          // Add subtle bloom to bright areas with toggle
+          if (enableBloom > 0.5) {
+            float luminance = dot(baseColor, vec3(0.2126, 0.7152, 0.0722));
+            float bloom = smoothstep(0.7, 0.9, luminance);
+            baseColor += bloom * highlightColor * 0.3;
+          }
           
-          // Apply gentle film grain
-          float grain = hash(uv + time) * 0.03;
-          baseColor = mix(baseColor, deepColor, grain);
+          // Apply gentle film grain with toggle
+          if (enableFilmGrain > 0.5) {
+            float grain = hash(uv + time) * 0.03;
+            baseColor = mix(baseColor, deepColor, grain);
+          }
           
           // Final vignette
           baseColor *= vignette;
@@ -586,7 +733,7 @@ export class SceneService {
       side: THREE.BackSide  // Use BackSide to show it behind the video plane
     });
     
-    // Store for animation updates
+    // Store the material for later updates
     this.backgroundShaderMaterial = shaderMaterial;
     
     const planeMesh = new THREE.Mesh(planeGeometry, shaderMaterial);
@@ -621,6 +768,40 @@ export class SceneService {
       this.backgroundShaderMaterial.uniforms['time'].value = currentTime;
       
       // Force material update to ensure shader gets the latest values
+      this.backgroundShaderMaterial.needsUpdate = true;
+    }
+  }
+
+  // Add new methods to toggle background effects
+  updateBackgroundEffects(settings: SceneSettings): void {
+    if (this.backgroundShaderMaterial) {
+      // Update all effect toggles based on settings
+      this.effectToggles.continents = settings.bgEffectContinents;
+      this.effectToggles.mountains = settings.bgEffectMountains;
+      this.effectToggles.waves = settings.bgEffectWaves;
+      this.effectToggles.borders = settings.bgEffectBorders;
+      this.effectToggles.swirls = settings.bgEffectSwirls;
+      this.effectToggles.lightRays = settings.bgEffectLightRays;
+      this.effectToggles.particles = settings.bgEffectParticles;
+      this.effectToggles.videoInfluence = settings.bgEffectVideoInfluence;
+      this.effectToggles.bloom = settings.bgEffectBloom;
+      this.effectToggles.filmGrain = settings.bgEffectFilmGrain;
+      this.effectToggles.vignette = settings.bgEffectVignette;
+      
+      // Update shader uniforms
+      this.backgroundShaderMaterial.uniforms['enableContinents'].value = this.effectToggles.continents ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableMountains'].value = this.effectToggles.mountains ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableWaves'].value = this.effectToggles.waves ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableBorders'].value = this.effectToggles.borders ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableSwirls'].value = this.effectToggles.swirls ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableLightRays'].value = this.effectToggles.lightRays ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableParticles'].value = this.effectToggles.particles ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableVideoInfluence'].value = this.effectToggles.videoInfluence ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableBloom'].value = this.effectToggles.bloom ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableFilmGrain'].value = this.effectToggles.filmGrain ? 1.0 : 0.0;
+      this.backgroundShaderMaterial.uniforms['enableVignette'].value = this.effectToggles.vignette ? 1.0 : 0.0;
+      
+      // Force material update
       this.backgroundShaderMaterial.needsUpdate = true;
     }
   }

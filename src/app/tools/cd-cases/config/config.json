@@ -164,14 +164,18 @@
     }
   },
   "videoPlane2Position": {
-    "offsetX": -1.0,
-    "offsetY": 0.2,
-    "offsetZ": 0.2
+    "offsetX": -0.04,
+    "offsetY": 0.75,
+    "offsetZ": -0.37
   },
   "videoPlane2Rotation": {
-    "offsetX": 3.14,
-    "offsetY": 0.0,
-    "offsetZ": 0.0
+    "offsetX": -0.01,
+    "offsetY": -1.57,
+    "offsetZ": -0.012
+  },
+  "videoPlane2Size": {
+    "width": 4.5,
+    "height": 2.5
   },
   "menuAnimation": {
     "duration": 0.5,

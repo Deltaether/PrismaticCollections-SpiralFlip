@@ -314,6 +314,10 @@ export interface Config {
     offsetY: number;
     offsetZ: number;
   };
+  videoPlane2Size?: {
+    width: number;
+    height: number;
+  };
   menuAnimation?: {
     duration: number;
     bezierCurve: {
@@ -367,4 +371,16 @@ export interface SceneSettings {
   groundY: number;
   groundOpacity: number;
   lockControls: boolean;
+  // Background effect toggles
+  bgEffectContinents: boolean;
+  bgEffectMountains: boolean;
+  bgEffectWaves: boolean;
+  bgEffectBorders: boolean;
+  bgEffectSwirls: boolean;
+  bgEffectLightRays: boolean;
+  bgEffectParticles: boolean;
+  bgEffectVideoInfluence: boolean;
+  bgEffectBloom: boolean;
+  bgEffectFilmGrain: boolean;
+  bgEffectVignette: boolean;
 } 

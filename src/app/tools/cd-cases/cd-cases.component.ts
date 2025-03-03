@@ -43,6 +43,7 @@ import { CDCasesStateService } from './services/state/cd-cases-state.service';
       [onUpdateGround]="updateGround.bind(this)"
       [onUpdateCaseTransform]="updateCaseTransform.bind(this)"
       [onResetToDefault]="resetToDefault.bind(this)"
+      [onUpdateBackgroundEffects]="updateBackgroundEffects.bind(this)"
     ></app-debug-menu>
   `,
   styleUrls: ['./cd-cases.component.scss']
@@ -91,7 +92,19 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     orbitDampingFactor: this.config.sceneSettings.orbitControls.dampingFactor,
     groundY: this.config.sceneSettings.ground.y,
     groundOpacity: this.config.sceneSettings.ground.opacity,
-    lockControls: this.config.sceneSettings.camera.lockControls
+    lockControls: this.config.sceneSettings.camera.lockControls,
+    // Initialize background effect toggles to true
+    bgEffectContinents: true,
+    bgEffectMountains: true,
+    bgEffectWaves: true,
+    bgEffectBorders: true,
+    bgEffectSwirls: true,
+    bgEffectLightRays: true,
+    bgEffectParticles: true,
+    bgEffectVideoInfluence: true,
+    bgEffectBloom: true,
+    bgEffectFilmGrain: true,
+    bgEffectVignette: true
   };
   
   public caseSettings: CaseSettings = {};
@@ -257,6 +270,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
       if (activeCase) {
         this.createActiveCaseSilhouette(activeCase);
+        
+        // Initialize videoPlane2 alignment with active case
+        this.updateVideoPlane2Alignment();
       }
 
     } catch (error) {
@@ -296,16 +312,16 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         
         // Get video plane configuration values
         const videoPlane2Pos = this.config.videoPlane2Position || { 
-          offsetX: -1.0, 
-          offsetY: 0.2, 
-          offsetZ: 0.0 
+          offsetX: 0.8, 
+          offsetY: 0.01, 
+          offsetZ: 0.02 
         };
         
         // Get video plane rotation values
         const videoPlane2Rot = this.config.videoPlane2Rotation || { 
-          offsetX: 3.14,
-          offsetY: 0.0, 
-          offsetZ: 0.0 
+          offsetX: 0,
+          offsetY: -1.57, 
+          offsetZ: 0
         };
         
         // Get final case position offset
@@ -395,34 +411,41 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           if (this.caseBackVideoPlane) {
             // Calculate position for the video plane based on current animated case position
             const casePosition = new THREE.Vector3().copy(clickedCase.model.position);
+            const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
             
-            // FIXED: Position the video plane relative to the current case position (not original)
-            // This ensures it follows the case as it moves
+            // Create a position offset vector
+            const offsetVector = new THREE.Vector3(
+              videoPlane2Pos.offsetX,
+              videoPlane2Pos.offsetY,
+              videoPlane2Pos.offsetZ
+            );
+            
+            // Apply case rotation to the offset vector so it rotates with the case
+            offsetVector.applyQuaternion(caseQuaternion);
+            
+            // Calculate final position by adding the rotated offset to the case position
             const videoPlanePosition = new THREE.Vector3(
-              // Use the current case position + videoPlane2Pos offset
-              casePosition.x + videoPlane2Pos.offsetX,
-              casePosition.y + videoPlane2Pos.offsetY,
-              casePosition.z + videoPlane2Pos.offsetZ
+              casePosition.x + offsetVector.x,
+              casePosition.y + offsetVector.y,
+              casePosition.z + offsetVector.z
             );
             
             // Apply the position to the video plane
             this.caseBackVideoPlane.position.copy(videoPlanePosition);
             
-            // Debug logging to verify positions
-            if (rawProgress === 0 || rawProgress >= 0.99) {
-              console.log(`Case position: `, clickedCase.model.position);
-              console.log(`Video plane position: `, this.caseBackVideoPlane.position);
-            }
+            // Create a new quaternion for the CD case
+            const caseQuat = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
             
-            // Match the case rotation (with adjustment to face upward)
-            this.caseBackVideoPlane.rotation.copy(clickedCase.model.rotation);
-            // Apply video plane specific rotation offsets
-            this.caseBackVideoPlane.rotation.x += videoPlane2Rot.offsetX - Math.PI / 2;
-            this.caseBackVideoPlane.rotation.y += videoPlane2Rot.offsetY;
-            this.caseBackVideoPlane.rotation.z += videoPlane2Rot.offsetZ;
+            // Create a quaternion for our additional rotation
+            const offsetQuat = new THREE.Quaternion().setFromEuler(
+              new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
+            );
             
-            // Note: Video plane is already visible, no need to toggle visibility here
-            // The animation of the plane is handled by positioning it relative to the CD case
+            // Combine the quaternions (case rotation first, then offset rotation)
+            const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
+            
+            // Apply the combined rotation
+            this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
           }
           
           if (rawProgress < 1.0) {
@@ -579,6 +602,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Update case positions - ONLY if we're not manually animating
     if (!this.isManuallyAnimating) {
       this.stateService.updatePositions(this.cdCases);
+      
+      // Keep videoPlane2 aligned with the active case
+      this.updateVideoPlane2Alignment();
     } else {
       // Only apply automatic position updates to cases we're not manually animating
       this.cdCases.forEach(cdCase => {
@@ -793,27 +819,112 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   // New method to create a video plane for the case back
   private createCaseBackVideoPlane(videoTexture: THREE.VideoTexture): THREE.Mesh {
-    // Create a plane geometry for the video
-    // Using smaller dimensions that will fit on the back of the CD case
-    const geometry = new THREE.PlaneGeometry(1.2, 0.8);
+    // Get size from config with fallback values
+    const width = this.config.videoPlane2Size?.width || 1.2;
+    const height = this.config.videoPlane2Size?.height || 0.8;
     
-    // Create a material that uses the same video texture
+    // Create a plane geometry for the video using config sizes
+    const geometry = new THREE.PlaneGeometry(width, height);
+    
+    // Create a material that uses the same video texture but with paper-like quality
     const material = new THREE.MeshBasicMaterial({
       map: videoTexture,
-      side: THREE.FrontSide,
+      side: THREE.DoubleSide, // Make visible from both sides
       transparent: true,
-      opacity: 0.9
+      opacity: 0.95,
+      color: 0xfcfcfc, // Slightly off-white to mimic paper
     });
     
     // Create the mesh
     const videoPlane = new THREE.Mesh(geometry, material);
     
+    // Add slight random rotation offset to make it look more realistic
+    const randomX = (Math.random() - 0.5) * 0.01;
+    const randomY = (Math.random() - 0.5) * 0.01;
+    const randomZ = (Math.random() - 0.5) * 0.01;
+    videoPlane.rotation.set(randomX, randomY, randomZ);
+    
     // Set render order to ensure proper layering
     videoPlane.renderOrder = 2; // Highest render order to ensure it's always on top
+    
+    // Cast shadows for better realism
+    videoPlane.castShadow = true;
+    videoPlane.receiveShadow = true;
     
     // Position and rotation will be set when the case is clicked
     // as it needs to follow the case
     
     return videoPlane;
+  }
+
+  // Add method to update background effects
+  public updateBackgroundEffects(): void {
+    this.sceneService.updateBackgroundEffects(this.sceneSettings);
+  }
+
+  // New method to keep videoPlane2 aligned with active case
+  private updateVideoPlane2Alignment(): void {
+    if (this.caseBackVideoPlane && this.manuallyAnimatedCaseId !== null) {
+      const cdCase = this.cdCases.find(c => c.id === this.manuallyAnimatedCaseId);
+      
+      if (cdCase) {
+        // Get configuration values
+        const videoPlane2Pos = this.config.videoPlane2Position || { 
+          offsetX: 0.8, 
+          offsetY: 0.01, 
+          offsetZ: 0.02 
+        };
+        
+        const videoPlane2Rot = this.config.videoPlane2Rotation || { 
+          offsetX: 0,
+          offsetY: -1.57, 
+          offsetZ: 0
+        };
+        
+        // Log rotation values being applied
+        console.log('Applying rotation to videoPlane2:', {
+          x: videoPlane2Rot.offsetX,
+          y: videoPlane2Rot.offsetY,
+          z: videoPlane2Rot.offsetZ
+        });
+        console.log('CD Case current rotation:', cdCase.model.rotation);
+        
+        // Get case position and rotation
+        const casePosition = new THREE.Vector3().copy(cdCase.model.position);
+        const caseQuaternion = new THREE.Quaternion().setFromEuler(cdCase.model.rotation);
+        
+        // Create offset vector and apply case rotation
+        const offsetVector = new THREE.Vector3(
+          videoPlane2Pos.offsetX,
+          videoPlane2Pos.offsetY,
+          videoPlane2Pos.offsetZ
+        );
+        offsetVector.applyQuaternion(caseQuaternion);
+        
+        // Calculate final position
+        const videoPlanePosition = new THREE.Vector3(
+          casePosition.x + offsetVector.x,
+          casePosition.y + offsetVector.y,
+          casePosition.z + offsetVector.z
+        );
+        
+        // Apply position to videoPlane2
+        this.caseBackVideoPlane.position.copy(videoPlanePosition);
+        
+        // Create a new quaternion for the CD case
+        const caseQuat = new THREE.Quaternion().setFromEuler(cdCase.model.rotation);
+        
+        // Create a quaternion for our additional rotation
+        const offsetQuat = new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
+        );
+        
+        // Combine the quaternions (case rotation first, then offset rotation)
+        const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
+        
+        // Apply the combined rotation
+        this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
+      }
+    }
   }
 } 

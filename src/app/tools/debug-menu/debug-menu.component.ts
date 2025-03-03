@@ -116,6 +116,7 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() onUpdateGround!: () => void;
   @Input() onUpdateCaseTransform!: (cdCase: CDCase) => void;
   @Input() onResetToDefault!: () => void;
+  @Input() onUpdateBackgroundEffects!: () => void;
 
   isDebugVisible = true;
   private gui!: dat.GUI;
@@ -270,6 +271,20 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         // Apply the update to orbit controls
         this.onUpdateOrbitControls();
       });
+    
+    // Add Background Effects folder
+    const backgroundEffectsFolder = sceneFolder.addFolder('Background Effects');
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectContinents').name('Continents').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectMountains').name('Mountains').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectWaves').name('Waves').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBorders').name('Borders').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectSwirls').name('Swirls').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectLightRays').name('Magical Ley Lines').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectParticles').name('Particles').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVideoInfluence').name('Video Shimmer').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBloom').name('Bloom').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectFilmGrain').name('Film Grain').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVignette').name('Vignette').onChange(this.onUpdateBackgroundEffects);
     
     // Open the folders that were previously open
     if (this.isDebugVisible) {

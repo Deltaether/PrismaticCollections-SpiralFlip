@@ -22,6 +22,7 @@
     "@types/howler": "^2.2.12",
     "@types/matter-js": "^0.19.8",
     "dat.gui": "^0.7.9",
+    "gsap": "^3.12.7",
     "howler": "^2.2.4",
     "matter-js": "^0.20.0",
     "rxjs": "~7.8.0",

@@ -198,6 +198,12 @@ export class SceneService {
     video.muted = true;
     video.playsInline = true;
     video.autoplay = false;  // Disable autoplay
+    video.preload = 'auto';  // Preload the video data to reduce loading delays
+    video.crossOrigin = 'anonymous'; // Handle cross-origin issues
+    
+    // Add event listeners to help with debugging
+    video.addEventListener('loadeddata', () => console.log('Video loaded data'));
+    video.addEventListener('error', (e) => console.error('Video error:', e));
     
     // Create video texture
     const videoTexture = new THREE.VideoTexture(video);
@@ -238,21 +244,42 @@ export class SceneService {
     
     // Function to update video source
     const updateVideoSource = (videoPath: string) => {
+      console.log('Updating video source to:', videoPath);
+      
+      // Only update if the source is different
+      if (video.src.endsWith(videoPath)) {
+        console.log('Video source already set to', videoPath);
+        return;
+      }
+      
       // Pause current video if playing
       if (!video.paused) {
         video.pause();
       }
       
-      // Update video source
+      // Store the previous playing state
+      const wasPlaying = this.isVideoPlaying;
+      
+      // Add a listener for the loadeddata event
+      const loadHandler = () => {
+        console.log('New video loaded:', videoPath);
+        videoTexture.needsUpdate = true;
+        
+        // If video was playing before, restart it
+        if (wasPlaying) {
+          video.play().catch(e => console.warn('Video play failed after source update:', e));
+        }
+        
+        // Remove this event listener
+        video.removeEventListener('loadeddata', loadHandler);
+      };
+      
+      // Add the event listener
+      video.addEventListener('loadeddata', loadHandler);
+      
+      // Update video source - this triggers the loading process
       video.src = videoPath;
-      
-      // If video was playing before, restart it
-      if (this.isVideoPlaying) {
-        video.play().catch(e => console.warn('Video play failed after source update:', e));
-      }
-      
-      // Update texture
-      videoTexture.needsUpdate = true;
+      video.load(); // Explicitly call load to start loading the new video
     };
     
     // Return the mesh, play/pause functions, videoTexture, and update function

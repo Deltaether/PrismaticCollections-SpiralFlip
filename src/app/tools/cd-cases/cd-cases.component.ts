@@ -334,6 +334,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         // If the case is already expanded, collapse it fully and stop
         if (this.activeCaseExpanded) {
           console.log("Case is already expanded, collapsing it fully");
+          
+          // Immediately hide the case back video plane
+          if (this.caseBackVideoPlane) {
+            this.caseBackVideoPlane.visible = false;
+          }
+          
           // Use the same animation logic as scrolling away
           // Keep the same index to stay on this case, don't switch
           this.animateActiveCaseBack(clickedCase, clickedIndex);
@@ -341,8 +347,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         }
         
         // If we get here, case is active but not yet expanded, so expand it
-        // Show and reset the back video plane
-        this.resetCaseBackVideoPlane();
+        // Reset the back video plane with opacity 0 (it will fade in after animation)
+        this.resetCaseBackVideoPlane(0);
         
         // Show the main video plane when a case is expanded
         this.videoPlane.visible = true;
@@ -350,10 +356,13 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         // Remove silhouette immediately by restoring original materials
         this.removeSilhouetteEffect(clickedCase);
         
-        // Store original rotation and position
+        // Store original rotation and current position (not initial position)
         const originalRotation = new THREE.Euler().copy(clickedCase.model.rotation);
-        // Use the initialPosition instead of current position to prevent stacking
-        const originalPosition = new THREE.Vector3().copy(clickedCase.initialPosition);
+        // Use the current position instead of initialPosition to prevent teleporting
+        const startPosition = new THREE.Vector3().copy(clickedCase.model.position);
+        
+        console.log("Starting expansion from current position:", startPosition);
+        console.log("Initial position (for reference):", clickedCase.initialPosition);
         
         // Set flag to prevent position updates during animation
         this.isManuallyAnimating = true;
@@ -389,7 +398,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         };
         
         // Debug logging to track position configurations
-        console.log('Original Position:', originalPosition);
+        console.log('Original Position:', startPosition);
         console.log('videoPlane2Position offsets:', videoPlane2Pos);
         console.log('finalCasePosition offsets (added to original):', finalCasePosOffset);
         console.log('finalCaseRotation offsets (added to original):', finalCaseRotOffset);
@@ -419,45 +428,48 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
             1              // End at 1
           );
           
-          // SIMPLIFIED: Use direct linear interpolation for position like we do for rotation
-          // This ensures consistent behavior between position and rotation
-          const posX = originalPosition.x + (finalCasePosOffset.offsetX * t);
-          const posY = originalPosition.y + (finalCasePosOffset.offsetY * t);
-          const posZ = originalPosition.z + (finalCasePosOffset.offsetZ * t);
+          // Use the same offset approach as with the video planes
+          // Store current position before applying offsets
+          const currentPosition = new THREE.Vector3().copy(clickedCase.model.position);
           
-          // Output more detailed debug info
-          if (rawProgress === 0 || rawProgress >= 0.99) {
-            console.log(`Animation progress: ${rawProgress.toFixed(2)}, t=${t.toFixed(2)}`);
-            console.log(`Original position:`, originalPosition);
-            console.log(`Calculated position: X=${posX.toFixed(2)}, Y=${posY.toFixed(2)}, Z=${posZ.toFixed(2)}`);
-            console.log(`finalCasePosOffset:`, finalCasePosOffset);
-          }
+          // Calculate offsets that will be applied for this frame
+          const offsetX = finalCasePosOffset.offsetX * t;
+          const offsetY = finalCasePosOffset.offsetY * t;
+          const offsetZ = finalCasePosOffset.offsetZ * t;
           
-          // Interpolate rotation - adding finalCaseRotation offsets to original rotation
+          // Apply rotation offsets
+          const currentRotation = new THREE.Euler().copy(clickedCase.model.rotation);
           clickedCase.model.rotation.x = originalRotation.x + (finalCaseRotOffset.offsetX * t);
           clickedCase.model.rotation.y = originalRotation.y + (finalCaseRotOffset.offsetY * t);
           clickedCase.model.rotation.z = originalRotation.z + (finalCaseRotOffset.offsetZ * t);
+          
+          // Get rotation as quaternion to apply to position offset
+          const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
+          
+          // Create an offset vector based on the final offset scaled by progress
+          const offsetVector = new THREE.Vector3(offsetX, offsetY, offsetZ);
+          
+          // Optionally, apply case rotation to the offset vector
+          // This makes the offset follow the case's rotation
+          // offsetVector.applyQuaternion(caseQuaternion);
+          
+          // Calculate final position by applying offsets to original position
+          const posX = startPosition.x + offsetVector.x;
+          const posY = startPosition.y + offsetVector.y;
+          const posZ = startPosition.z + offsetVector.z;
+          
+          // Debug info
+          if (rawProgress === 0 || rawProgress >= 0.99) {
+            console.log(`Animation progress: ${rawProgress.toFixed(2)}, t=${t.toFixed(2)}`);
+            console.log(`Original position:`, startPosition);
+            console.log(`Applied offsets: X=${offsetX.toFixed(2)}, Y=${offsetY.toFixed(2)}, Z=${offsetZ.toFixed(2)}`);
+            console.log(`Final position: X=${posX.toFixed(2)}, Y=${posY.toFixed(2)}, Z=${posZ.toFixed(2)}`);
+          }
           
           // Apply calculated position directly to the case
           clickedCase.model.position.set(posX, posY, posZ);
           // Also update the case's internal position
           clickedCase.position.copy(clickedCase.model.position);
-          
-          // Debug check for position application
-          if (rawProgress >= 0.99) {
-            console.log(`Final position after set:`, clickedCase.model.position);
-            // Verify that position was really applied
-            const casePosAfterSet = new THREE.Vector3().copy(clickedCase.model.position);
-            if (Math.abs(casePosAfterSet.x - posX) > 0.001 ||
-                Math.abs(casePosAfterSet.y - posY) > 0.001 ||
-                Math.abs(casePosAfterSet.z - posZ) > 0.001) {
-              console.error('Position was not applied correctly!');
-              console.log('Calculated:', posX, posY, posZ);
-              console.log('Actual after set:', casePosAfterSet);
-            } else {
-              console.log('Position set successfully');
-            }
-          }
           
           // Update the case back video plane position to follow the case
           if (this.caseBackVideoPlane) {
@@ -552,6 +564,51 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       
       // Start video playback
       this.videoPlay();
+      
+      // Now that animation is complete, make the caseBackVideoPlane visible and fade it in
+      if (this.caseBackVideoPlane && this.activeCaseExpanded) {
+        console.log('Animation complete, revealing video plane 2');
+        this.caseBackVideoPlane.visible = true;
+        
+        // Apply fade-in for the material opacity
+        const startOpacity = 0;
+        const targetOpacity = 0.95;
+        const fadeDuration = 0.3; // Short fade-in
+        
+        // Get starting time
+        const startTime = this.clock.getElapsedTime();
+        
+        // Create fade-in animation
+        const fadeIn = () => {
+          const currentTime = this.clock.getElapsedTime();
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / fadeDuration, 1.0);
+          
+          // Calculate current opacity
+          const currentOpacity = startOpacity + (targetOpacity - startOpacity) * progress;
+          
+          // Update opacity based on material type
+          if (this.caseBackVideoPlane.material instanceof THREE.ShaderMaterial && 
+              this.caseBackVideoPlane.material.uniforms) {
+            const opacityUniform = this.caseBackVideoPlane.material.uniforms['opacity'];
+            if (opacityUniform) {
+              opacityUniform.value = currentOpacity;
+            }
+          } else if (this.caseBackVideoPlane.material instanceof THREE.MeshBasicMaterial) {
+            this.caseBackVideoPlane.material.opacity = currentOpacity;
+          }
+          
+          // Continue animation until complete
+          if (progress < 1.0) {
+            requestAnimationFrame(fadeIn);
+          } else {
+            console.log('Fade-in complete, video plane 2 opacity:', currentOpacity);
+          }
+        };
+        
+        // Start fade-in animation
+        fadeIn();
+      }
     }
   }
   
@@ -873,15 +930,17 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     console.log("Initial position: ", activeCase.initialPosition);
     console.log("Current position: ", activeCase.model.position);
     
-    // Store original model rotation (current rotation during expansion)
-    const originalRotation = new THREE.Euler().copy(activeCase.model.rotation);
+    // Store current rotation and position
+    const currentRotation = new THREE.Euler().copy(activeCase.model.rotation);
+    const currentPosition = new THREE.Vector3().copy(activeCase.model.position);
     
-    // IMPORTANT: Calculate the active position instead of using initialPosition
+    // IMPORTANT: Calculate the active position (where we want to end up)
     // Active position = initialPosition + Z_OFFSET from the state service (1.0)
-    const activePosition = new THREE.Vector3().copy(activeCase.initialPosition);
-    activePosition.z += 1.0; // This is the Z_OFFSET from CDCasesStateService
+    const targetActivePosition = new THREE.Vector3().copy(activeCase.initialPosition);
+    targetActivePosition.z += 1.0; // This is the Z_OFFSET from CDCasesStateService
     
-    console.log("Using active position as target:", activePosition);
+    console.log("Using active position as target:", targetActivePosition);
+    console.log("Starting from current position:", currentPosition);
     
     // Set flag to prevent position updates during animation
     this.isManuallyAnimating = true;
@@ -935,19 +994,35 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         1              // End at 1
       );
       
-      // For going back, we start from expanded position and move back toward the original position
-      // We need to make sure we're properly reversing the expansion animation
+      // For collapse, calculate the needed offset to reach the target position
+      // These offsets will decrease as t increases from 0 to 1
       
-      // Calculate position going from expanded (t=0) to original (t=1)
-      const posX = activeCase.model.position.x + ((activePosition.x - activeCase.model.position.x) * t);
-      const posY = activeCase.model.position.y + ((activePosition.y - activeCase.model.position.y) * t);
-      const posZ = activeCase.model.position.z + ((activePosition.z - activeCase.model.position.z) * t);
+      // Calculate the total offsets we need to remove
+      // This is the difference between our current expanded position and the target active position
+      const totalOffsetX = currentPosition.x - targetActivePosition.x;
+      const totalOffsetY = currentPosition.y - targetActivePosition.y;
+      const totalOffsetZ = currentPosition.z - targetActivePosition.z;
+      
+      // Calculate current frame offsets by applying (1-t) to gradually remove them
+      const offsetX = totalOffsetX * (1 - t);
+      const offsetY = totalOffsetY * (1 - t);
+      const offsetZ = totalOffsetZ * (1 - t);
+      
+      // Create offset vector for this frame
+      const offsetVector = new THREE.Vector3(offsetX, offsetY, offsetZ);
+      
+      // Calculate position for this frame - starting from target and adding remaining offset
+      const posX = targetActivePosition.x + offsetX;
+      const posY = targetActivePosition.y + offsetY; 
+      const posZ = targetActivePosition.z + offsetZ;
       
       if (rawProgress === 0 || rawProgress >= 0.99) {
         console.log(`Animation progress: ${t.toFixed(2)}`);
         console.log(`Current pos: (${activeCase.model.position.x.toFixed(2)}, ${activeCase.model.position.y.toFixed(2)}, ${activeCase.model.position.z.toFixed(2)})`);
+        console.log(`Total offsets to remove: X=${totalOffsetX.toFixed(2)}, Y=${totalOffsetY.toFixed(2)}, Z=${totalOffsetZ.toFixed(2)}`);
+        console.log(`Remaining offsets: X=${offsetX.toFixed(2)}, Y=${offsetY.toFixed(2)}, Z=${offsetZ.toFixed(2)}`);
         console.log(`Target pos: (${posX.toFixed(2)}, ${posY.toFixed(2)}, ${posZ.toFixed(2)})`);
-        console.log(`Original pos: (${activePosition.x.toFixed(2)}, ${activePosition.y.toFixed(2)}, ${activePosition.z.toFixed(2)})`);
+        console.log(`Final target: (${targetActivePosition.x.toFixed(2)}, ${targetActivePosition.y.toFixed(2)}, ${targetActivePosition.z.toFixed(2)})`);
       }
       
       // Set the position
@@ -958,10 +1033,29 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Get the base rotation - this is what we want to return to
       const baseRotation = this.config.caseSettings?.baseRotation || { x: 0, y: 0, z: 0 };
       
-      // Interpolate rotation - from current back to base
-      const rotX = activeCase.model.rotation.x + ((baseRotation.x - activeCase.model.rotation.x) * t);
-      const rotY = activeCase.model.rotation.y + ((baseRotation.y - activeCase.model.rotation.y) * t);
-      const rotZ = activeCase.model.rotation.z + ((baseRotation.z - activeCase.model.rotation.z) * t);
+      // Calculate the total rotation offset to remove
+      const totalRotX = currentRotation.x - baseRotation.x;
+      const totalRotY = currentRotation.y - baseRotation.y;
+      const totalRotZ = currentRotation.z - baseRotation.z;
+      
+      // Calculate remaining rotation offset for this frame
+      const remainingRotX = totalRotX * (1 - t);
+      const remainingRotY = totalRotY * (1 - t);
+      const remainingRotZ = totalRotZ * (1 - t);
+      
+      // Apply rotation: target + remaining offset
+      const rotX = baseRotation.x + remainingRotX;
+      const rotY = baseRotation.y + remainingRotY;
+      const rotZ = baseRotation.z + remainingRotZ;
+      
+      // Debug rotation info
+      if (rawProgress === 0 || rawProgress >= 0.99) {
+        console.log(`Rotation progress: t=${t.toFixed(2)}`);
+        console.log(`Current rotation: (${activeCase.model.rotation.x.toFixed(2)}, ${activeCase.model.rotation.y.toFixed(2)}, ${activeCase.model.rotation.z.toFixed(2)})`);
+        console.log(`Total rotation to remove: X=${totalRotX.toFixed(2)}, Y=${totalRotY.toFixed(2)}, Z=${totalRotZ.toFixed(2)}`);
+        console.log(`Remaining rotation: X=${remainingRotX.toFixed(2)}, Y=${remainingRotY.toFixed(2)}, Z=${remainingRotZ.toFixed(2)}`);
+        console.log(`Target rotation: (${rotX.toFixed(2)}, ${rotY.toFixed(2)}, ${rotZ.toFixed(2)})`);
+      }
       
       activeCase.model.rotation.set(rotX, rotY, rotZ);
       
@@ -981,12 +1075,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         this.manuallyAnimatedCaseId = null;
         this.activeCaseExpanded = false; // Reset the expanded state
         
-        // Ensure the case is exactly at its active position
-        activeCase.model.position.copy(activePosition);
-        activeCase.position.copy(activePosition);
-        activeCase.targetPosition.copy(activePosition);
+        // Set exact active position - should be the original active position with no offsets
+        activeCase.model.position.copy(targetActivePosition);
+        activeCase.position.copy(targetActivePosition);
+        activeCase.targetPosition.copy(targetActivePosition);
         
-        // For rotation, use the base rotation from config
+        // Set exact base rotation
         const baseRotation = this.config.caseSettings?.baseRotation || { x: 0, y: 0, z: 0 };
         activeCase.model.rotation.set(baseRotation.x, baseRotation.y, baseRotation.z);
         
@@ -1047,11 +1141,19 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   // Helper method to reset the caseBackVideoPlane properties
   private resetCaseBackVideoPlane(initialOpacity: number = 0.95): void {
     if (this.caseBackVideoPlane) {
-      const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
-      // Set to specified opacity
-      material.opacity = initialOpacity;
-      // Set visibility based on opacity - only visible if opacity > 0
-      this.caseBackVideoPlane.visible = initialOpacity > 0;
+      if (this.caseBackVideoPlane.material instanceof THREE.ShaderMaterial && 
+          this.caseBackVideoPlane.material.uniforms) {
+        // Set opacity for fade-in later using shader uniform
+        const opacityUniform = this.caseBackVideoPlane.material.uniforms['opacity'];
+        if (opacityUniform) {
+          opacityUniform.value = initialOpacity;
+        }
+      } else if (this.caseBackVideoPlane.material instanceof THREE.MeshBasicMaterial) {
+        // Fallback for MeshBasicMaterial if used
+        this.caseBackVideoPlane.material.opacity = initialOpacity;
+      }
+      // Always start with plane hidden, regardless of opacity
+      this.caseBackVideoPlane.visible = false;
     }
   }
 
@@ -1060,17 +1162,67 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Get size from config with fallback values
     const width = this.config.videoPlane2Size?.width || 1.2;
     const height = this.config.videoPlane2Size?.height || 0.8;
+    const radius = this.config.videoPlane2Size?.cornerRadius || 0.05; // Get radius from config or use default
     
-    // Create a plane geometry for the video using config sizes
+    // Create a simple plane geometry with correct UVs
     const geometry = new THREE.PlaneGeometry(width, height);
     
-    // Create a material that uses the same video texture but with paper-like quality
-    const material = new THREE.MeshBasicMaterial({
-      map: videoTexture,
-      side: THREE.DoubleSide, // Make visible from both sides
+    // Create a shader material that handles rounded corners in the fragment shader
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        map: { value: videoTexture },
+        opacity: { value: 0.95 },
+        size: { value: new THREE.Vector2(width, height) },
+        radius: { value: radius },
+        ambient: { value: new THREE.Color(0xfcfcfc) }, // Ambient light color for scene integration
+        ambientIntensity: { value: 0.75 } // Controls darkness level (lower = darker)
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform float opacity;
+        uniform vec2 size;
+        uniform float radius;
+        uniform vec3 ambient;
+        uniform float ambientIntensity;
+        varying vec2 vUv;
+        
+        float roundedRectangle(vec2 position, vec2 size, float radius) {
+          // Convert UV to pixel coordinates
+          vec2 q = abs(position) - size + vec2(radius);
+          return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - radius;
+        }
+        
+        void main() {
+          // Convert UV from 0-1 to -size/2 to size/2
+          vec2 position = (vUv - 0.5) * size;
+          
+          // Calculate distance to rounded rectangle edge
+          float distance = roundedRectangle(position, size * 0.5, radius);
+          
+          // Apply a sharp cutoff for rounded corners
+          if (distance > 0.0) {
+            discard; // Discard fragments outside the rounded rectangle
+          }
+          
+          // Sample texture
+          vec4 texColor = texture2D(map, vUv);
+          
+          // Apply subtle darkening for scene integration
+          vec3 finalColor = texColor.rgb * ambientIntensity;
+          
+          // Apply opacity
+          gl_FragColor = vec4(finalColor, texColor.a * opacity);
+        }
+      `,
       transparent: true,
-      opacity: 0.95,
-      color: 0xfcfcfc, // Slightly off-white to mimic paper
+      side: THREE.DoubleSide,
     });
     
     // Create the mesh
@@ -1088,9 +1240,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Cast shadows for better realism
     videoPlane.castShadow = true;
     videoPlane.receiveShadow = true;
-    
-    // Position and rotation will be set when the case is clicked
-    // as it needs to follow the case
     
     return videoPlane;
   }

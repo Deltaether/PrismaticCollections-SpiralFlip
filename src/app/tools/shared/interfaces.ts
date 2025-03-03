@@ -317,6 +317,7 @@ export interface Config {
   videoPlane2Size?: {
     width: number;
     height: number;
+    cornerRadius?: number;
   };
   menuAnimation?: {
     duration: number;

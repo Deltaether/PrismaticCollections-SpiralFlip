@@ -175,7 +175,8 @@
   },
   "videoPlane2Size": {
     "width": 4.5,
-    "height": 2.5
+    "height": 2.5,
+    "cornerRadius": 0.05
   },
   "menuAnimation": {
     "duration": 0.5,

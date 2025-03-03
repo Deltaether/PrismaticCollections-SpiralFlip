@@ -120,6 +120,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   // Flag to prevent position updates during manual animations
   private isManuallyAnimating: boolean = false;
   private manuallyAnimatedCaseId: number | null = null;
+  private activeCaseExpanded: boolean = false; // Track if the active case is expanded
   
   // Array of video paths for each CD case
   private videoPaths: string[] = [
@@ -167,7 +168,23 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.setupRenderer();
     this.setupControls();
-    this.loadModels();
+    this.loadModels().then(() => {
+      // Initialize caseSettings for each CD case to prevent "Cannot read properties of undefined" errors
+      this.cdCases.forEach(cdCase => {
+        if (!this.caseSettings[cdCase.id]) {
+          // Default settings if none exist
+          this.caseSettings[cdCase.id] = {
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            rotationX: 0,
+            rotationY: 0,
+            rotationZ: 0
+          };
+        }
+      });
+      this.isLoading = false;
+    });
   }
 
   private setupRenderer(): void {
@@ -208,17 +225,17 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Set up ground
     this.sceneService.setupGround(this.scene, this.config);
 
-    // Add video plane (formerly red plane) - NOW VISIBLE BY DEFAULT
+    // Add video plane (formerly red plane) - INITIALLY INVISIBLE
     const videoPlaneResult = this.sceneService.setupVideoPlane(this.scene, this.config);
-    videoPlaneResult.mesh.visible = true; // Show from the beginning
+    videoPlaneResult.mesh.visible = false; // Start invisible until a case is expanded
     
-    // Add background plane behind video plane - NOW VISIBLE BY DEFAULT
+    // Add background plane behind video plane - KEEP VISIBLE
     const backgroundPlane = this.sceneService.setupBackgroundPlane(this.scene, this.config, videoPlaneResult.videoTexture);
-    backgroundPlane.visible = true; // Show from the beginning
+    backgroundPlane.visible = true; // Background remains visible
     
-    // Create a new video plane that will be attached to the back of the CD case - NOW VISIBLE BY DEFAULT
+    // Create a new video plane that will be attached to the back of the CD case - INITIALLY INVISIBLE
     const caseBackVideoPlane = this.createCaseBackVideoPlane(videoPlaneResult.videoTexture);
-    caseBackVideoPlane.visible = true; // Show from the beginning
+    caseBackVideoPlane.visible = false; // Start invisible until a case is expanded
     this.scene.add(caseBackVideoPlane);
     
     // Store references for later use
@@ -247,6 +264,21 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       
       // Initialize tutorialCompleted array to match CD cases
       this.tutorialCompleted = new Array(this.cdCases.length).fill(false);
+      
+      // Initialize caseSettings for each CD case to prevent "Cannot read properties of undefined" errors
+      this.cdCases.forEach(cdCase => {
+        if (!this.caseSettings[cdCase.id]) {
+          // Default settings if none exist
+          this.caseSettings[cdCase.id] = {
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            rotationX: 0,
+            rotationY: 0,
+            rotationZ: 0
+          };
+        }
+      });
       
       // Add label renderer to DOM and start animation
       this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
@@ -292,23 +324,41 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Get the index of the clicked case
       const clickedIndex = clickedCase ? this.cdCases.indexOf(clickedCase) : -1;
       
-      // If active case is clicked - don't open it anymore
+      // If active case is clicked
       if (clickedCase && clickedCase.isActive) {
         // Mark tutorial as completed for this case
         if (clickedIndex >= 0) {
           this.tutorialCompleted[clickedIndex] = true;
         }
         
+        // If the case is already expanded, collapse it fully and stop
+        if (this.activeCaseExpanded) {
+          console.log("Case is already expanded, collapsing it fully");
+          // Use the same animation logic as scrolling away
+          // Keep the same index to stay on this case, don't switch
+          this.animateActiveCaseBack(clickedCase, clickedIndex);
+          return;
+        }
+        
+        // If we get here, case is active but not yet expanded, so expand it
+        // Show and reset the back video plane
+        this.resetCaseBackVideoPlane();
+        
+        // Show the main video plane when a case is expanded
+        this.videoPlane.visible = true;
+        
         // Remove silhouette immediately by restoring original materials
         this.removeSilhouetteEffect(clickedCase);
         
         // Store original rotation and position
         const originalRotation = new THREE.Euler().copy(clickedCase.model.rotation);
-        const originalPosition = new THREE.Vector3().copy(clickedCase.model.position);
+        // Use the initialPosition instead of current position to prevent stacking
+        const originalPosition = new THREE.Vector3().copy(clickedCase.initialPosition);
         
         // Set flag to prevent position updates during animation
         this.isManuallyAnimating = true;
         this.manuallyAnimatedCaseId = clickedCase.id;
+        this.activeCaseExpanded = true; // Mark that the active case is now expanded
         
         // Get video plane configuration values
         const videoPlane2Pos = this.config.videoPlane2Position || { 
@@ -390,6 +440,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           
           // Apply calculated position directly to the case
           clickedCase.model.position.set(posX, posY, posZ);
+          // Also update the case's internal position
+          clickedCase.position.copy(clickedCase.model.position);
           
           // Debug check for position application
           if (rawProgress >= 0.99) {
@@ -598,13 +650,18 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     
     // Update animations and physics
     this.animationService.updateAnimations(this.cdCases);
-    
+
     // Update case positions - ONLY if we're not manually animating
-    if (!this.isManuallyAnimating) {
+    const isManualAnimation = this.isManuallyAnimating;
+    
+    if (!isManualAnimation) {
       this.stateService.updatePositions(this.cdCases);
       
-      // Keep videoPlane2 aligned with the active case
-      this.updateVideoPlane2Alignment();
+      // Keep videoPlane2 aligned with the active case if one exists
+      const activeIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
+      if (activeIndex >= 0) {
+        this.updateVideoPlane2Alignment();
+      }
     } else {
       // Only apply automatic position updates to cases we're not manually animating
       this.cdCases.forEach(cdCase => {
@@ -614,6 +671,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           cdCase.model.position.copy(cdCase.position);
         }
       });
+      
+      // Also keep videoPlane2 aligned during manual animation
+      this.updateVideoPlane2Alignment();
     }
     
     // Update silhouette animation for active case
@@ -671,7 +731,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.renderer.render(this.scene, this.camera);
     this.labelRenderer.render(this.scene, this.camera);
   }
-  
+
   // Add clock for animations
   private clock = new THREE.Clock();
 
@@ -759,7 +819,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   onWheel(event: WheelEvent) {
     // If controls are locked, handle CD case navigation
     if (this.sceneSettings.lockControls) {
-      // Check if any animations are currently running
+      // Check if any automatic animations are currently running
+      // But allow scrolling when a case is expanded (isManuallyAnimating is true but no active animation)
       if (this.animationService.hasAnyActiveAnimations(this.cdCases)) {
         event.preventDefault();
         event.stopPropagation();
@@ -791,30 +852,207 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
         newIndex = (currentActiveIndex - 1 + this.cdCases.length) % this.cdCases.length;
       }
       
-      this.stateService.setActiveCase(this.cdCases, newIndex);
+      // Get the active case that we will animate back
+      const activeCase = this.cdCases[currentActiveIndex];
       
-      // Create silhouette for new active case if it's not playing music and tutorial not completed
-      const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
-      if (activeCase && !this.playingMusic[newIndex] && !this.tutorialCompleted[newIndex]) {
-        this.createActiveCaseSilhouette(activeCase);
-      }
-      
-      // If we're navigating to a case that is playing music, update the video
-      if (this.playingMusic[newIndex] && this.videoPlane) {
-        // Update video source to match new active case
-        if (newIndex >= 0 && newIndex < this.videoPaths.length) {
-          this.updateVideoSource(this.videoPaths[newIndex]);
-          
-          // If the case is playing music, also start the video
-          this.videoPlay();
-        }
+      // Animate current active case back to its original position ONLY if it's expanded
+      if (activeCase && activeCase.isActive && this.activeCaseExpanded) {
+        this.animateActiveCaseBack(activeCase, newIndex);
       } else {
-        // If case is not playing music, we keep planes visible but pause video
-        // (Note: We don't hide the planes anymore, they stay visible)
-        this.videoPause(); // Pause the video when no music is playing
+        // If the case isn't expanded, just set the new active case directly
+        this.stateService.setActiveCase(this.cdCases, newIndex);
+        this.updateVideoForNewActiveCase(newIndex);
       }
     }
     // If controls are not locked, the event will propagate to OrbitControls naturally
+  }
+
+  // New method to animate active case back to its original position
+  private animateActiveCaseBack(activeCase: CDCase, newIndex: number): void {
+    console.log("Animating case back: ", activeCase.id, "New index: ", newIndex);
+    console.log("Initial position: ", activeCase.initialPosition);
+    console.log("Current position: ", activeCase.model.position);
+    
+    // Store original model rotation (current rotation during expansion)
+    const originalRotation = new THREE.Euler().copy(activeCase.model.rotation);
+    
+    // IMPORTANT: Calculate the active position instead of using initialPosition
+    // Active position = initialPosition + Z_OFFSET from the state service (1.0)
+    const activePosition = new THREE.Vector3().copy(activeCase.initialPosition);
+    activePosition.z += 1.0; // This is the Z_OFFSET from CDCasesStateService
+    
+    console.log("Using active position as target:", activePosition);
+    
+    // Set flag to prevent position updates during animation
+    this.isManuallyAnimating = true;
+    this.manuallyAnimatedCaseId = activeCase.id;
+    
+    // Hide the case back video plane gradually during the animation
+    let videoPlaneOriginalOpacity = 0;
+    if (this.caseBackVideoPlane) {
+      const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
+      videoPlaneOriginalOpacity = material.opacity;
+    }
+    
+    // Get final case position offset - but we will use negative values to go back
+    const finalCasePosOffset = this.config.finalCasePosition || {
+      offsetX: -1, 
+      offsetY: 0.0,
+      offsetZ: 2
+    };
+
+    // Get final case rotation offset - but we will use negative values to go back
+    const finalCaseRotOffset = this.config.finalCaseRotation || {
+      offsetX: 3.14,
+      offsetY: 0.0,
+      offsetZ: 0.0
+    };
+    
+    console.log("Final position offset: ", finalCasePosOffset);
+    
+    // Get animation settings from config
+    const animConfig = this.config.menuAnimation || {
+      duration: 0.5, // Use a faster animation for going back
+      bezierCurve: { p1: 0.25, p2: 0.1, p3: 0.25, p4: 1.0 }
+    };
+
+    // Create animation
+    const startTime = this.clock.getElapsedTime();
+    const duration = animConfig.duration; // Use configured duration
+
+    const animateBack = () => {
+      const currentTime = this.clock.getElapsedTime();
+      const elapsed = currentTime - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1.0);
+      
+      // Apply bezier curve easing for time interpolation
+      const bezierParams = animConfig.bezierCurve;
+      const t = this.cubicBezier(
+        rawProgress, 
+        0,             // Start at 0
+        bezierParams.p1,
+        bezierParams.p2,
+        1              // End at 1
+      );
+      
+      // For going back, we start from expanded position and move back toward the original position
+      // We need to make sure we're properly reversing the expansion animation
+      
+      // Calculate position going from expanded (t=0) to original (t=1)
+      const posX = activeCase.model.position.x + ((activePosition.x - activeCase.model.position.x) * t);
+      const posY = activeCase.model.position.y + ((activePosition.y - activeCase.model.position.y) * t);
+      const posZ = activeCase.model.position.z + ((activePosition.z - activeCase.model.position.z) * t);
+      
+      if (rawProgress === 0 || rawProgress >= 0.99) {
+        console.log(`Animation progress: ${t.toFixed(2)}`);
+        console.log(`Current pos: (${activeCase.model.position.x.toFixed(2)}, ${activeCase.model.position.y.toFixed(2)}, ${activeCase.model.position.z.toFixed(2)})`);
+        console.log(`Target pos: (${posX.toFixed(2)}, ${posY.toFixed(2)}, ${posZ.toFixed(2)})`);
+        console.log(`Original pos: (${activePosition.x.toFixed(2)}, ${activePosition.y.toFixed(2)}, ${activePosition.z.toFixed(2)})`);
+      }
+      
+      // Set the position
+      activeCase.model.position.set(posX, posY, posZ);
+      // Also update the case's internal position
+      activeCase.position.copy(activeCase.model.position);
+      
+      // Get the base rotation - this is what we want to return to
+      const baseRotation = this.config.caseSettings?.baseRotation || { x: 0, y: 0, z: 0 };
+      
+      // Interpolate rotation - from current back to base
+      const rotX = activeCase.model.rotation.x + ((baseRotation.x - activeCase.model.rotation.x) * t);
+      const rotY = activeCase.model.rotation.y + ((baseRotation.y - activeCase.model.rotation.y) * t);
+      const rotZ = activeCase.model.rotation.z + ((baseRotation.z - activeCase.model.rotation.z) * t);
+      
+      activeCase.model.rotation.set(rotX, rotY, rotZ);
+      
+      // Fade out the video plane
+      if (this.caseBackVideoPlane) {
+        const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
+        material.opacity = videoPlaneOriginalOpacity * (1 - t);
+        this.updateVideoPlane2Alignment();
+      }
+      
+      if (rawProgress < 1.0) {
+        requestAnimationFrame(animateBack);
+      } else {
+        console.log("Return animation complete: Case returned to active position");
+        // Animation is complete - clear flags
+        this.isManuallyAnimating = false;
+        this.manuallyAnimatedCaseId = null;
+        this.activeCaseExpanded = false; // Reset the expanded state
+        
+        // Ensure the case is exactly at its active position
+        activeCase.model.position.copy(activePosition);
+        activeCase.position.copy(activePosition);
+        activeCase.targetPosition.copy(activePosition);
+        
+        // For rotation, use the base rotation from config
+        const baseRotation = this.config.caseSettings?.baseRotation || { x: 0, y: 0, z: 0 };
+        activeCase.model.rotation.set(baseRotation.x, baseRotation.y, baseRotation.z);
+        
+        // Hide both video planes completely
+        if (this.caseBackVideoPlane) {
+          const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
+          material.opacity = 0;
+          this.caseBackVideoPlane.visible = false;
+        }
+        this.videoPlane.visible = false;
+        
+        // If the new index is different than the current index (scrolling to another case),
+        // set the new active case. Otherwise (clicking on the same case), just reset UI elements
+        const currentIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
+        if (newIndex !== currentIndex) {
+          // Now set the new active case
+          this.stateService.setActiveCase(this.cdCases, newIndex);
+        }
+        this.updateVideoForNewActiveCase(newIndex);
+        
+        console.log("Final position after animation:", activeCase.model.position);
+      }
+    };
+    
+    // Start the animation
+    animateBack();
+  }
+  
+  // Helper method to update video for new active case
+  private updateVideoForNewActiveCase(newIndex: number): void {
+    // Reset the expanded state for the new active case
+    this.activeCaseExpanded = false;
+    
+    // Reset the case back video plane with opacity 0 (invisible until clicked)
+    this.resetCaseBackVideoPlane(0);
+    
+    // Create silhouette for new active case if it's not playing music and tutorial not completed
+    const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+    if (activeCase && !this.playingMusic[newIndex] && !this.tutorialCompleted[newIndex]) {
+      this.createActiveCaseSilhouette(activeCase);
+    }
+    
+    // If we're navigating to a case that is playing music, update the video
+    if (this.playingMusic[newIndex] && this.videoPlane) {
+      // Update video source to match new active case
+      if (newIndex >= 0 && newIndex < this.videoPaths.length) {
+        this.updateVideoSource(this.videoPaths[newIndex]);
+        
+        // If the case is playing music, also start the video
+        this.videoPlay();
+      }
+    } else {
+      // If case is not playing music, we keep planes visible but pause video
+      this.videoPause(); // Pause the video when no music is playing
+    }
+  }
+
+  // Helper method to reset the caseBackVideoPlane properties
+  private resetCaseBackVideoPlane(initialOpacity: number = 0.95): void {
+    if (this.caseBackVideoPlane) {
+      const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
+      // Set to specified opacity
+      material.opacity = initialOpacity;
+      // Set visibility based on opacity - only visible if opacity > 0
+      this.caseBackVideoPlane.visible = initialOpacity > 0;
+    }
   }
 
   // New method to create a video plane for the case back
@@ -864,66 +1102,101 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
 
   // New method to keep videoPlane2 aligned with active case
   private updateVideoPlane2Alignment(): void {
-    if (this.caseBackVideoPlane && this.manuallyAnimatedCaseId !== null) {
-      const cdCase = this.cdCases.find(c => c.id === this.manuallyAnimatedCaseId);
+    if (!this.caseBackVideoPlane) return;
+
+    // Find the case to align with - either the manually animated case or the active case
+    let caseToAlignWith: CDCase | undefined;
+
+    if (this.isManuallyAnimating && this.manuallyAnimatedCaseId !== null) {
+      // During manual animation, use the case being manually animated
+      caseToAlignWith = this.cdCases.find(c => c.id === this.manuallyAnimatedCaseId);
+    } else {
+      // Otherwise, use the active case (if any), or try to find a case that was recently active
+      // and is being automatically animated back to its position
+      caseToAlignWith = this.cdCases.find(c => c.isActive);
       
-      if (cdCase) {
-        // Get configuration values
-        const videoPlane2Pos = this.config.videoPlane2Position || { 
-          offsetX: 0.8, 
-          offsetY: 0.01, 
-          offsetZ: 0.02 
-        };
-        
-        const videoPlane2Rot = this.config.videoPlane2Rotation || { 
-          offsetX: 0,
-          offsetY: -1.57, 
-          offsetZ: 0
-        };
-        
-        // Log rotation values being applied
-        console.log('Applying rotation to videoPlane2:', {
-          x: videoPlane2Rot.offsetX,
-          y: videoPlane2Rot.offsetY,
-          z: videoPlane2Rot.offsetZ
-        });
-        console.log('CD Case current rotation:', cdCase.model.rotation);
-        
-        // Get case position and rotation
-        const casePosition = new THREE.Vector3().copy(cdCase.model.position);
-        const caseQuaternion = new THREE.Quaternion().setFromEuler(cdCase.model.rotation);
-        
-        // Create offset vector and apply case rotation
-        const offsetVector = new THREE.Vector3(
-          videoPlane2Pos.offsetX,
-          videoPlane2Pos.offsetY,
-          videoPlane2Pos.offsetZ
-        );
-        offsetVector.applyQuaternion(caseQuaternion);
-        
-        // Calculate final position
-        const videoPlanePosition = new THREE.Vector3(
-          casePosition.x + offsetVector.x,
-          casePosition.y + offsetVector.y,
-          casePosition.z + offsetVector.z
-        );
-        
-        // Apply position to videoPlane2
-        this.caseBackVideoPlane.position.copy(videoPlanePosition);
-        
-        // Create a new quaternion for the CD case
-        const caseQuat = new THREE.Quaternion().setFromEuler(cdCase.model.rotation);
-        
-        // Create a quaternion for our additional rotation
-        const offsetQuat = new THREE.Quaternion().setFromEuler(
-          new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
-        );
-        
-        // Combine the quaternions (case rotation first, then offset rotation)
-        const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
-        
-        // Apply the combined rotation
-        this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
+      // If no active case but we have a previously animated case that might be in transition
+      if (!caseToAlignWith && this.manuallyAnimatedCaseId !== null) {
+        caseToAlignWith = this.cdCases.find(c => c.id === this.manuallyAnimatedCaseId);
+      }
+    }
+    
+    if (!caseToAlignWith) return;
+    
+    // Get configuration values
+    const videoPlane2Pos = this.config.videoPlane2Position || { 
+      offsetX: 0.8, 
+      offsetY: 0.01, 
+      offsetZ: 0.02 
+    };
+    
+    const videoPlane2Rot = this.config.videoPlane2Rotation || { 
+      offsetX: 0,
+      offsetY: -1.57, 
+      offsetZ: 0
+    };
+    
+    // Debug logging (optional)
+    if (this.isManuallyAnimating) {
+      console.log('Aligning videoPlane2 with manually animated case:', caseToAlignWith.id);
+    }
+    
+    // Get case position and rotation
+    const casePosition = new THREE.Vector3().copy(caseToAlignWith.model.position);
+    const caseQuaternion = new THREE.Quaternion().setFromEuler(caseToAlignWith.model.rotation);
+    
+    // Create offset vector and apply case rotation
+    const offsetVector = new THREE.Vector3(
+      videoPlane2Pos.offsetX,
+      videoPlane2Pos.offsetY,
+      videoPlane2Pos.offsetZ
+    );
+    
+    // Apply case rotation to the offset vector so it rotates with the case
+    offsetVector.applyQuaternion(caseQuaternion);
+    
+    // Calculate final position by adding the rotated offset to the case position
+    const videoPlanePosition = new THREE.Vector3(
+      casePosition.x + offsetVector.x,
+      casePosition.y + offsetVector.y,
+      casePosition.z + offsetVector.z
+    );
+    
+    // Apply the position to the video plane
+    this.caseBackVideoPlane.position.copy(videoPlanePosition);
+    
+    // Create a new quaternion for the CD case
+    const caseQuat = new THREE.Quaternion().setFromEuler(caseToAlignWith.model.rotation);
+    
+    // Create a quaternion for our additional rotation
+    const offsetQuat = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
+    );
+    
+    // Combine the quaternions (case rotation first, then offset rotation)
+    const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
+    
+    // Apply the combined rotation
+    this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
+
+    // If case is not active and we have a material that should fade out
+    // Gradually reduce opacity as the case moves back to its position
+    if (!caseToAlignWith.isActive && !this.isManuallyAnimating) {
+      const material = this.caseBackVideoPlane.material as THREE.MeshBasicMaterial;
+      // Calculate distance from current to target position as a percentage
+      const currentPos = new THREE.Vector3().copy(caseToAlignWith.position);
+      const targetPos = new THREE.Vector3().copy(caseToAlignWith.targetPosition);
+      // Use the same Z offset as defined in the config.finalCasePosition
+      const Z_OFFSET_ACTIVE = 2.0; // Match the finalCasePosition.offsetZ value
+      const totalDistance = caseToAlignWith.initialPosition.distanceTo(targetPos.add(new THREE.Vector3(0, 0, Z_OFFSET_ACTIVE)));
+      const currentDistance = caseToAlignWith.initialPosition.distanceTo(currentPos);
+      
+      // Fade out based on proximity to final position
+      if (totalDistance > 0) {
+        const progress = 1 - (currentDistance / totalDistance);
+        material.opacity = Math.max(0, 0.95 * (1 - progress));
+      } else {
+        material.opacity = 0;
       }
     }
   }

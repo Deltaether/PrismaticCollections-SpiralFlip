@@ -169,6 +169,7 @@ export class SceneService {
   setupVideoPlane(scene: THREE.Scene, config: Config): { 
     mesh: THREE.Mesh, 
     play: () => void, 
+    pause: () => void,
     videoTexture: THREE.VideoTexture,
     updateVideoSource: (videoPath: string) => void 
   } {
@@ -188,6 +189,11 @@ export class SceneService {
     videoTexture.minFilter = THREE.LinearFilter;
     videoTexture.magFilter = THREE.LinearFilter;
     videoTexture.colorSpace = THREE.SRGBColorSpace;
+    
+    // Prevent texture seams and improve quality
+    videoTexture.wrapS = THREE.ClampToEdgeWrapping;
+    videoTexture.wrapT = THREE.ClampToEdgeWrapping;
+    videoTexture.needsUpdate = true;
     
     // Create simple material with video
     const planeMaterial = new THREE.MeshBasicMaterial({
@@ -210,6 +216,9 @@ export class SceneService {
       videoPlane.rotation.z
     );
     
+    // Set render order to ensure proper layering
+    planeMesh.renderOrder = 1; // Higher render order so it renders after the background
+    
     scene.add(planeMesh);
     
     // Function to update video source
@@ -231,12 +240,16 @@ export class SceneService {
       videoTexture.needsUpdate = true;
     };
     
-    // Return the mesh, play function, videoTexture, and update function
+    // Return the mesh, play/pause functions, videoTexture, and update function
     return {
       mesh: planeMesh,
       play: () => {
         this.isVideoPlaying = true;
         return video.play().catch(e => console.warn('Video play failed:', e));
+      },
+      pause: () => {
+        this.isVideoPlaying = false;
+        video.pause();
       },
       videoTexture: videoTexture,
       updateVideoSource: updateVideoSource
@@ -248,21 +261,23 @@ export class SceneService {
     // Create a background plane with config dimensions
     const planeGeometry = new THREE.PlaneGeometry(backgroundPlane.size.width, backgroundPlane.size.height);
     
-    // Define colors for medieval fantasy theme with gold and brown/orange tones
-    const goldColor = new THREE.Color(0xd4af37);      // Rich gold
-    const darkGoldColor = new THREE.Color(0x8b6914);  // Dark gold/bronze
-    const orangeColor = new THREE.Color(0xc86400);    // Deep orange
-    const brownColor = new THREE.Color(0x4d2800);     // Dark brown
+    // Define an updated, more sophisticated color palette that still maintains a gold theme
+    const primaryGold = new THREE.Color(0xf5d884);      // Softer gold
+    const secondaryGold = new THREE.Color(0xbfa26f);    // Muted antique gold
+    const accentColor = new THREE.Color(0xa86d3d);      // Rich amber/copper
+    const deepColor = new THREE.Color(0x453024);        // Deep umber/mahogany
+    const highlightColor = new THREE.Color(0xfff4d4);   // Warm cream highlight
     
-    // Create a shader material for medieval fantasy style background with video influence
+    // Create a shader material for an elegant background with video influence
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0.0 },
         resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        goldColor: { value: new THREE.Vector3(goldColor.r, goldColor.g, goldColor.b) },
-        darkGoldColor: { value: new THREE.Vector3(darkGoldColor.r, darkGoldColor.g, darkGoldColor.b) },
-        orangeColor: { value: new THREE.Vector3(orangeColor.r, orangeColor.g, orangeColor.b) },
-        brownColor: { value: new THREE.Vector3(brownColor.r, brownColor.g, brownColor.b) },
+        primaryGold: { value: new THREE.Vector3(primaryGold.r, primaryGold.g, primaryGold.b) },
+        secondaryGold: { value: new THREE.Vector3(secondaryGold.r, secondaryGold.g, secondaryGold.b) },
+        accentColor: { value: new THREE.Vector3(accentColor.r, accentColor.g, accentColor.b) },
+        deepColor: { value: new THREE.Vector3(deepColor.r, deepColor.g, deepColor.b) },
+        highlightColor: { value: new THREE.Vector3(highlightColor.r, highlightColor.g, highlightColor.b) },
         videoTexture: { value: videoTexture || null }
       },
       vertexShader: `
@@ -275,10 +290,11 @@ export class SceneService {
       fragmentShader: `
         uniform float time;
         uniform vec2 resolution;
-        uniform vec3 goldColor;
-        uniform vec3 darkGoldColor;
-        uniform vec3 orangeColor;
-        uniform vec3 brownColor;
+        uniform vec3 primaryGold;
+        uniform vec3 secondaryGold;
+        uniform vec3 accentColor;
+        uniform vec3 deepColor;
+        uniform vec3 highlightColor;
         uniform sampler2D videoTexture;
         varying vec2 vUv;
 
@@ -301,7 +317,7 @@ export class SceneService {
           return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
         }
         
-        // Fractal Brownian Motion for rich texture
+        // Fractal Brownian Motion for richer texture
         float fbm(vec2 p) {
           float sum = 0.0;
           float amp = 0.5;
@@ -316,48 +332,142 @@ export class SceneService {
           return sum;
         }
         
-        // Create flowing wave pattern
-        float flowPattern(vec2 uv, float scale, float speed) {
+        // Domain warping for more interesting patterns
+        vec2 warp(vec2 p) {
+            float d1 = fbm(p + time * 0.1);
+            float d2 = fbm(p - time * 0.15);
+            return p + vec2(d1, d2) * 0.3;
+        }
+        
+        // Enhanced domain warping for continent-like shapes
+        vec2 continentWarp(vec2 p) {
+            // Multiple layers of warping for more natural, organic terrain shapes
+            vec2 q = vec2(
+                fbm(p + vec2(0.0, 0.1) + time * 0.05),
+                fbm(p + vec2(0.2, 0.3) - time * 0.03)
+            );
+            
+            vec2 r = vec2(
+                fbm(p + 2.0 * q + vec2(1.7, 9.2) + time * 0.02),
+                fbm(p + 2.0 * q + vec2(8.3, 2.8) - time * 0.01)
+            );
+            
+            // Final warped coordinates
+            return p + 0.5 * r;
+        }
+        
+        // Height map for terrain elevation
+        float terrainHeight(vec2 p) {
+            vec2 warped = continentWarp(p * 0.5);
+            float height = fbm(warped * 2.0);
+            
+            // Add ridges for mountain ranges
+            float ridges = 1.0 - abs(0.5 - fbm(warped * 4.0)) * 2.0;
+            ridges = ridges * ridges * 0.7;
+            
+            // Combine for final height map
+            return smoothstep(0.2, 0.75, height) + ridges * 0.3;
+        }
+        
+        // Create fantasy continent shapes
+        float continentShape(vec2 uv) {
+            // Scale to create larger continent forms
+            vec2 scaled = uv * 1.5;
+            
+            // Create main landmass shape
+            float terrain = terrainHeight(scaled);
+            
+            // Erode the edges for coastlines
+            float coast = smoothstep(0.4, 0.45, terrain);
+            
+            // Add inner terrain details
+            float details = fbm(continentWarp(scaled * 3.0)) * coast;
+            
+            return coast + details * 0.2;
+        }
+        
+        // Create elegant wave patterns
+        float wavePattern(vec2 uv, float scale, float speed) {
+          vec2 warpedUV = warp(uv);
           float t = time * speed;
-          vec2 dir = vec2(1.0, 0.5);
-          float pattern = fbm(uv * scale + dir * t);
+          vec2 dir = vec2(0.8, 0.6);
+          float pattern = fbm(warpedUV * scale + dir * t);
           pattern = smoothstep(0.2, 0.8, pattern);
           return pattern;
         }
         
-        // Create elegant curves
-        float elegantCurve(vec2 uv, float scale, float thickness, float offset) {
-          // Distorted sine wave pattern
-          float distortion = fbm(uv * 2.0 + time * 0.05) * 0.2;
-          float wave = sin(uv.x * scale + uv.y * scale * 0.5 + offset + distortion);
-          return smoothstep(1.0 - thickness, 1.0, wave + 1.0);
-        }
-        
-        // Create modern light beam effect
-        float lightBeam(vec2 uv, float angle, float width, float softness) {
-          // Rotate space
-          float s = sin(angle);
-          float c = cos(angle);
-          vec2 rotatedUV = vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
-          
-          // Create beam with soft edges
-          float beam = smoothstep(width, width + softness, abs(rotatedUV.y));
-          return 1.0 - beam;
-        }
-        
-        // Create decorative swirl
-        float swirl(vec2 uv, vec2 center, float radius, float thickness, float rotation) {
+        // Create soft gradient swirls
+        float swirl(vec2 uv, vec2 center, float radius, float intensity) {
           vec2 toCenter = uv - center;
           float dist = length(toCenter);
           
-          // Calculate angle with rotation
-          float angle = atan(toCenter.y, toCenter.x) + rotation + dist * 3.0;
+          // Angular distortion
+          float angle = atan(toCenter.y, toCenter.x) + dist * intensity + time * 0.2;
           
-          // Create swirl pattern
-          float swirl = sin(angle * 3.0);
-          return smoothstep(thickness, thickness + 0.01, swirl) * 
-                 smoothstep(radius + 0.1, radius, dist) * 
-                 smoothstep(0.0, radius - 0.2, dist);
+          // Radial gradient
+          float radialGradient = smoothstep(radius, radius * 0.6, dist);
+          
+          // Combine with smooth wave
+          float wave = 0.5 + 0.5 * sin(angle * 5.0);
+          
+          return radialGradient * wave;
+        }
+        
+        // Create subtle light rays
+        float lightRays(vec2 uv, float density, float speed) {
+          // Moving origin point
+          vec2 center = vec2(0.5 + 0.2 * sin(time * 0.2), 0.5 + 0.2 * cos(time * 0.2));
+          
+          // Direction to center
+          vec2 dir = normalize(uv - center);
+          
+          // Angle based rays with time animation
+          float angle = atan(dir.y, dir.x);
+          float rays = 0.5 + 0.5 * sin(angle * density + time * speed);
+          
+          // Fade with distance from center
+          float dist = length(uv - center);
+          rays *= smoothstep(1.0, 0.1, dist);
+          
+          return rays * 0.3; // Subtle effect
+        }
+        
+        // Create floating particles effect
+        float particles(vec2 uv) {
+          float result = 0.0;
+          
+          // Create multiple particle layers
+          for (int i = 0; i < 3; i++) {
+            float speed = 0.1 + float(i) * 0.05;
+            float scale = 100.0 + float(i) * 50.0;
+            float timeOffset = time * speed + float(i) * 10.0;
+            
+            // Create particle grid and animate
+            vec2 gridUV = uv * scale;
+            vec2 gridPos = floor(gridUV);
+            
+            // Unique random properties for each particle
+            float random = hash(gridPos);
+            float size = 0.3 + 0.7 * hash(gridPos + 1.2);
+            float particleTime = timeOffset * (0.5 + 0.5 * random);
+            
+            // Particle movement path
+            vec2 center = gridPos + 0.5;
+            center.x += 0.3 * sin(particleTime * 0.7 + random * 6.28);
+            center.y += 0.3 * cos(particleTime * 0.5 + random * 6.28);
+            
+            // Particle glow
+            float dist = length(gridUV - center);
+            float glow = size * 0.5 * (0.1 / (dist + 0.01));
+            
+            // Fade particles in and out
+            float fade = 0.5 + 0.5 * sin(particleTime);
+            glow *= fade;
+            
+            result += glow;
+          }
+          
+          return smoothstep(0.0, 1.0, result * 0.25); // Normalize and smooth
         }
         
         // Sample video with blur and offset
@@ -389,93 +499,88 @@ export class SceneService {
           vec2 uv = vUv;
           
           // Sample video for reactive elements
-          vec4 blurredVideo1 = sampleVideoBlurred(uv, 0.1, vec2(sin(time * 0.3) * 0.05, cos(time * 0.2) * 0.05));
-          vec4 blurredVideo2 = sampleVideoBlurred(uv + 0.2, 0.15, vec2(cos(time * 0.2) * 0.05, sin(time * 0.3) * 0.05));
+          vec4 blurredVideo1 = sampleVideoBlurred(uv, 0.1, vec2(sin(time * 0.2) * 0.05, cos(time * 0.15) * 0.05));
+          vec4 blurredVideo2 = sampleVideoBlurred(uv + 0.2, 0.15, vec2(cos(time * 0.15) * 0.05, sin(time * 0.25) * 0.05));
           
           // Extract luminance and motion from video
           float vidLuma1 = dot(blurredVideo1.rgb, vec3(0.2126, 0.7152, 0.0722));
           float vidLuma2 = dot(blurredVideo2.rgb, vec3(0.2126, 0.7152, 0.0722));
-          float videoMotion = abs(vidLuma1 - vidLuma2) * 5.0; // Motion detection
+          float videoMotion = abs(vidLuma1 - vidLuma2) * 3.0; // Motion detection
           
-          // Base flowing pattern influenced by video
-          float flow = flowPattern(uv, 3.0, 0.1 + videoMotion * 0.2);
+          // Generate continent shapes
+          float continent = continentShape(uv);
           
-          // Create layered elegant curves
-          float curvePattern = 0.0;
-          for (int i = 0; i < 3; i++) {
-            float offset = float(i) * 2.0 + time * 0.2;
-            curvePattern += elegantCurve(uv, 10.0 + float(i) * 5.0, 0.1, offset) * (0.5 - float(i) * 0.1);
-          }
+          // Create subtle rotating and flowing terrain details
+          vec2 rotatedUV = vec2(
+            uv.x * cos(time * 0.02) - uv.y * sin(time * 0.02),
+            uv.x * sin(time * 0.02) + uv.y * cos(time * 0.02)
+          );
+          float terrainDetail = fbm(continentWarp(rotatedUV * 5.0));
           
-          // Create dynamic light beams
-          float beams = 0.0;
-          for (int i = 0; i < 4; i++) {
-            float angle = time * 0.1 + float(i) * 1.57; // 90 degrees apart, slowly rotating
-            beams += lightBeam(uv - 0.5, angle, 0.1 + vidLuma1 * 0.1, 0.05) * 0.2;
-          }
+          // Create mountain ridges and terrain variations
+          float mountains = terrainHeight(uv * 3.0 + time * 0.01) * continent;
           
-          // Create decorative swirls
+          // Base wave pattern for water/oceans
+          float waves = wavePattern(uv, 2.5, 0.08 + videoMotion * 0.1) * (1.0 - continent * 0.7);
+          
+          // Create subtle "kingdom borders" or territory lines
+          float borders = 0.0;
+          vec2 borderUV = continentWarp(uv * 2.0);
+          // Cellular-like patterns for territory divisions
+          float cellValue = fract(sin(borderUV.x * 12.0) * 43758.5453 + cos(borderUV.y * 13.0) * 93728.3462);
+          float territoryEdge = smoothstep(0.02, 0.0, abs(fract(cellValue * 3.0) - 0.5) - 0.2) * 0.4;
+          // Only show borders on land
+          borders = territoryEdge * continent;
+          
+          // Create layered swirls for magical elements
           float swirlPattern = 0.0;
-          vec2 swirlCenter1 = vec2(0.25 + sin(time * 0.2) * 0.1, 0.25 + cos(time * 0.3) * 0.1);
-          vec2 swirlCenter2 = vec2(0.75 + cos(time * 0.25) * 0.1, 0.75 + sin(time * 0.35) * 0.1);
+          swirlPattern += swirl(uv, vec2(0.3, 0.3), 0.5, 3.0) * 0.3;
+          swirlPattern += swirl(uv, vec2(0.7, 0.7), 0.6, 2.0) * 0.2;
           
-          swirlPattern += swirl(uv, swirlCenter1, 0.15 + vidLuma1 * 0.05, 0.5, time * 0.5);
-          swirlPattern += swirl(uv, swirlCenter2, 0.15 + vidLuma2 * 0.05, 0.5, -time * 0.5);
+          // Add light rays for mystical effect
+          float rays = lightRays(uv, 12.0, 0.1) * 0.6;
           
-          // Use video content to create reactive highlight nodes
-          float videoNodes = 0.0;
-          for (int i = 0; i < 6; i++) {
-            float t = time * 0.2 + float(i);
-            vec2 nodePos = vec2(
-              0.5 + sin(t) * 0.4 * sin(t * 0.5),
-              0.5 + cos(t) * 0.4 * sin(t * 0.7)
-            );
-            float nodeBrightness = 0.3 + 0.7 * sin(t * 0.5);
-            
-            float distToNode = length(uv - nodePos);
-            float nodeSize = 0.03 + vidLuma1 * 0.02;
-            
-            videoNodes += smoothstep(nodeSize, nodeSize * 0.5, distToNode) * nodeBrightness;
-          }
+          // Add subtle particles for magical dust
+          float particleEffect = particles(uv) * (0.5 + continent * 0.5);
           
-          // Blend different pattern elements
-          float combinedPattern = flow * 0.3 + curvePattern * 0.4 + beams * (0.3 + videoMotion) + swirlPattern * 0.5;
+          // Soft vignette
+          float vignette = smoothstep(0.0, 0.7, 1.0 - length((uv - 0.5) * 1.3));
           
-          // Base color from warm gold to dark gold with flow pattern
-          vec3 baseColor = mix(darkGoldColor, goldColor, flow);
+          // Base color gradient from deep to primary gold
+          vec3 baseColor = mix(deepColor, primaryGold, vignette * 0.7);
           
-          // Apply layered visual elements
-          vec3 color = baseColor;
+          // Layer visual elements for fantasy map appearance
+          // Land areas
+          baseColor = mix(baseColor, mix(secondaryGold, accentColor, terrainDetail), continent * 0.8);
+          // Mountains and elevated terrain
+          baseColor = mix(baseColor, highlightColor * 0.9, mountains * 0.6);
+          // Water/ocean areas with wave patterns
+          baseColor = mix(baseColor, deepColor * 0.8 + secondaryGold * 0.2, waves * (1.0 - continent * 0.8));
+          // Kingdom/territory borders
+          baseColor = mix(baseColor, highlightColor, borders);
+          // Magical elements
+          baseColor = mix(baseColor, mix(accentColor, highlightColor, 0.5), swirlPattern * 0.3);
+          baseColor = mix(baseColor, highlightColor, rays * 0.4);
+          baseColor = mix(baseColor, highlightColor, particleEffect * 0.4);
           
-          // Add curvature highlights
-          color = mix(color, goldColor * 1.2, curvePattern * 0.8);
+          // Add subtle video influence for magical shimmer
+          vec3 videoColor = blurredVideo1.rgb;
+          float videoInfluence = videoMotion * 0.15;
+          baseColor = mix(baseColor, videoColor * vec3(1.2, 1.1, 0.8), videoInfluence * continent); 
           
-          // Add light beams with video influence
-          color = mix(color, orangeColor, beams * (0.5 + vidLuma1 * 0.5));
+          // Add subtle bloom to bright areas
+          float luminance = dot(baseColor, vec3(0.2126, 0.7152, 0.0722));
+          float bloom = smoothstep(0.7, 0.9, luminance);
+          baseColor += bloom * highlightColor * 0.3;
           
-          // Add swirl pattern
-          color = mix(color, goldColor * 1.5, swirlPattern * 0.7);
-          
-          // Add nodes with video influence
-          color = mix(color, goldColor * 1.8, videoNodes * (0.4 + videoMotion));
-          
-          // Subtle video color influence (tinted to match palette)
-          vec3 tintedVideoColor = blurredVideo1.rgb * vec3(1.3, 1.0, 0.6); // Warm gold tint
-          color = mix(color, tintedVideoColor, videoMotion * 0.15);
-          
-          // Add subtle glow based on video motion
-          color += goldColor * videoMotion * 0.1;
-          
-          // Add subtle film grain for texture
+          // Apply gentle film grain
           float grain = hash(uv + time) * 0.03;
-          color = mix(color, brownColor, grain);
+          baseColor = mix(baseColor, deepColor, grain);
           
-          // Vignette effect - darker at the edges
-          float vignette = 1.0 - length((uv - 0.5) * 1.3);
-          vignette = smoothstep(0.0, 0.7, vignette);
-          color = mix(brownColor, color, vignette);
+          // Final vignette
+          baseColor *= vignette;
           
-          gl_FragColor = vec4(color, 1.0);
+          gl_FragColor = vec4(baseColor, 1.0);
         }
       `,
       side: THREE.BackSide  // Use BackSide to show it behind the video plane
@@ -490,7 +595,7 @@ export class SceneService {
     planeMesh.position.set(
       backgroundPlane.position.x,
       backgroundPlane.position.y,
-      backgroundPlane.position.z
+      backgroundPlane.position.z - 0.01 // Slight offset to prevent z-fighting with video plane
     );
     
     planeMesh.rotation.set(
@@ -499,15 +604,24 @@ export class SceneService {
       backgroundPlane.rotation.z
     );
     
+    // Set render order to ensure proper layering
+    planeMesh.renderOrder = 0; // Lower render order so it renders first
+    
     scene.add(planeMesh);
     return planeMesh;
   }
 
-  // Add method to update shader animations
+  // Add method to update shader animations with smoother transitions
   updateBackgroundAnimations(): void {
     if (this.backgroundShaderMaterial) {
-      // Access uniforms with bracket notation to avoid TypeScript error
-      this.backgroundShaderMaterial.uniforms['time'].value = this.clock.getElapsedTime();
+      // Use a consistent time update to avoid glitches
+      const currentTime = this.clock.getElapsedTime();
+      
+      // Update the shader time uniform
+      this.backgroundShaderMaterial.uniforms['time'].value = currentTime;
+      
+      // Force material update to ensure shader gets the latest values
+      this.backgroundShaderMaterial.needsUpdate = true;
     }
   }
 

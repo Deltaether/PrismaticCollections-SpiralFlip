@@ -101,6 +101,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   private backgroundPlane!: THREE.Mesh;
   private caseBackVideoPlane!: THREE.Mesh; // New property for the case back video plane
   private videoPlay!: () => void;
+  private videoPause!: () => void;
   private updateVideoSource!: (videoPath: string) => void;
   
   // Flag to prevent position updates during manual animations
@@ -194,17 +195,17 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     // Set up ground
     this.sceneService.setupGround(this.scene, this.config);
 
-    // Add video plane (formerly red plane) - INITIALLY INVISIBLE
+    // Add video plane (formerly red plane) - NOW VISIBLE BY DEFAULT
     const videoPlaneResult = this.sceneService.setupVideoPlane(this.scene, this.config);
-    videoPlaneResult.mesh.visible = false; // Hide initially
+    videoPlaneResult.mesh.visible = true; // Show from the beginning
     
-    // Add background plane behind video plane - INITIALLY INVISIBLE
+    // Add background plane behind video plane - NOW VISIBLE BY DEFAULT
     const backgroundPlane = this.sceneService.setupBackgroundPlane(this.scene, this.config, videoPlaneResult.videoTexture);
-    backgroundPlane.visible = false; // Hide initially
+    backgroundPlane.visible = true; // Show from the beginning
     
-    // Create a new video plane that will be attached to the back of the CD case - INITIALLY INVISIBLE
+    // Create a new video plane that will be attached to the back of the CD case - NOW VISIBLE BY DEFAULT
     const caseBackVideoPlane = this.createCaseBackVideoPlane(videoPlaneResult.videoTexture);
-    caseBackVideoPlane.visible = false; // Hide initially
+    caseBackVideoPlane.visible = true; // Show from the beginning
     this.scene.add(caseBackVideoPlane);
     
     // Store references for later use
@@ -212,6 +213,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     this.backgroundPlane = backgroundPlane;
     this.caseBackVideoPlane = caseBackVideoPlane;
     this.videoPlay = videoPlaneResult.play;
+    this.videoPause = videoPlaneResult.pause;
     this.updateVideoSource = videoPlaneResult.updateVideoSource;
   }
 
@@ -419,10 +421,8 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
             this.caseBackVideoPlane.rotation.y += videoPlane2Rot.offsetY;
             this.caseBackVideoPlane.rotation.z += videoPlane2Rot.offsetZ;
             
-            // Make the video plane visible once the case starts moving
-            if (rawProgress > 0.1 && !this.caseBackVideoPlane.visible) {
-              this.caseBackVideoPlane.visible = true;
-            }
+            // Note: Video plane is already visible, no need to toggle visibility here
+            // The animation of the plane is handled by positioning it relative to the CD case
           }
           
           if (rawProgress < 1.0) {
@@ -460,12 +460,10 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     canvas.addEventListener('contextmenu', (e) => this.eventsService.handleContextMenu(e, canvas, this.camera, this.cdCases));
   }
   
-  // Method to reveal video and background planes
+  // Method to start playback on video and background planes
   private revealVideoAndBackground(): void {
     if (this.videoPlane && this.backgroundPlane) {
-      // Make planes visible
-      this.videoPlane.visible = true;
-      this.backgroundPlane.visible = true;
+      // The planes are already visible, so we only need to handle the video content
       
       // Get active case index to load the appropriate video
       const activeIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
@@ -479,11 +477,6 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       
       // Start video playback
       this.videoPlay();
-      
-      // Make sure the case back video plane is also visible
-      if (this.caseBackVideoPlane) {
-        this.caseBackVideoPlane.visible = true;
-      }
     }
   }
   
@@ -643,10 +636,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       }
     });
     
-    // Only update background animations if background is visible
-    if (this.backgroundPlane && this.backgroundPlane.visible) {
-      this.sceneService.updateBackgroundAnimations();
-    }
+    // Always update background animations - don't check for visibility
+    // This ensures continuous shader animation even when the plane is toggled
+    this.sceneService.updateBackgroundAnimations();
     
     // Update controls and render
     this.controls.update();
@@ -782,22 +774,18 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       }
       
       // If we're navigating to a case that is playing music, update the video
-      if (this.playingMusic[newIndex] && this.videoPlane && this.videoPlane.visible) {
+      if (this.playingMusic[newIndex] && this.videoPlane) {
         // Update video source to match new active case
         if (newIndex >= 0 && newIndex < this.videoPaths.length) {
           this.updateVideoSource(this.videoPaths[newIndex]);
+          
+          // If the case is playing music, also start the video
+          this.videoPlay();
         }
       } else {
-        // Hide the video and background if the new case isn't playing music
-        if (this.videoPlane && this.backgroundPlane) {
-          this.videoPlane.visible = this.playingMusic[newIndex];
-          this.backgroundPlane.visible = this.playingMusic[newIndex];
-          
-          // Also hide the case back video plane
-          if (this.caseBackVideoPlane) {
-            this.caseBackVideoPlane.visible = this.playingMusic[newIndex];
-          }
-        }
+        // If case is not playing music, we keep planes visible but pause video
+        // (Note: We don't hide the planes anymore, they stay visible)
+        this.videoPause(); // Pause the video when no music is playing
       }
     }
     // If controls are not locked, the event will propagate to OrbitControls naturally
@@ -819,6 +807,9 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
     
     // Create the mesh
     const videoPlane = new THREE.Mesh(geometry, material);
+    
+    // Set render order to ensure proper layering
+    videoPlane.renderOrder = 2; // Highest render order to ensure it's always on top
     
     // Position and rotation will be set when the case is clicked
     // as it needs to follow the case

@@ -342,203 +342,12 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           
           // Use the same animation logic as scrolling away
           // Keep the same index to stay on this case, don't switch
-          this.animateActiveCaseBack(clickedCase, clickedIndex);
+          this.animateActiveCaseBack(clickedCase, clickedIndex, false);
           return;
         }
         
-        // If we get here, case is active but not yet expanded, so expand it
-        // Reset the back video plane with opacity 0 (it will fade in after animation)
-        this.resetCaseBackVideoPlane(0);
-        
-        // Show the main video plane when a case is expanded
-        this.videoPlane.visible = true;
-        
-        // Remove silhouette immediately by restoring original materials
-        this.removeSilhouetteEffect(clickedCase);
-        
-        // Store original rotation and current position (not initial position)
-        const originalRotation = new THREE.Euler().copy(clickedCase.model.rotation);
-        // Use the current position instead of initialPosition to prevent teleporting
-        const startPosition = new THREE.Vector3().copy(clickedCase.model.position);
-        
-        console.log("Starting expansion from current position:", startPosition);
-        console.log("Initial position (for reference):", clickedCase.initialPosition);
-        
-        // Set flag to prevent position updates during animation
-        this.isManuallyAnimating = true;
-        this.manuallyAnimatedCaseId = clickedCase.id;
-        this.activeCaseExpanded = true; // Mark that the active case is now expanded
-        
-        // Get video plane configuration values
-        const videoPlane2Pos = this.config.videoPlane2Position || { 
-          offsetX: 0.8, 
-          offsetY: 0.01, 
-          offsetZ: 0.02 
-        };
-        
-        // Get video plane rotation values
-        const videoPlane2Rot = this.config.videoPlane2Rotation || { 
-          offsetX: 0,
-          offsetY: -1.57, 
-          offsetZ: 0
-        };
-        
-        // Get final case position offset
-        const finalCasePosOffset = this.config.finalCasePosition || {
-          offsetX: -2.5,
-          offsetY: 3.0,
-          offsetZ: -2.0
-        };
-
-        // Get final case rotation offset
-        const finalCaseRotOffset = this.config.finalCaseRotation || {
-          offsetX: 3.14,
-          offsetY: 0.0,
-          offsetZ: 0.0
-        };
-        
-        // Debug logging to track position configurations
-        console.log('Original Position:', startPosition);
-        console.log('videoPlane2Position offsets:', videoPlane2Pos);
-        console.log('finalCasePosition offsets (added to original):', finalCasePosOffset);
-        console.log('finalCaseRotation offsets (added to original):', finalCaseRotOffset);
-        
-        // Get animation settings from config
-        const animConfig = this.config.menuAnimation || {
-          duration: 1.0,
-          bezierCurve: { p1: 0.25, p2: 0.1, p3: 0.25, p4: 1.0 }
-        };
-
-        // Create animation
-        const startTime = this.clock.getElapsedTime();
-        const duration = animConfig.duration; // Use configured duration
-
-        const animateTransform = () => {
-          const currentTime = this.clock.getElapsedTime();
-          const elapsed = currentTime - startTime;
-          const rawProgress = Math.min(elapsed / duration, 1.0);
-          
-          // Apply bezier curve easing for time interpolation
-          const bezierParams = animConfig.bezierCurve;
-          const t = this.cubicBezier(
-            rawProgress, 
-            0,             // Start at 0
-            bezierParams.p1,
-            bezierParams.p2,
-            1              // End at 1
-          );
-          
-          // Use the same offset approach as with the video planes
-          // Store current position before applying offsets
-          const currentPosition = new THREE.Vector3().copy(clickedCase.model.position);
-          
-          // Calculate offsets that will be applied for this frame
-          const offsetX = finalCasePosOffset.offsetX * t;
-          const offsetY = finalCasePosOffset.offsetY * t;
-          const offsetZ = finalCasePosOffset.offsetZ * t;
-          
-          // Apply rotation offsets
-          const currentRotation = new THREE.Euler().copy(clickedCase.model.rotation);
-          clickedCase.model.rotation.x = originalRotation.x + (finalCaseRotOffset.offsetX * t);
-          clickedCase.model.rotation.y = originalRotation.y + (finalCaseRotOffset.offsetY * t);
-          clickedCase.model.rotation.z = originalRotation.z + (finalCaseRotOffset.offsetZ * t);
-          
-          // Get rotation as quaternion to apply to position offset
-          const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
-          
-          // Create an offset vector based on the final offset scaled by progress
-          const offsetVector = new THREE.Vector3(offsetX, offsetY, offsetZ);
-          
-          // Optionally, apply case rotation to the offset vector
-          // This makes the offset follow the case's rotation
-          // offsetVector.applyQuaternion(caseQuaternion);
-          
-          // Calculate final position by applying offsets to original position
-          const posX = startPosition.x + offsetVector.x;
-          const posY = startPosition.y + offsetVector.y;
-          const posZ = startPosition.z + offsetVector.z;
-          
-          // Debug info
-          if (rawProgress === 0 || rawProgress >= 0.99) {
-            console.log(`Animation progress: ${rawProgress.toFixed(2)}, t=${t.toFixed(2)}`);
-            console.log(`Original position:`, startPosition);
-            console.log(`Applied offsets: X=${offsetX.toFixed(2)}, Y=${offsetY.toFixed(2)}, Z=${offsetZ.toFixed(2)}`);
-            console.log(`Final position: X=${posX.toFixed(2)}, Y=${posY.toFixed(2)}, Z=${posZ.toFixed(2)}`);
-          }
-          
-          // Apply calculated position directly to the case
-          clickedCase.model.position.set(posX, posY, posZ);
-          // Also update the case's internal position
-          clickedCase.position.copy(clickedCase.model.position);
-          
-          // Update the case back video plane position to follow the case
-          if (this.caseBackVideoPlane) {
-            // Calculate position for the video plane based on current animated case position
-            const casePosition = new THREE.Vector3().copy(clickedCase.model.position);
-            const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
-            
-            // Create a position offset vector
-            const offsetVector = new THREE.Vector3(
-              videoPlane2Pos.offsetX,
-              videoPlane2Pos.offsetY,
-              videoPlane2Pos.offsetZ
-            );
-            
-            // Apply case rotation to the offset vector so it rotates with the case
-            offsetVector.applyQuaternion(caseQuaternion);
-            
-            // Calculate final position by adding the rotated offset to the case position
-            const videoPlanePosition = new THREE.Vector3(
-              casePosition.x + offsetVector.x,
-              casePosition.y + offsetVector.y,
-              casePosition.z + offsetVector.z
-            );
-            
-            // Apply the position to the video plane
-            this.caseBackVideoPlane.position.copy(videoPlanePosition);
-            
-            // Create a new quaternion for the CD case
-            const caseQuat = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
-            
-            // Create a quaternion for our additional rotation
-            const offsetQuat = new THREE.Quaternion().setFromEuler(
-              new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
-            );
-            
-            // Combine the quaternions (case rotation first, then offset rotation)
-            const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
-            
-            // Apply the combined rotation
-            this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
-          }
-          
-          if (rawProgress < 1.0) {
-            requestAnimationFrame(animateTransform);
-          }
-          else {
-            console.log("Animation complete: Keeping case in final position");
-            // Animation is complete - keep the case in this position permanently!
-            // We don't reset the animation flags, so the case position won't be overridden
-            
-            // Update the case's internal position to match its model position
-            // This ensures if we later want to animate from here, we have the correct starting point
-            clickedCase.position.copy(clickedCase.model.position);
-            clickedCase.targetPosition.copy(clickedCase.model.position);
-          }
-        };
-        
-        // Start animation
-        animateTransform();
-        
-        // After animation completes, show video and background planes
-        setTimeout(() => {
-          // Mark this case as playing music
-          if (clickedIndex >= 0) {
-            this.playingMusic[clickedIndex] = true;
-          }
-          
-          this.revealVideoAndBackground();
-        }, duration * 1000); // Convert duration to milliseconds
+        // If not expanded, expand the case using the new method
+        this.expandActiveCase(clickedCase);
       }
     });
     
@@ -912,20 +721,25 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // Get the active case that we will animate back
       const activeCase = this.cdCases[currentActiveIndex];
       
+      // Track if the case was expanded before we navigate away
+      const wasExpandedBefore = this.activeCaseExpanded;
+      
       // Animate current active case back to its original position ONLY if it's expanded
       if (activeCase && activeCase.isActive && this.activeCaseExpanded) {
-        this.animateActiveCaseBack(activeCase, newIndex);
+        // Pass the expanded state to the animateActiveCaseBack method
+        // so it can be used when setting up the new case
+        this.animateActiveCaseBack(activeCase, newIndex, wasExpandedBefore);
       } else {
         // If the case isn't expanded, just set the new active case directly
         this.stateService.setActiveCase(this.cdCases, newIndex);
-        this.updateVideoForNewActiveCase(newIndex);
+        this.updateVideoForNewActiveCase(newIndex, wasExpandedBefore);
       }
     }
     // If controls are not locked, the event will propagate to OrbitControls naturally
   }
 
   // New method to animate active case back to its original position
-  private animateActiveCaseBack(activeCase: CDCase, newIndex: number): void {
+  private animateActiveCaseBack(activeCase: CDCase, newIndex: number, wasExpandedBefore: boolean): void {
     console.log("Animating case back: ", activeCase.id, "New index: ", newIndex);
     console.log("Initial position: ", activeCase.initialPosition);
     console.log("Current position: ", activeCase.model.position);
@@ -1099,7 +913,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
           // Now set the new active case
           this.stateService.setActiveCase(this.cdCases, newIndex);
         }
-        this.updateVideoForNewActiveCase(newIndex);
+        this.updateVideoForNewActiveCase(newIndex, wasExpandedBefore);
         
         console.log("Final position after animation:", activeCase.model.position);
       }
@@ -1110,7 +924,7 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
   }
   
   // Helper method to update video for new active case
-  private updateVideoForNewActiveCase(newIndex: number): void {
+  private updateVideoForNewActiveCase(newIndex: number, wasExpandedBefore: boolean = false): void {
     // Reset the expanded state for the new active case
     this.activeCaseExpanded = false;
     
@@ -1136,6 +950,255 @@ export class CDCasesComponent implements AfterViewInit, OnDestroy {
       // If case is not playing music, we keep planes visible but pause video
       this.videoPause(); // Pause the video when no music is playing
     }
+    
+    // If the previous case was expanded, automatically expand the new case
+    // but only after the activation animation has completed
+    if (wasExpandedBefore && activeCase) {
+      // We need to properly wait for the position animation to complete
+      // This is determined by checking when the case's position has reached (or very close to)
+      // its target position
+      
+      // Create a flag to ensure we only trigger the expansion once
+      let expansionTriggered = false;
+      
+      // Create a function to check if case is in position
+      const checkPosition = () => {
+        // Skip if expansion was already triggered
+        if (expansionTriggered) return;
+
+        // Calculate the distance between current position and target position
+        const distanceToTarget = activeCase.position.distanceTo(activeCase.targetPosition);
+        
+        // Consider the position reached when very close to target (within a small threshold)
+        const POSITION_THRESHOLD = 0.05; // Small distance threshold
+        
+        if (distanceToTarget <= POSITION_THRESHOLD) {
+          // Case has reached its target position, now expand it
+          console.log("Case reached target position, auto-expanding because previous case was expanded");
+          console.log("Distance to target:", distanceToTarget);
+          
+          // Set flag to prevent multiple expansions
+          expansionTriggered = true;
+          
+          // Expand the case
+          this.expandActiveCase(activeCase);
+        } else {
+          // Keep checking until position is reached
+          console.log("Waiting for case to reach position before auto-expanding. Current distance:", distanceToTarget);
+          
+          // Continue checking until position reached
+          requestAnimationFrame(checkPosition);
+        }
+      };
+      
+      // Start checking for position
+      checkPosition();
+    }
+  }
+
+  // New method to handle case expansion, extracted from click handler to be reusable
+  private expandActiveCase(clickedCase: CDCase): void {
+    // Only expand if the case is active and not already expanded
+    if (!clickedCase.isActive || this.activeCaseExpanded) {
+      return;
+    }
+    
+    // Get the index of the clicked case
+    const clickedIndex = this.cdCases.indexOf(clickedCase);
+    
+    // Mark tutorial as completed for this case
+    if (clickedIndex >= 0) {
+      this.tutorialCompleted[clickedIndex] = true;
+    }
+    
+    // Reset the back video plane with opacity 0 (it will fade in after animation)
+    this.resetCaseBackVideoPlane(0);
+    
+    // Show the main video plane when a case is expanded
+    this.videoPlane.visible = true;
+    
+    // Remove silhouette immediately by restoring original materials
+    this.removeSilhouetteEffect(clickedCase);
+    
+    // Store original rotation and current position (not initial position)
+    const originalRotation = new THREE.Euler().copy(clickedCase.model.rotation);
+    // Use the current position instead of initialPosition to prevent teleporting
+    const startPosition = new THREE.Vector3().copy(clickedCase.model.position);
+    
+    console.log("Starting expansion from current position:", startPosition);
+    console.log("Initial position (for reference):", clickedCase.initialPosition);
+    
+    // Set flag to prevent position updates during animation
+    this.isManuallyAnimating = true;
+    this.manuallyAnimatedCaseId = clickedCase.id;
+    this.activeCaseExpanded = true; // Mark that the active case is now expanded
+    
+    // Get video plane configuration values
+    const videoPlane2Pos = this.config.videoPlane2Position || { 
+      offsetX: 0.8, 
+      offsetY: 0.01, 
+      offsetZ: 0.02 
+    };
+    
+    // Get video plane rotation values
+    const videoPlane2Rot = this.config.videoPlane2Rotation || { 
+      offsetX: 0,
+      offsetY: -1.57, 
+      offsetZ: 0
+    };
+    
+    // Get final case position offset
+    const finalCasePosOffset = this.config.finalCasePosition || {
+      offsetX: -2.5,
+      offsetY: 3.0,
+      offsetZ: -2.0
+    };
+
+    // Get final case rotation offset
+    const finalCaseRotOffset = this.config.finalCaseRotation || {
+      offsetX: 3.14,
+      offsetY: 0.0,
+      offsetZ: 0.0
+    };
+    
+    // Debug logging to track position configurations
+    console.log('Original Position:', startPosition);
+    console.log('videoPlane2Position offsets:', videoPlane2Pos);
+    console.log('finalCasePosition offsets (added to original):', finalCasePosOffset);
+    console.log('finalCaseRotation offsets (added to original):', finalCaseRotOffset);
+    
+    // Get animation settings from config
+    const animConfig = this.config.menuAnimation || {
+      duration: 1.0,
+      bezierCurve: { p1: 0.25, p2: 0.1, p3: 0.25, p4: 1.0 }
+    };
+
+    // Create animation
+    const startTime = this.clock.getElapsedTime();
+    const duration = animConfig.duration; // Use configured duration
+
+    const animateTransform = () => {
+      const currentTime = this.clock.getElapsedTime();
+      const elapsed = currentTime - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1.0);
+      
+      // Apply bezier curve easing for time interpolation
+      const bezierParams = animConfig.bezierCurve;
+      const t = this.cubicBezier(
+        rawProgress, 
+        0,             // Start at 0
+        bezierParams.p1,
+        bezierParams.p2,
+        1              // End at 1
+      );
+      
+      // Use the same offset approach as with the video planes
+      // Store current position before applying offsets
+      const currentPosition = new THREE.Vector3().copy(clickedCase.model.position);
+      
+      // Calculate offsets that will be applied for this frame
+      const offsetX = finalCasePosOffset.offsetX * t;
+      const offsetY = finalCasePosOffset.offsetY * t;
+      const offsetZ = finalCasePosOffset.offsetZ * t;
+      
+      // Apply rotation offsets
+      const currentRotation = new THREE.Euler().copy(clickedCase.model.rotation);
+      clickedCase.model.rotation.x = originalRotation.x + (finalCaseRotOffset.offsetX * t);
+      clickedCase.model.rotation.y = originalRotation.y + (finalCaseRotOffset.offsetY * t);
+      clickedCase.model.rotation.z = originalRotation.z + (finalCaseRotOffset.offsetZ * t);
+      
+      // Get rotation as quaternion to apply to position offset
+      const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
+      
+      // Create an offset vector based on the final offset scaled by progress
+      const offsetVector = new THREE.Vector3(offsetX, offsetY, offsetZ);
+      
+      // Calculate final position by applying offsets to original position
+      const posX = startPosition.x + offsetVector.x;
+      const posY = startPosition.y + offsetVector.y;
+      const posZ = startPosition.z + offsetVector.z;
+      
+      // Debug info
+      if (rawProgress === 0 || rawProgress >= 0.99) {
+        console.log(`Animation progress: ${rawProgress.toFixed(2)}, t=${t.toFixed(2)}`);
+        console.log(`Original position:`, startPosition);
+        console.log(`Applied offsets: X=${offsetX.toFixed(2)}, Y=${offsetY.toFixed(2)}, Z=${offsetZ.toFixed(2)}`);
+        console.log(`Final position: X=${posX.toFixed(2)}, Y=${posY.toFixed(2)}, Z=${posZ.toFixed(2)}`);
+      }
+      
+      // Apply calculated position directly to the case
+      clickedCase.model.position.set(posX, posY, posZ);
+      // Also update the case's internal position
+      clickedCase.position.copy(clickedCase.model.position);
+      
+      // Update the case back video plane position to follow the case
+      if (this.caseBackVideoPlane) {
+        // Calculate position for the video plane based on current animated case position
+        const casePosition = new THREE.Vector3().copy(clickedCase.model.position);
+        const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
+        
+        // Create a position offset vector
+        const offsetVector = new THREE.Vector3(
+          videoPlane2Pos.offsetX,
+          videoPlane2Pos.offsetY,
+          videoPlane2Pos.offsetZ
+        );
+        
+        // Apply case rotation to the offset vector so it rotates with the case
+        offsetVector.applyQuaternion(caseQuaternion);
+        
+        // Calculate final position by adding the rotated offset to the case position
+        const videoPlanePosition = new THREE.Vector3(
+          casePosition.x + offsetVector.x,
+          casePosition.y + offsetVector.y,
+          casePosition.z + offsetVector.z
+        );
+        
+        // Apply the position to the video plane
+        this.caseBackVideoPlane.position.copy(videoPlanePosition);
+        
+        // Create a new quaternion for the CD case
+        const caseQuat = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
+        
+        // Create a quaternion for our additional rotation
+        const offsetQuat = new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(videoPlane2Rot.offsetX, videoPlane2Rot.offsetY, videoPlane2Rot.offsetZ, 'YXZ')
+        );
+        
+        // Combine the quaternions (case rotation first, then offset rotation)
+        const finalQuat = new THREE.Quaternion().multiplyQuaternions(caseQuat, offsetQuat);
+        
+        // Apply the combined rotation
+        this.caseBackVideoPlane.setRotationFromQuaternion(finalQuat);
+      }
+      
+      if (rawProgress < 1.0) {
+        requestAnimationFrame(animateTransform);
+      }
+      else {
+        console.log("Animation complete: Keeping case in final position");
+        // Animation is complete - keep the case in this position permanently!
+        // We don't reset the animation flags, so the case position won't be overridden
+        
+        // Update the case's internal position to match its model position
+        // This ensures if we later want to animate from here, we have the correct starting point
+        clickedCase.position.copy(clickedCase.model.position);
+        clickedCase.targetPosition.copy(clickedCase.model.position);
+      }
+    };
+    
+    // Start animation
+    animateTransform();
+    
+    // After animation completes, show video and background planes
+    setTimeout(() => {
+      // Mark this case as playing music
+      if (clickedIndex >= 0) {
+        this.playingMusic[clickedIndex] = true;
+      }
+      
+      this.revealVideoAndBackground();
+    }, duration * 1000); // Convert duration to milliseconds
   }
 
   // Helper method to reset the caseBackVideoPlane properties

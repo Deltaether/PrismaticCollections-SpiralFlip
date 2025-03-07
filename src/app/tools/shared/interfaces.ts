@@ -86,6 +86,7 @@ export interface VideoPlaneConfig {
   };
   color: string;
   opacity: number;
+  rightCrop?: number; // Amount to crop from right side of the plane (0.0 to 1.0)
 }
 
 export interface BackgroundPlaneConfig {
@@ -333,11 +334,13 @@ export interface Config {
     offsetY: number;
     offsetZ: number;
   };
+  consecutiveCaseExtraY?: number;
   finalCaseRotation?: {
     offsetX: number;
     offsetY: number;
     offsetZ: number;
   };
+  videoPaths?: string[];
 }
 
 // Legacy interfaces kept for compatibility with debug menu

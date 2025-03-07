@@ -62,21 +62,22 @@
     },
     "videoPlane": {
       "position": {
-        "x": -0.05,
-        "y": -1.5,
-        "z": 1.3
+        "x": 0.6,
+        "y": -2.5,
+        "z": 5.2
       },
       "rotation": {
         "x": 1.5708,
-        "y": -0.23,
+        "y": -0.27,
         "z": 1.57
       },
       "size": {
-        "width": 7.5,
+        "width": 8.5,
         "height": 5.3
       },
       "color": "#e9dcd2",
-      "opacity": 1
+      "opacity": 1,
+      "rightCrop": 0.42
     },
     "backgroundPlane": {
       "position": {
@@ -101,6 +102,13 @@
       }
     }
   },
+  "videoPaths": [
+    "assets/3d/CD_Case/twitter_crossfade.mp4",
+    "assets/3d/CD_Case/twitter_crossfade2.mp4",
+    "assets/3d/CD_Case/twitter_crossfade3.mp4",
+    "assets/3d/CD_Case/twitter_crossfade4.mp4",
+    "assets/3d/CD_Case/twitter_crossfade5.mp4"
+  ],
   "caseSettings": {
     "basePosition": {
       "x": 2,
@@ -176,7 +184,9 @@
   "videoPlane2Size": {
     "width": 4.5,
     "height": 2.5,
-    "cornerRadius": 0.05
+    "cornerRadius": 0.05,
+    "rightCrop": 0,
+    "visible": false
   },
   "menuAnimation": {
     "duration": 0.5,
@@ -190,8 +200,9 @@
   "finalCasePosition": {
     "offsetX": -1, 
     "offsetY": 0.0,
-    "offsetZ": 3
+    "offsetZ": 2.5
   },
+  "consecutiveCaseExtraY": -0.3,
   "finalCaseRotation": {
     "offsetX": 3.14,
     "offsetY": 0.0,

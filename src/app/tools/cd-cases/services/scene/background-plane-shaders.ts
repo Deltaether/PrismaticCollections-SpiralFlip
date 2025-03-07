@@ -243,10 +243,22 @@ export const fragmentShader = `
       );
       
       // Add bouncing behavior by using abs(sin) patterns with different frequencies
-      // This creates a complex motion path that naturally reverses at boundaries
+      // MODIFIED: Enhanced TV screensaver-like bouncing with edge detection and velocity changes
+      float xBounce = 0.2 + abs(sin(bounceTime * 0.2 + lineIndex)) * 0.6;
+      float yBounce = 0.2 + abs(sin(bounceTime * 0.3 + lineIndex * 0.7)) * 0.6;
+      
+      // Create edge-aware bouncing behavior (like old TV screensavers)
+      // Detect if we're close to an "edge" and change direction
+      float edgeDetectX = smoothstep(0.75, 0.8, xBounce) - smoothstep(0.2, 0.15, xBounce);
+      float edgeDetectY = smoothstep(0.75, 0.8, yBounce) - smoothstep(0.2, 0.15, yBounce);
+      
+      // Add a slight pause at edges and momentum changes
+      float momentumX = 1.0 + 0.3 * sin(bounceTime * 0.7 + lineIndex * 2.5) * edgeDetectX;
+      float momentumY = 1.0 + 0.3 * sin(bounceTime * 0.5 + lineIndex * 1.9) * edgeDetectY;
+      
       bouncePos = vec2(
-        0.2 + abs(sin(bounceTime * 0.3 + lineIndex)) * 0.6,
-        0.2 + abs(sin(bounceTime * 0.5 + lineIndex * 0.7)) * 0.6
+        0.2 + abs(sin(bounceTime * 0.2 * momentumX + lineIndex)) * 0.6,
+        0.2 + abs(sin(bounceTime * 0.3 * momentumY + lineIndex * 0.7)) * 0.6
       );
       
       // Get current node center from the bouncing calculation
@@ -326,7 +338,7 @@ export const fragmentShader = `
       float runeOpacity = smoothstep(0.0, 0.3, runeTime) * smoothstep(1.0, 0.7, runeTime);
       
       // Continuous rotation angle for the four spikes
-      float rotationSpeed = 0.7 + lineIndex * 0.2; // Speed varies slightly per node
+      float rotationSpeed = 0.3 + lineIndex * 0.1; // MODIFIED: Reduced speed from 0.7 to 0.3 and factor from 0.2 to 0.1
       float mainRotationAngle = time * rotationSpeed;
       
       // Create four rotating spikes/rays emanating from the center
@@ -445,16 +457,30 @@ export const fragmentShader = `
     vec2 toCenter = uv - center;
     float dist = length(toCenter);
     
-    // Angular distortion
-    float angle = atan(toCenter.y, toCenter.x) + dist * intensity + time * 0.2;
+    // Enhanced angular distortion with multiple frequencies
+    float angle = atan(toCenter.y, toCenter.x);
+    float timeFactor = time * 0.15;
     
-    // Radial gradient
-    float radialGradient = smoothstep(radius, radius * 0.6, dist);
+    // Create a more complex swirl pattern with multiple layers
+    float twist = dist * intensity;
+    float timeVariation = sin(timeFactor) * 0.5 + 0.5;
     
-    // Combine with smooth wave
-    float wave = 0.5 + 0.5 * sin(angle * 5.0);
+    // Dynamic swirl pattern with rotating core
+    float swirl1 = sin(angle * 4.0 + twist + timeFactor);
+    float swirl2 = cos(angle * 3.0 - twist * 1.5 + timeFactor * 0.7);
+    float swirl3 = sin(angle * 7.0 + twist * 0.8 - timeFactor * 1.2);
     
-    return radialGradient * wave;
+    // Combine swirl layers with different weights
+    float combinedSwirl = swirl1 * 0.5 + swirl2 * 0.3 + swirl3 * 0.2;
+    
+    // Enhanced radial gradient with soft edges
+    float fade = 1.0 - smoothstep(radius * 0.7, radius * 1.1, dist);
+    float innerGlow = smoothstep(0.0, radius * 0.3, dist) * fade;
+    
+    // Add subtle pulsing effect
+    float pulse = 0.85 + 0.15 * sin(time * 0.3 + dist * 5.0);
+    
+    return innerGlow * (0.6 + 0.4 * combinedSwirl) * pulse;
   }
   
   // Create floating particles effect
@@ -562,8 +588,19 @@ export const fragmentShader = `
     // Create layered swirls for magical elements with toggle
     float swirlPattern = 0.0;
     if (enableSwirls > 0.5) {
-      swirlPattern += swirl(uv, vec2(0.3, 0.3), 0.5, 3.0) * 0.3;
-      swirlPattern += swirl(uv, vec2(0.7, 0.7), 0.6, 2.0) * 0.2;
+      // More distributed and varied swirl centers
+      swirlPattern += swirl(uv, vec2(0.25, 0.35), 0.55, 2.5) * 0.35;
+      swirlPattern += swirl(uv, vec2(0.75, 0.65), 0.65, 3.0) * 0.3;
+      swirlPattern += swirl(uv, vec2(0.5, 0.15), 0.45, 2.2) * 0.25;
+      swirlPattern += swirl(uv, vec2(0.15, 0.8), 0.4, 3.5) * 0.2;
+      
+      // Add subtle interaction with video motion
+      if (enableVideoInfluence > 0.5) {
+        swirlPattern *= 1.0 + videoMotion * 0.25;
+      }
+      
+      // Enhance with terrain interaction
+      swirlPattern *= 1.0 + terrainDetail * 0.2;
     }
     
     // Replace light rays with ley lines
@@ -588,7 +625,7 @@ export const fragmentShader = `
     // Kingdom/territory borders
     baseColor = mix(baseColor, highlightColor, borders);
     // Magical elements
-    baseColor = mix(baseColor, mix(accentColor, highlightColor, 0.5), swirlPattern * 0.3);
+    baseColor = mix(baseColor, mix(accentColor, highlightColor, 0.6 + 0.4 * sin(time * 0.2)), swirlPattern * 0.4);
     baseColor = mix(baseColor, vec3(0.7, 0.9, 1.0), leyLineEffect * 0.5);
     baseColor = mix(baseColor, highlightColor, particleEffect * 0.4);
     

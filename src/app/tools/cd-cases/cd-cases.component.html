@@ -1,4 +1,35 @@
-<div class="cd-container">
-  <canvas #canvas></canvas>
-  <div class="loading" *ngIf="!cdCases.length">Loading 3D Models...</div>
-</div> 
+<div class="cd-container" role="application" aria-label="3D CD Cases Viewer">
+  <!-- Loading overlay -->
+  <app-scene-loader [isVisible]="isLoading" aria-live="polite"></app-scene-loader>
+  
+  <!-- Main canvas for THREE.js rendering -->
+  <canvas #canvas [style.opacity]="isLoading ? '0' : '1'" aria-hidden="true"></canvas>
+  
+  <!-- Label renderer for CSS elements -->
+  <div #labelRenderer [style.opacity]="isLoading ? '0' : '1'" aria-hidden="true"></div>
+  
+  <!-- Case status indicators -->
+  <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'" aria-live="polite">
+    <h2 class="visually-hidden">CD Case Status</h2>
+    <div *ngFor="let cdCase of cdCases" 
+         class="case-indicator"
+         [class.open]="cdCase.isOpen">
+      Case {{cdCase.id}}: {{cdCase.isOpen ? 'Open' : 'Closed'}}
+    </div>
+  </div>
+</div>
+
+<!-- Debug menu -->
+<app-debug-menu
+  [sceneSettings]="sceneSettings"
+  [caseSettings]="caseSettings"
+  [cdCases]="cdCases"
+  [onUpdateCamera]="updateCamera.bind(this)"
+  [onUpdateLighting]="updateLighting.bind(this)"
+  [onUpdateRenderer]="updateRenderer.bind(this)"
+  [onUpdateOrbitControls]="updateOrbitControls.bind(this)"
+  [onUpdateGround]="updateGround.bind(this)"
+  [onUpdateCaseTransform]="updateCaseTransform.bind(this)"
+  [onResetToDefault]="resetToDefault.bind(this)"
+  [onUpdateBackgroundEffects]="updateBackgroundEffects.bind(this)"
+></app-debug-menu> 

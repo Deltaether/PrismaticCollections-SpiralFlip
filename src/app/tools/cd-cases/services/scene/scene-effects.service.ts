@@ -51,7 +51,53 @@ export class SceneEffectsService {
     updateVideoSource: (videoPath: string) => void 
   } {
     const { videoPlane } = config.sceneSettings;
-    const planeGeometry = new THREE.PlaneGeometry(videoPlane.size.width, videoPlane.size.height);
+    const { width, height } = videoPlane.size;
+    // Use type assertion to include rightCrop property
+    const rightCrop = (videoPlane as any).rightCrop || 0; // Default to 0 if not specified
+    
+    // Create custom geometry for the cropped video plane
+    let planeGeometry;
+    
+    if (rightCrop > 0 && rightCrop < 1) {
+      // Calculate the adjusted width based on the crop amount
+      const croppedWidth = width * (1 - rightCrop);
+      
+      // Create custom geometry with modified vertices
+      planeGeometry = new THREE.BufferGeometry();
+      
+      // Define the vertices of the plane (4 corners, clockwise from bottom left)
+      const vertices = new Float32Array([
+        -width/2, -height/2, 0,            // bottom left
+        -width/2 + croppedWidth, -height/2, 0,  // bottom right (cropped)
+        -width/2 + croppedWidth, height/2, 0,   // top right (cropped)
+        -width/2, height/2, 0              // top left
+      ]);
+      
+      // Define UV coordinates - still use full UV range to maintain aspect ratio
+      const uvs = new Float32Array([
+        0, 0,  // bottom left
+        1 - rightCrop, 0,  // bottom right (cropped in x)
+        1 - rightCrop, 1,  // top right (cropped in x)
+        0, 1   // top left
+      ]);
+      
+      // Define the face indices (two triangles)
+      const indices = new Uint16Array([
+        0, 1, 2,  // first triangle
+        0, 2, 3   // second triangle
+      ]);
+      
+      // Set the attributes for the geometry
+      planeGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      planeGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      planeGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      
+      // Compute vertex normals
+      planeGeometry.computeVertexNormals();
+    } else {
+      // Use standard PlaneGeometry if no cropping
+      planeGeometry = new THREE.PlaneGeometry(width, height);
+    }
     
     // Create video element
     const video = document.createElement('video');

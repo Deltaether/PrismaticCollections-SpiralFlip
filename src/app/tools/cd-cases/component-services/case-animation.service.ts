@@ -11,35 +11,132 @@ export class CaseAnimationService {
   private activeCaseExpanded: boolean = false;
   private animationCancelToken: number | null = null; // To track and cancel animations
   
+  // This property will hold the expandActiveCase function bound from the component
+  private expandActiveCaseAfterScroll: (cdCase: CDCase) => void = () => {};
+  
+  // New properties to track activation animation
+  private isActivationAnimating: boolean = false;
+  private pendingExpansion: { 
+    case: CDCase | null,
+    params: any[] | null
+  } = { case: null, params: null };
+
+  /**
+   * Stores component configuration data
+   * Makes animation settings accessible to all methods
+   * 【✓】
+   */
   setConfig(config: any): void {
     this.config = config;
   }
 
+  /**
+   * Returns whether manual animation is currently in progress
+   * Used to control behavior during transitions
+   * 【✓】
+   */
   getIsManuallyAnimating(): boolean {
     return this.isManuallyAnimating;
   }
 
+  /**
+   * Sets the manual animation state flag
+   * Controls behavior during user-triggered animations
+   * 【✓】
+   */
   setIsManuallyAnimating(value: boolean): void {
     this.isManuallyAnimating = value;
   }
 
+  /**
+   * Returns ID of case being manually animated
+   * Used to identify which case is in transition
+   * 【✓】
+   */
   getManuallyAnimatedCaseId(): number | null {
     return this.manuallyAnimatedCaseId;
   }
 
+  /**
+   * Sets the ID of the case being manually animated
+   * Tracks which case is currently in transition
+   * 【✓】
+   */
   setManuallyAnimatedCaseId(value: number | null): void {
     this.manuallyAnimatedCaseId = value;
   }
 
+  /**
+   * Returns whether the active case is in expanded state
+   * Used to control behavior and UI based on expansion status
+   * 【✓】
+   */
   getActiveCaseExpanded(): boolean {
     return this.activeCaseExpanded;
   }
 
+  /**
+   * Sets the expanded state of the active case
+   * Controls behavior and UI based on expansion status
+   * 【✓】
+   */
   setActiveCaseExpanded(value: boolean): void {
     this.activeCaseExpanded = value;
   }
 
-  // Helper function to calculate cubic bezier curve point
+  /**
+   * Checks if a case activation animation is in progress
+   * Prevents conflicting animations from starting
+   * 【✓】
+   */
+  isActivationInProgress(): boolean {
+    return this.isActivationAnimating;
+  }
+  
+  /**
+   * Initiates case activation animation sequence
+   * Manages timing for expansion after activation completes
+   * Handles queuing of animation steps for smooth transitions
+   * 【✓】
+   */
+  startCaseActivation(cdCase: CDCase): void {
+    this.isActivationAnimating = true;
+    
+    // The case is considered in activation animation until its position lerp reaches close to target
+    // Typically takes about 10-15 frames at default lerp factor
+    
+    // We'll use a timeout to approximate when activation is done
+    // A better way would be to track the actual lerp progress, but this is simpler
+    setTimeout(() => {
+      this.isActivationAnimating = false;
+      
+      // If there's a pending expansion, trigger it now
+      if (this.pendingExpansion.case && this.pendingExpansion.params) {
+        const { case: pendingCase, params } = this.pendingExpansion;
+        this.pendingExpansion = { case: null, params: null };
+        
+        // Call expandActiveCase with the saved parameters
+        this.expandActiveCase(
+          pendingCase,
+          params[0], // cdCases
+          params[1], // playingMusic
+          params[2], // tutorialCompleted 
+          params[3], // caseBackVideoPlane
+          params[4], // videoPlane
+          params[5], // resetCaseBackVideoPlane
+          params[6], // removeSilhouetteEffect
+          params[7], // revealVideoAndBackground
+          params[8]  // updateVideoPlane2Alignment
+        );
+      }
+    }, 500); // Use 500ms as approximation for activation animation duration
+  }
+
+  /**
+   * Calculates point along a cubic Bezier curve
+   * Provides smooth animation paths for case movement
+   * 【✓】
+   */
   cubicBezier(t: number, p0: number, p1: number, p2: number, p3: number): number {
     // Standard cubic Bezier formula
     const oneMinusT = 1 - t;
@@ -51,6 +148,12 @@ export class CaseAnimationService {
     );
   }
 
+  /**
+   * Expands the active CD case with animation
+   * Controls transition from browsing to detailed view
+   * Manages position, rotation, and visual effects during expansion
+   * 【✓】
+   */
   expandActiveCase(
     clickedCase: CDCase, 
     cdCases: CDCase[], 
@@ -65,6 +168,29 @@ export class CaseAnimationService {
   ): void {
     // Only expand if the case is active and not already expanded
     if (!clickedCase.isActive || this.activeCaseExpanded) {
+      return;
+    }
+    
+    // If activation animation is in progress, queue this expansion for later
+    if (this.isActivationAnimating) {
+      console.log("Queuing expansion - activation animation in progress");
+      
+      // Store the current parameters for later execution
+      this.pendingExpansion = { 
+        case: clickedCase, 
+        params: [
+          cdCases,
+          playingMusic,
+          tutorialCompleted,
+          caseBackVideoPlane,
+          videoPlane,
+          resetCaseBackVideoPlane,
+          removeSilhouetteEffect,
+          revealVideoAndBackground,
+          updateVideoPlane2Alignment
+        ]
+      };
+      
       return;
     }
     
@@ -186,10 +312,23 @@ export class CaseAnimationService {
       
       // Apply rotation offsets
       const currentRotation = new THREE.Euler().copy(clickedCase.model.rotation);
+
+      // First apply the rotations from finalCaseRotOffset
       clickedCase.model.rotation.x = originalRotation.x + (finalCaseRotOffset.offsetX * t);
       clickedCase.model.rotation.y = originalRotation.y + (finalCaseRotOffset.offsetY * t);
       clickedCase.model.rotation.z = originalRotation.z + (finalCaseRotOffset.offsetZ * t);
-      
+
+      // Then apply additional rotations from finalCasePosition if they exist
+      if (finalCasePosOffset.rotationX !== undefined) {
+        clickedCase.model.rotation.x += (finalCasePosOffset.rotationX * t);
+      }
+      if (finalCasePosOffset.rotationY !== undefined) {
+        clickedCase.model.rotation.y += (finalCasePosOffset.rotationY * t);
+      }
+      if (finalCasePosOffset.rotationZ !== undefined) {
+        clickedCase.model.rotation.z += (finalCasePosOffset.rotationZ * t);
+      }
+
       // Get rotation as quaternion to apply to position offset
       const caseQuaternion = new THREE.Quaternion().setFromEuler(clickedCase.model.rotation);
       
@@ -247,6 +386,12 @@ export class CaseAnimationService {
     }, duration * 1000); // Convert duration to milliseconds
   }
 
+  /**
+   * Animates active case back to its original position
+   * Handles transition from expanded to browsing view
+   * Controls smooth retraction and state changes during animation
+   * 【✓】
+   */
   animateActiveCaseBack(
     activeCase: CDCase, 
     newIndex: number, 
@@ -410,6 +555,19 @@ export class CaseAnimationService {
         if (newIndex !== currentIndex) {
           // Now set the new active case
           stateService.setActiveCase(cdCases, newIndex);
+          
+          // If the previous case was expanded, we should also expand the new case
+          if (wasExpandedBefore) {
+            // Need to wait a bit for the new case to be set as active before expanding it
+            setTimeout(() => {
+              // Find the newly activated case and expand it
+              const newActiveCase = cdCases.find(cdCase => cdCase.isActive);
+              if (newActiveCase) {
+                // Use the expandActiveCase method of the component that will be bound when this is called
+                this.expandActiveCaseAfterScroll(newActiveCase);
+              }
+            }, 100); // Short delay to ensure the case is fully activated
+          }
         }
         updateVideoForNewActiveCase(newIndex, wasExpandedBefore);
       }
@@ -419,7 +577,11 @@ export class CaseAnimationService {
     animateBack();
   }
 
-  // Cancel any in-progress animations
+  /**
+   * Cancels any currently running animations
+   * Prevents animation conflicts and allows clean transitions
+   * 【✓】
+   */
   cancelCurrentAnimation(): void {
     if (this.animationCancelToken !== null) {
       cancelAnimationFrame(this.animationCancelToken);
@@ -427,7 +589,20 @@ export class CaseAnimationService {
     }
   }
 
-  // Method to forcefully reset a case to its original position
+  /**
+   * Sets the function to call for expanding a case after scrolling
+   * Allows animation sequencing between component and service
+   * 【✓】
+   */
+  setExpandFunction(expandFn: (cdCase: CDCase) => void): void {
+    this.expandActiveCaseAfterScroll = expandFn;
+  }
+
+  /**
+   * Resets a case to its default position and rotation
+   * Used to clean up cases during rapid navigation
+   * 【✓】
+   */
   resetCasePosition(cdCase: CDCase): void {
     // Calculate the target active position
     const targetActivePosition = new THREE.Vector3().copy(cdCase.initialPosition);

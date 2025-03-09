@@ -4,7 +4,7 @@ import { CDCase } from '../../shared/interfaces';
 
 @Injectable()
 export class VideoService {
-  private videoPlane!: THREE.Mesh;
+  private rightSideMenuPlane!: THREE.Mesh;
   private backgroundPlane!: THREE.Mesh;
   private caseBackVideoPlane!: THREE.Mesh;
   private videoPlay!: () => void;
@@ -13,19 +13,29 @@ export class VideoService {
   private clock = new THREE.Clock();
   private config: any; // will be set in setConfig method
 
+  /**
+   * Stores configuration data for video planes and settings
+   * Used to configure video elements with proper dimensions and properties
+   * 【✓】
+   */
   setConfig(config: any): void {
     this.config = config;
   }
 
+  /**
+   * Sets up references to video planes and control functions
+   * Initializes all video-related elements for the component
+   * 【✓】
+   */
   setVideoElements(
-    videoPlane: THREE.Mesh,
+    rightSideMenuPlane: THREE.Mesh,
     backgroundPlane: THREE.Mesh,
     caseBackVideoPlane: THREE.Mesh,
     videoPlay: () => void,
     videoPause: () => void,
     updateVideoSource: (videoPath: string) => void
   ): void {
-    this.videoPlane = videoPlane;
+    this.rightSideMenuPlane = rightSideMenuPlane;
     this.backgroundPlane = backgroundPlane;
     this.caseBackVideoPlane = caseBackVideoPlane;
     this.videoPlay = videoPlay;
@@ -33,8 +43,14 @@ export class VideoService {
     this.updateVideoSource = updateVideoSource;
   }
 
+  /**
+   * Reveals and plays video content when a case is expanded
+   * Shows background planes and starts video playback for active case
+   * Includes transition effects like fade-in animations
+   * 【✓】
+   */
   revealVideoAndBackground(activeCaseExpanded: boolean, cdCases: CDCase[], videoPaths: string[]): void {
-    if (this.videoPlane && this.backgroundPlane) {
+    if (this.rightSideMenuPlane && this.backgroundPlane) {
       // The planes are already visible, so we only need to handle the video content
       
       // Get active case index to load the appropriate video
@@ -108,6 +124,11 @@ export class VideoService {
     }
   }
 
+  /**
+   * Resets the case back video plane to initial state
+   * Prepares video plane for new content with proper opacity
+   * 【✓】
+   */
   resetCaseBackVideoPlane(initialOpacity: number = 0.95): void {
     if (this.caseBackVideoPlane) {
       // Check if the plane should be visible based on configuration
@@ -131,11 +152,17 @@ export class VideoService {
       // Always start with plane hidden, regardless of opacity
       this.caseBackVideoPlane.visible = false;
       
-      // Store visibility setting - the videoPlane may be recreated during resets
+      // Store visibility setting - the rightSideMenuPlane may be recreated during resets
       this.caseBackVideoPlane.userData['configVisible'] = isVisibleByConfig;
     }
   }
 
+  /**
+   * Creates a video plane for the back of CD cases
+   * Configures a mesh with custom shader material for video display
+   * Sets up proper positioning and appearance based on config
+   * 【✓】
+   */
   createCaseBackVideoPlane(videoTexture: THREE.VideoTexture): THREE.Mesh {
     // Get size from config with fallback values
     const width = this.config.videoPlane2Size?.width || 1.2;
@@ -271,6 +298,12 @@ export class VideoService {
     return videoPlane;
   }
 
+  /**
+   * Updates video content when a new case becomes active
+   * Handles video source switching and silhouette effects
+   * Manages expanded state and animation transitions
+   * 【✓】
+   */
   updateVideoForNewActiveCase(newIndex: number, wasExpandedBefore: boolean, videoPaths: string[], 
                              playingMusic: boolean[], cdCases: CDCase[], 
                              tutorialCompleted: boolean[], 
@@ -286,7 +319,7 @@ export class VideoService {
     }
     
     // If we're navigating to a case that is playing music, update the video
-    if (playingMusic[newIndex] && this.videoPlane) {
+    if (playingMusic[newIndex] && this.rightSideMenuPlane) {
       // Update video source to match new active case
       if (newIndex >= 0 && newIndex < videoPaths.length) {
         this.updateVideoSource(videoPaths[newIndex]);
@@ -344,6 +377,12 @@ export class VideoService {
     }
   }
 
+  /**
+   * Aligns the video plane with the active case during animations
+   * Ensures video display follows case movement for smooth transitions
+   * Updates position and rotation to match the active or animated case
+   * 【✓】
+   */
   updateVideoPlane2Alignment(
     caseBackVideoPlane: THREE.Mesh, 
     isManuallyAnimating: boolean, 
@@ -458,5 +497,23 @@ export class VideoService {
         material.opacity = 0;
       }
     }
+  }
+
+  /**
+   * Returns the video play function
+   * Provides access to video playback control
+   * 【✓】
+   */
+  public getVideoPlay(): (() => void) {
+    return this.videoPlay;
+  }
+
+  /**
+   * Returns the video source update function
+   * Provides access to change video content
+   * 【✓】
+   */
+  public getUpdateVideoSource(): ((videoPath: string) => void) {
+    return this.updateVideoSource;
   }
 } 

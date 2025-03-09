@@ -3,10 +3,20 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CDCase, SceneSettings, Config } from '../../../shared/interfaces';
 
+/**
+ * Debug service for CD cases visualization
+ * Provides configuration controls for scene elements
+ * Used with the debug panel for real-time adjustments
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class CDCasesDebugService {
+  /**
+   * Updates camera position and target
+   * Applies debug panel settings to camera view
+   * 【✓】
+   */
   updateCamera(
     camera: THREE.PerspectiveCamera,
     controls: OrbitControls,
@@ -25,6 +35,11 @@ export class CDCasesDebugService {
     controls.update();
   }
 
+  /**
+   * Updates lighting parameters from debug panel
+   * Controls intensity, color, and position of scene lights
+   * 【✓】
+   */
   updateLighting(
     ambientLight: THREE.AmbientLight,
     mainLight: THREE.DirectionalLight,
@@ -41,6 +56,11 @@ export class CDCasesDebugService {
     backLightHelper.update();
   }
 
+  /**
+   * Updates renderer settings from debug panel
+   * Controls exposure, tone mapping, and other visual parameters
+   * 【✓】
+   */
   updateRenderer(
     renderer: THREE.WebGLRenderer,
     settings: SceneSettings
@@ -48,6 +68,11 @@ export class CDCasesDebugService {
     renderer.toneMappingExposure = settings.exposure;
   }
 
+  /**
+   * Updates orbit controls with debug panel settings
+   * Controls camera movement constraints and behavior
+   * 【✓】
+   */
   updateOrbitControls(
     controls: OrbitControls,
     settings: SceneSettings
@@ -76,6 +101,11 @@ export class CDCasesDebugService {
     controls.update();
   }
 
+  /**
+   * Updates ground plane with debug panel settings
+   * Controls floor visibility, position, and opacity
+   * 【✓】
+   */
   updateGround(
     scene: THREE.Scene,
     settings: SceneSettings
@@ -92,11 +122,21 @@ export class CDCasesDebugService {
     }
   }
 
+  /**
+   * Updates CD case transform from debug panel
+   * Allows fine-tuning of case position and rotation
+   * 【✓】
+   */
   updateCaseTransform(cdCase: CDCase): void {
     cdCase.model.position.copy(cdCase.position);
     cdCase.model.rotation.copy(cdCase.rotation);
   }
 
+  /**
+   * Resets all settings to default values
+   * Provides a way to return to baseline configuration
+   * 【✓】
+   */
   resetToDefault(
     sceneSettings: SceneSettings,
     config: Config,

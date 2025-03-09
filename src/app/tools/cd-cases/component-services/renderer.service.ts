@@ -12,7 +12,11 @@ export class RendererService {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
-  private videoPlane!: THREE.Mesh;
+  
+  // Renamed from videoPlane to rightSideMenuPlane
+  private rightSideMenuPlane!: THREE.Mesh;
+  // Keep videoTexture for background effects
+  private videoTexture!: THREE.VideoTexture;
   private backgroundPlane!: THREE.Mesh;
   private caseBackVideoPlane!: THREE.Mesh;
   private videoPlay!: () => void;
@@ -30,42 +34,111 @@ export class RendererService {
   private fillLightHelper!: THREE.DirectionalLightHelper;
   private backLightHelper!: THREE.DirectionalLightHelper;
 
+  /**
+   * Stores component configuration data
+   * Makes configuration accessible to all renderer methods
+   * 【✓】
+   */
   setConfig(config: any): void {
     this.config = config;
   }
 
+  /**
+   * Returns the main WebGL renderer instance
+   * Used to access rendering capabilities throughout the component
+   * 【✓】
+   */
   getRenderer(): THREE.WebGLRenderer {
     return this.renderer;
   }
 
+  /**
+   * Returns the 2D label renderer for UI elements
+   * Used for HTML elements in 3D space
+   * 【✓】
+   */
   getLabelRenderer(): CSS2DRenderer {
     return this.labelRenderer;
   }
 
+  /**
+   * Returns the Three.js scene instance
+   * Main container for all 3D objects and lights
+   * 【✓】
+   */
   getScene(): THREE.Scene {
     return this.scene;
   }
 
+  /**
+   * Returns the perspective camera for the scene
+   * Controls viewpoint and projection settings
+   * 【✓】
+   */
   getCamera(): THREE.PerspectiveCamera {
     return this.camera;
   }
 
+  /**
+   * Returns the orbit controls for camera manipulation
+   * Enables user interaction with the 3D scene
+   * 【✓】
+   */
   getControls(): OrbitControls {
     return this.controls;
   }
 
+  /**
+   * Returns the video plane (legacy name)
+   * Maintained for backwards compatibility
+   * 【✓】
+   */
   getVideoPlane(): THREE.Mesh {
-    return this.videoPlane;
+    // Renamed internally but keep method name for compatibility
+    return this.rightSideMenuPlane;
   }
   
+  /**
+   * Returns the right side menu plane
+   * Area where menu/UI is displayed when a case is expanded
+   * 【✓】
+   */
+  getRightSideMenuPlane(): THREE.Mesh {
+    return this.rightSideMenuPlane;
+  }
+  
+  /**
+   * Returns the video texture used for background effects
+   * Provides access to video material for animations
+   * 【✓】
+   */
+  getVideoTexture(): THREE.VideoTexture {
+    return this.videoTexture;
+  }
+  
+  /**
+   * Returns the background plane behind the CD cases
+   * Used for cosmic/animated background effects
+   * 【✓】
+   */
   getBackgroundPlane(): THREE.Mesh {
     return this.backgroundPlane;
   }
   
+  /**
+   * Returns the video plane that appears on the back of CD cases
+   * Displays case-specific content when a case is expanded
+   * 【✓】
+   */
   getCaseBackVideoPlane(): THREE.Mesh {
     return this.caseBackVideoPlane;
   }
   
+  /**
+   * Returns object with video control functions
+   * Provides unified access to play, pause and source update
+   * 【✓】
+   */
   getVideoControls(): { play: () => void, pause: () => void, updateSource: (videoPath: string) => void } {
     return {
       play: this.videoPlay,
@@ -74,6 +147,11 @@ export class RendererService {
     };
   }
 
+  /**
+   * Returns all light objects used in the scene
+   * Provides access to ambient, main, fill and back lights
+   * 【✓】
+   */
   getLights(): { 
     ambientLight: THREE.AmbientLight,
     mainLight: THREE.DirectionalLight,
@@ -87,7 +165,12 @@ export class RendererService {
       backLight: this.backLight
     };
   }
-  
+
+  /**
+   * Returns all light helper objects for debugging
+   * Provides visual indicators of light direction and position
+   * 【✓】
+   */
   getLightHelpers(): {
     mainLightHelper: THREE.DirectionalLightHelper,
     fillLightHelper: THREE.DirectionalLightHelper,
@@ -100,6 +183,12 @@ export class RendererService {
     };
   }
 
+  /**
+   * Sets up all rendering infrastructure for the CD cases component
+   * Creates renderer, scene, camera, lights, and video planes
+   * Configures initial properties based on component settings
+   * 【✓】
+   */
   setupRenderer(canvasRef: HTMLCanvasElement, sceneService: any, createCaseBackVideoPlane: (videoTexture: THREE.VideoTexture) => THREE.Mesh): void {
     this.renderer = sceneService.setupRenderer(canvasRef, this.config);
     this.scene = sceneService.setupScene(this.config);
@@ -140,7 +229,7 @@ export class RendererService {
 
     // Add video plane (formerly red plane) - INITIALLY INVISIBLE
     const videoPlaneResult = sceneService.setupVideoPlane(this.scene, this.config);
-    videoPlaneResult.mesh.visible = false; // Start invisible until a case is expanded
+    videoPlaneResult.mesh.visible = false;
     
     // Add background plane behind video plane - KEEP VISIBLE
     const backgroundPlane = sceneService.setupBackgroundPlane(this.scene, this.config, videoPlaneResult.videoTexture);
@@ -152,18 +241,37 @@ export class RendererService {
     this.scene.add(caseBackVideoPlane);
     
     // Store references for later use
-    this.videoPlane = videoPlaneResult.mesh;
+    this.rightSideMenuPlane = videoPlaneResult.mesh;
     this.backgroundPlane = backgroundPlane;
     this.caseBackVideoPlane = caseBackVideoPlane;
+    this.videoTexture = videoPlaneResult.videoTexture;
     this.videoPlay = videoPlaneResult.play;
     this.videoPause = videoPlaneResult.pause;
     this.updateVideoSource = videoPlaneResult.updateVideoSource;
+
+    // Make the rightSideMenuPlane transparent (we'll use CSS3D for the menu)
+    // while still keeping the video playing for background effects
+    if (this.rightSideMenuPlane.material instanceof THREE.Material) {
+      this.rightSideMenuPlane.material.transparent = true;
+      this.rightSideMenuPlane.material.opacity = 0;
+      this.rightSideMenuPlane.material.needsUpdate = true;
+    }
   }
 
+  /**
+   * Sets up orbit controls for camera interaction
+   * Configures movement constraints and behavior
+   * 【✓】
+   */
   setupControls(sceneService: any): void {
     this.controls = sceneService.setupControls(this.camera, this.renderer.domElement, this.config);
   }
 
+  /**
+   * Handles window resize events for responsive rendering
+   * Updates camera aspect ratio and renderer dimensions
+   * 【✓】
+   */
   onWindowResize(): void {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
@@ -171,6 +279,11 @@ export class RendererService {
     this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
   }
 
+  /**
+   * Cleans up resources when component is destroyed
+   * Disposes of materials, textures, and geometries to prevent memory leaks
+   * 【✓】
+   */
   cleanUpResources(cdCases: CDCase[], animationId: number | null): void {
     if (animationId !== null) {
       cancelAnimationFrame(animationId);

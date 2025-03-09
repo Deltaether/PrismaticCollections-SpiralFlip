@@ -10,6 +10,11 @@ export class SilhouetteService {
   private scene!: THREE.Scene;
   private clock = new THREE.Clock();
 
+  /**
+   * Stores configuration data for silhouette effects
+   * Sets up appearance settings like color, intensity, and animation parameters
+   * 【✓】
+   */
   setConfig(config: any): void {
     this.config = config;
     // Save a reference to cdCases if it exists
@@ -18,10 +23,21 @@ export class SilhouetteService {
     }
   }
 
+  /**
+   * Sets the Three.js scene for adding silhouette meshes
+   * Required for all silhouette operations that modify the scene
+   * 【✓】
+   */
   setScene(scene: THREE.Scene): void {
     this.scene = scene;
   }
 
+  /**
+   * Removes silhouette effect from a CD case
+   * Restores original materials and cleans up added meshes
+   * Called when a case is no longer active or during cleanup
+   * 【✓】
+   */
   removeSilhouetteEffect(cdCase: CDCase): void {
     // Restore original materials to the case model
     cdCase.model.traverse((child) => {
@@ -45,6 +61,12 @@ export class SilhouetteService {
     }
   }
 
+  /**
+   * Creates a pulsating silhouette effect for the active CD case
+   * Applies emissive materials for visual highlighting
+   * Skips effect if tutorial is completed for that case
+   * 【✓】
+   */
   createActiveCaseSilhouette(cdCase: CDCase, tutorialCompleted: boolean[]): void {
     // Check if tutorial has been completed for this case - don't show silhouette if so
     const caseIndex = this.config.cdCases.indexOf(cdCase);
@@ -110,6 +132,12 @@ export class SilhouetteService {
     console.log('Silhouette effect applied directly to CD case:', cdCase.id);
   }
 
+  /**
+   * Updates silhouette animation effects each frame
+   * Handles pulsing glow and visual feedback for active cases
+   * Adjusts animation based on music playing and tutorial completion status
+   * 【✓】
+   */
   updateSilhouetteAnimation(cdCases: CDCase[], playingMusic: boolean[], tutorialCompleted: boolean[]): void {
     // Update silhouette animation for active case
     const activeIndex = cdCases.findIndex(cdCase => cdCase.isActive && !cdCase.isOpen);

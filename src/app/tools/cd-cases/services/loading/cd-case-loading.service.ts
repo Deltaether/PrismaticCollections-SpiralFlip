@@ -6,10 +6,20 @@ import { CDCase, Config } from '../../../shared/interfaces';
 import { CDCaseAnimationsService } from '../animations/cd-case-animations.service';
 import { CDCaseMaterialsService } from '../materials/cd-case-materials.service';
 
+/**
+ * Specialized service for loading CD case 3D models
+ * Handles asset loading, configuration, and initialization
+ * Creates fully functional CD case objects with animations
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class CDCaseLoadingService {
+  /**
+   * Position calculation utilities for CD case positioning
+   * Determines where each case should be placed in the stack
+   * 【✓】
+   */
   private readonly POSITION_STATES = {
     getInactivePosition: (basePosition: THREE.Vector3, stackIndex: number, stackOffset: number): THREE.Vector3 => {
       return new THREE.Vector3(
@@ -28,6 +38,12 @@ export class CDCaseLoadingService {
     private materialsService: CDCaseMaterialsService
   ) {}
 
+  /**
+   * Main method for loading all CD case models
+   * Sets up model geometry, animations, and materials
+   * Creates complete CD case objects ready for scene use
+   * 【✓】
+   */
   async loadModels(
     config: Config,
     scene: THREE.Scene,
@@ -145,6 +161,11 @@ export class CDCaseLoadingService {
     }
   }
 
+  /**
+   * Logs skeletal bone information for debugging
+   * Used during development to identify animation structure
+   * 【✗】
+   */
   private logBones(scene: THREE.Object3D): void {
     scene.traverse((node) => {
       if (node.type === 'Bone') {

@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { CDCase } from '../../../shared/interfaces';
 import { CDCaseAnimationsService } from '../animations/cd-case-animations.service';
+import { CaseAnimationService } from '../../component-services/case-animation.service';
 
+/**
+ * Manages the state of CD cases in the scene
+ * Handles case activation, positioning, and transitions
+ * Coordinates with animation services for smooth movement
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -11,13 +17,28 @@ export class CDCasesStateService {
   private readonly DEACTIVATED_Z_OFFSET = -3.0;
   private readonly POSITION_LERP_FACTOR = 0.1; // Smoothing factor for position transitions
 
-  constructor(private animationsService: CDCaseAnimationsService) {}
+  constructor(
+    private animationsService: CDCaseAnimationsService,
+    private caseAnimationService: CaseAnimationService
+  ) {
+    console.log('CDCasesStateService created with CaseAnimationService:', !!caseAnimationService);
+  }
 
-  // Getter to expose the position lerp factor
+  /**
+   * Returns the position lerp factor for smooth transitions
+   * Controls how quickly cases move to their target positions
+   * 【✓】
+   */
   getPositionLerpFactor(): number {
     return this.POSITION_LERP_FACTOR;
   }
 
+  /**
+   * Sets the active CD case and repositions all cases
+   * Handles activation state changes and animations
+   * Coordinates Z-position for case stacking and focus
+   * 【✓】
+   */
   setActiveCase(cdCases: CDCase[], index: number): void {
     console.group('Setting active case:', index);
     
@@ -65,20 +86,26 @@ export class CDCasesStateService {
       }
     });
 
-    // Activate new case
+    // Activate target case
     console.log('Activating case:', targetCase.id);
     targetCase.isActive = true;
     
-    // Set target position for active case - bring it forward
+    // Set target position for active state
     targetCase.targetPosition.copy(targetCase.initialPosition);
     targetCase.targetPosition.z += this.Z_OFFSET;
     
-    // REMOVED: Do not queue the open animation - will be handled by click
+    // Inform the CaseAnimationService to start tracking activation animation
+    this.caseAnimationService.startCaseActivation(targetCase);
     
     console.groupEnd();
   }
 
-  // Update positions of all cases (should be called in animation loop)
+  /**
+   * Updates positions of all cases in animation loop
+   * Smoothly interpolates between current and target positions
+   * Creates fluid movement for case transitions
+   * 【✓】
+   */
   updatePositions(cdCases: CDCase[]): void {
     cdCases.forEach(cdCase => {
       // Smoothly interpolate current position to target position
@@ -87,6 +114,11 @@ export class CDCasesStateService {
     });
   }
 
+  /**
+   * Toggles a CD case between open and closed states
+   * Triggers appropriate animation sequence
+   * 【✓】
+   */
   flipCase(cdCase: CDCase): void {
     console.log('Attempting to flip case:', cdCase.id);
     
@@ -98,6 +130,11 @@ export class CDCasesStateService {
     this.animationsService.queueAnimation(cdCase, cdCase.isOpen ? 'open' : 'close');
   }
 
+  /**
+   * Sets up materials for CD case model
+   * Configures appearance properties for realistic rendering
+   * 【✓】
+   */
   setupMaterials(model: THREE.Object3D, caseConfig: any): void {
     model.traverse((node: THREE.Object3D) => {
       if (node instanceof THREE.Mesh && node.name === 'CD') {
@@ -122,6 +159,11 @@ export class CDCasesStateService {
     });
   }
 
+  /**
+   * Sets up environment mapping for reflective materials
+   * Creates realistic reflections on CD case surfaces
+   * 【✓】
+   */
   setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer, texture: THREE.Texture): void {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();

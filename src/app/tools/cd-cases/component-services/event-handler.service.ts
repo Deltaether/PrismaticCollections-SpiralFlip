@@ -7,10 +7,21 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 export class EventHandlerService {
   private config: any; // will be set in setConfig method
 
+  /**
+   * Stores component configuration data
+   * Makes settings accessible to all event handlers
+   * 【✓】
+   */
   setConfig(config: any): void {
     this.config = config;
   }
 
+  /**
+   * Handles mouse wheel events for case navigation
+   * Implements scrolling behavior to cycle through CD cases
+   * Controls case activation, animation, and video updates
+   * 【✓】
+   */
   onWheel(
     event: WheelEvent,
     cdCases: CDCase[],
@@ -86,6 +97,12 @@ export class EventHandlerService {
     // If controls are not locked, the event will propagate to OrbitControls naturally
   }
 
+  /**
+   * Sets up all event listeners for user interaction
+   * Configures mouse/touch events for case selection and camera control
+   * Handles click detection for case expansion and interface elements
+   * 【✓】
+   */
   addEventListeners(
     canvasRef: HTMLCanvasElement,
     cdCases: CDCase[],
@@ -142,6 +159,11 @@ export class EventHandlerService {
     canvas.addEventListener('contextmenu', (e) => eventsService.handleContextMenu(e, canvas, camera, cdCases));
   }
 
+  /**
+   * Handles window resize events for responsive display
+   * Updates camera and renderer dimensions to match new window size
+   * 【✓】
+   */
   onWindowResize(
     camera: THREE.PerspectiveCamera,
     renderer: THREE.WebGLRenderer,
@@ -151,5 +173,63 @@ export class EventHandlerService {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  /**
+   * Activates a CD case with proper visual effects
+   * Sets active state, creates silhouette, and handles expansion
+   * 【✓】
+   */
+  activateCase(
+    cdCase: CDCase,
+    cdCases: CDCase[],
+    playingMusic: boolean[],
+    tutorialCompleted: boolean[],
+    caseBackVideoPlane: THREE.Mesh,
+    createSilhouette: (cdCase: CDCase) => void,
+    expandActiveCase: (cdCase: CDCase) => void
+  ): void {
+    // Set the case as active
+    cdCase.isActive = true;
+    
+    // Create silhouette for the newly active case
+    createSilhouette(cdCase);
+    
+    // If the case back video plane exists, make it visible
+    if (caseBackVideoPlane) {
+      caseBackVideoPlane.visible = true;
+    }
+    
+    // Expand the active case if the user clicks on it
+    expandActiveCase(cdCase);
+  }
+  
+  /**
+   * Deactivates a CD case and resets its appearance
+   * Cleans up effects and resets state when case is no longer selected
+   * 【✓】
+   */
+  deactivateCase(
+    cdCase: CDCase,
+    cdCases: CDCase[],
+    playingMusic: boolean[],
+    tutorialCompleted: boolean[],
+    caseBackVideoPlane: THREE.Mesh,
+    createSilhouette: (cdCase: CDCase) => void,
+    expandActiveCase: (cdCase: CDCase) => void
+  ): void {
+    // Set the case as inactive
+    cdCase.isActive = false;
+    cdCase.isDeactivating = true;
+    
+    // If the case back video plane exists, hide it
+    if (caseBackVideoPlane) {
+      caseBackVideoPlane.visible = false;
+    }
+    
+    // Reset the case position to its default
+    setTimeout(() => {
+      cdCase.isDeactivating = false;
+    }, 300);
   }
 } 

@@ -5,6 +5,11 @@ import { Injectable } from '@angular/core';
 import { Config, SceneSettings } from '../../../shared/interfaces';
 import { SceneEffectsService } from './scene-effects.service';
 
+/**
+ * Core service for Three.js scene management
+ * Handles scene creation, camera setup, rendering, and lighting
+ * Provides infrastructure for the 3D environment
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,6 +20,12 @@ export class SceneService {
   
   constructor(private sceneEffectsService: SceneEffectsService) { }
 
+  /**
+   * Creates and configures the Three.js scene
+   * Sets up background, fog, and debug helpers
+   * Creates the container for all 3D objects
+   * 【✓】
+   */
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a1a4f);
@@ -33,6 +44,12 @@ export class SceneService {
     return scene;
   }
 
+  /**
+   * Creates and configures the perspective camera
+   * Sets initial position and viewing angle
+   * Primary viewpoint for the 3D scene
+   * 【✓】
+   */
   setupCamera(config: Config): THREE.PerspectiveCamera {
     const { position, lookAt } = config.sceneSettings.camera;
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -41,6 +58,12 @@ export class SceneService {
     return camera;
   }
 
+  /**
+   * Creates and configures the WebGL renderer
+   * Sets up pixel ratio, color space, and shadows
+   * Handles the actual rendering to the canvas
+   * 【✓】
+   */
   setupRenderer(canvas: HTMLCanvasElement, config: Config): THREE.WebGLRenderer {
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -57,6 +80,12 @@ export class SceneService {
     return renderer;
   }
 
+  /**
+   * Creates and configures orbit controls for camera manipulation
+   * Handles user interaction for rotating, panning, and zooming
+   * Applies constraints and behavior settings from config
+   * 【✓】
+   */
   setupControls(camera: THREE.PerspectiveCamera, canvas: HTMLCanvasElement, config: Config): OrbitControls {
     const { orbitControls } = config.sceneSettings;
     const controls = new OrbitControls(camera, canvas);
@@ -99,6 +128,12 @@ export class SceneService {
     return controls;
   }
 
+  /**
+   * Creates and configures lighting for the scene
+   * Sets up ambient, main, fill, and back lights
+   * Creates dramatic lighting for the CD cases
+   * 【✓】
+   */
   setupLights(scene: THREE.Scene, config: Config): {
     ambientLight: THREE.AmbientLight;
     mainLight: THREE.DirectionalLight;
@@ -136,6 +171,12 @@ export class SceneService {
     return { ambientLight, mainLight, fillLight, backLight };
   }
 
+  /**
+   * Creates a ground plane for the scene
+   * Provides visual reference for CD case positioning
+   * Adds depth and context to the 3D space
+   * 【✓】
+   */
   setupGround(scene: THREE.Scene, config: Config): THREE.Mesh {
     const { ground } = config.sceneSettings;
     const groundGeometry = new THREE.PlaneGeometry(ground.size, ground.size);
@@ -148,6 +189,12 @@ export class SceneService {
     return groundMesh;
   }
 
+  /**
+   * Creates a CSS2D label for lights in debug mode
+   * Displays text labels for light sources
+   * Helps visualize lighting setup
+   * 【✗】
+   */
   createLightLabel(text: string): CSS2DObject {
     const div = document.createElement('div');
     div.className = 'light-label';
@@ -155,28 +202,60 @@ export class SceneService {
     return new CSS2DObject(div);
   }
   
-  // Helper method to access SceneEffectsService
+  /**
+   * Gets the video playing state flag
+   * Used to track video playback status
+   * 【✓】
+   */
   get videoPlaying(): boolean {
     return this.sceneEffectsService.videoPlaying;
   }
   
+  /**
+   * Sets the video playing state flag
+   * Used to control video playback status
+   * 【✓】
+   */
   set videoPlaying(value: boolean) {
     this.sceneEffectsService.videoPlaying = value;
   }
   
-  // Delegate methods to SceneEffectsService
+  /**
+   * Sets up the video plane for the CD case display
+   * Creates a mesh for video texture display
+   * Shows content when a case is expanded
+   * 【✓】
+   */
   setupVideoPlane(scene: THREE.Scene, config: Config) {
     return this.sceneEffectsService.setupVideoPlane(scene, config);
   }
   
+  /**
+   * Creates the cosmic background plane
+   * Sets up shaders and animations for the background
+   * Creates atmospheric visual effects
+   * 【✓】
+   */
   setupBackgroundPlane(scene: THREE.Scene, config: Config, videoTexture?: THREE.VideoTexture) {
     return this.sceneEffectsService.setupBackgroundPlane(scene, config, videoTexture);
   }
   
+  /**
+   * Updates background animations each frame
+   * Advances shader time uniforms for animated effects
+   * Creates dynamic cosmic background
+   * 【✓】
+   */
   updateBackgroundAnimations(): void {
     this.sceneEffectsService.updateBackgroundAnimations();
   }
   
+  /**
+   * Updates background visual effects based on scene settings
+   * Applies color, intensity, and animation parameters
+   * Controls the mood and atmosphere of the scene
+   * 【✓】
+   */
   updateBackgroundEffects(settings: SceneSettings): void {
     this.sceneEffectsService.updateBackgroundEffects(settings);
   }

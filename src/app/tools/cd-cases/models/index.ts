@@ -2,7 +2,12 @@ import { CaseConfig } from '../../shared/interfaces';
 import config from '../config/config.json';
 import { createCaseConfig } from './template';
 
-// Create 8 test cases
+/**
+ * Defines all CD cases used in the application
+ * Creates an array of case configurations with default properties
+ * Currently generates 5 test cases with sequential numbering
+ * 【✓】
+ */
 export const allCases: CaseConfig[] = Array.from({ length: 5 }, (_, i) => 
   createCaseConfig(
     i + 1,
@@ -11,6 +16,12 @@ export const allCases: CaseConfig[] = Array.from({ length: 5 }, (_, i) =>
   )
 );
 
+/**
+ * Updates vertical positioning of cases in the stack
+ * Applies proper Y-coordinate spacing based on config settings
+ * Ensures cases are properly stacked with consistent spacing
+ * 【✓】
+ */
 export const updateCasePositions = (cases: CaseConfig[]): CaseConfig[] => {
   return cases.map((caseConfig, index) => ({
     ...caseConfig,

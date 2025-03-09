@@ -333,6 +333,9 @@ export interface Config {
     offsetX: number;
     offsetY: number;
     offsetZ: number;
+    rotationX?: number;
+    rotationY?: number;
+    rotationZ?: number;
   };
   consecutiveCaseExtraY?: number;
   finalCaseRotation?: {

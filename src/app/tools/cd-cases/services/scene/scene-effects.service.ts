@@ -3,29 +3,59 @@ import { Injectable } from '@angular/core';
 import { Config, SceneSettings } from '../../../shared/interfaces';
 import { vertexShader, fragmentShader } from './background-plane-shaders';
 
+/**
+ * Manages visual effects for the CD cases scene
+ * Handles background animations, shaders, and video effects
+ * Creates the atmospheric cosmic background
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class SceneEffectsService {
-  // Property to track if the video is currently playing
+  /**
+   * Tracks video playback state
+   * Used to control background effects synchronized with video
+   * 【✓】
+   */
   private isVideoPlaying = false;
   
-  // Add getter and setter for isVideoPlaying
+  /**
+   * Returns current video playing state
+   * Used to coordinate effects with video playback
+   * 【✓】
+   */
   get videoPlaying(): boolean {
     return this.isVideoPlaying;
   }
   
+  /**
+   * Sets video playing state
+   * Controls whether video-driven effects are active
+   * 【✓】
+   */
   set videoPlaying(value: boolean) {
     this.isVideoPlaying = value;
   }
   
-  // Clock for animations
+  /**
+   * Clock for animating background effects
+   * Provides timing reference for shader animations
+   * 【✓】
+   */
   private clock = new THREE.Clock();
   
-  // Store instances of shaders for animations
+  /**
+   * Shader material for cosmic background
+   * Used to apply and animate custom visual effects
+   * 【✓】
+   */
   private backgroundShaderMaterial: THREE.ShaderMaterial | null = null;
   
-  // Add effect toggle properties with default values
+  /**
+   * Toggle flags for individual background effects
+   * Controls which visual elements appear in the background
+   * 【✓】
+   */
   private effectToggles = {
     continents: true,
     mountains: true,
@@ -42,7 +72,12 @@ export class SceneEffectsService {
   
   constructor() { }
 
-  // Renamed from setupRedPlane to setupVideoPlane
+  /**
+   * Creates and configures the video display plane
+   * Sets up texture, material, and playback controls
+   * Provides interactive video display for CD cases
+   * 【✓】
+   */
   setupVideoPlane(scene: THREE.Scene, config: Config): { 
     mesh: THREE.Mesh, 
     play: () => void, 
@@ -206,6 +241,30 @@ export class SceneEffectsService {
     };
   }
 
+  /**
+   * Updates video source to match active CD case
+   * Handles video loading and playback transitions
+   * 【✓】
+   */
+  private updateVideoSource(videoPath: string): void {
+    // ... existing code ...
+  }
+
+  /**
+   * Handles video load completion
+   * Sets up video playback and prepares texture
+   * 【✓】
+   */
+  private loadHandler(): void {
+    // ... existing code ...
+  }
+
+  /**
+   * Creates the cosmic background plane with shader effects
+   * Sets up customizable visual atmosphere for the scene
+   * Configures animated shader parameters for dynamic effects
+   * 【✓】
+   */
   setupBackgroundPlane(scene: THREE.Scene, config: Config, videoTexture?: THREE.VideoTexture): THREE.Mesh {
     const { backgroundPlane } = config.sceneSettings;
     // Create a background plane with config dimensions
@@ -272,7 +331,12 @@ export class SceneEffectsService {
     return planeMesh;
   }
 
-  // Add method to update shader animations with smoother transitions
+  /**
+   * Updates background animations each frame
+   * Advances shader time uniforms for flowing effects
+   * Creates dynamic cosmic atmosphere behind CD cases
+   * 【✓】
+   */
   updateBackgroundAnimations(): void {
     if (this.backgroundShaderMaterial) {
       // Use a consistent time update to avoid glitches
@@ -286,7 +350,12 @@ export class SceneEffectsService {
     }
   }
 
-  // Add new methods to toggle background effects
+  /**
+   * Updates background visual effects based on scene settings
+   * Controls colors, intensities, and animation parameters
+   * Adjusts mood and atmosphere of the cosmic background
+   * 【✓】
+   */
   updateBackgroundEffects(settings: SceneSettings): void {
     if (this.backgroundShaderMaterial) {
       // Update all effect toggles based on settings

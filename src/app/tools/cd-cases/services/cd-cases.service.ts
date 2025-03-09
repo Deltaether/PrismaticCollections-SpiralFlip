@@ -8,6 +8,11 @@ import { CDCaseAnimationsService } from './animations/cd-case-animations.service
 import { CDCaseEffectsService } from './effects/cd-case-effects.service';
 import { CDCaseLoadingService } from './loading/cd-case-loading.service';
 
+/**
+ * Core service for CD cases functionality
+ * Manages CD case models, animations, and interactions
+ * Delegates to specialized services for specific tasks
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,19 +20,31 @@ export class CDCasesService {
   private clock = new THREE.Clock();
   private readonly ANIMATION_DURATION = 1.0; // seconds
 
-  // Movement Types - clearly labeled case movements
+  /**
+   * Defines animation trigger names for CD case movements
+   * Maps logical actions to actual animation names in the 3D models
+   * 【✓】
+   */
   private readonly MOVEMENTS = {
     OPEN_LID: 'Open Lid.001',    // Trigger to open the CD case lid
     CLOSE_LID: 'Close Lid'       // Trigger to close the CD case lid
   };
 
-  // Animation configurations
+  /**
+   * Animation configuration for smooth transitions
+   * Provides easing function and duration for all animations
+   * 【✓】
+   */
   private readonly ANIMATION_CONFIG = {
     duration: 1.0,
     easing: (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
   };
 
-  // Position states - define exact positions for cases
+  /**
+   * Position calculations for CD cases
+   * Computes exact stack positioning and active case location
+   * 【✓】
+   */
   private readonly POSITION_STATES = {
     getInactivePosition: (basePosition: THREE.Vector3, stackIndex: number, stackOffset: number): THREE.Vector3 => {
       return new THREE.Vector3(
@@ -47,6 +64,12 @@ export class CDCasesService {
     private loadingService: CDCaseLoadingService
   ) {}
 
+  /**
+   * Loads CD case 3D models and sets up their properties
+   * Delegates to loading service for actual model loading
+   * Entry point for initializing all CD cases in the scene
+   * 【✓】
+   */
   async loadModels(
     config: Config,
     scene: THREE.Scene,
@@ -55,6 +78,11 @@ export class CDCasesService {
     return this.loadingService.loadModels(config, scene, renderer);
   }
 
+  /**
+   * Logs bone information for debugging skeletal animations
+   * Used during development to identify animation structure
+   * 【✗】
+   */
   private logBones(scene: THREE.Object3D): void {
     scene.traverse((node) => {
       if (node.type === 'Bone') {
@@ -69,6 +97,11 @@ export class CDCasesService {
     });
   }
 
+  /**
+   * Sets up environment map with custom tint effect
+   * Creates reflection mapping for metallic CD case materials
+   * 【✓】
+   */
   private setupEnvironmentMap(scene: THREE.Scene, renderer: THREE.WebGLRenderer, texture: THREE.Texture): void {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     
@@ -147,6 +180,11 @@ export class CDCasesService {
     pmremGenerator.dispose();
   }
 
+  /**
+   * Configures materials for CD case model
+   * Sets up metallic and reflective properties for realistic appearance
+   * 【✓】
+   */
   private setupMaterials(model: THREE.Object3D, caseConfig: any): void {
     model.traverse((node: THREE.Object3D) => {
       if (node instanceof THREE.Mesh && node.name === 'CD') {
@@ -175,7 +213,11 @@ export class CDCasesService {
     });
   }
 
-  // MOVEMENT 1 & 2: Lid Opening/Closing Triggers
+  /**
+   * Initializes animation system for a CD case
+   * Sets up mixers, actions, and animation clips
+   * 【✓】
+   */
   private setupAnimation(cdCase: CDCase): void {
     if (!cdCase.mixer || !cdCase.animations) {
       console.warn('No mixer or animations available for case:', cdCase.id);
@@ -209,10 +251,20 @@ export class CDCasesService {
     }
   }
 
+  /**
+   * Updates animations for all CD cases each frame
+   * Advances animation timelines based on elapsed time
+   * 【✓】
+   */
   updateAnimations(cdCases: CDCase[]): void {
     this.animationsService.updateAnimations(cdCases);
   }
 
+  /**
+   * Creates glowing highlight effect for CD cases
+   * Used for emphasizing active cases with visual feedback
+   * 【✓】
+   */
   private createGlowEffect(model: THREE.Object3D): THREE.MeshBasicMaterial {
     const glowMaterial = new THREE.MeshBasicMaterial({
       color: 0x00ff00,  // Green glow
@@ -223,6 +275,11 @@ export class CDCasesService {
     return glowMaterial;
   }
 
+  /**
+   * Updates glow effect intensity during animation
+   * Creates pulsating highlight for interactive feedback
+   * 【✓】
+   */
   private updateGlowEffect(cdCase: CDCase): void {
     if (!cdCase.glowMaterial) {
       cdCase.glowMaterial = this.createGlowEffect(cdCase.model);
@@ -247,6 +304,11 @@ export class CDCasesService {
     });
   }
 
+  /**
+   * Toggles CD case open/closed state with animation
+   * Triggers appropriate animation sequence for case lid
+   * 【✓】
+   */
   flipCase(cdCase: CDCase): void {
     console.log('Attempting to flip case:', cdCase.id, {
       hasOpenAction: !!cdCase.openAction,
@@ -274,6 +336,11 @@ export class CDCasesService {
     );
   }
 
+  /**
+   * Checks for collisions between CD cases
+   * Prevents cases from clipping through each other
+   * 【✓】
+   */
   checkCollisions(currentCase: CDCase, cdCases: CDCase[]): void {
     // Disabled to prevent unwanted drifting
     return;

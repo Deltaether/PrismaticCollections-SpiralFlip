@@ -1,6 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/**
+ * Defines position and animation properties for rune elements
+ * Controls appearance and movement of magical rune symbols
+ */
 interface RunePosition {
   x: number;
   y: number;
@@ -13,6 +17,11 @@ interface RunePosition {
   clockwise: boolean;
 }
 
+/**
+ * Creates an animated loading screen with magical effects
+ * Displays during CD case model loading and initialization
+ * Provides visual feedback and sets atmosphere for the application
+ */
 @Component({
   selector: 'app-scene-loader',
   standalone: true,
@@ -494,10 +503,20 @@ export class SceneLoaderComponent implements OnInit {
   @Input() devMode = false;
   runes: RunePosition[] = [];
 
+  /**
+   * Initializes the loading screen and generates rune positions
+   * Creates randomized magical elements with varied animations
+   * 【✓】
+   */
   ngOnInit() {
     this.generateRunePositions();
   }
 
+  /**
+   * Creates random positions and properties for rune elements
+   * Generates visually interesting magical symbols with varied behavior
+   * 【✓】
+   */
   private generateRunePositions() {
     const numRunes = 48;
     this.runes = Array.from({ length: numRunes }, () => ({

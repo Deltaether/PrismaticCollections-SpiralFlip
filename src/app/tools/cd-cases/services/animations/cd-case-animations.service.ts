@@ -2,11 +2,20 @@ import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { CDCase } from '../../../shared/interfaces';
 
+/**
+ * Represents an animation operation in the queue
+ * Defines the animation type and optional completion callback
+ */
 interface AnimationQueueItem {
   type: 'open' | 'close';
   onComplete?: () => void;
 }
 
+/**
+ * Handles CD case lid animations and animation queuing
+ * Manages smooth transitions between open and closed states
+ * Coordinates animation timing and sequencing
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -15,19 +24,27 @@ export class CDCaseAnimationsService {
   private readonly ANIMATION_DURATION = 1.0; // seconds
   private readonly ANIMATION_BUFFER = 100; // ms buffer between animations
 
-  // Movement Types - clearly labeled case movements
+  /**
+   * Maps logical animation names to actual model animation names
+   * Used to trigger the correct animation clips
+   * 【✓】
+   */
   private readonly MOVEMENTS = {
     OPEN_LID: 'Open Lid.001',    // Trigger to open the CD case lid
     CLOSE_LID: 'Close Lid'       // Trigger to close the CD case lid
   };
 
-  // Animation configurations
+  /**
+   * Animation configuration parameters
+   * Defines timing and easing for smooth motion
+   * 【✓】
+   */
   private readonly ANIMATION_CONFIG = {
     duration: 1.0,
     easing: (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
   };
 
-  // Animation queues for each case
+  // State tracking collections
   private animationQueues: Map<number, AnimationQueueItem[]> = new Map();
   private activeAnimations: Map<number, boolean> = new Map();
   private animationListeners: Map<number, (e: any) => void> = new Map();
@@ -35,13 +52,23 @@ export class CDCaseAnimationsService {
   private targetStates: Map<number, boolean> = new Map(); // Tracks desired final state (open/closed)
   private animationLocks: Map<number, boolean> = new Map(); // Prevents any interference during animation
 
-  // Add timing tracking
+  /**
+   * Tracks animation timing parameters
+   * Used for precise animation coordination and sequencing
+   * 【✓】
+   */
   private animationTimers: Map<number, {
     startTime: number,
     duration: number,
     type: 'open' | 'close'
   }> = new Map();
 
+  /**
+   * Initializes animation system for a CD case
+   * Sets up mixers, actions, and event listeners
+   * Configures initial state (closed by default)
+   * 【✓】
+   */
   setupAnimation(cdCase: CDCase): void {
     if (!cdCase.mixer || !cdCase.animations) {
       console.warn('🔧 [Setup] No mixer or animations available for case:', cdCase.id);
@@ -95,6 +122,12 @@ export class CDCaseAnimationsService {
     }
   }
 
+  /**
+   * Adds an animation to the case's queue
+   * Handles animation sequencing and prevents conflicts
+   * Optionally executes callback when animation completes
+   * 【✓】
+   */
   queueAnimation(cdCase: CDCase, type: 'open' | 'close', onComplete?: () => void): void {
     const targetOpen = type === 'open';
     
@@ -145,6 +178,12 @@ export class CDCaseAnimationsService {
     });
   }
 
+  /**
+   * Processes the next animation in a case's queue
+   * Starts animation playback and manages state transitions
+   * Ensures only one animation plays at a time
+   * 【✓】
+   */
   private processNextAnimation(cdCase: CDCase): void {
     console.group(`%c ⚙️ [ANIM-PROCESS] Case ${cdCase.id}`, 'background: #673AB7; color: white; padding: 2px 5px; border-radius: 3px;');
     
@@ -221,6 +260,11 @@ export class CDCaseAnimationsService {
     console.groupEnd();
   }
 
+  /**
+   * Stops any currently running animations
+   * Resets animation state before starting a new one
+   * 【✓】
+   */
   private stopExistingAnimations(cdCase: CDCase): void {
     if (cdCase.mixer) {
       cdCase.mixer.stopAllAction();
@@ -228,6 +272,12 @@ export class CDCaseAnimationsService {
     this.cleanupListeners(cdCase);
   }
 
+  /**
+   * Handles animation completion events
+   * Processes next animation in queue or finalizes state
+   * Executes completion callbacks when animation finishes
+   * 【✓】
+   */
   private onAnimationComplete(cdCase: CDCase): void {
     console.group(`%c ✨ [ANIM-COMPLETE] Case ${cdCase.id}`, 'background: #009688; color: white; padding: 2px 5px; border-radius: 3px;');
     
@@ -290,6 +340,11 @@ export class CDCaseAnimationsService {
     console.groupEnd();
   }
 
+  /**
+   * Cleans up animation resources
+   * Removes listeners and resets state tracking
+   * 【✓】
+   */
   private cleanupAnimation(cdCase: CDCase): void {
     console.group(`%c 🧹 [ANIM-CLEANUP] Case ${cdCase.id}`, 'background: #795548; color: white; padding: 2px 5px; border-radius: 3px;');
     
@@ -314,6 +369,12 @@ export class CDCaseAnimationsService {
     console.groupEnd();
   }
 
+  /**
+   * Updates all animations each frame
+   * Advances animation timers and mixers
+   * Called from the main animation loop
+   * 【✓】
+   */
   updateAnimations(cdCases: CDCase[]): void {
     const delta = this.clock.getDelta();
     
@@ -332,6 +393,11 @@ export class CDCaseAnimationsService {
     });
   }
 
+  /**
+   * Clears all pending animations from a case's queue
+   * Used when interrupting animation sequences
+   * 【✓】
+   */
   clearQueue(cdCase: CDCase): void {
     // Don't clear if case is locked
     if (this.animationLocks.get(cdCase.id)) {
@@ -341,10 +407,20 @@ export class CDCaseAnimationsService {
     this.targetStates.set(cdCase.id, cdCase.isOpen);
   }
 
+  /**
+   * Checks if a case is currently animating
+   * Used to prevent conflicting interactions
+   * 【✓】
+   */
   private isAnimating(cdCase: CDCase): boolean {
     return this.activeAnimations.get(cdCase.id) || false;
   }
 
+  /**
+   * Removes event listeners for a case
+   * Prevents memory leaks during cleanup
+   * 【✓】
+   */
   private cleanupListeners(cdCase: CDCase): void {
     const currentAction = this.currentActions.get(cdCase.id);
     const listener = this.animationListeners.get(cdCase.id);
@@ -357,13 +433,19 @@ export class CDCaseAnimationsService {
     }
   }
 
-  // New method to check if any case is currently animating
+  /**
+   * Checks if any cases have active animations
+   * Used to block user interactions during animations
+   * 【✓】
+   */
   hasAnyActiveAnimations(cdCases: CDCase[]): boolean {
     return cdCases.some(cdCase => this.isAnimating(cdCase));
   }
 
   /**
-   * Opens a specific CD case with animation
+   * Opens a CD case with animation
+   * Wrapper for queueAnimation with "open" type
+   * 【✓】
    */
   openCase(cdCase: CDCase): void {
     if (cdCase.isOpen) return;

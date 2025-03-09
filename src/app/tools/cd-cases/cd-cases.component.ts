@@ -20,14 +20,37 @@ import {
   EventHandlerService, 
   SilhouetteService, 
   RendererService, 
-  CaseAnimationService 
+  CaseAnimationService,
+  ViewHelperService,
+  SetupHelperService,
+  AnimationHelperService,
+  SceneConfigHelperService
 } from './component-services';
+import { MenuIntegrationService } from '../right-side-menu/services/menu-integration.service';
+import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 
 @Component({
   selector: 'app-cd-cases',
   standalone: true,
   imports: [CommonModule, DebugMenuComponent, SceneLoaderComponent],
-  providers: [VideoService, EventHandlerService, SilhouetteService, RendererService, CaseAnimationService],
+  providers: [
+    VideoService, 
+    EventHandlerService, 
+    SilhouetteService, 
+    RendererService, 
+    CaseAnimationService,
+    MenuIntegrationService,
+    ViewHelperService,
+    SetupHelperService,
+    AnimationHelperService,
+    SceneConfigHelperService,
+    CDCasesService,
+    SceneService,
+    CDCasesEventsService,
+    CDCaseAnimationsService,
+    CDCasesDebugService,
+    CDCasesStateService,
+  ],
   templateUrl: './cd-cases.component.html',
   styleUrls: ['./cd-cases.component.scss']
 })
@@ -36,7 +59,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('labelRenderer') private labelRendererElement!: ElementRef<HTMLDivElement>;
 
   private renderer!: THREE.WebGLRenderer;
-  private labelRenderer!: CSS2DRenderer;
+  private labelRenderer!: CSS3DRenderer;
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
@@ -92,10 +115,12 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   
   public caseSettings: CaseSettings = {};
 
-  // Add properties to store references
+  // Rename from videoPlane to rightSideMenuPlane
+  private rightSideMenuPlane!: THREE.Mesh;
+  // Keep original videoPlane for background effects
   private videoPlane!: THREE.Mesh;
   private backgroundPlane!: THREE.Mesh;
-  private caseBackVideoPlane!: THREE.Mesh; // New property for the case back video plane
+  private caseBackVideoPlane!: THREE.Mesh;
   private videoPlay!: () => void;
   private videoPause!: () => void;
   private updateVideoSource!: (videoPath: string) => void;
@@ -121,6 +146,8 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private playingMusic: boolean[] = [];
   private tutorialCompleted: boolean[] = [];
 
+  private css3DMenu: any; // The CSS3D object containing our menu
+
   constructor(
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
@@ -133,9 +160,19 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     private silhouetteService: SilhouetteService,
     private rendererService: RendererService,
     private caseAnimationService: CaseAnimationService,
+    private menuIntegrationService: MenuIntegrationService,
+    private viewHelperService: ViewHelperService,
+    private setupHelperService: SetupHelperService,
+    private animationHelperService: AnimationHelperService,
+    private sceneConfigHelperService: SceneConfigHelperService,
     private ngZone: NgZone
   ) {}
 
+  /**
+   * Initializes component data and services
+   * Sets up configuration and initializes state tracking arrays
+   * 【✓】
+   */
   ngOnInit(): void {
     // Load cases data
     this.config.cdCases = updateCasePositions(allCases);
@@ -155,6 +192,12 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.tutorialCompleted = new Array(caseCount).fill(false);
   }
 
+  /**
+   * Sets up the 3D environment after the view is initialized
+   * Creates renderers, controls, and loads 3D models
+   * Configures CSS3D integration for the menu system
+   * 【✓】
+   */
   ngAfterViewInit(): void {
     this.setupRenderer();
     this.setupControls();
@@ -179,68 +222,76 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       
       this.isLoading = false;
     });
+
+    // Set up the CSS3D renderer for 2D/3D integration
+    this.setupCSS3DRenderer();
+    
+    // Add our menu component instead of using videos
+    this.setupRightSideMenu();
+
+    // Set the expand function for use after scrolling
+    this.caseAnimationService.setExpandFunction(this.expandActiveCase.bind(this));
   }
 
+  /**
+   * Sets up the WebGL renderer, scene, camera, and lighting
+   * Creates video planes and initializes core Three.js components
+   * 【✓】
+   */
   private setupRenderer(): void {
-    // Use the RendererService to set up the renderer, scene, camera, and video planes
-    this.rendererService.setupRenderer(
+    // Use the SetupHelperService to set up the renderer
+    const results = this.setupHelperService.setupRenderer(
       this.canvasRef.nativeElement, 
-      this.sceneService, 
-      this.videoService.createCaseBackVideoPlane.bind(this.videoService)
+      this.sceneService,
+      this.config
     );
     
-    // Get references to the renderer components
-    this.renderer = this.rendererService.getRenderer();
-    this.labelRenderer = this.rendererService.getLabelRenderer();
-    this.scene = this.rendererService.getScene();
-    this.camera = this.rendererService.getCamera();
+    // Get references to components
+    this.renderer = results.renderer;
+    this.scene = results.scene;
+    this.camera = results.camera;
     
     // Get references to lights
-    const lights = this.rendererService.getLights();
-    this.ambientLight = lights.ambientLight;
-    this.mainLight = lights.mainLight;
-    this.fillLight = lights.fillLight;
-    this.backLight = lights.backLight;
+    this.ambientLight = results.lights.ambientLight;
+    this.mainLight = results.lights.mainLight;
+    this.fillLight = results.lights.fillLight;
+    this.backLight = results.lights.backLight;
 
     // Get references to light helpers
-    const lightHelpers = this.rendererService.getLightHelpers();
-    this.mainLightHelper = lightHelpers.mainLightHelper;
-    this.fillLightHelper = lightHelpers.fillLightHelper;
-    this.backLightHelper = lightHelpers.backLightHelper;
+    this.mainLightHelper = results.lightHelpers.mainLightHelper;
+    this.fillLightHelper = results.lightHelpers.fillLightHelper;
+    this.backLightHelper = results.lightHelpers.backLightHelper;
     
     // Get references to video-related elements
-    this.videoPlane = this.rendererService.getVideoPlane();
-    this.backgroundPlane = this.rendererService.getBackgroundPlane();
-    this.caseBackVideoPlane = this.rendererService.getCaseBackVideoPlane();
+    this.rightSideMenuPlane = results.videoElements.rightSideMenuPlane;
+    this.backgroundPlane = results.videoElements.backgroundPlane;
+    this.caseBackVideoPlane = results.videoElements.caseBackVideoPlane;
     
     // Get references to video controls
-    const videoControls = this.rendererService.getVideoControls();
-    this.videoPlay = videoControls.play;
-    this.videoPause = videoControls.pause;
-    this.updateVideoSource = videoControls.updateSource;
-    
-    // Initialize VideoService with these video elements
-    this.videoService.setVideoElements(
-      this.videoPlane,
-      this.backgroundPlane,
-      this.caseBackVideoPlane,
-      this.videoPlay,
-      this.videoPause,
-      this.updateVideoSource
-    );
+    this.videoPlay = results.videoElements.videoPlay;
+    this.videoPause = results.videoElements.videoPause;
+    this.updateVideoSource = results.videoElements.updateVideoSource;
   }
 
+  /**
+   * Sets up camera controls for scene navigation
+   * Configures OrbitControls with appropriate constraints
+   * 【✓】
+   */
   private setupControls(): void {
-    // Use the RendererService to set up the controls
-    this.rendererService.setupControls(this.sceneService);
-    
-    // Get a reference to the controls
-    this.controls = this.rendererService.getControls();
+    // Use the SetupHelperService to set up the controls
+    this.controls = this.setupHelperService.setupControls(this.sceneService);
     
     // Make sure controls match sceneSettings after initialization
-    this.updateOrbitControls();
+    this.setupHelperService.updateOrbitControls(this.controls, this.sceneSettings);
   }
 
+  /**
+   * Loads CD case models and initializes related state
+   * Creates 3D representations of album cases and sets up initial positions
+   * Activated first case and sets up silhouette effects
+   * 【✗】 - Refactored to SetupHelperService
+   */
   private async loadModels(): Promise<void> {
     try {
       // Load CD cases
@@ -305,15 +356,15 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Adds event listeners for user interaction with CD cases
+   * Sets up mouse/touch handlers for case selection and manipulation
+   * 【✓】
+   */
   private addEventListeners(): void {
-    const canvas = this.canvasRef.nativeElement;
-    
-    // Initialize the EventHandlerService with the config
-    this.eventHandlerService.setConfig(this.config);
-    
-    // Use the EventHandlerService to add event listeners
-    this.eventHandlerService.addEventListeners(
-      canvas,
+    // Use the SetupHelperService to add event listeners
+    this.setupHelperService.addEventListeners(
+      this.canvasRef.nativeElement,
       this.cdCases,
       this.camera,
       this.eventsService,
@@ -325,104 +376,90 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   
-  // Method to start playback on video and background planes
+  /**
+   * Reveals video and background planes when a case is expanded
+   * Handles transition between browsing and detailed view modes
+   * 【✓】
+   */
   private revealVideoAndBackground(): void {
-    // Delegate to the VideoService
-    this.videoService.revealVideoAndBackground(
-      this.activeCaseExpanded, 
+    this.viewHelperService.revealVideoAndBackground(
+      this.backgroundPlane,
       this.cdCases,
       this.videoPaths
     );
   }
 
-  // Add method to update background effects
+  /**
+   * Updates background visual effects based on scene settings
+   * Controls shader parameters for the cosmic background
+   * 【✓】
+   */
   public updateBackgroundEffects(): void {
-    this.sceneService.updateBackgroundEffects(this.sceneSettings);
+    this.viewHelperService.updateBackgroundEffects(this.sceneSettings);
   }
   
-  // Helper method to remove silhouette effect by restoring original materials
+  /**
+   * Removes silhouette effect from a CD case
+   * Restores original materials when a case is no longer active
+   * 【✓】
+   */
   private removeSilhouetteEffect(cdCase: CDCase): void {
-    this.silhouetteService.removeSilhouetteEffect(cdCase);
+    this.viewHelperService.removeSilhouetteEffect(cdCase);
   }
   
-  // Method to create pulsating silhouette for active case
+  /**
+   * Creates a pulsating silhouette for the active case
+   * Provides visual feedback to highlight the selected case
+   * 【✓】
+   */
   private createActiveCaseSilhouette(cdCase: CDCase): void {
     this.silhouetteService.createActiveCaseSilhouette(cdCase, this.tutorialCompleted);
   }
 
+  /**
+   * Main animation loop that runs every frame
+   * Orchestrates all animations, physics updates, and rendering
+   * 【✓】
+   */
   private animate(): void {
     if (!this.renderer) return;
     
     this.animationId = requestAnimationFrame(() => this.animate());
     
-    // Update animations and physics
-    this.animationService.updateAnimations(this.cdCases);
-
-    // Get animation state from CaseAnimationService
-    const isManualAnimation = this.isManuallyAnimating;
-    
-    if (!isManualAnimation) {
-      this.stateService.updatePositions(this.cdCases);
-      
-      // Keep videoPlane2 aligned with the active case if one exists
-      const activeIndex = this.cdCases.findIndex(cdCase => cdCase.isActive);
-      if (activeIndex >= 0) {
-        this.videoService.updateVideoPlane2Alignment(
-          this.caseBackVideoPlane,
-          this.isManuallyAnimating,
-          this.manuallyAnimatedCaseId,
-          this.cdCases
-        );
-      }
-    } else {
-      // Only apply automatic position updates to cases we're not manually animating
-      this.cdCases.forEach(cdCase => {
-        if (cdCase.id !== this.manuallyAnimatedCaseId) {
-          // Update positions for other cases only
-          cdCase.position.lerp(cdCase.targetPosition, this.stateService.getPositionLerpFactor());
-          cdCase.model.position.copy(cdCase.position);
-        }
-      });
-      
-      // Also keep videoPlane2 aligned during manual animation
-      this.videoService.updateVideoPlane2Alignment(
-        this.caseBackVideoPlane,
-        this.isManuallyAnimating,
-        this.manuallyAnimatedCaseId,
-        this.cdCases
-      );
-    }
-    
-    // Update silhouette animation using SilhouetteService
-    this.silhouetteService.updateSilhouetteAnimation(this.cdCases, this.playingMusic, this.tutorialCompleted);
-    
-    // Always update background animations - don't check for visibility
-    // This ensures continuous shader animation even when the plane is toggled
-    this.sceneService.updateBackgroundAnimations();
-    
-    // Update controls and render
-    this.controls.update();
-    this.renderer.render(this.scene, this.camera);
-    this.labelRenderer.render(this.scene, this.camera);
-
-    // Update video plane alignment if needed
-    if (this.caseBackVideoPlane && (this.activeCaseExpanded || this.isManuallyAnimating)) {
-      this.videoService.updateVideoPlane2Alignment(
-        this.caseBackVideoPlane,
-        this.isManuallyAnimating,
-        this.manuallyAnimatedCaseId,
-        this.cdCases
-      );
-    }
+    // Use the AnimationHelperService to handle animation
+    this.animationHelperService.animate(
+      this.renderer,
+      this.scene,
+      this.camera,
+      this.controls,
+      this.labelRenderer,
+      this.cdCases,
+      this.caseBackVideoPlane,
+      this.rightSideMenuPlane,
+      this.isManuallyAnimating,
+      this.manuallyAnimatedCaseId,
+      this.activeCaseExpanded,
+      this.playingMusic,
+      this.tutorialCompleted
+    );
   }
 
-  // Debug menu methods
+  /**
+   * Updates camera settings from debug panel values
+   * Part of the debug configuration system
+   * 【✓】
+   */
   public updateCamera(): void {
-    this.debugService.updateCamera(this.camera, this.controls, this.sceneSettings);
+    this.sceneConfigHelperService.updateCamera(this.camera, this.controls, this.sceneSettings);
   }
 
+  /**
+   * Updates lighting parameters from debug panel
+   * Controls colors, intensities and positions of all scene lights
+   * 【✓】
+   */
   public updateLighting(): void {
-    this.debugService.updateLighting(
+    this.sceneConfigHelperService.updateLighting(
       this.ambientLight,
       this.mainLight,
       this.mainLightHelper,
@@ -432,43 +469,89 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  /**
+   * Updates renderer settings from debug panel
+   * Controls exposure, gamma, and tone mapping
+   * 【✓】
+   */
   public updateRenderer(): void {
-    this.debugService.updateRenderer(this.renderer, this.sceneSettings);
+    this.sceneConfigHelperService.updateRenderer(this.renderer, this.sceneSettings);
   }
 
+  /**
+   * Updates orbit controls parameters from debug panel
+   * Adjusts camera movement constraints and behavior
+   * 【✓】
+   */
   public updateOrbitControls(): void {
-    this.debugService.updateOrbitControls(this.controls, this.sceneSettings);
+    this.sceneConfigHelperService.updateOrbitControls(this.controls, this.sceneSettings);
   }
 
+  /**
+   * Updates ground plane settings from debug panel
+   * Controls floor visibility and appearance
+   * 【✓】
+   */
   public updateGround(): void {
-    this.debugService.updateGround(this.scene, this.sceneSettings);
+    this.sceneConfigHelperService.updateGround(this.scene, this.sceneSettings);
   }
 
+  /**
+   * Updates individual case transform from debug panel
+   * Fine-tunes position and rotation of CD cases
+   * 【✓】
+   */
   public updateCaseTransform(cdCase: CDCase): void {
-    this.debugService.updateCaseTransform(cdCase);
+    this.sceneConfigHelperService.updateCaseTransform(cdCase);
   }
 
+  /**
+   * Resets all debug settings to default values
+   * Returns scene to initial configuration
+   * 【✓】
+   */
   public resetToDefault(): void {
-    this.debugService.resetToDefault(this.sceneSettings, this.config, this.cdCases);
-    this.updateCamera();
-    this.updateLighting();
-    this.updateRenderer();
-    this.updateOrbitControls();
-    this.updateGround();
-    this.cdCases.forEach(cdCase => this.updateCaseTransform(cdCase));
+    this.sceneConfigHelperService.resetToDefault(
+      this.sceneSettings,
+      this.config,
+      this.cdCases,
+      this.updateCamera.bind(this),
+      this.updateLighting.bind(this),
+      this.updateRenderer.bind(this),
+      this.updateOrbitControls.bind(this),
+      this.updateGround.bind(this),
+      this.updateCaseTransform.bind(this)
+    );
   }
 
+  /**
+   * Handles window resize events to maintain proper rendering
+   * Adjusts camera and renderer dimensions for responsive display
+   * 【✓】
+   */
   @HostListener('window:resize')
   onWindowResize(): void {
-    this.rendererService.onWindowResize();
+    this.viewHelperService.onWindowResize(this.renderer, this.camera, this.labelRenderer);
   }
 
+  /**
+   * Cleans up resources when component is destroyed
+   * Cancels animation loop and releases memory
+   * 【✓】
+   */
   ngOnDestroy(): void {
     // Use the RendererService to clean up resources
     this.rendererService.cleanUpResources(this.cdCases, this.animationId);
+    
+    // Clean up the menu integration
+    this.menuIntegrationService.destroy();
   }
 
-  // Wheel event handler for changing active case
+  /**
+   * Handles mouse wheel events for case navigation
+   * Implements scrolling behavior to cycle through cases
+   * 【✓】
+   */
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
     this.eventHandlerService.onWheel(
@@ -485,7 +568,11 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  // Method to animate active case back to its original position
+  /**
+   * Animates a case back to its original position
+   * Handles the transition when a case is collapsed
+   * 【✓】
+   */
   private animateActiveCaseBack(activeCase: CDCase, newIndex: number, wasExpandedBefore: boolean): void {
     // Delegate to the CaseAnimationService
     this.caseAnimationService.animateActiveCaseBack(
@@ -494,7 +581,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       wasExpandedBefore,
       this.cdCases,
       this.caseBackVideoPlane,
-      this.videoPlane,
+      this.rightSideMenuPlane,
       this.stateService,
       this.updateVideoForNewActiveCase.bind(this),
       () => this.videoService.updateVideoPlane2Alignment(
@@ -506,22 +593,29 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   
-  // Helper method to update video for new active case
+  /**
+   * Updates video content when a new case becomes active
+   * Synchronizes displayed media with the selected case
+   * 【✓】
+   */
   private updateVideoForNewActiveCase(newIndex: number, wasExpandedBefore: boolean = false): void {
-    // Call the videoService's method with appropriate parameters
-    this.videoService.updateVideoForNewActiveCase(
+    this.viewHelperService.updateVideoForNewActiveCase(
       newIndex,
       wasExpandedBefore,
       this.videoPaths,
       this.playingMusic,
       this.cdCases,
       this.tutorialCompleted,
-      this.createActiveCaseSilhouette.bind(this),
-      this.expandActiveCase.bind(this)
+      this.createSilhouetteWrapper.bind(this),
+      this.expandActiveCaseWrapper.bind(this)
     );
   }
 
-  // Method to handle case expansion, extracted from click handler to be reusable
+  /**
+   * Expands the currently active case with animations
+   * Transitions from browsing mode to detailed view
+   * 【✓】
+   */
   private expandActiveCase(clickedCase: CDCase): void {
     // Delegate to the CaseAnimationService
     this.caseAnimationService.expandActiveCase(
@@ -530,7 +624,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playingMusic,
       this.tutorialCompleted,
       this.caseBackVideoPlane,
-      this.videoPlane,
+      this.rightSideMenuPlane,
       this.videoService.resetCaseBackVideoPlane.bind(this.videoService),
       this.removeSilhouetteEffect.bind(this),
       this.revealVideoAndBackground.bind(this),
@@ -541,5 +635,98 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdCases
       )
     );
+  }
+
+  /**
+   * Sets up the CSS3D renderer for HTML content in 3D space
+   * Enables integration of Angular components with the 3D scene
+   * 【✓】
+   */
+  private setupCSS3DRenderer(): void {
+    this.labelRenderer = this.viewHelperService.setupCSS3DRenderer(this.labelRendererElement);
+  }
+  
+  /**
+   * Sets up the right side menu for track selection
+   * Creates an interactive UI that appears in 3D space
+   * 【✓】
+   */
+  private setupRightSideMenu(): void {
+    this.css3DMenu = this.viewHelperService.setupRightSideMenu(
+      this.scene,
+      this.config,
+      this.cdCases,
+      this.rightSideMenuPlane,
+      this.handleTrackSelection.bind(this)
+    );
+  }
+  
+  /**
+   * Creates a silhouette effect wrapper function
+   * Used for highlighting active cases
+   * 【✓】
+   */
+  private createSilhouetteWrapper(cdCase: CDCase): void {
+    this.viewHelperService.createSilhouetteWrapper(cdCase, this.tutorialCompleted);
+  }
+
+  /**
+   * Wrapper for expanding the active case with proper animations
+   * Handles the transition to detailed view mode
+   * 【✓】
+   */
+  private expandActiveCaseWrapper(cdCase: CDCase): void {
+    this.viewHelperService.expandActiveCaseWrapper(
+      cdCase,
+      this.cdCases,
+      this.playingMusic,
+      this.tutorialCompleted,
+      this.caseBackVideoPlane,
+      this.rightSideMenuPlane,
+      this.revealVideoAndBackground.bind(this),
+      () => this.videoService.updateVideoPlane2Alignment(
+        this.caseBackVideoPlane,
+        this.isManuallyAnimating,
+        this.manuallyAnimatedCaseId,
+        this.cdCases
+      )
+    );
+  }
+
+  /**
+   * Handles track selection from the menu
+   * Processes user interaction with the track list
+   * 【✓】
+   */
+  private handleTrackSelection(index: number): void {
+    // Handle track selection - activate the corresponding CD case
+    if (index >= 0 && index < this.cdCases.length) {
+      // First deactivate any currently active case
+      const activeCase = this.cdCases.find(c => c.isActive);
+      if (activeCase) {
+        this.eventHandlerService.deactivateCase(
+          activeCase,
+          this.cdCases,
+          this.playingMusic,
+          this.tutorialCompleted,
+          this.caseBackVideoPlane,
+          this.createSilhouetteWrapper.bind(this),
+          this.expandActiveCaseWrapper.bind(this)
+        );
+      }
+      
+      // Then activate the selected case
+      setTimeout(() => {
+        this.eventHandlerService.activateCase(
+          this.cdCases[index],
+          this.cdCases,
+          this.playingMusic,
+          this.tutorialCompleted,
+          this.caseBackVideoPlane,
+          this.createSilhouetteWrapper.bind(this),
+          this.expandActiveCaseWrapper.bind(this)
+        );
+      }, 300);
+    }
   }
 } 

@@ -1,16 +1,17 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MusicPlayerComponent } from '../music-player/music-player.component';
 
 @Component({
   selector: 'app-right-side-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MusicPlayerComponent],
   templateUrl: './right-side-menu.component.html',
   styleUrls: ['./right-side-menu.component.scss']
 })
-export class RightSideMenuComponent implements OnInit {
-  @Input() activeCaseIndex: number = -1;
+export class RightSideMenuComponent implements OnInit, OnDestroy {
   @Input() cdCases: any[] = [];
+  @Input() activeCaseIndex: number | null = null;
   @Output() trackSelected = new EventEmitter<number>();
 
   // Track list from the CD cases
@@ -34,9 +35,25 @@ export class RightSideMenuComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.applyResponsiveSizing();
+    window.addEventListener('resize', this.handleResize.bind(this));
   }
 
-  selectTrack(index: number): void {
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.handleResize.bind(this));
+  }
+
+  private handleResize(): void {
+    this.applyResponsiveSizing();
+  }
+
+  private applyResponsiveSizing(): void {
+    // This will be handled by CSS variables and responsive classes
+    // No need for additional JavaScript logic
+  }
+
+  onTrackSelected(index: number): void {
+    this.activeCaseIndex = index;
     this.trackSelected.emit(index);
   }
 }

@@ -195,12 +195,22 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Sets up the 3D environment after the view is initialized
    * Creates renderers, controls, and loads 3D models
-   * Configures CSS3D integration for the menu system
+   * Configures menu system as DOM overlay
    * 【✓】
    */
   ngAfterViewInit(): void {
     this.setupRenderer();
     this.setupControls();
+    
+    // Set up the CSS3D renderer for any 2D/3D integration needs 
+    // (though we won't use it for the menu anymore)
+    this.setupCSS3DRenderer();
+    
+    // Add our menu component as DOM overlay instead of using CSS3D
+    // Do this before loading models to ensure it's interactable from the start
+    this.setupRightSideMenu();
+    
+    // Now load models (do this last so menu is ready first)
     this.loadModels().then(() => {
       // Initialize caseSettings for each CD case to prevent "Cannot read properties of undefined" errors
       this.cdCases.forEach(cdCase => {
@@ -222,12 +232,6 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       
       this.isLoading = false;
     });
-
-    // Set up the CSS3D renderer for 2D/3D integration
-    this.setupCSS3DRenderer();
-    
-    // Add our menu component instead of using videos
-    this.setupRightSideMenu();
 
     // Set the expand function for use after scrolling
     this.caseAnimationService.setExpandFunction(this.expandActiveCase.bind(this));

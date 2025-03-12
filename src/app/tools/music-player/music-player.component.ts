@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Howl } from 'howler';
 import { AudioService } from './audio.service';
@@ -12,6 +12,10 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./music-player.component.scss']
 })
 export class MusicPlayerComponent implements OnInit, OnDestroy {
+  @Input() trackTitle: string = '';
+  @Input() trackArtist: string = '';
+  @Input() activeTrack: any = null;
+  
   private audio: Howl | null = null;
   private trackSubscription: Subscription | null = null;
   isPlaying = false;
@@ -21,6 +25,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   duration = 0;
   volume = 0.1;
   error = '';
+  currentSubtitle: string = ''; // For storing additional track information
 
   constructor(private audioService: AudioService) {}
 
@@ -51,6 +56,9 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     this.error = '';
     this.currentTime = 0;
     this.duration = 0;
+    
+    // Extract useful information from filename for subtitle if needed
+    this.updateSubtitleFromFilename(track);
 
     this.audio = new Howl({
       src: [track],
@@ -95,6 +103,19 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.isPlaying = false;
       }
     });
+  }
+
+  // Update subtitle based on filename if other inputs aren't provided
+  private updateSubtitleFromFilename(track: string) {
+    if (track) {
+      const filename = track.split('/').pop() || '';
+      const parts = filename.replace('.mp3', '').split(' - ');
+      if (parts.length > 1) {
+        this.currentSubtitle = parts[0];
+      } else {
+        this.currentSubtitle = '';
+      }
+    }
   }
 
   private updateTime() {
@@ -151,6 +172,34 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
 
   getTrackName(track: string): string {
     const parts = track.split('/');
-    return parts[parts.length - 1].replace('.mp3', '');
+    const filename = parts[parts.length - 1].replace('.mp3', '');
+    
+    // If we have title and artist inputs, prefer those
+    if (this.trackTitle) {
+      return this.trackTitle;
+    }
+    
+    // Otherwise extract from filename
+    const fileParts = filename.split(' - ');
+    if (fileParts.length > 1) {
+      return fileParts[1]; // Return song title part
+    }
+    return filename;
+  }
+  
+  getArtistName(): string {
+    if (this.trackArtist) {
+      return this.trackArtist;
+    }
+    
+    if (this.currentTrack) {
+      const filename = this.currentTrack.split('/').pop() || '';
+      const parts = filename.replace('.mp3', '').split(' - ');
+      if (parts.length > 1) {
+        return parts[0]; // Artist is usually first
+      }
+    }
+    
+    return this.currentSubtitle;
   }
 } 

@@ -1,6 +1,6 @@
 import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MusicPlayerComponent } from './tools/music-player/music-player.component';
+// import { MusicPlayerComponent } from './tools/music-player/music-player.component'; // Removed - now in right-side menu
 import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
 
@@ -9,7 +9,7 @@ import { AudioService } from './tools/music-player/audio.service';
   standalone: true,
   imports: [
     CommonModule,
-    MusicPlayerComponent,
+    // MusicPlayerComponent, // Removed - now in right-side menu
     CDCasesComponent
   ],
   templateUrl: './phantasia.component.html',

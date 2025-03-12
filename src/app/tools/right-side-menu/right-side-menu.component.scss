@@ -1,6 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap');
 
+// Define responsive font sizes that will be consistent due to the container scaling
+$title-size: 2rem;
+$subtitle-size: 1rem;
+$track-title-size: 1rem;
+$track-artist-size: 0.8rem;
+$track-number-size: 0.9rem;
+$icon-size: 1rem;
+$small-text-size: 0.75rem;
+
 :host {
   display: block;
   width: 100%;
@@ -9,6 +18,11 @@
   font-family: 'Quicksand', sans-serif;
   overflow: hidden;
   pointer-events: auto;
+  user-select: none; /* Prevent text selection */
+  transform: rotate(0deg); /* Fix for any potential transform issues */
+  box-sizing: border-box;
+  /* Set a fixed design size so scaling works correctly */
+  font-size: 16px; /* Base font size for the component */
 }
 
 @keyframes floatParticle {
@@ -18,9 +32,9 @@
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 5px rgba(78, 175, 255, 0.5), 0 0 10px rgba(120, 220, 255, 0.3); }
-  50% { box-shadow: 0 0 15px rgba(78, 175, 255, 0.7), 0 0 20px rgba(120, 220, 255, 0.5); }
-  100% { box-shadow: 0 0 5px rgba(78, 175, 255, 0.5), 0 0 10px rgba(120, 220, 255, 0.3); }
+  0% { box-shadow: 0 0 5px rgba(184, 166, 130, 0.3), 0 0 10px rgba(184, 166, 130, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(184, 166, 130, 0.5), 0 0 20px rgba(184, 166, 130, 0.4); }
+  100% { box-shadow: 0 0 5px rgba(184, 166, 130, 0.3), 0 0 10px rgba(184, 166, 130, 0.2); }
 }
 
 @keyframes glow {
@@ -29,146 +43,498 @@
   100% { opacity: 0.3; }
 }
 
+@keyframes arrow-pulse {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes circuit-pulse {
+  0% { opacity: 0.1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.1; }
+}
+
+@keyframes edge-glow {
+  0% { box-shadow: inset 0 0 5px rgba(184, 166, 130, 0.2); }
+  50% { box-shadow: inset 0 0 15px rgba(184, 166, 130, 0.4); }
+  100% { box-shadow: inset 0 0 5px rgba(184, 166, 130, 0.2); }
+}
+
+@keyframes selector-rock {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes selector-pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
 .futuristic-menu {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(20, 33, 61, 0.95), rgba(41, 53, 86, 0.95));
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(12, 20, 36, 0.85);
+  border: 1px solid rgba(184, 166, 130, 0.2);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  border: 1px solid rgba(78, 175, 255, 0.3);
+  border-radius: 8px; /* Slightly rounded corners */
+  animation: edge-glow 4s infinite;
+  
+  /* Futuristic corner decorations */
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  /* Top-left corner decoration */
+  &::before {
+    top: 0;
+    left: 0;
+    border-top: 2px solid rgba(184, 166, 130, 0.4);
+    border-left: 2px solid rgba(184, 166, 130, 0.4);
+    border-top-left-radius: 8px;
+    clip-path: polygon(0 0, 30px 0, 0 30px);
+    background: radial-gradient(circle at 15px 15px, rgba(184, 166, 130, 0.2), transparent 40%);
+  }
+  
+  /* Bottom-right corner decoration */
+  &::after {
+    bottom: 0;
+    right: 0;
+    border-bottom: 2px solid rgba(184, 166, 130, 0.4);
+    border-right: 2px solid rgba(184, 166, 130, 0.4);
+    border-bottom-right-radius: 8px;
+    clip-path: polygon(100% 100%, 100% calc(100% - 30px), calc(100% - 30px) 100%);
+    background: radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), rgba(184, 166, 130, 0.2), transparent 40%);
+  }
+  
+  /* Consistent font sizing classes */
+  .responsive-text {
+    /* Font will scale with container due to rem units and container's controlled size */
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+  }
+  
+  .responsive-container {
+    /* Container elements will maintain proportions */
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Header section */
+  .menu-header {
+    padding: 1.5rem 1rem 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(184, 166, 130, 0.3);
+    position: relative;
+    margin-bottom: 1rem;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 25%;
+      height: 2px;
+      background: rgba(184, 166, 130, 0.7);
+      box-shadow: 0 0 10px rgba(184, 166, 130, 0.4);
+    }
+    
+    .menu-title {
+      font-size: $title-size;
+      font-weight: 700;
+      color: #b8a682;
+      margin: 0 0 0.5rem;
+      text-shadow: 0 0 10px rgba(184, 166, 130, 0.4);
+    }
+    
+    .menu-subtitle {
+      font-size: $subtitle-size;
+      font-weight: 400;
+      color: rgba(184, 166, 130, 0.7);
+      margin: 0;
+    }
+  }
+  
+  /* Track listing section */
+  .tracklist-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1rem;
+    min-height: 0; /* Fix to prevent flex item from expanding beyond content */
+    margin-bottom: 0.5rem; /* Add small margin to separate from footer */
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(20, 30, 48, 0.2);
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(184, 166, 130, 0.3);
+      border-radius: 3px;
+      
+      &:hover {
+        background: rgba(184, 166, 130, 0.5);
+      }
+    }
+    
+    .tracklist-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      padding-bottom: 0.5rem; /* Add padding at bottom of grid */
+      
+      .track-item {
+        padding: 0.6rem 1rem;
+        border-radius: 3px;
+        background: rgba(25, 35, 55, 0.3);
+        border: 1px solid rgba(184, 166, 130, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        padding-left: 3rem; /* Increase space for the selector arrow */
+        
+        /* Classic RPG video game style selector arrow */
+        .selector-arrow {
+          position: absolute;
+          left: 0.8rem;
+          color: #b8a682;
+          font-size: 1.4rem;
+          animation: 
+            selector-rock 1.2s infinite ease-in-out,
+            selector-pulse 1.5s infinite;
+          text-shadow: 0 0 8px rgba(184, 166, 130, 0.8);
+          pointer-events: none;
+          z-index: 2;
+          font-family: monospace; /* Better triangle shape in monospace */
+          line-height: 1;
+          transform-origin: center;
+          font-weight: bold;
+        }
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 3px;
+          height: 100%;
+          background: #b8a682;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        
+        &:hover {
+          background: rgba(35, 45, 65, 0.5);
+          border-color: rgba(184, 166, 130, 0.3);
+          
+          .play-icon {
+            opacity: 0.8;
+          }
+        }
+        
+        &.active {
+          background: rgba(45, 55, 75, 0.7);
+          border-color: rgba(184, 166, 130, 0.5);
+          
+          &::before {
+            opacity: 1;
+          }
+          
+          .track-title, .track-artist, .track-number {
+            color: #b8a682;
+          }
+          
+          .play-icon {
+            opacity: 1;
+          }
+        }
+        
+        .track-number {
+          font-size: $track-number-size;
+          font-weight: 700;
+          color: rgba(184, 166, 130, 0.6);
+          min-width: 1.5rem;
+          text-align: center;
+        }
+        
+        .track-info {
+          flex: 1;
+          
+          .track-title {
+            font-size: $track-title-size;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s ease;
+          }
+          
+          .track-artist {
+            font-size: $track-artist-size;
+            color: rgba(184, 166, 130, 0.6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s ease;
+          }
+        }
+        
+        .play-icon {
+          font-size: $icon-size;
+          color: #b8a682;
+          opacity: 0.3;
+          transition: opacity 0.2s ease;
+        }
+      }
+    }
+  }
+  
+  /* Now playing footer */
+  .now-playing {
+    padding: 1rem;
+    background: rgba(15, 25, 42, 0.8);
+    border-top: 1px solid rgba(184, 166, 130, 0.2);
+    margin-top: auto; /* Push footer to bottom */
+    
+    .now-playing-label {
+      font-size: $small-text-size;
+      color: rgba(184, 166, 130, 0.7);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.1em;
+      
+      &::before, &::after {
+        content: '❖';
+        margin: 0 0.5rem;
+        font-size: 0.6rem;
+        vertical-align: middle;
+      }
+    }
+    
+    .current-track {
+      font-size: $track-title-size;
+      color: #b8a682;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  
+  /* Music player container */
+  .music-player-container {
+    padding: 0 1rem 1rem;
+  }
+  
+  /* Background decorative elements */
+  .magical-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    background-image: radial-gradient(circle at 85% 15%, rgba(184, 166, 130, 0.1) 1px, transparent 1px),
+                      radial-gradient(circle at 15% 85%, rgba(184, 166, 130, 0.1) 1px, transparent 1px),
+                      radial-gradient(circle at 50% 50%, rgba(184, 166, 130, 0.05) 1px, transparent 2px);
+    background-size: 40px 40px, 40px 40px, 60px 60px;
+    animation: floatParticle 20s infinite linear;
+  }
+  
+  .circuit-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+    background-image: 
+      linear-gradient(90deg, transparent 98%, rgba(184, 166, 130, 0.1) 98%, rgba(184, 166, 130, 0.1) 99%, transparent 99%),
+      linear-gradient(180deg, transparent 98%, rgba(184, 166, 130, 0.1) 98%, rgba(184, 166, 130, 0.1) 99%, transparent 99%);
+    background-size: 50px 50px;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+  }
+  
+  .magical-runes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -3;
+    opacity: 0.2;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(184, 166, 130, 0.2) 3px, transparent 4px),
+      radial-gradient(circle at 90% 90%, rgba(184, 166, 130, 0.2) 3px, transparent 4px),
+      radial-gradient(circle at 90% 10%, rgba(184, 166, 130, 0.2) 3px, transparent 4px),
+      radial-gradient(circle at 10% 90%, rgba(184, 166, 130, 0.2) 3px, transparent 4px);
+    background-size: 150px 150px;
+  }
+  
+  .glow-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -4;
+    background: 
+      radial-gradient(circle at center, rgba(184, 166, 130, 0.03) 0%, transparent 70%),
+      radial-gradient(circle at 80% 20%, rgba(184, 166, 130, 0.05) 0%, transparent 60%);
+    opacity: 0.8;
+    mix-blend-mode: screen;
+  }
 }
 
 .menu-frame {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 1rem;
+  padding: 1.2rem;
   position: relative;
   z-index: 2;
 }
 
-.magical-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(78, 175, 255, 0.1) 1px, transparent 1px),
-    radial-gradient(circle at 50% 70%, rgba(157, 214, 255, 0.1) 1px, transparent 1px),
-    radial-gradient(circle at 80% 40%, rgba(195, 230, 255, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
-  z-index: 1;
-}
-
-.glow-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 30% 20%, rgba(78, 175, 255, 0.2), transparent 30%),
-    radial-gradient(circle at 70% 80%, rgba(137, 207, 240, 0.2), transparent 30%);
-  pointer-events: none;
-  z-index: 1;
-  animation: glow 4s infinite ease-in-out;
-}
-
-.menu-header {
-  margin-bottom: 0.8rem;
-  position: relative;
-  
-  .title {
-    font-family: 'Cinzel', serif;
-    font-size: 1.6rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 0;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(78, 175, 255, 0.7);
-    letter-spacing: 0.08em;
-  }
-}
-
-.crystal-line {
-  height: 2px;
-  width: 100%;
-  margin: 0.5rem 0;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(78, 175, 255, 0.3),
-    rgba(157, 214, 255, 0.7),
-    rgba(78, 175, 255, 0.3),
-    transparent);
-  position: relative;
-  
-  &:before {
-    content: '';
-    position: absolute;
-    width: 30%;
-    height: 100%;
-    left: 35%;
-    background: rgba(255, 255, 255, 0.8);
-    filter: blur(2px);
-  }
-  
-  &.small {
-    width: 50%;
-    margin: 0.3rem auto;
-  }
-}
-
-.tracklist-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 0.35rem;
-  margin-bottom: 0.8rem;
+/* Update this to remove the purple debug background */
+.tracklist-grid:not(.futuristic-menu .tracklist-grid) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
   flex: 1;
-  max-height: calc(100% - 8rem); /* Ensure it doesn't overflow */
-  overflow: hidden;
+  max-height: calc(100% - 13rem);
+  overflow-y: auto;
+  padding-right: 10px;
+  position: relative;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(184, 166, 130, 0.05);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(184, 166, 130, 0.2);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(184, 166, 130, 0.3);
+  }
 }
 
 .track-item {
   display: flex;
   align-items: center;
-  padding: 0.28rem 0.4rem;
-  border: 1px solid rgba(78, 175, 255, 0.2);
-  background: rgba(51, 63, 96, 0.4);
-  border-radius: 3px;
+  padding: 0.8rem;
+  border: 1px solid rgba(184, 166, 130, 0.1);
+  background: rgba(30, 40, 65, 0.6);
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 2.5rem;
+  
+  /* Add tech-like accent to each item */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: rgba(184, 166, 130, 0.2);
+    transition: all 0.3s ease;
+  }
   
   &:hover {
-    background: rgba(61, 73, 116, 0.6);
-    border-color: rgba(78, 175, 255, 0.5);
+    background: rgba(40, 50, 80, 0.7);
+    border-color: rgba(184, 166, 130, 0.3);
     transform: translateY(-2px);
+    
+    .track-arrow {
+      opacity: 0.8;
+      animation: arrow-pulse 1s infinite;
+    }
+    
+    /* Accent gets brighter on hover */
+    &::before {
+      background: rgba(184, 166, 130, 0.4);
+    }
   }
   
   &.active {
-    background: rgba(78, 112, 155, 0.5);
-    border-color: rgba(120, 185, 255, 0.7);
+    background: rgba(50, 60, 95, 0.7);
+    border-color: rgba(184, 166, 130, 0.5);
     animation: pulse 2s infinite;
     
+    .track-arrow {
+      opacity: 1;
+      color: #b8a682;
+    }
+    
     .track-number {
-      color: #9ed6ff;
+      color: #b8a682;
     }
     
     .track-title {
       color: #fff;
       font-weight: 600;
-      text-shadow: 0 0 5px rgba(120, 185, 255, 0.7);
+      text-shadow: 0 0 5px rgba(184, 166, 130, 0.5);
+    }
+    
+    /* Accent is fully visible when active */
+    &::before {
+      background: rgba(184, 166, 130, 0.6);
     }
   }
 }
 
+.track-arrow {
+  flex: 0 0 24px;
+  font-size: $icon-size;
+  opacity: 0.4;
+  color: rgba(184, 166, 130, 0.7);
+  margin-right: 8px;
+  transition: all 0.3s ease;
+}
+
 .track-number {
-  flex: 0 0 1.3rem;
-  color: rgba(157, 214, 255, 0.7);
-  font-size: 0.75rem;
+  flex: 0 0 2.5rem;
+  color: rgba(184, 166, 130, 0.7);
+  font-size: $track-number-size;
   font-weight: 600;
   text-align: center;
   font-family: 'Cinzel', serif;
@@ -177,58 +543,149 @@
 .track-content {
   flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 .track-title {
-  font-size: 0.75rem;
+  font-size: $track-title-size;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
 }
 
 .track-artist {
-  font-size: 0.65rem;
+  font-size: $track-artist-size;
   font-weight: 300;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: rgba(157, 214, 255, 0.7);
+  color: rgba(184, 166, 130, 0.6);
+  line-height: 1.2;
 }
 
 .menu-footer {
   margin-top: auto;
-  padding-top: 0.5rem;
+  padding-top: 0.8rem;
+  position: relative;
   
-  .now-playing {
+  /* Add tech-like decorative element to the footer */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15%;
+    width: 70%;
+    height: 1px;
+    background: rgba(184, 166, 130, 0.2);
+  }
+  
+  .music-section {
     text-align: center;
     
-    h3 {
-      font-size: 0.8rem;
-      margin: 0.2rem 0;
+    .section-heading {
+      font-size: $subtitle-size;
+      margin: 0.3rem 0;
       font-weight: 600;
-      color: rgba(157, 214, 255, 0.9);
+      color: rgba(184, 166, 130, 0.8);
       letter-spacing: 0.05em;
       font-family: 'Cinzel', serif;
-    }
-    
-    .active-track {
-      background: rgba(51, 73, 116, 0.5);
-      border: 1px solid rgba(78, 175, 255, 0.4);
-      border-radius: 3px;
-      padding: 0.4rem;
-      margin-top: 0.3rem;
+      position: relative;
+      display: inline-block;
       
-      .track-title {
-        font-size: 0.85rem;
-        margin-bottom: 0.2rem;
-        text-shadow: 0 0 5px rgba(120, 185, 255, 0.5);
+      /* Decorative brackets around "NOW PLAYING" */
+      &::before, &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 15px;
+        height: 15px;
+        border: 1px solid rgba(184, 166, 130, 0.4);
+        transform: translateY(-50%);
       }
       
-      .track-artist {
-        font-size: 0.75rem;
+      &::before {
+        left: -25px;
+        border-right: none;
+        border-bottom: none;
+      }
+      
+      &::after {
+        right: -25px;
+        border-left: none;
+        border-top: none;
+      }
+    }
+  }
+
+  .music-player-wrapper {
+    margin-top: 0.8rem;
+    background: rgba(30, 40, 65, 0.3);
+    border: 1px solid rgba(184, 166, 130, 0.2);
+    border-radius: 8px;
+    position: relative;
+    padding: 0.2rem;
+    
+    /* Add futuristic decorative elements */
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      background: rgba(184, 166, 130, 0.2);
+      height: 1px;
+    }
+    
+    &::before {
+      top: -3px;
+      left: 30%;
+      width: 40%;
+    }
+    
+    &::after {
+      bottom: -3px;
+      left: 30%;
+      width: 40%;
+    }
+    
+    /* Corner decorations for music player */
+    .corner {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgba(184, 166, 130, 0.3);
+      
+      &.top-left {
+        top: -1px;
+        left: -1px;
+        border-bottom: none;
+        border-right: none;
+        border-top-left-radius: 4px;
+      }
+      
+      &.top-right {
+        top: -1px;
+        right: -1px;
+        border-bottom: none;
+        border-left: none;
+        border-top-right-radius: 4px;
+      }
+      
+      &.bottom-left {
+        bottom: -1px;
+        left: -1px;
+        border-top: none;
+        border-right: none;
+        border-bottom-left-radius: 4px;
+      }
+      
+      &.bottom-right {
+        bottom: -1px;
+        right: -1px;
+        border-top: none;
+        border-left: none;
+        border-bottom-right-radius: 4px;
       }
     }
   }

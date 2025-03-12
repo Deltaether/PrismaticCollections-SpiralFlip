@@ -50,7 +50,7 @@ export class ViewHelperService {
 
   /**
    * Sets up the right-side menu for track selection and information display
-   * Creates a 3D-positioned Angular component that integrates with the scene
+   * Creates a DOM-positioned Angular component that overlays the scene
    * Handles interaction between the 3D world and the 2D UI elements
    * 【✓】
    */
@@ -64,29 +64,19 @@ export class ViewHelperService {
     // Get the config values for the rightSideMenuPlane
     const planeConfig = config.sceneSettings.videoPlane;
 
-    // Create the menu component as a CSS3D object
-    const css3DMenu = this.menuIntegrationService.createMenuObject(
+    // Create the menu component as a DOM overlay
+    const menuContainer = this.menuIntegrationService.createMenuObject(
       scene,
       planeConfig,
       cdCases,
       handleTrackSelection
     );
     
-    // The CSS3D menu will not be visible until a case is expanded
+    // The menu will not be visible until a case is expanded
+    // But it will be interactable from the start
+    this.menuIntegrationService.setMenuVisibility(false);
     
-    // Ensure the original video is still loaded for background effects
-    // but not visible on the rightSideMenuPlane
-    if (rightSideMenuPlane) {
-      // Make the rightSideMenuPlane transparent but keep its geometry
-      const material = rightSideMenuPlane.material as THREE.MeshBasicMaterial;
-      if (material) {
-        material.opacity = 0;
-        material.transparent = true;
-        material.needsUpdate = true;
-      }
-    }
-    
-    return css3DMenu;
+    return menuContainer;
   }
 
   /**
@@ -154,13 +144,15 @@ export class ViewHelperService {
   }
 
   /**
-   * Creates a silhouette effect wrapper for the active CD case
-   * Adds a pulsating outline to highlight the currently selected case
-   * Takes tutorial completion into account for visual feedback
+   * Creates a silhouette effect that highlights the currently active CD case
+   * Handles the visual feedback for case selection and ensures menu visibility
    * 【✓】
    */
   createSilhouetteWrapper(cdCase: CDCase, tutorialCompleted: boolean[]): void {
     this.silhouetteService.createActiveCaseSilhouette(cdCase, tutorialCompleted);
+    
+    // Ensure menu is ready for interaction
+    this.menuIntegrationService.updateActiveCase(cdCase.id);
   }
 
   /**

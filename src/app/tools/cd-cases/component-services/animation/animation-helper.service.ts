@@ -102,11 +102,6 @@ export class AnimationHelperService {
       );
     }
 
-    // Update CSS3D renderer
-    if (labelRenderer) {
-      labelRenderer.render(scene, camera);
-    }
-    
     // If we have an active case, make sure the menu is visible and update its active index
     const activeIndex = cdCases.findIndex(cdCase => cdCase.isActive);
     if (activeIndex >= 0 && activeCaseExpanded) {

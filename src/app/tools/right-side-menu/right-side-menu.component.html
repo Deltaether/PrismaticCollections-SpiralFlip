@@ -1,35 +1,46 @@
 <div class="futuristic-menu">
-  <div class="menu-frame">
-    <div class="menu-header">
-      <h1 class="title">PROJECT: PHANTASIA</h1>
-      <div class="crystal-line"></div>
-    </div>
-    
-    <div class="tracklist-grid">
-      <div *ngFor="let track of tracks; let i = index" 
-          class="track-item" 
-          [class.active]="i === activeCaseIndex"
-          (click)="selectTrack(i)">
-        <div class="track-number">{{ i + 1 > 9 ? i + 1 : '0' + (i + 1) }}</div>
-        <div class="track-content">
-          <div class="track-title">{{ track.title }}</div>
-          <div class="track-artist">{{ track.artist }}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-footer">
-      <div *ngIf="activeCaseIndex >= 0" class="now-playing">
-        <div class="crystal-line small"></div>
-        <h3>NOW PLAYING</h3>
-        <div class="active-track" *ngIf="tracks[activeCaseIndex]">
-          <div class="track-title">{{ tracks[activeCaseIndex].title }}</div>
-          <div class="track-artist">{{ tracks[activeCaseIndex].artist }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+  <!-- Background decorative elements -->
   <div class="magical-particles"></div>
+  <div class="circuit-lines"></div>
+  <div class="magical-runes"></div>
   <div class="glow-effect"></div>
+
+  <header class="menu-header">
+    <h1 class="menu-title responsive-text">PHANTASIA</h1>
+    <h2 class="menu-subtitle responsive-text">SOUNDTRACK</h2>
+  </header>
+
+  <section class="tracklist-container">
+    <div class="tracklist-grid">
+      <ng-container *ngFor="let track of tracks; let i = index">
+        <div 
+          class="track-item responsive-container" 
+          [class.active]="i === activeCaseIndex"
+          (click)="onTrackSelected(i)"
+        >
+          <div class="selector-arrow" *ngIf="i === activeCaseIndex">▶</div>
+          <div class="track-number responsive-text">{{i + 1}}</div>
+          <div class="track-info">
+            <div class="track-title responsive-text">{{track.title}}</div>
+            <div class="track-artist responsive-text">{{track.artist}}</div>
+          </div>
+          <div class="play-icon">
+            <i class="fas fa-play"></i>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+
+  <footer class="now-playing">
+    <div class="now-playing-label responsive-text">NOW PLAYING</div>
+    <div *ngIf="activeCaseIndex !== null && activeCaseIndex >= 0 && activeCaseIndex < tracks.length" class="current-track responsive-text">
+      {{tracks[activeCaseIndex].title}} - {{tracks[activeCaseIndex].artist}}
+    </div>
+    <div *ngIf="activeCaseIndex === null || activeCaseIndex < 0 || activeCaseIndex >= tracks.length" class="current-track responsive-text">
+      Select a track to begin playback
+    </div>
+  </footer>
+  
+  <app-music-player class="music-player-container" *ngIf="activeCaseIndex !== null && activeCaseIndex >= 0"></app-music-player>
 </div>

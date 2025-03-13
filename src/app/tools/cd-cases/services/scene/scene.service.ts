@@ -28,8 +28,10 @@ export class SceneService {
    */
   setupScene(config: Config): THREE.Scene {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a4f);
-    scene.fog = new THREE.Fog(0x1a1a4f, 10, 50);
+    // Remove scene background to ensure full transparency
+    scene.background = null;
+    // Use a very distant fog to avoid clipping
+    scene.fog = new THREE.Fog(0x000000, 30, 100);
 
     // Add AxesHelper for orientation
     const axesHelper = new THREE.AxesHelper(5);
@@ -68,7 +70,10 @@ export class SceneService {
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: true
+      antialias: true,
+      powerPreference: 'high-performance',
+      stencil: true,
+      depth: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -77,6 +82,10 @@ export class SceneService {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = config.sceneSettings.renderer.exposure;
+    
+    // Set a fully transparent background
+    renderer.setClearColor(0x000000, 0);
+    
     return renderer;
   }
 

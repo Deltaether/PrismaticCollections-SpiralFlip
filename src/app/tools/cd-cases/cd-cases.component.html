@@ -1,12 +1,12 @@
-<div class="cd-container" role="application" aria-label="3D CD Cases Viewer">
+<div class="cd-cases-container" role="application" aria-label="3D CD Cases Viewer">
   <!-- Loading overlay -->
   <app-scene-loader [isVisible]="isLoading" aria-live="polite"></app-scene-loader>
   
-  <!-- Main canvas for THREE.js rendering -->
+  <!-- Main canvas for THREE.js rendering with overflow -->
   <canvas #canvas [style.opacity]="isLoading ? '0' : '1'" aria-hidden="true"></canvas>
   
-  <!-- Label renderer for CSS elements -->
-  <div #labelRenderer [style.opacity]="isLoading ? '0' : '1'" aria-hidden="true"></div>
+  <!-- Label renderer for CSS elements with matching overflow -->
+  <div #labelRenderer class="label-renderer" [style.opacity]="isLoading ? '0' : '1'" aria-hidden="true"></div>
   
   <!-- Case status indicators -->
   <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'" aria-live="polite">

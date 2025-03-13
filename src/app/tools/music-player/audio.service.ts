@@ -19,8 +19,20 @@ export class AudioService {
     'information': 'An × Feryquitous - Digital Entropy.mp3'
   };
 
+  // UI sound paths
+  private uiSounds: { [key: string]: string } = {
+    'menu-click': 'assets/audio/ui/menu-click.mp3',
+    'page-turn': 'assets/audio/ui/page-turn.mp3',
+    'success': 'assets/audio/ui/success.mp3',
+    'error': 'assets/audio/ui/error.mp3'
+  };
+
+  // Audio element for playing tracks
+  private audioElement: HTMLAudioElement | null = null;
+
   constructor(private http: HttpClient) {
     this.loadAudioFiles();
+    this.initAudioElement();
   }
 
   private async loadAudioFiles() {
@@ -34,6 +46,12 @@ export class AudioService {
     } catch (error) {
       console.error('Error loading audio files:', error);
     }
+  }
+
+  private initAudioElement() {
+    // Create audio element for playing music
+    this.audioElement = new Audio();
+    this.audioElement.volume = 0.7;
   }
 
   setTrackForSection(section: string) {
@@ -76,5 +94,42 @@ export class AudioService {
 
   getCurrentIndex(): number {
     return this.audioFiles.indexOf(this.currentTrackSubject.value);
+  }
+
+  // New methods to fix TypeScript errors
+
+  // 【✓】 Play UI sound effects for interactions
+  playUISound(soundName: string): void {
+    if (this.uiSounds[soundName]) {
+      const sound = new Audio(this.uiSounds[soundName]);
+      sound.volume = 0.5;
+      sound.play().catch(error => console.warn('Error playing UI sound:', error));
+    } else {
+      console.warn(`UI sound not found: ${soundName}`);
+    }
+  }
+
+  // 【✓】 Play a music track from source URL
+  playTrack(src: string): void {
+    if (!this.audioElement) return;
+    
+    // Update current track and start playing
+    this.currentTrackSubject.next(src);
+    this.audioElement.src = src;
+    this.audioElement.play().catch(error => console.warn('Error playing track:', error));
+  }
+
+  // 【✓】 Pause the currently playing track
+  pauseTrack(): void {
+    if (this.audioElement && !this.audioElement.paused) {
+      this.audioElement.pause();
+    }
+  }
+
+  // 【✓】 Resume the paused track
+  resumeTrack(): void {
+    if (this.audioElement && this.audioElement.paused) {
+      this.audioElement.play().catch(error => console.warn('Error resuming track:', error));
+    }
   }
 } 

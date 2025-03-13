@@ -533,9 +533,143 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Adjusts camera and renderer dimensions for responsive display
    * 【✓】
    */
-  @HostListener('window:resize')
+  @HostListener('window:resize', ['$event'])
   onWindowResize(): void {
-    this.viewHelperService.onWindowResize(this.renderer, this.camera, this.labelRenderer);
+    if (!this.renderer || !this.camera || !this.labelRenderer) return;
+    
+    // Get current viewport dimensions
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspectRatio = width / height;
+    
+    // Update camera aspect ratio
+    this.camera.aspect = aspectRatio;
+    
+    // Calculate scaling factor to prevent empty space at screen edges
+    // Use design resolution of 1920x1080 as base
+    const designWidth = 1920;
+    const designHeight = 1080;
+    const designAspect = designWidth / designHeight;
+    
+    // Default FOV value - most THREE.js cameras use 75 as default
+    const defaultFOV = 75;
+    
+    // Adjust camera parameters based on aspect ratio differences
+    if (aspectRatio > designAspect) {
+      // Wider screen - use a wider FOV to show more horizontal content
+      const widthRatio = aspectRatio / designAspect;
+      // Much more aggressive FOV adjustment for wider screens
+      this.camera.fov = defaultFOV * (0.7 / widthRatio);
+    } else {
+      // Taller screen - use a narrower FOV to show more vertical content
+      const heightRatio = designAspect / aspectRatio;
+      // Much more aggressive FOV adjustment for taller screens
+      this.camera.fov = defaultFOV * 0.75 * heightRatio;
+    }
+    
+    // Update the camera's projection matrix
+    this.camera.updateProjectionMatrix();
+    
+    // Update renderers with new dimensions
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+    
+    // Reposition cases if needed
+    this.adjustCasePositionsForAspectRatio();
+    
+    // Update the camera's position to ensure the scene is properly centered
+    this.centerCamera();
+  }
+
+  // Add a method to ensure the camera is properly positioned 
+  private centerCamera(): void {
+    // Get the active case position as a reference point
+    const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+    if (activeCase && this.camera) {
+      // Calculate a position that ensures the active case is centered
+      // Adjust the camera's z position to ensure the scene fills the viewport
+      const zPosition = Math.max(window.innerWidth, window.innerHeight) / 150;
+      
+      // Move the camera to look at the active case
+      this.camera.position.set(0, 0, zPosition);
+      this.camera.lookAt(0, 0, 0);
+      
+      // Update camera far clip plane to ensure we see everything
+      this.camera.far = 2000;
+      this.camera.updateProjectionMatrix();
+    }
+    
+    // Reset the container to ensure no positioning issues
+    const container = document.querySelector('.cd-cases-container') as HTMLElement;
+    if (container) {
+      container.style.display = 'flex';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      container.style.position = 'absolute';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100vw';
+      container.style.height = '100vh';
+    }
+    
+    // Reset both canvas and label renderer to 100%
+    const canvas = this.renderer?.domElement;
+    if (canvas) {
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+    }
+    
+    const labelRenderer = document.querySelector('.label-renderer') as HTMLElement;
+    if (labelRenderer) {
+      labelRenderer.style.width = '100%';
+      labelRenderer.style.height = '100%';
+      labelRenderer.style.position = 'absolute';
+      labelRenderer.style.top = '0';
+      labelRenderer.style.left = '0';
+    }
+  }
+
+  // Replace centerContainer with a call to centerCamera
+  private centerContainer(): void {
+    this.centerCamera();
+  }
+
+  // 【✓】 Helper to update case positions based on screen aspect ratio
+  private adjustCasePositionsForAspectRatio(): void {
+    // Calculate aspect-based position adjustments
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const designAspect = 16 / 9; // Base design aspect ratio
+    
+    // Apply position adjustments
+    this.cdCases.forEach(cdCase => {
+      // Get original position from the case's userData
+      const originalPosition = cdCase.model.userData['originalPosition'] || 
+        { x: cdCase.model.position.x, y: cdCase.model.position.y, z: cdCase.model.position.z };
+      
+      // Store original position if not yet saved
+      if (!cdCase.model.userData['originalPosition']) {
+        cdCase.model.userData['originalPosition'] = originalPosition;
+      }
+      
+      // More aggressive position adjustments based on aspect ratio
+      if (aspectRatio > designAspect) {
+        // Wider screen - increase X spread
+        const widthFactor = Math.min(aspectRatio / designAspect * 1.15, 1.8);
+        cdCase.model.position.x = originalPosition.x * widthFactor;
+      } else {
+        // Taller screen - increase Y spread
+        const heightFactor = Math.min(designAspect / aspectRatio * 1.15, 1.8);
+        cdCase.model.position.y = originalPosition.y * heightFactor;
+      }
+    });
+    
+    // Also update positions through the state service if needed
+    if (this.cdCases.length > 0) {
+      this.stateService.updatePositions(this.cdCases);
+    }
   }
 
   /**

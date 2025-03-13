@@ -50,8 +50,8 @@
   justify-content: center;
   pointer-events: none;
   background: radial-gradient(circle at center, 
-    rgb(142, 45, 45) 0%, 
-    rgb(85, 25, 25) 100%
+    rgb(221, 125, 55) 0%, 
+    rgb(145, 65, 25) 100%
   );
 }
 
@@ -81,7 +81,10 @@
   height: 100vh;
   overflow: hidden;
   display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 2;
+  padding: 0;
 
   app-music-player {
     position: fixed;
@@ -96,6 +99,8 @@
     width: 100%;
     height: 100%;
     z-index: 200;
+    top: 0;
+    left: 0;
   }
 }
 
@@ -196,4 +201,45 @@ section {
   position: relative;
   overflow: hidden;
   background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+  transform: scale(1.1);
+}
+
+@media (min-width: 1920px) {
+  .scene-container {
+    transform: scale(1.05);
+  }
+}
+
+@media (min-width: 2560px) {
+  .scene-container {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 1366px) {
+  .scene-container {
+    transform: scale(1.0);
+  }
+}
+
+@media (min-aspect-ratio: 21/9) {
+  .scene-container {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-aspect-ratio: 9/16) {
+  .scene-container {
+    transform: scale(1.05);
+  }
 }

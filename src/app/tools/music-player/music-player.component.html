@@ -56,7 +56,7 @@
 
       <div class="playback-controls">
         <button class="control-button previous" (click)="previousTrack()" [disabled]="isLoading">
-          <span>⏮</span>
+          <i class="control-icon">⏮</i>
         </button>
         <button 
           class="control-button play-button" 
@@ -64,11 +64,11 @@
           [class.playing]="isPlaying"
           [disabled]="isLoading"
         >
-          <span class="play-icon" *ngIf="!isPlaying">▶</span>
-          <span class="pause-icon" *ngIf="isPlaying">⏸</span>
+          <i class="control-icon play-icon" *ngIf="!isPlaying">▶</i>
+          <i class="control-icon pause-icon" *ngIf="isPlaying">⏸</i>
         </button>
         <button class="control-button next" (click)="nextTrack()" [disabled]="isLoading">
-          <span>⏭</span>
+          <i class="control-icon">⏭</i>
         </button>
       </div>
     </div>

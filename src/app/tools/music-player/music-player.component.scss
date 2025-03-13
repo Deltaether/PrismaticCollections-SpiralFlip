@@ -259,23 +259,21 @@ $tiny-text: 0.7rem;
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
         padding: 0;
-        line-height: 1;
         position: relative;
         transform-origin: center center;
         box-shadow: 0 0 8px rgba(184, 166, 130, 0.2);
 
-        span {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 1em;
-          height: 1em;
+        /* Universal styling for control icons */
+        .control-icon {
+          font-style: normal; /* Remove italic styling from <i> element */
+          font-size: 14px;
+          line-height: 1;
           display: flex;
           align-items: center;
           justify-content: center;
+          height: 100%;
+          width: 100%;
         }
 
         &:hover {
@@ -294,9 +292,16 @@ $tiny-text: 0.7rem;
         &.play-button {
           width: 38px;
           height: 38px;
-          font-size: 1.1rem;
           background: rgba(30, 40, 70, 0.9);
           border-color: rgba(184, 166, 130, 0.4);
+          
+          .control-icon {
+            font-size: 16px;
+          }
+          
+          .play-icon {
+            padding-left: 2px; /* Optically center the play triangle */
+          }
           
           &.playing {
             background: rgba(40, 50, 80, 0.9);

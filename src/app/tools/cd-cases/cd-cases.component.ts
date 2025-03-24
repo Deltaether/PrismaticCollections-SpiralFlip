@@ -174,22 +174,8 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * 【✓】
    */
   ngOnInit(): void {
-    // Load cases data
-    this.config.cdCases = updateCasePositions(allCases);
-    
-    // Load video paths from config
-    this.videoPaths = this.config.videoPaths || [];
-    
-    // Initialize services with config
-    this.videoService.setConfig(this.config);
-    this.silhouetteService.setConfig(this.config);
-    this.rendererService.setConfig(this.config);
-    this.caseAnimationService.setConfig(this.config);
-
-    // Initialize arrays based on the number of cases
-    const caseCount = this.config.cdCases.length;
-    this.playingMusic = new Array(caseCount).fill(false);
-    this.tutorialCompleted = new Array(caseCount).fill(false);
+    // Load CD cases data and initialize services
+    this.loadCDCases();
   }
 
   /**
@@ -755,6 +741,11 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * 【✓】
    */
   private expandActiveCase(clickedCase: CDCase): void {
+    console.log(`Expanding case ${clickedCase.id}`);
+    
+    // Reload menu config to ensure positioning is updated
+    this.menuIntegrationService.reloadMenuConfig();
+    
     // Delegate to the CaseAnimationService
     this.caseAnimationService.expandActiveCase(
       clickedCase,
@@ -866,5 +857,29 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }, 300);
     }
+  }
+
+  // Add the loadCDCases method to load CD cases data and initialize services
+  /**
+   * 【✓】 Loads CD cases data and initializes services with configuration
+   * Sets up tracking arrays for playback and tutorial state
+   */
+  private loadCDCases(): void {
+    // Load cases data
+    this.config.cdCases = updateCasePositions(allCases);
+    
+    // Load video paths from config
+    this.videoPaths = this.config.videoPaths || [];
+    
+    // Initialize services with config
+    this.videoService.setConfig(this.config);
+    this.silhouetteService.setConfig(this.config);
+    this.rendererService.setConfig(this.config);
+    this.caseAnimationService.setConfig(this.config);
+
+    // Initialize arrays based on the number of cases
+    const caseCount = this.config.cdCases.length;
+    this.playingMusic = new Array(caseCount).fill(false);
+    this.tutorialCompleted = new Array(caseCount).fill(false);
   }
 } 

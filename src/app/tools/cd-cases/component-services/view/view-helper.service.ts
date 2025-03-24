@@ -93,7 +93,12 @@ export class ViewHelperService {
     // Show the right-side menu
     const activeIndex = cdCases.findIndex(cdCase => cdCase.isActive);
     if (activeIndex >= 0) {
-      // Show the menu
+      console.log(`revealVideoAndBackground: Showing menu for active case index ${activeIndex}`);
+      
+      // First ensure the menu container is initialized
+      this.menuIntegrationService.createMenu();
+      
+      // Show the menu and update active case
       this.menuIntegrationService.setMenuVisibility(true);
       this.menuIntegrationService.updateActiveCase(activeIndex);
       
@@ -116,6 +121,8 @@ export class ViewHelperService {
           playVideo();
         }
       }
+    } else {
+      console.log('revealVideoAndBackground: No active case found, menu will not be shown');
     }
     
     // Make the background visible

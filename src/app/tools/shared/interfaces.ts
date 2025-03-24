@@ -149,6 +149,22 @@ export interface SceneConfig {
   backgroundPlane: BackgroundPlaneConfig;
 }
 
+export interface MenuConfig {
+  position: {
+    rightPercentage: number;
+    topPercentage: number;
+    minRightPercentage: number;
+    maxRightPercentage: number;
+  };
+  size: {
+    maxWidth: number;
+    widthPercentage: number;
+    heightPercentage: number;
+  };
+  transformOrigin: string;
+  zIndex: number;
+}
+
 export interface Config {
   sceneSettings: {
     camera: {
@@ -344,6 +360,7 @@ export interface Config {
     offsetZ: number;
   };
   videoPaths?: string[];
+  rightSideMenu?: MenuConfig;
 }
 
 // Legacy interfaces kept for compatibility with debug menu

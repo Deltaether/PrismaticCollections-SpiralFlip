@@ -1,0 +1,228 @@
+{
+  "sceneSettings": {
+    "camera": {
+      "position": {
+        "x": -1.2,
+        "y": -7.7,
+        "z": 0
+      },
+      "lookAt": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "lockControls": true
+    },
+    "lighting": {
+      "ambient": {
+        "intensity": 0.7
+      },
+      "main": {
+        "intensity": 1.2,
+        "position": {
+          "x": 8,
+          "y": -10,
+          "z": -7
+        }
+      },
+      "fill": {
+        "intensity": 0.6,
+        "position": {
+          "x": 7,
+          "y": -13,
+          "z": -3
+        }
+      },
+      "back": {
+        "intensity": 0.5,
+        "position": {
+          "x": -3,
+          "y": 4,
+          "z": 2.5
+        }
+      }
+    },
+    "renderer": {
+      "exposure": 1.2
+    },
+    "orbitControls": {
+      "minPolarAngle": 0,
+      "maxPolarAngle": 3.14159,
+      "minDistance": 5,
+      "maxDistance": 20,
+      "dampingFactor": 0.05,
+      "enableDamping": true,
+      "enableZoom": true,
+      "enablePan": true
+    },
+    "ground": {
+      "y": 0,
+      "opacity": 0.3,
+      "size": 20
+    },
+    "videoPlane": {
+      "position": {
+        "x": -0.75,
+        "y": -6.5,
+        "z": 0.8
+      },
+      "rotation": {
+        "x": 1.5708,
+        "y": -0.27,
+        "z": 1.57
+      },
+      "size": {
+        "width": 0.9,
+        "height": 1.05
+      },
+      "color": "#e9dcd2",
+      "opacity": 1,
+      "rightCrop": 0
+    },
+    "backgroundPlane": {
+      "position": {
+        "x": 0.7,
+        "y": -1.4,
+        "z": 0
+      },
+      "rotation": {
+        "x": -1.5708,
+        "y": 0.23,
+        "z": 1.57
+      },
+      "size": {
+        "width": 15.25,
+        "height": 7.7
+      },
+      "colors": {
+        "gold": "#ffd700",
+        "darkGold": "#d49b00",
+        "orange": "#ff8000",
+        "brown": "#996633"
+      }
+    }
+  },
+  "videoPaths": [
+    "assets/3d/CD_Case/twitter_crossfade.mp4",
+    "assets/3d/CD_Case/twitter_crossfade2.mp4",
+    "assets/3d/CD_Case/twitter_crossfade3.mp4",
+    "assets/3d/CD_Case/twitter_crossfade4.mp4",
+    "assets/3d/CD_Case/twitter_crossfade5.mp4"
+  ],
+  "caseSettings": {
+    "basePosition": {
+      "x": 2,
+      "y": -5.2,
+      "z": -3.5
+    },
+    "baseRotation": {
+      "x": 3.14,
+      "y": 0,
+      "z": 1.57
+    },
+    "stackOffset": 0.3,
+    "materials": {
+      "cd": [
+        {
+          "name": "Material.001",
+          "metalness": 0.9,
+          "roughness": 0.1,
+          "envMapIntensity": 2.0,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.1
+        },
+        {
+          "name": "Material.002",
+          "metalness": 0.8,
+          "roughness": 0.2,
+          "envMapIntensity": 2.0,
+          "clearcoat": 0.5,
+          "clearcoatRoughness": 0.2
+        }
+      ]
+    }
+  },
+  "silhouette": {
+    "size": {
+      "scale": 1,
+      "widthScale": 0.98,
+      "heightScale": 0.8,
+      "depthScale": 0.98
+    },
+    "appearance": {
+      "color": "#FFD700",
+      "intensity": 1.0,
+      "opacity": 0.9
+    },
+    "position": {
+      "offsetX": -0.77,
+      "offsetY": 0.0,
+      "offsetZ": 1.25
+    },
+    "rotation": {
+      "offsetX": 0.0,
+      "offsetY": 0,
+      "offsetZ": -1.59
+    },
+    "animation": {
+      "fastPulseSpeed": 5.0,
+      "slowPulseSpeed": 2.0,
+      "fastPulseAmount": 0.3,
+      "slowPulseAmount": 0.4
+    }
+  },
+  "videoPlane2Position": {
+    "offsetX": -0.04,
+    "offsetY": 0.75,
+    "offsetZ": -0.37
+  },
+  "videoPlane2Rotation": {
+    "offsetX": -0.01,
+    "offsetY": -1.57,
+    "offsetZ": -0.012
+  },
+  "videoPlane2Size": {
+    "width": 4.5,
+    "height": 2.5,
+    "cornerRadius": 0.05,
+    "rightCrop": 0,
+    "visible": false
+  },
+  "menuAnimation": {
+    "duration": 0.5,
+    "bezierCurve": {
+      "p1": 0.25,
+      "p2": 0.1,
+      "p3": 0.25,
+      "p4": 1.0
+    }
+  },
+  "menuSettings": {
+    "position": {
+      "right": 5,
+      "top": 10
+    },
+    "size": {
+      "maxWidth": 650,
+      "widthPercentage": 35,
+      "heightPercentage": 80
+    },
+    "transformOrigin": "top right",
+    "zIndex": 1000
+  },
+  "finalCasePosition": {
+    "offsetX": -1.08, 
+    "offsetY": 0.0,
+    "offsetZ": 2.5,
+    "rotationX": 0.0,
+    "rotationY": -0.02,
+    "rotationZ": 0.0
+  },
+  "consecutiveCaseExtraY": -0.3,
+  "finalCaseRotation": {
+    "offsetX": 3.14,
+    "offsetY": 0.0,
+    "offsetZ": 0.0
+  },
+  "cdCases": []
+} 

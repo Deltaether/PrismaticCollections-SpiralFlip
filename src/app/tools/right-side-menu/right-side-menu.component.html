@@ -5,6 +5,16 @@
   <div class="magical-runes"></div>
   <div class="glow-effect"></div>
 
+  <!-- Debug panel only visible in dev mode -->
+  <div class="debug-panel" *ngIf="isDevelopment">
+    <div class="debug-title">Menu Position (Dev Mode)</div>
+    <div class="debug-coordinates">
+      Right: {{menuPosition.right.toFixed(2)}}%<br>
+      Top: {{menuPosition.top.toFixed(2)}}%
+    </div>
+  </div>
+
+  <!-- Original menu content -->
   <header class="menu-header">
     <h1 class="menu-title responsive-text">PHANTASIA</h1>
     <h2 class="menu-subtitle responsive-text">SOUNDTRACK</h2>

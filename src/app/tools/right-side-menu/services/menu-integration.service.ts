@@ -2,6 +2,7 @@ import { Injectable, ElementRef, Renderer2, ApplicationRef, ComponentFactoryReso
 import * as THREE from 'three';
 import { RightSideMenuComponent } from '../right-side-menu.component';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,23 @@ export class MenuIntegrationService {
   // 【✓】 Store viewport dimensions
   private viewportWidth = window.innerWidth;
   private viewportHeight = window.innerHeight;
+
+  // 【✓】 Menu configuration from JSON
+  private menuConfig: any = {
+    position: {
+      rightPercentage: 5,
+      topPercentage: 10,
+      minRightPercentage: 5,
+      maxRightPercentage: 15
+    },
+    size: {
+      maxWidth: 650,
+      widthPercentage: 35,
+      heightPercentage: 80
+    },
+    transformOrigin: "top right",
+    zIndex: 1000
+  };
 
   // Original variables
   private menuElement: HTMLElement | null = null;
@@ -36,12 +54,67 @@ export class MenuIntegrationService {
     private appRef: ApplicationRef,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private http: HttpClient
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
     
     // 【✓】 Add window resize listener
     window.addEventListener('resize', this.handleResize.bind(this));
+    
+    // 【✓】 Load configuration from JSON
+    this.loadMenuConfiguration();
+  }
+  
+  // 【✓】 Load menu configuration from JSON file
+  private loadMenuConfiguration(): void {
+    console.log('Attempting to load menu configuration from primary path...');
+    
+    // Use a timestamp query parameter to prevent caching
+    const timestamp = new Date().getTime();
+    
+    this.http.get(`src/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`).subscribe(
+      (config: any) => {
+        if (config && config.rightSideMenu) {
+          this.menuConfig = config.rightSideMenu;
+          console.log('Menu configuration loaded successfully:', this.menuConfig);
+          
+          // Update menu dimensions immediately
+          if (this.menuContainer) {
+            this.updateMenuDimensions();
+            console.log('Menu dimensions updated with new config');
+          }
+        } else {
+          console.error('Config loaded but rightSideMenu property not found:', config);
+        }
+      },
+      error => {
+        console.error('Error loading menu configuration from primary path:', error);
+        
+        // Try alternate path with cache-busting
+        console.log('Attempting to load from alternate path...');
+        this.http.get(`assets/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`).subscribe(
+          (config: any) => {
+            if (config && config.rightSideMenu) {
+              this.menuConfig = config.rightSideMenu;
+              console.log('Menu configuration loaded from alternate path:', this.menuConfig);
+              
+              // Update menu dimensions immediately
+              if (this.menuContainer) {
+                this.updateMenuDimensions();
+                console.log('Menu dimensions updated with alternate config');
+              }
+            } else {
+              console.error('Alternate config loaded but rightSideMenu property not found:', config);
+            }
+          },
+          secondError => {
+            console.error('Error loading menu configuration from alternate path:', secondError);
+            console.log('Using default menu configuration, unable to load from any source');
+          }
+        );
+      }
+    );
   }
   
   // 【✓】 Handle window resize events
@@ -55,18 +128,70 @@ export class MenuIntegrationService {
     }
   }
   
-  // 【✓】 Update menu position and dimensions based on viewport
+  // 【✓】 Update menu position and dimensions based on viewport and config
   private updateMenuDimensions(): void {
-    // Calculate responsive dimensions
-    const menuWidth = Math.min(650, this.viewportWidth * 0.35);
-    const menuHeight = this.viewportHeight * 0.8;
-    const leftPosition = `${Math.min(85, Math.max(65, this.viewportWidth * 0.01 + 80))}%`;
+    // Use configuration values for calculations
+    const maxWidth = this.menuConfig.size.maxWidth;
+    const widthPercentage = this.menuConfig.size.widthPercentage;
+    const heightPercentage = this.menuConfig.size.heightPercentage;
+    const rightPercentage = this.menuConfig.position.rightPercentage;
+    const topPercentage = this.menuConfig.position.topPercentage;
     
-    // Apply responsive dimensions
+    // Calculate responsive dimensions
+    const menuWidth = Math.min(maxWidth, this.viewportWidth * (widthPercentage / 100));
+    const menuHeight = this.viewportHeight * (heightPercentage / 100);
+    
+    console.log(`Applying menu position: right=${rightPercentage}%, top=${topPercentage}%`);
+    
+    // Apply responsive dimensions to main container
     this.renderer.setStyle(this.menuContainer, 'width', `${menuWidth}px`);
     this.renderer.setStyle(this.menuContainer, 'height', `${menuHeight}px`);
-    this.renderer.setStyle(this.menuContainer, 'left', leftPosition);
-    this.renderer.setStyle(this.menuContainer, 'top', '10%');
+    this.renderer.setStyle(this.menuContainer, 'right', `${rightPercentage}%`);
+    this.renderer.setStyle(this.menuContainer, 'left', 'auto'); // Clear left position
+    this.renderer.setStyle(this.menuContainer, 'top', `${topPercentage}%`);
+    this.renderer.setStyle(this.menuContainer, 'z-index', this.menuConfig.zIndex.toString());
+    
+    // Also update the originalMenuContainer if it exists
+    if (this.originalMenuContainer) {
+      this.renderer.setStyle(this.originalMenuContainer, 'width', `${menuWidth}px`);
+      this.renderer.setStyle(this.originalMenuContainer, 'height', `${menuHeight}px`);
+      this.renderer.setStyle(this.originalMenuContainer, 'right', '0');
+      this.renderer.setStyle(this.originalMenuContainer, 'top', '0');
+    }
+    
+    // Update the CSS rules as well by removing old style and adding new
+    const oldStyle = document.querySelector('style.menu-container-style');
+    if (oldStyle) {
+      oldStyle.parentNode?.removeChild(oldStyle);
+    }
+    
+    // Add updated styles
+    const style = this.renderer.createElement('style');
+    this.renderer.addClass(style, 'menu-container-style');
+    style.textContent = `
+      .menu-container {
+        position: fixed;
+        width: ${maxWidth}px;
+        height: ${heightPercentage}%;
+        right: ${rightPercentage}%;
+        top: ${topPercentage}%;
+        z-index: ${this.menuConfig.zIndex};
+        overflow: hidden;
+        transition: opacity 0.5s ease, pointer-events 0s;
+      }
+      .menu-container.hidden {
+        opacity: 0;
+        pointer-events: none !important;
+        visibility: hidden;
+      }
+      .menu-container.visible {
+        opacity: 1;
+        pointer-events: auto !important;
+        visibility: visible;
+      }
+    `;
+    
+    this.renderer.appendChild(document.head, style);
   }
 
   // 【✓】 Initialize the menu container in the DOM
@@ -83,33 +208,7 @@ export class MenuIntegrationService {
       // Set initial state (hidden)
       this.setMenuVisibility(false);
       
-      // Add styles
-      const style = this.renderer.createElement('style');
-      style.textContent = `
-        .menu-container {
-          position: fixed;
-          width: 650px;
-          height: 80%;
-          left: 80%;
-          top: 10%;
-          transform: translateX(-100%);
-          z-index: 1000;
-          overflow: hidden;
-          transition: opacity 0.5s ease;
-        }
-        .menu-container.hidden {
-          opacity: 0;
-          pointer-events: none;
-        }
-        .menu-container.visible {
-          opacity: 1;
-          pointer-events: auto;
-        }
-      `;
-      
-      this.renderer.appendChild(document.head, style);
-      
-      // Set initial dimensions based on viewport
+      // Set initial dimensions based on viewport and config
       this.updateMenuDimensions();
     }
   }
@@ -134,8 +233,12 @@ export class MenuIntegrationService {
       // Add appropriate class
       if (visible) {
         this.renderer.addClass(this.menuContainer, 'visible');
+        // Explicitly enable pointer events when visible
+        this.renderer.setStyle(this.menuContainer, 'pointer-events', 'auto');
       } else {
         this.renderer.addClass(this.menuContainer, 'hidden');
+        // Explicitly disable pointer events when hidden
+        this.renderer.setStyle(this.menuContainer, 'pointer-events', 'none');
       }
     }
     
@@ -145,7 +248,7 @@ export class MenuIntegrationService {
       this.renderer.setStyle(this.originalMenuContainer, 'opacity', visible ? '1' : '0');
       
       // Toggle pointer events to enable/disable interaction
-      this.renderer.setStyle(this.originalMenuContainer, 'pointerEvents', visible ? 'auto' : 'none');
+      this.renderer.setStyle(this.originalMenuContainer, 'pointer-events', visible ? 'auto' : 'none');
       
       this.isMenuVisible = visible;
     }
@@ -192,6 +295,9 @@ export class MenuIntegrationService {
     cdCases: any[],
     onTrackSelected: (index: number) => void
   ): HTMLElement {
+    // First ensure our menu container is initialized in the DOM
+    this.initMenuContainer();
+    
     // Create the menu component
     const factory = this.componentFactoryResolver.resolveComponentFactory(RightSideMenuComponent);
     this.componentRef = factory.create(this.injector);
@@ -226,15 +332,18 @@ export class MenuIntegrationService {
       height: videoPlaneConfig.size.height
     };
     
-    // Create a container for the menu using our new responsive approach
+    // Create a container for the menu using configuration values
     this.originalMenuContainer = document.createElement('div');
     this.renderer.addClass(this.originalMenuContainer, 'menu-overlay-container');
     
-    // Calculate responsive dimensions
+    // Calculate responsive dimensions using configuration
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const width = Math.min(650, viewportWidth * 0.35); // Responsive width with max of 650px
-    const height = Math.round(viewportHeight * 0.8); // 80% of viewport height
+    const width = Math.min(
+      this.menuConfig.size.maxWidth, 
+      viewportWidth * (this.menuConfig.size.widthPercentage / 100)
+    );
+    const height = Math.round(viewportHeight * (this.menuConfig.size.heightPercentage / 100));
     
     this.menuSize = { width, height };
     this.renderer.setStyle(this.originalMenuContainer, 'width', `${width}px`);
@@ -242,35 +351,50 @@ export class MenuIntegrationService {
     
     // Add a scaling factor based on viewport size for internal elements
     const scaleFactor = Math.min(viewportWidth / 1920, viewportHeight / 1080);
-    this.renderer.setStyle(this.originalMenuContainer, 'transform', `translate(-50%, -50%) scale(${scaleFactor})`);
-    this.renderer.setStyle(this.originalMenuContainer, 'transform-origin', 'center center');
+    this.renderer.setStyle(this.originalMenuContainer, 'transform', `scale(${scaleFactor})`);
+    this.renderer.setStyle(this.originalMenuContainer, 'transform-origin', this.menuConfig.transformOrigin);
     
-    // Set position using viewport percentages
+    // Set position - the original container is positioned relative to the main menu container
     this.renderer.setStyle(this.originalMenuContainer, 'position', 'absolute');
-    this.renderer.setStyle(this.originalMenuContainer, 'pointerEvents', 'auto');
-    this.renderer.setStyle(this.originalMenuContainer, 'top', '60%');
-    this.renderer.setStyle(this.originalMenuContainer, 'left', '80%');
-    this.renderer.setStyle(this.originalMenuContainer, 'zIndex', '10');
-    this.renderer.setStyle(this.originalMenuContainer, 'opacity', '0');
-    this.renderer.setStyle(this.originalMenuContainer, 'transition', 'opacity 400ms ease');
+    this.renderer.setStyle(this.originalMenuContainer, 'right', '0');
+    this.renderer.setStyle(this.originalMenuContainer, 'top', '0');
     
-    // Add the menu element to the container
-    this.originalMenuContainer.appendChild(this.menuElement);
+    // Start with pointer events disabled if menu is not visible initially
+    const initialPointerEvents = this.menuVisible ? 'auto' : 'none';
+    this.renderer.setStyle(this.originalMenuContainer, 'pointer-events', initialPointerEvents);
     
-    // Add the container to the document body
-    document.body.appendChild(this.originalMenuContainer);
+    // Set initial opacity - hidden by default until explicitly shown
+    const initialOpacity = this.menuVisible ? '1' : '0';
+    this.renderer.setStyle(this.originalMenuContainer, 'opacity', initialOpacity);
     
-    // Add window resize listener to adjust menu size with viewport changes
+    // Append the menu element to the container
+    this.renderer.appendChild(this.originalMenuContainer, this.menuElement);
+    
+    // IMPORTANT: Append our originalMenuContainer to the menuContainer that's in the DOM
+    if (this.menuContainer) {
+      // Clear the menuContainer first to avoid duplicate components
+      while (this.menuContainer.firstChild) {
+        this.renderer.removeChild(this.menuContainer, this.menuContainer.firstChild);
+      }
+      
+      // Now append the originalMenuContainer to the menuContainer
+      this.renderer.appendChild(this.menuContainer, this.originalMenuContainer);
+    }
+    
+    // Set up resize handler to maintain responsive positioning
     this.setupResizeHandler();
     
-    return this.menuElement;
+    // Force initial visibility state
+    this.setMenuVisibility(this.menuVisible);
+    
+    return this.originalMenuContainer;
   }
 
   /**
-   * 【✓】 Updates the menu position when the camera or scene changes
+   * 【✓】 Updates the menu position based on camera perspective 
    * @param camera The Three.js camera
    */
-  updateMenuPosition(camera: THREE.Camera): void {
+  update3DMenuPosition(camera: THREE.Camera): void {
     // No need to update position for the overlay approach
     // The menu stays fixed on screen
   }
@@ -282,7 +406,7 @@ export class MenuIntegrationService {
     // Remove existing listener if any
     this.removeResizeHandler();
     
-    // Create new resize handler
+    // Create new resize handler using configuration values
     this.resizeListener = () => {
       this.ngZone.run(() => {
         if (this.originalMenuContainer) {
@@ -290,9 +414,12 @@ export class MenuIntegrationService {
           const viewportWidth = window.innerWidth;
           const viewportHeight = window.innerHeight;
           
-          // Update container size with responsive dimensions
-          const width = Math.min(650, viewportWidth * 0.35);
-          const height = Math.round(viewportHeight * 0.8);
+          // Update container size with responsive dimensions from config
+          const width = Math.min(
+            this.menuConfig.size.maxWidth,
+            viewportWidth * (this.menuConfig.size.widthPercentage / 100)
+          );
+          const height = Math.round(viewportHeight * (this.menuConfig.size.heightPercentage / 100));
           
           this.menuSize = { width, height };
           this.renderer.setStyle(this.originalMenuContainer, 'width', `${width}px`);
@@ -300,7 +427,19 @@ export class MenuIntegrationService {
           
           // Update scaling factor
           const scaleFactor = Math.min(viewportWidth / 1920, viewportHeight / 1080);
-          this.renderer.setStyle(this.originalMenuContainer, 'transform', `translate(-50%, -50%) scale(${scaleFactor})`);
+          this.renderer.setStyle(this.originalMenuContainer, 'transform', `scale(${scaleFactor})`);
+          
+          // Keep original container anchored to top-right of main container
+          this.renderer.setStyle(this.originalMenuContainer, 'right', '0');
+          this.renderer.setStyle(this.originalMenuContainer, 'top', '0');
+          
+          // Update main menu container position
+          const rightPercentage = this.menuConfig.position.rightPercentage;
+          const topPercentage = this.menuConfig.position.topPercentage;
+          
+          console.log(`Resize handler: Setting menu position right=${rightPercentage}%, top=${topPercentage}%`);
+          this.renderer.setStyle(this.menuContainer, 'right', `${rightPercentage}%`);
+          this.renderer.setStyle(this.menuContainer, 'top', `${topPercentage}%`);
         }
       });
     };
@@ -353,7 +492,7 @@ export class MenuIntegrationService {
   }
   
   /**
-   * 【✗】 Creates the menu with simplified DOM approach
+   * 【✓】 Creates the menu with simplified DOM approach
    * @param initialScale Initial scale of the menu
    */
   createMenu(initialScale: number = 1.0): void {
@@ -362,5 +501,116 @@ export class MenuIntegrationService {
     
     // Initialize menu container
     this.initMenuContainer();
+    
+    // If the component hasn't been created yet, create it
+    if (!this.componentRef) {
+      console.log('Creating right-side menu component');
+      
+      // Create the component
+      const factory = this.componentFactoryResolver.resolveComponentFactory(RightSideMenuComponent);
+      this.componentRef = factory.create(this.injector);
+      
+      // Attach component to the application
+      this.appRef.attachView(this.componentRef.hostView);
+      
+      // Get the DOM element
+      this.menuElement = (this.componentRef.location.nativeElement as HTMLElement);
+      
+      // Append the menu element to the container
+      if (this.menuContainer && this.menuElement) {
+        // Clear any existing children
+        while (this.menuContainer.firstChild) {
+          this.renderer.removeChild(this.menuContainer, this.menuContainer.firstChild);
+        }
+        
+        // Add the menu element
+        this.renderer.appendChild(this.menuContainer, this.menuElement);
+        
+        console.log('Right-side menu component added to DOM container');
+      } else {
+        console.error('Menu container or menu element not found');
+      }
+    }
+  }
+
+  // 【✓】 Set menu configuration directly from external source
+  public setMenuConfig(config: any): void {
+    console.log('Menu configuration being set directly:', config);
+    this.menuConfig = config;
+    
+    // Update menu dimensions immediately whenever config changes
+    if (this.menuContainer) {
+      this.updateMenuDimensions();
+      console.log('Menu dimensions updated with directly set config');
+    }
+  }
+
+  // Manual method to force update from the config file
+  public reloadMenuConfig(): void {
+    console.log('Manually reloading menu configuration...');
+    this.loadMenuConfiguration();
+  }
+
+  // 【✓】 Method to update a specific menu position property at runtime
+  public updateMenuPosition(property: string, value: any): void {
+    if (!this.menuConfig || !this.menuConfig.position) {
+      console.warn('Cannot update menu position: Config not properly initialized');
+      return;
+    }
+    
+    // Update the property in our local config
+    this.menuConfig.position[property] = value;
+    
+    // Apply the change to the DOM
+    this.updateMenuDimensions();
+    
+    // Log the change for debugging
+    console.log(`Menu position updated: ${property} = ${value}`);
+  }
+
+  // 【✓】 Method to get the current menu configuration
+  public getConfig(): any {
+    return this.menuConfig;
+  }
+
+  // 【✓】 Update menu dimensions using the current stored config
+  private updateMenuDimensionsWithCurrentConfig(): void {
+    if (!this.menuContainer || !this.menuConfig) return;
+    
+    const position = this.menuConfig.position;
+    const size = this.menuConfig.size;
+    
+    // Use the exact values from our config
+    const rightPosition = `${position.rightPercentage}%`;
+    const topPosition = `${position.topPercentage}%`;
+    
+    // Calculate width based on viewport or max-width constraint
+    const viewportWidth = window.innerWidth;
+    const calculatedWidth = Math.min(
+      (viewportWidth * size.widthPercentage) / 100,
+      size.maxWidth
+    );
+    
+    // Apply styles directly to the menu container
+    this.menuContainer.style.position = 'absolute';
+    this.menuContainer.style.right = rightPosition;
+    this.menuContainer.style.top = topPosition;
+    this.menuContainer.style.width = `${calculatedWidth}px`;
+    this.menuContainer.style.height = `${size.heightPercentage}%`;
+    this.menuContainer.style.transformOrigin = this.menuConfig.transformOrigin;
+    this.menuContainer.style.zIndex = this.menuConfig.zIndex.toString();
+    
+    // Add a data attribute for easier debugging
+    this.menuContainer.setAttribute('data-right-percent', position.rightPercentage.toString());
+    this.menuContainer.setAttribute('data-top-percent', position.topPercentage.toString());
+    
+    // Inner container should be positioned relative to the main container
+    if (this.originalMenuContainer) {
+      this.originalMenuContainer.style.position = 'absolute';
+      this.originalMenuContainer.style.top = '0';
+      this.originalMenuContainer.style.right = '0';
+      this.originalMenuContainer.style.width = '100%';
+      this.originalMenuContainer.style.height = '100%';
+    }
   }
 }

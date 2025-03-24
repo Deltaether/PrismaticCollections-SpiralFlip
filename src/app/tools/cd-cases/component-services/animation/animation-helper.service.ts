@@ -104,8 +104,10 @@ export class AnimationHelperService {
 
     // If we have an active case, make sure the menu is visible and update its active index
     const activeIndex = cdCases.findIndex(cdCase => cdCase.isActive);
+    
+    // Menu visibility logic: Show the menu if we have an active case AND it's expanded
     if (activeIndex >= 0 && activeCaseExpanded) {
-      // Only show the menu when a case is expanded
+      // Ensure menu is visible and updated with the correct index
       this.menuIntegrationService.setMenuVisibility(true);
       this.menuIntegrationService.updateActiveCase(activeIndex);
       
@@ -114,12 +116,14 @@ export class AnimationHelperService {
         rightSideMenuPlane.visible = false;
       }
     } else {
+      // Hide the menu when no case is active or expanded
       this.menuIntegrationService.setMenuVisibility(false);
       
-      // Restore the video plane visibility when the menu is hidden
-      // (if it would normally be visible)
-      if (rightSideMenuPlane && activeCaseExpanded) {
-        rightSideMenuPlane.visible = true;
+      // Restore the original video plane visibility only if needed
+      if (rightSideMenuPlane) {
+        // Only make it visible if we would expect it to be visible - 
+        // during normal (non-expanded) view it should be hidden
+        rightSideMenuPlane.visible = false;
       }
     }
   }

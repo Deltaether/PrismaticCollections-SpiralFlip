@@ -17,7 +17,17 @@ import { MobileViewComponent } from './pages/mobile-view/mobile-view.component';
     RouterModule,
     MobileViewComponent
   ],
-  templateUrl: './phantasia.component.html',
+  template: `
+    <ng-container *ngIf="!isMobileView; else mobileTemplate">
+      <div class="main-container" #mainContent>
+        <app-cd-cases *ngIf="!isMobileView"></app-cd-cases>
+        <router-outlet></router-outlet>
+      </div>
+    </ng-container>
+    <ng-template #mobileTemplate>
+      <app-mobile-view></app-mobile-view>
+    </ng-template>
+  `,
   styleUrls: ['./phantasia.component.scss']
 })
 export class PhantasiaComponent implements AfterViewInit, OnInit {
@@ -29,6 +39,8 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
   isAnimating = false;
   lastScrollTime = 0;
   scrollCooldown = 1000;
+  isMobileView = false;
+  isDebugMode = false;
   
   // Add viewport dimensions tracking for responsive scaling
   viewportWidth = window.innerWidth;
@@ -45,23 +57,54 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
     private audioService: AudioService,
     public deviceDetectionService: DeviceDetectionService,
     public router: Router
-  ) {}
+  ) {
+    // Initialize debug mode from environment or configuration
+    this.isDebugMode = false; // Set to true to enable debug logging
+  }
 
   ngAfterViewInit() {
-    this.detectCurrentSection();
-    this.updateAudioTrack(this.currentSection);
-    this.calculateScaling();
+    if (!this.isMobileView) {
+      this.detectCurrentSection();
+      this.updateAudioTrack(this.currentSection);
+      this.calculateScaling();
+    }
   }
 
   ngOnInit() {
-    // Check if we should redirect to the mobile view
-    this.deviceDetectionService.detectMobile();
-    // Initial calculation of viewport dimensions
-    this.calculateViewportDimensions();
+    // Check device and set view mode
+    this.checkDeviceAndSetView();
+    // Initial calculation of viewport dimensions if not mobile
+    if (!this.isMobileView) {
+      this.calculateViewportDimensions();
+    }
+  }
+
+  // 【✓】 Check device type and set appropriate view
+  private checkDeviceAndSetView() {
+    const shouldBeMobile = this.deviceDetectionService.shouldUseMobileView();
+    
+    // Only update if the view mode needs to change
+    if (shouldBeMobile !== this.isMobileView) {
+      this.isMobileView = shouldBeMobile;
+      
+      // Check current route to avoid unnecessary navigation
+      const currentRoute = this.router.url;
+      const isMobileRoute = currentRoute.includes('/mobile');
+      const isIntroRoute = currentRoute.includes('/introduction');
+      
+      // Only navigate if we're on the wrong route type
+      if (this.isMobileView && !isMobileRoute) {
+        this.router.navigate(['/mobile']);
+      } else if (!this.isMobileView && !isIntroRoute) {
+        this.router.navigate(['/introduction']);
+      }
+    }
   }
   
   // 【✓】 Calculate and update viewport dimensions
   private calculateViewportDimensions() {
+    if (this.isMobileView) return;
+    
     this.viewportWidth = window.innerWidth;
     this.viewportHeight = window.innerHeight;
     this.aspectRatio = this.viewportWidth / this.viewportHeight;
@@ -70,30 +113,23 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
 
   // 【✓】 Calculate the appropriate scaling factor for the scene
   private calculateScaling() {
-    // Base scaling on how the viewport differs from design resolution
-    const widthRatio = this.viewportWidth / this.designWidth;
-    const heightRatio = this.viewportHeight / this.designHeight;
+    if (this.isMobileView) return;
     
-    // Determine the appropriate scale based on screen size
-    if (this.aspectRatio > 21/9) { // Ultra-wide screen
-      this.scaleRatio = 1.1; 
-    } else if (this.viewportWidth >= 2560) { // 4K and higher
-      this.scaleRatio = 1.1;
-    } else if (this.viewportWidth >= 1920) { // Full HD
-      this.scaleRatio = 1.05;
-    } else if (this.viewportWidth <= 1366) { // Smaller screens
-      this.scaleRatio = 1.0;
-    } else if (this.aspectRatio < 9/16) { // Very tall screen
-      this.scaleRatio = 1.05;
-    } else {
-      // Default scaling for standard screens
-      this.scaleRatio = 1.0;
-    }
+    // Get optimal scale for current screen size
+    this.scaleRatio = this.deviceDetectionService.getOptimalScale();
     
     // Apply scaling to all scene containers to ensure consistent overflow
     const sceneContainers = document.querySelectorAll('.scene-container') as NodeListOf<HTMLElement>;
     sceneContainers.forEach(container => {
       container.style.transform = `scale(${this.scaleRatio})`;
+      
+      // Add debug info if needed
+      if (this.isDebugMode) {
+        console.log(`[Scaling] Screen Category: ${this.deviceDetectionService.getScreenCategory()}`);
+        console.log(`[Scaling] Applied Scale: ${this.scaleRatio}`);
+        console.log(`[Scaling] Viewport: ${this.viewportWidth}x${this.viewportHeight}`);
+        console.log(`[Scaling] Aspect Ratio: ${this.aspectRatio.toFixed(2)}`);
+      }
     });
     
     // Properly center the main container
@@ -102,6 +138,17 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
       mainContainer.style.display = 'flex';
       mainContainer.style.justifyContent = 'center';
       mainContainer.style.alignItems = 'center';
+      
+      // Add aspect ratio correction if needed
+      if (this.deviceDetectionService.needsAspectRatioCorrection()) {
+        mainContainer.style.maxWidth = '100vw';
+        mainContainer.style.maxHeight = '100vh';
+        mainContainer.style.overflow = 'hidden';
+        
+        if (this.isDebugMode) {
+          console.log('[Scaling] Applying aspect ratio correction');
+        }
+      }
     }
   }
 
@@ -140,7 +187,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
     }
   }
 
-  detectCurrentSection() {
+  private detectCurrentSection() {
     const mainElement = this.mainContent?.nativeElement;
     if (!mainElement) return;
 
@@ -184,14 +231,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit {
     // Update viewport calculations on resize
     this.calculateViewportDimensions();
     
-    // Check if we should switch to mobile view, but respect route-based user choices
-    // Only allow automatic switching if not explicitly in /introduction or /mobile
-    if (!this.router.url.includes('/introduction') && !this.router.url.includes('/mobile')) {
-      if (this.deviceDetectionService.shouldUseMobileView()) {
-        this.router.navigate(['/mobile']);
-      } else {
-        this.router.navigate(['/introduction']);
-      }
-    }
+    // Check if we should switch views based on new dimensions
+    this.checkDeviceAndSetView();
   }
 }

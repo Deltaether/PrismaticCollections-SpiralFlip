@@ -6,8 +6,32 @@ import { Router } from '@angular/router';
 })
 export class DeviceDetectionService {
   private mobileCheckDone = false;
-  private readonly MOBILE_WIDTH_THRESHOLD = 768; // Standard mobile breakpoint
-  private readonly TABLET_WIDTH_THRESHOLD = 1024; // Standard tablet breakpoint
+  
+  // 【✓】 Screen size breakpoints
+  private readonly SCREEN_SIZES = {
+    HD: { width: 1366, height: 768 },
+    FULL_HD: { width: 1920, height: 1080 },
+    QHD: { width: 2560, height: 1440 },
+    UHD_4K: { width: 3840, height: 2160 },
+    ULTRAWIDE: { width: 3440, height: 1440 }
+  };
+
+  // Mobile/Tablet thresholds
+  private readonly MOBILE_MAX_WIDTH = 768;
+  private readonly MOBILE_MAX_HEIGHT = 1024;
+  private readonly TABLET_MAX_WIDTH = 1024;
+  private readonly MIN_DESKTOP_WIDTH = 1024;
+
+  // Target aspect ratio for desktop (16:9)
+  private readonly TARGET_ASPECT_RATIO = 16 / 9;
+  
+  // Scaling thresholds
+  private readonly SCALE_THRESHOLDS = {
+    ULTRAWIDE: 21/9,  // Ultra-wide aspect ratio
+    QHD: 2560,        // 1440p
+    FULL_HD: 1920,    // 1080p
+    HD: 1366          // 720p
+  };
 
   // Debug mode flag - turn on to see detailed logging
   private isDebugMode = true;
@@ -16,10 +40,63 @@ export class DeviceDetectionService {
     this.debugLog('DeviceDetectionService initialized');
   }
 
+  // 【✓】 Get current screen category
+  public getScreenCategory(): string {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspect = width / height;
+
+    if (aspect > this.SCALE_THRESHOLDS.ULTRAWIDE) {
+      return 'ULTRAWIDE';
+    } else if (width >= this.SCREEN_SIZES.UHD_4K.width) {
+      return '4K';
+    } else if (width >= this.SCREEN_SIZES.QHD.width) {
+      return 'QHD';
+    } else if (width >= this.SCREEN_SIZES.FULL_HD.width) {
+      return 'FULL_HD';
+    } else {
+      return 'HD';
+    }
+  }
+
+  // 【✓】 Calculate optimal scale for current screen
+  public getOptimalScale(): number {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspect = width / height;
+    
+    // Base scale calculation on target 16:9 aspect ratio
+    let scale = 1.0;
+    
+    // Adjust scale based on screen category
+    if (aspect > this.SCALE_THRESHOLDS.ULTRAWIDE) {
+      scale = 1.2; // Ultra-wide needs larger scale
+    } else if (width >= this.SCREEN_SIZES.QHD.width) {
+      scale = 1.15; // QHD and 4K
+    } else if (width >= this.SCREEN_SIZES.FULL_HD.width) {
+      scale = 1.1; // Full HD
+    } else if (width <= this.SCREEN_SIZES.HD.width) {
+      scale = 0.95; // HD and below
+    }
+    
+    // Adjust for extreme aspect ratios
+    if (Math.abs(aspect - this.TARGET_ASPECT_RATIO) > 0.4) {
+      scale *= 1.1; // Increase scale for very wide or tall screens
+    }
+    
+    return scale;
+  }
+
+  // 【✓】 Check if current screen needs aspect ratio correction
+  public needsAspectRatioCorrection(): boolean {
+    const aspect = window.innerWidth / window.innerHeight;
+    return Math.abs(aspect - this.TARGET_ASPECT_RATIO) > 0.2;
+  }
+
   detectMobile(): void {
     this.debugLog('Detecting mobile device...', {
       isMobileDevice: this.isMobileDevice(),
-      isSmallScreen: this.isSmallScreen(),
+      isSmallScreen: this.isSmallViewport(),
       currentUrl: this.router.url,
       mobileCheckDone: this.mobileCheckDone
     });
@@ -54,49 +131,50 @@ export class DeviceDetectionService {
     return isMobile;
   }
 
+  public shouldUseMobileView(): boolean {
+    // Get current viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Check for mobile/tablet user agent
+    const isMobileDevice = this.isMobileDevice();
+    
+    // Check for touch capability
+    const isTouchDevice = this.isTouchDevice();
+    
+    // Use mobile view ONLY if:
+    // 1. It's a mobile device AND viewport width is below tablet threshold OR
+    // 2. Viewport width is below mobile threshold
+    return (isMobileDevice && viewportWidth <= this.TABLET_MAX_WIDTH) || 
+           (viewportWidth <= this.MOBILE_MAX_WIDTH);
+  }
+
   private isMobileDevice(): boolean {
-    // Check for common mobile user agent patterns
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-    
-    // RegExp pattern for mobile devices
-    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-    
-    const result = mobileRegex.test(userAgent);
-    this.debugLog('isMobileDevice check:', result, 'UserAgent:', userAgent);
-    return result;
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /android|webos|iphone|ipod|blackberry|iemobile|opera mini/.test(userAgent) && 
+           !/tablet|ipad|playbook|silk/.test(userAgent);
   }
 
-  private isSmallScreen(): boolean {
-    // Check if screen dimensions are below our threshold
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // More reasonable threshold based on standard breakpoints
-    const isSmall = width < this.MOBILE_WIDTH_THRESHOLD;
-    
-    this.debugLog('Screen size check:', {width, height, isSmall});
-    return isSmall;
+  private isSmallViewport(): boolean {
+    return window.innerWidth <= this.MOBILE_MAX_WIDTH || 
+           window.innerHeight <= this.MOBILE_MAX_HEIGHT;
   }
 
-  shouldUseMobileView(): boolean {
-    // Check if Chrome DevTools is open with a mobile device emulation
-    const isDevToolsMobile = /Android|webOS|iPhone|iPad|iPod/.test(navigator.userAgent) && 
-                             /Chrome\//.test(navigator.userAgent) && 
-                             /Google Inc/.test(navigator.vendor);
-    
-    // For mobile devices/small screens return true
-    const result = this.isMobileDevice() || this.isSmallScreen();
-    
-    this.debugLog('shouldUseMobileView result:', result, {
-      isMobileDevice: this.isMobileDevice(),
-      isSmallScreen: this.isSmallScreen(),
-      screen: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
-    });
-    
-    return result;
+  private isTouchDevice(): boolean {
+    return ('ontouchstart' in window) || 
+           (navigator.maxTouchPoints > 0) || 
+           ((navigator as any).msMaxTouchPoints > 0);
+  }
+
+  public getOrientation(): 'portrait' | 'landscape' {
+    return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+  }
+
+  public isTablet(): boolean {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent);
+    const viewportWidth = window.innerWidth;
+    return isTablet || (viewportWidth > this.MOBILE_MAX_WIDTH && viewportWidth <= this.TABLET_MAX_WIDTH);
   }
   
   // Helper function for conditional logging

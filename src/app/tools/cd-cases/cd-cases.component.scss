@@ -58,16 +58,32 @@ canvas {
 
 /* Updated container class name to match HTML */
 .cd-cases-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  /* Improve flexbox centering to align with parent */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.label-renderer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
 }
 
 .case-indicators {

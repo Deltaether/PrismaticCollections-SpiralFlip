@@ -148,6 +148,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private css3DMenu: any; // The CSS3D object containing our menu
 
+  // Add constant for target aspect ratio
+  private readonly targetAspect = 16 / 9;
+
   constructor(
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
@@ -271,6 +274,14 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private setupControls(): void {
     // Use the SetupHelperService to set up the controls
     this.controls = this.setupHelperService.setupControls(this.sceneService);
+    
+    // Disable zooming in OrbitControls
+    this.controls.enableZoom = false;
+    this.controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN
+    };
     
     // Make sure controls match sceneSettings after initialization
     this.setupHelperService.updateOrbitControls(this.controls, this.sceneSettings);
@@ -491,8 +502,8 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Fine-tunes position and rotation of CD cases
    * 【✓】
    */
-  public updateCaseTransform(cdCase: CDCase): void {
-    this.sceneConfigHelperService.updateCaseTransform(cdCase);
+  public updateCaseTransform(event: CDCase): void {
+    this.sceneConfigHelperService.updateCaseTransform(event);
   }
 
   /**
@@ -526,95 +537,45 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Get current viewport dimensions
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const aspectRatio = width / height;
     
-    // Update camera aspect ratio
-    this.camera.aspect = aspectRatio;
+    // Calculate aspect ratios
+    const currentAspect = width / height;
+    const targetAspect = 16 / 9; // Our design aspect ratio
     
-    // Calculate scaling factor to prevent empty space at screen edges
-    // Use design resolution of 1920x1080 as base
-    const designWidth = 1920;
-    const designHeight = 1080;
-    const designAspect = designWidth / designHeight;
+    // Base FOV for 16:9 aspect ratio
+    const baseFOV = 60;
     
-    // Default FOV value - most THREE.js cameras use 75 as default
-    const defaultFOV = 75;
-    
-    // Adjust camera parameters based on aspect ratio differences
-    if (aspectRatio > designAspect) {
-      // Wider screen - use a wider FOV to show more horizontal content
-      const widthRatio = aspectRatio / designAspect;
-      // Much more aggressive FOV adjustment for wider screens
-      this.camera.fov = defaultFOV * (0.7 / widthRatio);
+    // Adjust FOV based on aspect ratio to maintain scene composition
+    if (currentAspect > targetAspect) {
+      // Wider screen - increase FOV horizontally
+      this.camera.fov = baseFOV / (currentAspect / targetAspect);
     } else {
-      // Taller screen - use a narrower FOV to show more vertical content
-      const heightRatio = designAspect / aspectRatio;
-      // Much more aggressive FOV adjustment for taller screens
-      this.camera.fov = defaultFOV * 0.75 * heightRatio;
+      // Taller screen - increase FOV vertically
+      this.camera.fov = baseFOV * (targetAspect / currentAspect);
     }
     
-    // Update the camera's projection matrix
+    // Update camera parameters
+    this.camera.aspect = currentAspect;
     this.camera.updateProjectionMatrix();
     
     // Update renderers with new dimensions
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+    this.labelRenderer.setSize(width, height);
     
-    // Reposition cases if needed
-    this.adjustCasePositionsForAspectRatio();
-    
-    // Update the camera's position to ensure the scene is properly centered
-    this.centerCamera();
+    // Ensure pixel ratio is set correctly
+    this.renderer.setPixelRatio(window.devicePixelRatio);
   }
 
-  // Add a method to ensure the camera is properly positioned 
+  // Update centerCamera to maintain fixed positions
   private centerCamera(): void {
-    // Get the active case position as a reference point
     const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+    
     if (activeCase && this.camera) {
-      // Calculate a position that ensures the active case is centered
-      // Adjust the camera's z position to ensure the scene fills the viewport
-      const zPosition = Math.max(window.innerWidth, window.innerHeight) / 150;
+      // Keep camera at fixed distance regardless of screen size
+      const zPosition = 10; // Fixed distance that works for our scene
       
-      // Move the camera to look at the active case
       this.camera.position.set(0, 0, zPosition);
       this.camera.lookAt(0, 0, 0);
-      
-      // Update camera far clip plane to ensure we see everything
-      this.camera.far = 2000;
-      this.camera.updateProjectionMatrix();
-    }
-    
-    // Reset the container to ensure no positioning issues
-    const container = document.querySelector('.cd-cases-container') as HTMLElement;
-    if (container) {
-      container.style.display = 'flex';
-      container.style.justifyContent = 'center';
-      container.style.alignItems = 'center';
-      container.style.position = 'absolute';
-      container.style.top = '0';
-      container.style.left = '0';
-      container.style.width = '100vw';
-      container.style.height = '100vh';
-    }
-    
-    // Reset both canvas and label renderer to 100%
-    const canvas = this.renderer?.domElement;
-    if (canvas) {
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      canvas.style.position = 'absolute';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
-    }
-    
-    const labelRenderer = document.querySelector('.label-renderer') as HTMLElement;
-    if (labelRenderer) {
-      labelRenderer.style.width = '100%';
-      labelRenderer.style.height = '100%';
-      labelRenderer.style.position = 'absolute';
-      labelRenderer.style.top = '0';
-      labelRenderer.style.left = '0';
     }
   }
 
@@ -678,6 +639,11 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent) {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      return;
+    }
+    
     this.eventHandlerService.onWheel(
       event,
       this.cdCases,
@@ -881,5 +847,20 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     const caseCount = this.config.cdCases.length;
     this.playingMusic = new Array(caseCount).fill(false);
     this.tutorialCompleted = new Array(caseCount).fill(false);
+  }
+
+  // Add keyboard event handler to prevent zooming shortcuts
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): boolean {
+    // Prevent Ctrl/Cmd + Plus/Minus/Zero/Wheel for zooming
+    if ((event.ctrlKey || event.metaKey) && 
+        (event.key === '+' || 
+         event.key === '-' || 
+         event.key === '0' || 
+         event.key === '=')) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 } 

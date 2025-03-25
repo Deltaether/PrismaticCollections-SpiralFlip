@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -109,14 +109,15 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() sceneSettings!: SceneSettings;
   @Input() caseSettings!: CaseSettings;
   @Input() cdCases!: CDCase[];
-  @Input() onUpdateCamera!: () => void;
-  @Input() onUpdateLighting!: () => void;
-  @Input() onUpdateRenderer!: () => void;
-  @Input() onUpdateOrbitControls!: () => void;
-  @Input() onUpdateGround!: () => void;
-  @Input() onUpdateCaseTransform!: (cdCase: CDCase) => void;
-  @Input() onResetToDefault!: () => void;
-  @Input() onUpdateBackgroundEffects!: () => void;
+  
+  @Output() updateCamera = new EventEmitter<void>();
+  @Output() updateLighting = new EventEmitter<void>();
+  @Output() updateRenderer = new EventEmitter<void>();
+  @Output() updateOrbitControls = new EventEmitter<void>();
+  @Output() updateGround = new EventEmitter<void>();
+  @Output() updateCaseTransform = new EventEmitter<CDCase>();
+  @Output() resetToDefault = new EventEmitter<void>();
+  @Output() updateBackgroundEffects = new EventEmitter<void>();
 
   isDebugVisible = true;
   private gui!: dat.GUI;
@@ -185,34 +186,34 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Camera position
     const cameraFolder = sceneFolder.addFolder('Camera Position');
-    cameraFolder.add(this.sceneSettings, 'cameraX', -20, 20).onChange(this.onUpdateCamera);
-    cameraFolder.add(this.sceneSettings, 'cameraY', -20, 20).onChange(this.onUpdateCamera);
-    cameraFolder.add(this.sceneSettings, 'cameraZ', -20, 20).onChange(this.onUpdateCamera);
+    cameraFolder.add(this.sceneSettings, 'cameraX', -20, 20).onChange(() => this.updateCamera.emit());
+    cameraFolder.add(this.sceneSettings, 'cameraY', -20, 20).onChange(() => this.updateCamera.emit());
+    cameraFolder.add(this.sceneSettings, 'cameraZ', -20, 20).onChange(() => this.updateCamera.emit());
     
     // Look at point
     const lookAtFolder = sceneFolder.addFolder('Look At Point');
-    lookAtFolder.add(this.sceneSettings, 'lookAtX', -20, 20).onChange(this.onUpdateCamera);
-    lookAtFolder.add(this.sceneSettings, 'lookAtY', -20, 20).onChange(this.onUpdateCamera);
-    lookAtFolder.add(this.sceneSettings, 'lookAtZ', -20, 20).onChange(this.onUpdateCamera);
+    lookAtFolder.add(this.sceneSettings, 'lookAtX', -20, 20).onChange(() => this.updateCamera.emit());
+    lookAtFolder.add(this.sceneSettings, 'lookAtY', -20, 20).onChange(() => this.updateCamera.emit());
+    lookAtFolder.add(this.sceneSettings, 'lookAtZ', -20, 20).onChange(() => this.updateCamera.emit());
     
     // Orbit Controls
     const orbitFolder = sceneFolder.addFolder('Orbit Controls');
-    orbitFolder.add(this.sceneSettings, 'orbitMinPolarAngle', 0, Math.PI).onChange(this.onUpdateOrbitControls);
-    orbitFolder.add(this.sceneSettings, 'orbitMaxPolarAngle', 0, Math.PI).onChange(this.onUpdateOrbitControls);
-    orbitFolder.add(this.sceneSettings, 'orbitMinDistance', 1, 50).onChange(this.onUpdateOrbitControls);
-    orbitFolder.add(this.sceneSettings, 'orbitMaxDistance', 1, 50).onChange(this.onUpdateOrbitControls);
-    orbitFolder.add(this.sceneSettings, 'orbitDampingFactor', 0, 1).onChange(this.onUpdateOrbitControls);
+    orbitFolder.add(this.sceneSettings, 'orbitMinPolarAngle', 0, Math.PI).onChange(() => this.updateOrbitControls.emit());
+    orbitFolder.add(this.sceneSettings, 'orbitMaxPolarAngle', 0, Math.PI).onChange(() => this.updateOrbitControls.emit());
+    orbitFolder.add(this.sceneSettings, 'orbitMinDistance', 1, 50).onChange(() => this.updateOrbitControls.emit());
+    orbitFolder.add(this.sceneSettings, 'orbitMaxDistance', 1, 50).onChange(() => this.updateOrbitControls.emit());
+    orbitFolder.add(this.sceneSettings, 'orbitDampingFactor', 0, 1).onChange(() => this.updateOrbitControls.emit());
     
     // Ground settings
     const groundFolder = sceneFolder.addFolder('Ground Plane');
-    groundFolder.add(this.sceneSettings, 'groundY', -10, 10).onChange(this.onUpdateGround);
-    groundFolder.add(this.sceneSettings, 'groundOpacity', 0, 1).onChange(this.onUpdateGround);
+    groundFolder.add(this.sceneSettings, 'groundY', -10, 10).onChange(() => this.updateGround.emit());
+    groundFolder.add(this.sceneSettings, 'groundOpacity', 0, 1).onChange(() => this.updateGround.emit());
     
     // Lighting
     const lightingFolder = sceneFolder.addFolder('Lighting');
-    lightingFolder.add(this.sceneSettings, 'ambientIntensity', 0, 2).onChange(this.onUpdateLighting);
-    lightingFolder.add(this.sceneSettings, 'mainLightIntensity', 0, 2).onChange(this.onUpdateLighting);
-    lightingFolder.add(this.sceneSettings, 'exposure', 0, 2).onChange(this.onUpdateRenderer);
+    lightingFolder.add(this.sceneSettings, 'ambientIntensity', 0, 2).onChange(() => this.updateLighting.emit());
+    lightingFolder.add(this.sceneSettings, 'mainLightIntensity', 0, 2).onChange(() => this.updateLighting.emit());
+    lightingFolder.add(this.sceneSettings, 'exposure', 0, 2).onChange(() => this.updateRenderer.emit());
     
     // CD Cases folders with enhanced material controls
     const casesFolder = this.gui.addFolder('CD Cases');
@@ -223,15 +224,15 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
       
       // Position controls
       const posFolder = caseFolder.addFolder('Position');
-      posFolder.add(settings, 'positionX', -10, 10, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
-      posFolder.add(settings, 'positionY', -10, 10, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
-      posFolder.add(settings, 'positionZ', -10, 10, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
+      posFolder.add(settings, 'positionX', -10, 10, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
+      posFolder.add(settings, 'positionY', -10, 10, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
+      posFolder.add(settings, 'positionZ', -10, 10, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
       
       // Rotation controls
       const rotFolder = caseFolder.addFolder('Rotation');
-      rotFolder.add(settings, 'rotationX', -Math.PI, Math.PI, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
-      rotFolder.add(settings, 'rotationY', -Math.PI, Math.PI, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
-      rotFolder.add(settings, 'rotationZ', -Math.PI, Math.PI, 0.01).onChange(() => this.onUpdateCaseTransform(cdCase));
+      rotFolder.add(settings, 'rotationX', -Math.PI, Math.PI, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
+      rotFolder.add(settings, 'rotationY', -Math.PI, Math.PI, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
+      rotFolder.add(settings, 'rotationZ', -Math.PI, Math.PI, 0.01).onChange(() => this.updateCaseTransform.emit(cdCase));
       
       // Material controls for CD
       const matFolder = caseFolder.addFolder('CD Materials');
@@ -262,29 +263,28 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     this.gui.add({ printSettings: () => this.printCurrentSettings() }, 'printSettings').name('Print Settings');
     
     // Add button to reset to default
-    this.gui.add({ resetToDefault: () => this.onResetToDefault() }, 'resetToDefault').name('Reset to Default');
+    this.gui.add({ resetToDefault: () => this.resetToDefault.emit() }, 'resetToDefault').name('Reset to Default');
     
     // Add camera lock control toggle below reset button for easy access
     this.gui.add(this.sceneSettings, 'lockControls')
       .name('Lock Camera Controls')
-      .onChange((value) => {
-        // Apply the update to orbit controls
-        this.onUpdateOrbitControls();
+      .onChange(() => {
+        this.updateOrbitControls.emit();
       });
     
     // Add Background Effects folder
     const backgroundEffectsFolder = sceneFolder.addFolder('Background Effects');
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectContinents').name('Continents').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectMountains').name('Mountains').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectWaves').name('Waves').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBorders').name('Borders').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectSwirls').name('Swirls').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectLightRays').name('Magical Ley Lines').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectParticles').name('Particles').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVideoInfluence').name('Video Shimmer').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBloom').name('Bloom').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectFilmGrain').name('Film Grain').onChange(this.onUpdateBackgroundEffects);
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVignette').name('Vignette').onChange(this.onUpdateBackgroundEffects);
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectContinents').name('Continents').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectMountains').name('Mountains').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectWaves').name('Waves').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBorders').name('Borders').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectSwirls').name('Swirls').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectLightRays').name('Magical Ley Lines').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectParticles').name('Particles').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVideoInfluence').name('Video Shimmer').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBloom').name('Bloom').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectFilmGrain').name('Film Grain').onChange(() => this.updateBackgroundEffects.emit());
+    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVignette').name('Vignette').onChange(() => this.updateBackgroundEffects.emit());
     
     // Open the folders that were previously open
     if (this.isDebugVisible) {
@@ -328,12 +328,12 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             Object.assign(this.caseSettings, settings.cases);
             
             // Update everything
-            this.onUpdateCamera();
-            this.onUpdateLighting();
-            this.onUpdateRenderer();
-            this.onUpdateOrbitControls();
-            this.onUpdateGround();
-            this.cdCases.forEach(cdCase => this.onUpdateCaseTransform(cdCase));
+            this.updateCamera.emit();
+            this.updateLighting.emit();
+            this.updateRenderer.emit();
+            this.updateOrbitControls.emit();
+            this.updateGround.emit();
+            this.cdCases.forEach(cdCase => this.updateCaseTransform.emit(cdCase));
           } catch (error) {
             console.error('Error loading settings:', error);
           }

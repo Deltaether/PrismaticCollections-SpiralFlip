@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, NgZone, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, NgZone, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -57,6 +57,7 @@ import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('canvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('labelRenderer') private labelRendererElement!: ElementRef<HTMLDivElement>;
+  @Output() loadingChange = new EventEmitter<boolean>();
 
   private renderer!: THREE.WebGLRenderer;
   private labelRenderer!: CSS3DRenderer;
@@ -151,6 +152,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Add constant for target aspect ratio
   private readonly targetAspect = 16 / 9;
 
+  // Add debug mode flag
+  private isDebugMode = false;
+
   constructor(
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
@@ -171,14 +175,48 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     private ngZone: NgZone
   ) {}
 
+  // 【✓】 Initialize services and setup scene
+  private initializeServices(): void {
+    // Load CD cases data and initialize services
+    this.loadCDCases();
+  }
+
+  // 【✓】 Setup scene and initialize components
+  private setupScene(): void {
+    if (this.isDebugMode) {
+      console.log('[CDCases] Setting up scene');
+    }
+    
+    // Setup renderers and controls
+    this.setupRenderer();
+    this.setupControls();
+    this.setupCSS3DRenderer();
+    this.setupRightSideMenu();
+    
+    // Load models and initialize scene
+    this.loadModels().then(() => {
+      if (this.isDebugMode) {
+        console.log('[CDCases] Scene setup completed');
+      }
+      this.setLoadingState(false);
+    }).catch(error => {
+      console.error('[CDCases] Error setting up scene:', error);
+      this.setLoadingState(false);
+    });
+  }
+
   /**
    * Initializes component data and services
    * Sets up configuration and initializes state tracking arrays
    * 【✓】
    */
   ngOnInit(): void {
-    // Load CD cases data and initialize services
-    this.loadCDCases();
+    if (this.isDebugMode) {
+      console.log('[CDCases] Initializing component');
+    }
+    
+    // Initialize services only
+    this.initializeServices();
   }
 
   /**
@@ -188,38 +226,25 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * 【✓】
    */
   ngAfterViewInit(): void {
+    if (this.isDebugMode) {
+      console.log('[CDCases] AfterViewInit - Setting up renderers and controls');
+    }
+    
+    // Setup renderers and controls
     this.setupRenderer();
     this.setupControls();
-    
-    // Set up the CSS3D renderer for any 2D/3D integration needs 
-    // (though we won't use it for the menu anymore)
     this.setupCSS3DRenderer();
-    
-    // Add our menu component as DOM overlay instead of using CSS3D
-    // Do this before loading models to ensure it's interactable from the start
     this.setupRightSideMenu();
     
-    // Now load models (do this last so menu is ready first)
+    // Load models and initialize scene
     this.loadModels().then(() => {
-      // Initialize caseSettings for each CD case to prevent "Cannot read properties of undefined" errors
-      this.cdCases.forEach(cdCase => {
-        if (!this.caseSettings[cdCase.id]) {
-          // Default settings if none exist
-          this.caseSettings[cdCase.id] = {
-            positionX: 0,
-            positionY: 0,
-            positionZ: 0,
-            rotationX: 0,
-            rotationY: 0,
-            rotationZ: 0
-          };
-        }
-      });
-      
-      // Set up the scene for the SilhouetteService
-      this.silhouetteService.setScene(this.scene);
-      
-      this.isLoading = false;
+      if (this.isDebugMode) {
+        console.log('[CDCases] Models loaded successfully');
+      }
+      this.setLoadingState(false);
+    }).catch(error => {
+      console.error('[CDCases] Error loading models:', error);
+      this.setLoadingState(false);
     });
 
     // Set the expand function for use after scrolling
@@ -304,10 +329,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       // Initialize tutorialCompleted array to match CD cases
       this.tutorialCompleted = new Array(this.cdCases.length).fill(false);
       
-      // Initialize caseSettings for each CD case to prevent "Cannot read properties of undefined" errors
+      // Initialize caseSettings for each CD case
       this.cdCases.forEach(cdCase => {
         if (!this.caseSettings[cdCase.id]) {
-          // Default settings if none exist
           this.caseSettings[cdCase.id] = {
             positionX: 0,
             positionY: 0,
@@ -327,9 +351,6 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       // Ensure everything is rendered before showing
       this.renderer.render(this.scene, this.camera);
       this.labelRenderer.render(this.scene, this.camera);
-
-      // Hide loading screen
-      this.isLoading = false;
 
       // Wait for next frame to ensure all cases are properly positioned
       await new Promise(resolve => requestAnimationFrame(resolve));
@@ -352,8 +373,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
     } catch (error) {
-      console.error('Error loading scene:', error);
-      this.isLoading = false;
+      console.error('[CDCases] Error loading scene:', error);
+      this.setLoadingState(false);
+      throw error; // Re-throw to be caught by the caller
     }
   }
 
@@ -589,6 +611,12 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Calculate aspect-based position adjustments
     const aspectRatio = window.innerWidth / window.innerHeight;
     const designAspect = 16 / 9; // Base design aspect ratio
+    
+    // Debug logging for aspect ratio adjustments
+    if (this.isDebugMode) {
+      console.log(`[CDCases] Current Aspect Ratio: ${aspectRatio.toFixed(3)}`);
+      console.log(`[CDCases] Design Aspect Ratio: ${designAspect.toFixed(3)}`);
+    }
     
     // Apply position adjustments
     this.cdCases.forEach(cdCase => {
@@ -862,5 +890,13 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       return false;
     }
     return true;
+  }
+
+  private setLoadingState(isLoading: boolean) {
+    if (this.isDebugMode) {
+      console.log('[CDCases] Setting loading state:', isLoading);
+    }
+    this.isLoading = isLoading;
+    this.loadingChange.emit(isLoading);
   }
 } 

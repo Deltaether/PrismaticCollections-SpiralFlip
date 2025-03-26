@@ -9,6 +9,8 @@ export class DeviceDetectionService {
   
   // 【✓】 Screen size breakpoints
   private readonly SCREEN_SIZES = {
+    MOBILE: { width: 768, height: 1024 },
+    TABLET: { width: 1024, height: 1366 },
     HD: { width: 1366, height: 768 },
     FULL_HD: { width: 1920, height: 1080 },
     QHD: { width: 2560, height: 1440 },
@@ -43,54 +45,34 @@ export class DeviceDetectionService {
   // 【✓】 Get current screen category
   public getScreenCategory(): string {
     const width = window.innerWidth;
-    const height = window.innerHeight;
-    const aspect = width / height;
-
-    if (aspect > this.SCALE_THRESHOLDS.ULTRAWIDE) {
-      return 'ULTRAWIDE';
-    } else if (width >= this.SCREEN_SIZES.UHD_4K.width) {
-      return '4K';
-    } else if (width >= this.SCREEN_SIZES.QHD.width) {
-      return 'QHD';
-    } else if (width >= this.SCREEN_SIZES.FULL_HD.width) {
-      return 'FULL_HD';
-    } else {
-      return 'HD';
+    
+    // Debug logging
+    console.log('[Device Detection] Getting screen category for width:', width);
+    
+    // Mobile devices (phones)
+    if (width <= 480) {
+      return 'MOBILE';
     }
+    
+    // Tablets
+    if (width <= 768) {
+      return 'TABLET';
+    }
+    
+    // All other sizes are desktop
+    return 'DESKTOP';
   }
 
   // 【✓】 Calculate optimal scale for current screen
   public getOptimalScale(): number {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const aspect = width / height;
-    
-    // Base scale calculation on target 16:9 aspect ratio
-    let scale = 1.0;
-    
-    // Adjust scale based on screen category
-    if (aspect > this.SCALE_THRESHOLDS.ULTRAWIDE) {
-      scale = 1.2; // Ultra-wide needs larger scale
-    } else if (width >= this.SCREEN_SIZES.QHD.width) {
-      scale = 1.15; // QHD and 4K
-    } else if (width >= this.SCREEN_SIZES.FULL_HD.width) {
-      scale = 1.1; // Full HD
-    } else if (width <= this.SCREEN_SIZES.HD.width) {
-      scale = 0.95; // HD and below
-    }
-    
-    // Adjust for extreme aspect ratios
-    if (Math.abs(aspect - this.TARGET_ASPECT_RATIO) > 0.4) {
-      scale *= 1.1; // Increase scale for very wide or tall screens
-    }
-    
-    return scale;
+    // Always return 1 to maintain consistent size
+    return 1;
   }
 
   // 【✓】 Check if current screen needs aspect ratio correction
   public needsAspectRatioCorrection(): boolean {
-    const aspect = window.innerWidth / window.innerHeight;
-    return Math.abs(aspect - this.TARGET_ASPECT_RATIO) > 0.2;
+    // No aspect ratio correction needed as we're maintaining fixed size
+    return false;
   }
 
   detectMobile(): void {
@@ -132,27 +114,47 @@ export class DeviceDetectionService {
   }
 
   public shouldUseMobileView(): boolean {
-    // Get current viewport dimensions
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Check for mobile/tablet user agent
-    const isMobileDevice = this.isMobileDevice();
+    // Debug logging
+    console.log('[Device Detection] Viewport:', viewportWidth, 'x', viewportHeight);
+    console.log('[Device Detection] Current Route:', this.router.url);
     
-    // Check for touch capability
-    const isTouchDevice = this.isTouchDevice();
+    // Force desktop view for 1920x1080 screens
+    if (viewportWidth === 1920 && viewportHeight === 1080) {
+      console.log('[Device Detection] Detected 1920x1080 screen - forcing desktop view');
+      return false;
+    }
     
-    // Use mobile view ONLY if:
-    // 1. It's a mobile device AND viewport width is below tablet threshold OR
-    // 2. Viewport width is below mobile threshold
-    return (isMobileDevice && viewportWidth <= this.TABLET_MAX_WIDTH) || 
-           (viewportWidth <= this.MOBILE_MAX_WIDTH);
+    // Check if we're already on the introduction route
+    if (this.router.url.includes('/introduction')) {
+      console.log('[Device Detection] Already on introduction route - staying in desktop view');
+      return false;
+    }
+    
+    // Simple mobile detection based on width
+    const isMobile = viewportWidth <= 768;
+    console.log('[Device Detection] Is Mobile:', isMobile);
+    return isMobile;
   }
 
   private isMobileDevice(): boolean {
-    const userAgent = navigator.userAgent.toLowerCase();
-    return /android|webos|iphone|ipod|blackberry|iemobile|opera mini/.test(userAgent) && 
-           !/tablet|ipad|playbook|silk/.test(userAgent);
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    
+    // Debug logging
+    console.log('[Device Detection] User Agent:', userAgent);
+    
+    // Check for mobile devices
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+    
+    // Additional check for tablet devices
+    const isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobi))/i.test(userAgent.toLowerCase());
+    
+    console.log('[Device Detection] Is Mobile:', isMobile);
+    console.log('[Device Detection] Is Tablet:', isTablet);
+    
+    return isMobile || isTablet;
   }
 
   private isSmallViewport(): boolean {
@@ -161,9 +163,12 @@ export class DeviceDetectionService {
   }
 
   private isTouchDevice(): boolean {
-    return ('ontouchstart' in window) || 
-           (navigator.maxTouchPoints > 0) || 
-           ((navigator as any).msMaxTouchPoints > 0);
+    // Modern way to detect touch devices
+    const hasTouch = 'ontouchstart' in window || 
+                    navigator.maxTouchPoints > 0;
+    
+    console.log('[Device Detection] Is Touch Device:', hasTouch);
+    return hasTouch;
   }
 
   public getOrientation(): 'portrait' | 'landscape' {

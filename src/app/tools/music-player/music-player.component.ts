@@ -1,23 +1,36 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Howl } from 'howler';
 import { AudioService } from './audio.service';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+// 【✓】 Define interface for track data
+interface Track {
+  title: string;
+  artist: string;
+  id?: string;
+  url?: string;
+}
 
 @Component({
   selector: 'app-music-player',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './music-player.component.html',
-  styleUrls: ['./music-player.component.scss']
+  styleUrls: ['./music-player.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush // 【✓】 Optimize change detection
 })
 export class MusicPlayerComponent implements OnInit, OnDestroy {
+  // 【✓】 Add proper typing for inputs
   @Input() trackTitle: string = '';
   @Input() trackArtist: string = '';
-  @Input() activeTrack: any = null;
+  @Input() activeTrack: Track | null = null;
   
   private audio: Howl | null = null;
-  private trackSubscription: Subscription | null = null;
+  private readonly destroy$ = new Subject<void>();
+  
+  // 【✓】 Add proper typing for state
   isPlaying = false;
   isLoading = true;
   currentTrack = '';
@@ -25,88 +38,100 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   duration = 0;
   volume = 0.1;
   error = '';
-  currentSubtitle: string = ''; // For storing additional track information
+  currentSubtitle: string = '';
 
-  constructor(private audioService: AudioService) {}
+  constructor(
+    private readonly audioService: AudioService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
-  ngOnInit() {
-    this.trackSubscription = this.audioService.currentTrack$.subscribe(track => {
-      if (track && track !== this.currentTrack) {
-        this.currentTrack = track;
-        this.initializeAudio(track);
-      }
-    });
+  // 【✓】 Initialize component
+  ngOnInit(): void {
+    this.initializeAudio();
   }
 
-  ngOnDestroy() {
+  // 【✓】 Cleanup resources
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.audio) {
       this.audio.unload();
     }
-    if (this.trackSubscription) {
-      this.trackSubscription.unsubscribe();
-    }
   }
 
-  private initializeAudio(track: string) {
-    if (this.audio) {
-      this.audio.unload();
-    }
+  // 【✓】 Initialize audio player
+  private initializeAudio(): void {
+    this.audioService.currentTrack$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(track => {
+        if (track) {
+          // 【✓】 Convert string track to Track object
+          const trackObj: Track = {
+            title: this.getTrackName(track),
+            artist: this.getArtistName(),
+            url: track
+          };
+          this.loadTrack(trackObj);
+        }
+      });
+  }
 
+  // 【✓】 Load and play track
+  private loadTrack(track: Track): void {
     this.isLoading = true;
-    this.error = '';
-    this.currentTime = 0;
-    this.duration = 0;
-    
-    // Extract useful information from filename for subtitle if needed
-    this.updateSubtitleFromFilename(track);
+    this.cdr.markForCheck();
+
+    if (this.audio) {
+      this.audio.unload();
+    }
 
     this.audio = new Howl({
-      src: [track],
+      src: [track.url || track.title], // Fallback to title if url is not provided
       html5: true,
-      preload: true,
-      format: ['mp3'],
-      volume: this.volume,
       onload: () => {
-        console.log('Audio loaded successfully');
         this.isLoading = false;
         this.duration = this.audio?.duration() || 0;
-        if (this.isPlaying) {
-          this.audio?.play();
-        }
+        this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
-        console.error('Error loading audio:', error);
-        this.error = 'Error loading audio file';
+        this.error = `Failed to load track: ${error}`;
         this.isLoading = false;
-      },
-      onplayerror: (id, error) => {
-        console.error('Error playing audio:', error);
-        this.error = 'Error playing audio file';
-        if (this.audio) {
-          this.audio.once('unlock', () => {
-            this.audio?.play();
-          });
-        }
-      },
-      onplay: () => {
-        this.isPlaying = true;
-        this.updateTime();
-      },
-      onpause: () => {
-        this.isPlaying = false;
-      },
-      onend: () => {
-        this.isPlaying = false;
-        this.nextTrack();
-      },
-      onstop: () => {
-        this.isPlaying = false;
+        this.cdr.markForCheck();
       }
     });
   }
 
-  // Update subtitle based on filename if other inputs aren't provided
-  private updateSubtitleFromFilename(track: string) {
+  // 【✓】 Play/pause track
+  togglePlay(): void {
+    if (!this.audio) return;
+
+    if (this.isPlaying) {
+      this.audio.pause();
+    } else {
+      this.audio.play();
+    }
+    this.isPlaying = !this.isPlaying;
+    this.cdr.markForCheck();
+  }
+
+  // 【✓】 Update volume
+  setVolume(value: number): void {
+    if (!this.audio) return;
+    this.volume = value;
+    this.audio.volume(value);
+    this.cdr.markForCheck();
+  }
+
+  // 【✓】 Seek to position
+  seek(value: number): void {
+    if (!this.audio) return;
+    this.audio.seek(value);
+    this.currentTime = value;
+    this.cdr.markForCheck();
+  }
+
+  // 【✓】 Update subtitle based on filename
+  private updateSubtitleFromFilename(track: string): void {
     if (track) {
       const filename = track.split('/').pop() || '';
       const parts = filename.replace('.mp3', '').split(' - ');
@@ -118,75 +143,68 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateTime() {
+  // 【✓】 Update time
+  private updateTime(): void {
     if (this.audio && this.isPlaying) {
       this.currentTime = this.audio.seek() as number;
       requestAnimationFrame(() => this.updateTime());
     }
   }
 
-  togglePlay() {
-    if (!this.audio || this.isLoading) return;
-    
-    if (this.isPlaying) {
-      this.audio.pause();
-    } else {
-      this.audio.play();
-    }
-  }
-
-  nextTrack() {
+  // 【✓】 Next track
+  nextTrack(): void {
     if (this.isLoading) return;
     const nextTrack = this.audioService.getNextTrack();
     if (nextTrack) {
-      this.initializeAudio(nextTrack);
+      // 【✓】 Convert string track to Track object
+      const trackObj: Track = {
+        title: this.getTrackName(nextTrack),
+        artist: this.getArtistName(),
+        url: nextTrack
+      };
+      this.loadTrack(trackObj);
     }
   }
 
-  previousTrack() {
+  // 【✓】 Previous track
+  previousTrack(): void {
     if (this.isLoading) return;
     const prevTrack = this.audioService.getPreviousTrack();
     if (prevTrack) {
-      this.initializeAudio(prevTrack);
+      // 【✓】 Convert string track to Track object
+      const trackObj: Track = {
+        title: this.getTrackName(prevTrack),
+        artist: this.getArtistName(),
+        url: prevTrack
+      };
+      this.loadTrack(trackObj);
     }
   }
 
-  seek(time: number) {
-    if (this.audio && !this.isLoading) {
-      this.audio.seek(time);
-    }
-  }
-
-  setVolume(value: number) {
-    this.volume = value;
-    if (this.audio) {
-      this.audio.volume(value);
-    }
-  }
-
+  // 【✓】 Format time
   formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
+  // 【✓】 Get track name
   getTrackName(track: string): string {
     const parts = track.split('/');
     const filename = parts[parts.length - 1].replace('.mp3', '');
     
-    // If we have title and artist inputs, prefer those
     if (this.trackTitle) {
       return this.trackTitle;
     }
     
-    // Otherwise extract from filename
     const fileParts = filename.split(' - ');
     if (fileParts.length > 1) {
-      return fileParts[1]; // Return song title part
+      return fileParts[1];
     }
     return filename;
   }
   
+  // 【✓】 Get artist name
   getArtistName(): string {
     if (this.trackArtist) {
       return this.trackArtist;
@@ -196,7 +214,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       const filename = this.currentTrack.split('/').pop() || '';
       const parts = filename.replace('.mp3', '').split(' - ');
       if (parts.length > 1) {
-        return parts[0]; // Artist is usually first
+        return parts[0];
       }
     }
     

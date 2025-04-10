@@ -1,29 +1,70 @@
-import { Injectable, ElementRef, Renderer2, ApplicationRef, ComponentFactoryResolver, Injector, ComponentRef, NgZone, RendererFactory2 } from '@angular/core';
+import { Injectable, ElementRef, Renderer2, ApplicationRef, ComponentFactoryResolver, Injector, ComponentRef, NgZone, RendererFactory2, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 import { RightSideMenuComponent } from '../right-side-menu.component';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { takeUntil } from 'rxjs/operators';
+
+// 【✓】 Define interfaces for type safety
+interface MenuPosition {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
+interface MenuRotation {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
+interface MenuSize {
+  readonly width: number;
+  readonly height: number;
+}
+
+interface MenuPositionConfig {
+  rightPercentage: number;
+  topPercentage: number;
+  minRightPercentage: number;
+  maxRightPercentage: number;
+}
+
+interface MenuSizeConfig {
+  maxWidth: number;
+  widthPercentage: number;
+  heightPercentage: number;
+}
+
+interface MenuConfig {
+  position: MenuPositionConfig;
+  size: MenuSizeConfig;
+  transformOrigin: string;
+  zIndex: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class MenuIntegrationService {
-  private renderer: Renderer2;
+export class MenuIntegrationService implements OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  private readonly isDebugMode = true;
+  private readonly renderer: Renderer2;
   private menuContainer!: HTMLElement;
   private menuVisible = false;
   
   // 【✓】 Observable for menu visibility state
-  public menuVisibilityState = new BehaviorSubject<boolean>(false);
+  public readonly menuVisibilityState = new BehaviorSubject<boolean>(false);
   
   // 【✓】 Store viewport dimensions
   private viewportWidth = window.innerWidth;
   private viewportHeight = window.innerHeight;
 
-  // 【✓】 Menu configuration from JSON
-  private menuConfig: any = {
+  // 【✓】 Menu configuration with proper typing
+  private menuConfig: MenuConfig = {
     position: {
       rightPercentage: 5,
-      topPercentage: 10,
+      topPercentage: 5,
       minRightPercentage: 5,
       maxRightPercentage: 15
     },
@@ -36,87 +77,150 @@ export class MenuIntegrationService {
     zIndex: 1000
   };
 
-  // Original variables
+  // 【✓】 Component properties with proper typing
   private menuElement: HTMLElement | null = null;
   private componentRef: ComponentRef<RightSideMenuComponent> | null = null;
   private isMenuVisible = false;
-  // Store menu container for DOM manipulations
   private originalMenuContainer: HTMLElement | null = null;
-  // Store 3D coordinates for positioning calculations
-  private menuPosition = { x: 0, y: 0, z: 0 };
-  private menuRotation = { x: 0, y: 0, z: 0 };
-  private menuSize = { width: 0, height: 0 };
-  // Track window resize listener
+  private menuPosition: MenuPosition = { x: 0, y: 0, z: 0 };
+  private menuRotation: MenuRotation = { x: 0, y: 0, z: 0 };
+  private menuSize: MenuSize = { width: 0, height: 0 };
   private resizeListener: (() => void) | null = null;
 
   constructor(
-    private rendererFactory: RendererFactory2,
-    private appRef: ApplicationRef,
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private injector: Injector,
-    private ngZone: NgZone,
-    private http: HttpClient
+    private readonly rendererFactory: RendererFactory2,
+    private readonly appRef: ApplicationRef,
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    private readonly injector: Injector,
+    private readonly ngZone: NgZone,
+    private readonly http: HttpClient
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
     
+    if (this.isDebugMode) {
+      console.log('[MenuIntegration] Service initialized');
+    }
+    
     // 【✓】 Add window resize listener
-    window.addEventListener('resize', this.handleResize.bind(this));
+    this.setupResizeListener();
     
     // 【✓】 Load configuration from JSON
     this.loadMenuConfiguration();
   }
+
+  // 【✓】 Setup resize listener with proper cleanup
+  private setupResizeListener(): void {
+    window.addEventListener('resize', this.handleResize.bind(this));
+    
+    if (this.isDebugMode) {
+      console.log('[MenuIntegration] Resize listener set up');
+    }
+  }
   
   // 【✓】 Load menu configuration from JSON file
   private loadMenuConfiguration(): void {
-    console.log('Attempting to load menu configuration from primary path...');
+    if (this.isDebugMode) {
+      console.log('[MenuIntegration] Attempting to load menu configuration');
+    }
     
     // Use a timestamp query parameter to prevent caching
     const timestamp = new Date().getTime();
     
-    this.http.get(`src/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`).subscribe(
-      (config: any) => {
-        if (config && config.rightSideMenu) {
-          this.menuConfig = config.rightSideMenu;
-          console.log('Menu configuration loaded successfully:', this.menuConfig);
-          
-          // Update menu dimensions immediately
-          if (this.menuContainer) {
-            this.updateMenuDimensions();
-            console.log('Menu dimensions updated with new config');
-          }
-        } else {
-          console.error('Config loaded but rightSideMenu property not found:', config);
-        }
-      },
-      error => {
-        console.error('Error loading menu configuration from primary path:', error);
-        
-        // Try alternate path with cache-busting
-        console.log('Attempting to load from alternate path...');
-        this.http.get(`assets/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`).subscribe(
-          (config: any) => {
-            if (config && config.rightSideMenu) {
-              this.menuConfig = config.rightSideMenu;
-              console.log('Menu configuration loaded from alternate path:', this.menuConfig);
-              
-              // Update menu dimensions immediately
-              if (this.menuContainer) {
-                this.updateMenuDimensions();
-                console.log('Menu dimensions updated with alternate config');
-              }
-            } else {
-              console.error('Alternate config loaded but rightSideMenu property not found:', config);
+    this.http.get(`src/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        (config: any) => {
+          if (config && config.rightSideMenu) {
+            this.menuConfig = config.rightSideMenu;
+            
+            if (this.isDebugMode) {
+              console.log('[MenuIntegration] Configuration loaded successfully:', this.menuConfig);
             }
-          },
-          secondError => {
-            console.error('Error loading menu configuration from alternate path:', secondError);
-            console.log('Using default menu configuration, unable to load from any source');
+            
+            // Update menu dimensions immediately
+            if (this.menuContainer) {
+              this.updateMenuDimensions();
+            }
+          } else {
+            console.error('[MenuIntegration] Config loaded but rightSideMenu property not found:', config);
+            this.loadAlternateConfig(timestamp);
           }
-        );
-      }
-    );
+        },
+        error => {
+          console.error('[MenuIntegration] Error loading configuration from primary path:', error);
+          this.loadAlternateConfig(timestamp);
+        }
+      );
   }
   
+  // 【✓】 Load alternate configuration if primary fails
+  private loadAlternateConfig(timestamp: number): void {
+    if (this.isDebugMode) {
+      console.log('[MenuIntegration] Attempting to load from alternate path');
+    }
+    
+    this.http.get(`assets/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        (config: any) => {
+          if (config && config.rightSideMenu) {
+            this.menuConfig = config.rightSideMenu;
+            
+            if (this.isDebugMode) {
+              console.log('[MenuIntegration] Configuration loaded from alternate path:', this.menuConfig);
+            }
+            
+            // Update menu dimensions immediately
+            if (this.menuContainer) {
+              this.updateMenuDimensions();
+            }
+          } else {
+            console.error('[MenuIntegration] Alternate config loaded but rightSideMenu property not found:', config);
+          }
+        },
+        secondError => {
+          console.error('[MenuIntegration] Error loading from alternate path:', secondError);
+          console.log('[MenuIntegration] Using default menu configuration');
+        }
+      );
+  }
+
+  // 【✓】 Cleanup resources
+  ngOnDestroy(): void {
+    if (this.isDebugMode) {
+      console.log('[MenuIntegration] Destroying service');
+    }
+    
+    // Remove window event listener
+    window.removeEventListener('resize', this.handleResize.bind(this));
+    
+    // Remove resize handler if it exists
+    this.removeResizeHandler();
+    
+    // Detach and destroy component if it exists
+    if (this.componentRef) {
+      this.appRef.detachView(this.componentRef.hostView);
+      this.componentRef.destroy();
+      this.componentRef = null;
+    }
+    
+    // Remove menu container from DOM if it exists
+    if (this.menuContainer && this.menuContainer.parentNode) {
+      this.menuContainer.parentNode.removeChild(this.menuContainer);
+    }
+    
+    // Remove any styles we added
+    const menuStyle = document.querySelector('style.menu-container-style');
+    if (menuStyle && menuStyle.parentNode) {
+      menuStyle.parentNode.removeChild(menuStyle);
+    }
+    
+    // Complete all subjects
+    this.menuVisibilityState.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   // 【✓】 Handle window resize events
   private handleResize(): void {
     this.viewportWidth = window.innerWidth;
@@ -257,17 +361,6 @@ export class MenuIntegrationService {
   // 【✓】 Get reference to the menu container DOM element
   public getMenuContainer(): HTMLElement {
     return this.menuContainer;
-  }
-  
-  // 【✗】 Clean up when service is destroyed
-  public ngOnDestroy(): void {
-    // Remove resize listener
-    window.removeEventListener('resize', this.handleResize.bind(this));
-    
-    // Remove menu container from DOM if it exists
-    if (this.menuContainer && this.menuContainer.parentNode) {
-      this.renderer.removeChild(this.menuContainer.parentNode, this.menuContainer);
-    }
   }
 
   /**
@@ -551,21 +644,30 @@ export class MenuIntegrationService {
     this.loadMenuConfiguration();
   }
 
-  // 【✓】 Method to update a specific menu position property at runtime
-  public updateMenuPosition(property: string, value: any): void {
+  // 【✓】 Update position property
+  public updateMenuPosition(property: string, value: number): void {
     if (!this.menuConfig || !this.menuConfig.position) {
-      console.warn('Cannot update menu position: Config not properly initialized');
+      console.warn('[MenuIntegration] Cannot update menu position: Config not properly initialized');
       return;
     }
     
-    // Update the property in our local config
-    this.menuConfig.position[property] = value;
+    // Update the property in our local config using a type-safe approach
+    const validProperties = ['rightPercentage', 'topPercentage', 'minRightPercentage', 'maxRightPercentage'];
     
-    // Apply the change to the DOM
-    this.updateMenuDimensions();
-    
-    // Log the change for debugging
-    console.log(`Menu position updated: ${property} = ${value}`);
+    if (validProperties.includes(property)) {
+      // Cast the property name to keyof MenuPositionConfig for type safety
+      const positionKey = property as keyof MenuPositionConfig;
+      this.menuConfig.position[positionKey] = value;
+      
+      // Apply the change to the DOM
+      this.updateMenuDimensions();
+      
+      if (this.isDebugMode) {
+        console.log(`[MenuIntegration] Position updated: ${property} = ${value}`);
+      }
+    } else {
+      console.warn(`[MenuIntegration] Unknown position property: ${property}`);
+    }
   }
 
   // 【✓】 Method to get the current menu configuration

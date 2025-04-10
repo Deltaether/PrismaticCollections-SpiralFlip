@@ -103,13 +103,42 @@ canvas {
   color: white;
   margin: 5px 0;
   font-family: Arial, sans-serif;
-  transition: color 0.3s ease;
-  padding: 3px 8px;
-  border-radius: 3px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  
+  strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+  
+  .status {
+    opacity: 0.6;
+    font-size: 0.8rem;
+    margin-left: 5px;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 
   &.open {
     color: #00ff00;
     background-color: rgba(0, 255, 0, 0.1);
+    border-left: 3px solid #00ff00;
+  }
+  
+  &.active {
+    background-color: rgba(255, 215, 0, 0.2);
+    border-left: 3px solid gold;
+  }
+  
+  &.active.open {
+    background-color: rgba(0, 255, 50, 0.2);
+    border-left: 3px solid lime;
   }
 }
 

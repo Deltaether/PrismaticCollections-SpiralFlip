@@ -4,17 +4,34 @@ import { createCaseConfig } from './template';
 
 /**
  * Defines all CD cases used in the application
- * Creates an array of case configurations with default properties
- * Currently generates 5 test cases with sequential numbering
+ * Creates an array of case configurations with custom titles and artists
+ * Each case represents a different album release
  * 【✓】
  */
-export const allCases: CaseConfig[] = Array.from({ length: 5 }, (_, i) => 
-  createCaseConfig(
+export const allCases: CaseConfig[] = Array.from({ length: 5 }, (_, i) => {
+  // Define custom titles and artists for each CD case
+  const titles = [
+    "Phantasia",
+    "Xronixle",
+    "Fractalizer",
+    "Serenism",
+    "Archetype Engine"
+  ];
+  
+  const artists = [
+    "An × Feryquitous",
+    "Feryquitous",
+    "Voidheart",
+    "Team Grimoire",
+    "Sound Souler"
+  ];
+  
+  return createCaseConfig(
     i + 1,
-    `Disc ${i + 1}`,
-    "An × Feryquitous"
-  )
-);
+    titles[i],
+    artists[i]
+  );
+});
 
 /**
  * Updates vertical positioning of cases in the stack

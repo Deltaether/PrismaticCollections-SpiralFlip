@@ -1,6 +1,16 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/phantasia.config';
 import { PhantasiaComponent } from './app/phantasia.component';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
-bootstrapApplication(PhantasiaComponent, appConfig)
+// Update the configuration to include animations
+const updatedConfig = {
+  ...appConfig,
+  providers: [
+    ...appConfig.providers,
+    provideAnimations()
+  ]
+};
+
+bootstrapApplication(PhantasiaComponent, updatedConfig)
   .catch((err) => console.error(err));

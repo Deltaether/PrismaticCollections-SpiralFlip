@@ -62,12 +62,9 @@ interface RunePosition {
         </div>
       </div>
       <div class="content">
-        <div class="title-line"></div>
-        <h1>
-          <span class="title-top">Project</span>
-          <span class="title-main">Phantasia</span>
-        </h1>
-        <div class="title-line"></div>
+        <div class="logo-container">
+          <img src="/assets/graphic/prismcoll_logox_black_upright.svg" alt="Prismatic Collections" class="logo">
+        </div>
         <div class="loading-text">Now Loading</div>
       </div>
     </div>
@@ -82,10 +79,7 @@ interface RunePosition {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, 
-        rgb(142, 45, 45) 0%, 
-        rgb(85, 25, 25) 100%
-      );
+      background: #ffffff;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
@@ -97,11 +91,24 @@ interface RunePosition {
       pointer-events: all;
     }
 
+    .logo-container {
+      position: relative;
+      z-index: 10;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      width: 240px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
     .magical-circle {
       position: absolute;
       width: 800px;
       height: 800px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 50%;
       animation: rotate 20s linear infinite;
       
@@ -113,7 +120,7 @@ interface RunePosition {
         right: -2px;
         bottom: -2px;
         border: 2px solid transparent;
-        border-top-color: rgba(255, 180, 90, 0.4);
+        border-top-color: rgba(0, 0, 0, 0.2);
         border-radius: 50%;
       }
 
@@ -125,7 +132,7 @@ interface RunePosition {
         right: -10px;
         bottom: -10px;
         border: 1px solid transparent;
-        border-left-color: rgba(255, 170, 70, 0.3);
+        border-left-color: rgba(0, 0, 0, 0.15);
         border-radius: 50%;
       }
 
@@ -148,13 +155,13 @@ interface RunePosition {
       position: absolute;
       width: 150px;
       height: 150px;
-      border: 2px solid rgba(255, 170, 90, 0.3);
+      border: 2px solid rgba(0, 0, 0, 0.15);
       border-radius: 4px;
 
       &::before, &::after {
         content: '';
         position: absolute;
-        background: linear-gradient(90deg, rgba(255, 180, 90, 0.2), rgba(255, 200, 120, 0.4));
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
       }
 
       &.top-left {
@@ -194,7 +201,7 @@ interface RunePosition {
       position: absolute;
       width: 100px;
       height: 100px;
-      border: 2px solid rgba(255, 160, 80, 0.3);
+      border: 2px solid rgba(0, 0, 0, 0.15);
       border-radius: 4px;
       animation: pulse 3s infinite;
 
@@ -244,8 +251,8 @@ interface RunePosition {
       width: 18px;
       height: 18px;
       background: linear-gradient(135deg, 
-        rgba(255, 190, 110, 0.8), 
-        rgba(255, 160, 70, 0.6)
+        rgba(0, 0, 0, 0.4), 
+        rgba(60, 60, 60, 0.3)
       );
       clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
       transform-origin: center center;
@@ -296,10 +303,10 @@ interface RunePosition {
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       background: radial-gradient(circle at center,
         transparent 0%,
-        rgba(60, 120, 255, 0.03) 50%,
+        rgba(0, 0, 0, 0.02) 50%,
         transparent 100%
       );
       animation: effect-pulse 8s infinite ease-in-out;
@@ -310,7 +317,7 @@ interface RunePosition {
       width: 100%;
       height: 100%;
       pointer-events: none;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
     }
 
     .beam {
@@ -319,11 +326,11 @@ interface RunePosition {
       left: 50%;
       transform: translate(-50%, -50%);
       background: linear-gradient(90deg, 
-        rgba(255, 170, 90, 0.2),
-        rgba(255, 160, 70, 0.3),
-        rgba(255, 190, 110, 0.2)
+        rgba(0, 0, 0, 0.1),
+        rgba(40, 40, 40, 0.15),
+        rgba(0, 0, 0, 0.1)
       );
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       
       &.beam-1 {
         width: 600px;
@@ -358,56 +365,10 @@ interface RunePosition {
       position: relative;
       z-index: 2;
       text-align: center;
-      color: rgba(255, 255, 255, 0.9);
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      font-family: 'Cinzel', serif;
-    }
-
-    .title-line {
-      width: 300px;
-      height: 1px;
-      margin: 20px auto;
-      background: linear-gradient(90deg,
-        transparent,
-        rgba(255, 190, 110, 0.7),
-        transparent
-      );
-      position: relative;
-
-      &::before {
-        content: '';
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        background: rgba(255, 190, 110, 0.9);
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) rotate(45deg);
-      }
-    }
-
-    h1 {
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    .title-top {
-      display: block;
-      font-size: 1.2rem;
-      font-weight: 400;
-      letter-spacing: 0.3em;
-      color: rgba(255, 230, 190, 0.95);
-      text-shadow: 0 2px 10px rgba(180, 100, 50, 0.7);
-    }
-
-    .title-main {
-      display: block;
-      font-size: 3rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      color: rgba(255, 200, 120, 1);
-      text-shadow: 0 0 20px rgba(220, 140, 60, 0.8),
-                   0 0 40px rgba(255, 170, 70, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .loading-text {
@@ -415,8 +376,9 @@ interface RunePosition {
       font-size: 1rem;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      opacity: 0.85;
-      color: rgba(255, 210, 150, 0.9);
+      color: rgba(0, 0, 0, 0.7);
+      font-family: Arial, sans-serif;
+      font-weight: 500;
     }
 
     @keyframes rotate {

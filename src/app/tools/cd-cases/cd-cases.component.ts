@@ -821,7 +821,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Processes user interaction with the track list
    * 【✓】
    */
-  private handleTrackSelection(index: number): void {
+  public handleTrackSelection(index: number): void {
     // Handle track selection - activate the corresponding CD case
     if (index >= 0 && index < this.cdCases.length) {
       // First deactivate any currently active case

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface TeamMember {
@@ -8,17 +8,23 @@ interface TeamMember {
   image: string;
 }
 
+interface Milestone {
+  year: string;
+  event: string;
+}
+
 @Component({
   selector: 'app-mobile-about',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './mobile-about.component.html',
-  styleUrls: ['./mobile-about.component.scss']
+  styleUrls: ['./mobile-about.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MobileAboutComponent implements OnInit {
-  projectDescription = `Project Phantasia is a futuristic musical experience that blends electronic music with immersive visual storytelling. Created in 2023, our goal is to transport listeners to a digital realm where sound and visuals converge to create a unique sensory journey.`;
+  readonly projectDescription = `Project Phantasia is a futuristic musical experience that blends electronic music with immersive visual storytelling. Created in 2023, our goal is to transport listeners to a digital realm where sound and visuals converge to create a unique sensory journey.`;
   
-  teamMembers: TeamMember[] = [
+  readonly teamMembers: TeamMember[] = [
     {
       name: 'Alex Synth',
       role: 'Music Producer',
@@ -39,7 +45,7 @@ export class MobileAboutComponent implements OnInit {
     }
   ];
   
-  milestones = [
+  readonly milestones: Milestone[] = [
     { year: '2023', event: 'Project Phantasia founded' },
     { year: '2023', event: 'First EP "Digital Dreams" released' },
     { year: '2023', event: 'Official website launched' },

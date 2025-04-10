@@ -17,12 +17,17 @@
   </app-debug-menu>
 </div>
 
-<!-- Case status indicators -->
+<!-- Case status indicators with title and artist information -->
 <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'" aria-live="polite">
   <h2 class="visually-hidden">CD Case Status</h2>
-  <div *ngFor="let cdCase of cdCases" 
+  <div *ngFor="let cdCase of cdCases; let i = index" 
        class="case-indicator"
-       [class.open]="cdCase.isOpen">
-    Case {{cdCase.id}}: {{cdCase.isOpen ? 'Open' : 'Closed'}}
+       [class.open]="cdCase.isOpen"
+       [class.active]="cdCase.isActive"
+       (click)="handleTrackSelection(i)"
+       role="button"
+       tabindex="0">
+    <strong>{{cdCase.title}}</strong> by {{cdCase.artist}}
+    <span class="status">({{cdCase.isOpen ? 'Open' : 'Closed'}})</span>
   </div>
 </div> 

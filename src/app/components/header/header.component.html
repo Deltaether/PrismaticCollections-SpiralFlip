@@ -1,0 +1,38 @@
+<header class="site-header">
+  <div class="header-container">
+    <!-- Site Logo/Title -->
+    <div class="logo-container">
+      <a href="/" class="logo-link">
+        <img src="/assets/graphic/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
+      </a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="site-nav">
+      <!-- Collection Tabs -->
+      <div class="nav-section collection-tabs">
+        <h2 class="visually-hidden">Collections</h2>
+        <ul>
+          <li *ngFor="let collection of collections" 
+              [class.active]="collection.active" 
+              (click)="navigateToCollection(collection.id)">
+            <span>{{ collection.name }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Page Tabs -->
+      <div class="nav-section page-tabs">
+        <h2 class="visually-hidden">Pages</h2>
+        <ul>
+          <li *ngFor="let page of pages" 
+              [class.active]="page.active" 
+              (click)="navigateToPage(page.id)">
+            <span class="page-name">{{ page.name }}</span>
+            <span class="page-description">{{ page.description }}</span>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header> 

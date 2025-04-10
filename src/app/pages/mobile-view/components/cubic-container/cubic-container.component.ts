@@ -1,28 +1,109 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 import { AudioService } from '../../../../tools/music-player/audio.service';
 import { MobileNavigationService } from '../../services/mobile-navigation.service';
+
+// 【✓】 Define interfaces for type safety
+interface CubeDimensions {
+  width: number;
+  height: number;
+  depth: number;
+}
+
+interface CubeFace {
+  readonly name: string;
+  readonly route: string;
+}
 
 @Component({
   selector: 'app-cubic-container',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './cubic-container.component.html',
-  styleUrls: ['./cubic-container.component.scss']
+  template: `
+    <div class="cube-container" #cube>
+      <div class="cube" [class.transitioning]="isTransitioning">
+        <div class="face front" [class.active]="currentFace === 'front'"></div>
+        <div class="face right" [class.active]="currentFace === 'right'"></div>
+        <div class="face back" [class.active]="currentFace === 'back'"></div>
+        <div class="face left" [class.active]="currentFace === 'left'"></div>
+        <div class="face top" [class.active]="currentFace === 'top'"></div>
+        <div class="face bottom" [class.active]="currentFace === 'bottom'"></div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .cube-container {
+      width: 100%;
+      height: 100%;
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .cube.transitioning {
+      transition: transform 0.5s ease;
+    }
+
+    .face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backface-visibility: hidden;
+    }
+
+    .face.active {
+      background: rgba(0, 0, 0, 0.9);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .front { transform: translateZ(50%); }
+    .right { transform: rotateY(90deg) translateZ(50%); }
+    .back { transform: rotateY(180deg) translateZ(50%); }
+    .left { transform: rotateY(-90deg) translateZ(50%); }
+    .top { transform: rotateX(90deg) translateZ(50%); }
+    .bottom { transform: rotateX(-90deg) translateZ(50%); }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush // 【✓】 Optimize change detection
 })
 export class CubicContainerComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('cube') cubeElement!: ElementRef;
+  @ViewChild('cube') private readonly cubeElement!: ElementRef<HTMLDivElement>;
   
+  private readonly destroy$ = new Subject<void>();
+  private readonly isDebugMode = true;
+  private touchStartX: number = 0;
+  private touchStartY: number = 0;
+  private currentPage: number = 0;
+  private readonly totalPages: number = 6;
+  
+  cubeDimensions: CubeDimensions = {
+    width: 0,
+    height: 0,
+    depth: 0
+  };
+
   currentFace = 'front';
   isTransitioning = false;
   routerSubscription?: Subscription;
-  currentPage = 0; // Added for page indicators
   
-  // Map routes to cube faces
-  routeFaceMap: { [key: string]: string } = {
+  // 【✓】 Map routes to cube faces
+  private readonly routeFaceMap: Record<string, string> = {
     '/': 'front',
     '/music': 'right',
     '/about': 'back',
@@ -31,21 +112,46 @@ export class CubicContainerComponent implements OnInit, AfterViewInit, OnDestroy
     '/bottom': 'bottom'
   };
   
-  // Store touch start position
-  private touchStartX = 0;
-  private touchStartY = 0;
-  private touchThreshold = 50; // Minimum swipe distance to trigger navigation
-  
   constructor(
-    private router: Router,
-    private audioService: AudioService,
-    public navigationService: MobileNavigationService
+    private readonly cdr: ChangeDetectorRef,
+    private readonly router: Router,
+    private readonly audioService: AudioService,
+    public readonly navigationService: MobileNavigationService
   ) {}
 
+  // 【✓】 Initialize component
   ngOnInit(): void {
-    // Subscribe to router events to update cube face on navigation (✓)
+    if (this.isDebugMode) {
+      console.log('[CubicContainer] Initializing component');
+    }
+    this.initializeComponent();
+  }
+
+  // 【✓】 After view initialization
+  ngAfterViewInit(): void {
+    if (this.isDebugMode) {
+      console.log('[CubicContainer] After view init');
+    }
+    this.updateCubeDimensions();
+  }
+
+  // 【✓】 Cleanup resources
+  ngOnDestroy(): void {
+    if (this.isDebugMode) {
+      console.log('[CubicContainer] Destroying component');
+    }
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  // 【✓】 Initialize component
+  private initializeComponent(): void {
     this.routerSubscription = this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe((event: any) => {
       const url = event.urlAfterRedirects;
       const targetFace = this.getTargetFace(url);
@@ -55,194 +161,98 @@ export class CubicContainerComponent implements OnInit, AfterViewInit, OnDestroy
       }
     });
     
-    // Subscribe to the navigation service for page changes
-    this.navigationService.getCurrentPageIndex().subscribe(pageIndex => {
-      this.currentPage = pageIndex;
-    });
+    this.navigationService.getCurrentPageIndex()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(pageIndex => {
+        this.currentPage = pageIndex;
+        this.cdr.markForCheck();
+      });
   }
-  
-  ngAfterViewInit(): void {
-    // Set initial cube face based on current route (✓)
-    const currentUrl = this.router.url;
-    this.currentFace = this.getTargetFace(currentUrl);
-    this.updateCubeRotation();
-    this.updateCubeDimensions();
-  }
-  
-  ngOnDestroy(): void {
-    // Clean up subscriptions (✓)
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-    }
-  }
-  
+
+  // 【✓】 Handle window resize
   @HostListener('window:resize')
-  onResize(): void {
-    // Update cube dimensions on window resize (✓)
+  private handleResize(): void {
     this.updateCubeDimensions();
+    this.cdr.markForCheck();
   }
-  
-  // Handle touch start event (✓)
+
+  // 【✓】 Handle touch start
+  @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent): void {
     this.touchStartX = event.touches[0].clientX;
     this.touchStartY = event.touches[0].clientY;
   }
-  
-  // Handle touch end event for swipe navigation (✓)
-  onTouchEnd(event: TouchEvent): void {
+
+  // 【✓】 Handle touch move
+  @HostListener('touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
     if (this.isTransitioning) return;
-    
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
-    
-    const deltaX = this.touchStartX - touchEndX;
-    const deltaY = this.touchStartY - touchEndY;
-    
-    // Determine swipe direction based on the larger delta
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.touchThreshold) {
-      // Horizontal swipe
-      if (deltaX > 0) {
-        // Swipe left - navigate to the right face
-        this.navigateToCubeFace('right');
-      } else {
-        // Swipe right - navigate to the left face
-        this.navigateToCubeFace('left');
-      }
-    } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > this.touchThreshold) {
-      // Vertical swipe
-      if (deltaY > 0) {
-        // Swipe up - navigate to the bottom face
-        this.navigateToCubeFace('bottom');
-      } else {
-        // Swipe down - navigate to the top face
-        this.navigateToCubeFace('top');
+
+    const touchX = event.touches[0].clientX;
+    const touchY = event.touches[0].clientY;
+    const deltaX = touchX - this.touchStartX;
+    const deltaY = touchY - this.touchStartY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 50) {
+        this.navigationService.previousPage();
+      } else if (deltaX < -50) {
+        this.navigationService.nextPage();
       }
     }
   }
-  
-  // Handle mouse wheel event for navigation (✓)
+
+  // 【✓】 Handle wheel events
+  @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent): void {
-    if (this.isTransitioning) return;
     event.preventDefault();
     
-    if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-      // Vertical scroll
-      if (event.deltaY > 0) {
-        // Scroll down - navigate to next page
-        this.navigationService.navigateToNextPage();
-      } else {
-        // Scroll up - navigate to previous page
-        this.navigationService.navigateToPreviousPage();
-      }
-    } else {
-      // Horizontal scroll
-      if (event.deltaX > 0) {
-        // Scroll right - navigate to right face
-        this.navigateToCubeFace('right');
-      } else {
-        // Scroll left - navigate to left face
-        this.navigateToCubeFace('left');
-      }
-    }
-  }
-  
-  // Navigate to a cube face by its name (✓)
-  navigateToCubeFace(face: string): void {
-    // Get the route corresponding to the face
-    const route = Object.keys(this.routeFaceMap).find(key => this.routeFaceMap[key] === face);
-    if (route) {
-      this.router.navigateByUrl('mobile' + route);
-    }
-  }
-  
-  private getTargetFace(url: string): string {
-    // Get the cube face for a given route (✓)
-    // Remove query params and hash
-    const baseUrl = url.split('?')[0].split('#')[0];
-    return this.routeFaceMap[baseUrl] || 'front';
-  }
-  
-  private rotateCube(targetFace: string): void {
-    // Rotate the cube to the target face (✓)
     if (this.isTransitioning) return;
     
+    if (event.deltaY > 0) {
+      this.navigationService.nextPage();
+    } else {
+      this.navigationService.previousPage();
+    }
+  }
+
+  // 【✓】 Update cube dimensions
+  private updateCubeDimensions(): void {
+    if (!this.cubeElement) return;
+
+    const container = this.cubeElement.nativeElement;
+    const rect = container.getBoundingClientRect();
+    
+    this.cubeDimensions = {
+      width: rect.width,
+      height: rect.height,
+      depth: Math.min(rect.width, rect.height) / 2
+    };
+
+    if (this.isDebugMode) {
+      console.log('[CubicContainer] Cube dimensions updated:', this.cubeDimensions);
+    }
+  }
+
+  // 【✓】 Rotate cube to target face
+  private rotateCube(targetFace: string): void {
+    if (this.isDebugMode) {
+      console.log(`[CubicContainer] Rotating cube to face: ${targetFace}`);
+    }
+
     this.isTransitioning = true;
     this.currentFace = targetFace;
-    this.updateCubeRotation();
-    this.audioService.playUISound('page-turn');
-    
-    // Reset transition flag after animation completes
+    this.cdr.markForCheck();
+
     setTimeout(() => {
       this.isTransitioning = false;
-    }, 1000);
+      this.cdr.markForCheck();
+    }, 500);
   }
-  
-  private updateCubeRotation(): void {
-    // Update cube rotation based on current face (✓)
-    if (!this.cubeElement) return;
-    
-    const cube = this.cubeElement.nativeElement;
-    
-    switch (this.currentFace) {
-      case 'front':
-        cube.style.transform = 'rotateY(0deg)';
-        break;
-      case 'right':
-        cube.style.transform = 'rotateY(-90deg)';
-        break;
-      case 'back':
-        cube.style.transform = 'rotateY(-180deg)';
-        break;
-      case 'left':
-        cube.style.transform = 'rotateY(90deg)';
-        break;
-      case 'top':
-        cube.style.transform = 'rotateX(-90deg)';
-        break;
-      case 'bottom':
-        cube.style.transform = 'rotateX(90deg)';
-        break;
-    }
-  }
-  
-  private updateCubeDimensions(): void {
-    // Update cube dimensions to match viewport (✓)
-    if (!this.cubeElement) return;
-    
-    const cube = this.cubeElement.nativeElement;
-    const container = cube.parentElement;
-    
-    if (container) {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      
-      // Set cube size
-      cube.style.width = `${width}px`;
-      cube.style.height = `${height}px`;
-      
-      // Update transform-origin to center of cube
-      cube.style.transformOrigin = `center center -${width / 2}px`;
-      
-      // Update face positions
-      const faces = cube.querySelectorAll('.cube-face');
-      faces.forEach((face: HTMLElement) => {
-        face.style.width = `${width}px`;
-        face.style.height = `${height}px`;
-        
-        if (face.classList.contains('front')) {
-          face.style.transform = `translateZ(${width / 2}px)`;
-        } else if (face.classList.contains('back')) {
-          face.style.transform = `rotateY(180deg) translateZ(${width / 2}px)`;
-        } else if (face.classList.contains('right')) {
-          face.style.transform = `rotateY(90deg) translateZ(${width / 2}px)`;
-        } else if (face.classList.contains('left')) {
-          face.style.transform = `rotateY(-90deg) translateZ(${width / 2}px)`;
-        } else if (face.classList.contains('top')) {
-          face.style.transform = `rotateX(90deg) translateZ(${height / 2}px)`;
-        } else if (face.classList.contains('bottom')) {
-          face.style.transform = `rotateX(-90deg) translateZ(${height / 2}px)`;
-        }
-      });
-    }
+
+  // 【✓】 Get target face from URL
+  private getTargetFace(url: string): string {
+    const baseUrl = url.split('?')[0].split('#')[0];
+    return this.routeFaceMap[baseUrl] || 'front';
   }
 }

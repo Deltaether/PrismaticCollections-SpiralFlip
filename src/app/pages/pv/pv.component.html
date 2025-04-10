@@ -7,47 +7,17 @@
     </p>
 
     <div class="video-grid">
-      <div class="video-card">
-        <div class="video-placeholder">
+      <div class="video-card" *ngFor="let video of videos" (click)="playVideo(video)">
+        <div class="video-placeholder" [class.loading]="isLoading && selectedVideo?.videoId === video.videoId">
           <span class="play-icon">▶</span>
+          <div class="loading-indicator" *ngIf="isLoading && selectedVideo?.videoId === video.videoId">
+            <div class="spinner"></div>
+          </div>
         </div>
         <div class="video-info">
-          <h3>Incident (Official Music Video)</h3>
-          <p>Directed by Shiftpsh</p>
-          <span class="duration">5:23</span>
-        </div>
-      </div>
-
-      <div class="video-card">
-        <div class="video-placeholder">
-          <span class="play-icon">▶</span>
-        </div>
-        <div class="video-info">
-          <h3>i can avoid it (Visualizer)</h3>
-          <p>Visual Art by 1341obire</p>
-          <span class="duration">6:45</span>
-        </div>
-      </div>
-
-      <div class="video-card">
-        <div class="video-placeholder">
-          <span class="play-icon">▶</span>
-        </div>
-        <div class="video-info">
-          <h3>Making of Project Phantasia</h3>
-          <p>Behind the Scenes Documentary</p>
-          <span class="duration">15:30</span>
-        </div>
-      </div>
-
-      <div class="video-card">
-        <div class="video-placeholder">
-          <span class="play-icon">▶</span>
-        </div>
-        <div class="video-info">
-          <h3>Project Phantasia (Album Trailer)</h3>
-          <p>Official Album Preview</p>
-          <span class="duration">2:15</span>
+          <h3>{{ video.title }}</h3>
+          <p>{{ video.director }}</p>
+          <span class="duration">{{ video.duration }}</span>
         </div>
       </div>
     </div>

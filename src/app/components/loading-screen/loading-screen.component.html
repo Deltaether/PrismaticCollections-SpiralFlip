@@ -1,0 +1,19 @@
+<div class="loading-screen">
+  <div class="loading-content">
+    <div class="logo-container">
+      <img src="/assets/graphic/prismcoll_logox.svg" alt="Prismatic Collections" class="logo">
+      <div class="tagline">Project Phantasia</div>
+    </div>
+    
+    <div class="loader-container">
+      <div class="progress-bar-container">
+        <div class="progress-bar" [style.width]="progressText"></div>
+      </div>
+      <div class="progress-text">{{ progressText }}</div>
+    </div>
+    
+    <div class="loading-message">
+      {{ loadingMessages[currentMessageIndex] }}
+    </div>
+  </div>
+</div> 

@@ -9,6 +9,7 @@ import { MobileHomeComponent } from './pages/mobile-view/pages/mobile-home/mobil
 import { MobileMusicComponent } from './pages/mobile-view/pages/mobile-music/mobile-music.component';
 import { MobileAboutComponent } from './pages/mobile-view/pages/mobile-about/mobile-about.component';
 import { MobileContactComponent } from './pages/mobile-view/pages/mobile-contact/mobile-contact.component';
+import { MobileCreditsComponent } from './pages/mobile-view/pages/mobile-credits/mobile-credits.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'introduction', pathMatch: 'full' },
@@ -35,6 +36,11 @@ export const routes: Routes = [
         path: 'contact', 
         component: MobileContactComponent,
         outlet: 'left'
+      },
+      { 
+        path: 'credits', 
+        component: MobileCreditsComponent,
+        outlet: 'top'
       }
     ]
   },

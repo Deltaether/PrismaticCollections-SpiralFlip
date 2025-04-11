@@ -1,0 +1,97 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="title">PROJECT PHANTASIA</h1>
+      <p class="subtitle">A Revolutionary Musical Experience</p>
+      <div class="hero-buttons">
+        <button class="button primary" (click)="navigateTo('/introduction')">
+          Start 3D Experience
+        </button>
+        <button class="button secondary" (click)="navigateTo('/collection')">
+          Explore Collection
+        </button>
+      </div>
+    </div>
+    <div class="hero-background">
+      <div class="overlay"></div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <h2 class="section-title">Choose Your Experience</h2>
+    
+    <div class="featured-grid">
+      <div *ngFor="let section of featuredSections" 
+          class="feature-card" 
+          [class.main-feature]="section.isMain"
+          (click)="navigateTo(section.route)">
+        <div class="card-image" [style.backgroundImage]="'url(' + section.image + ')'">
+          <div class="card-overlay"></div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">{{ section.title }}</h3>
+          <p class="card-description">{{ section.description }}</p>
+          <div class="card-action">
+            <span class="explore-link">Explore</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about">
+    <div class="about-content">
+      <h2 class="section-title">About Project Phantasia</h2>
+      <p class="about-text">
+        Project Phantasia is an immersive musical experience that combines visual art, 
+        interactive 3D environments, and original music. Our goal is to create a new 
+        way to experience music beyond traditional formats.
+      </p>
+      <p class="about-text">
+        Navigate through our 3D environment to discover albums, listen to tracks, 
+        and learn about the creative process behind each piece.
+      </p>
+    </div>
+  </section>
+
+  <!-- Latest News Section -->
+  <section class="news">
+    <h2 class="section-title">Latest Updates</h2>
+    <div class="news-item">
+      <div class="news-date">2023.12.20</div>
+      <h3 class="news-title">New 3D Experience Released</h3>
+      <p class="news-content">
+        We've completely redesigned our 3D experience with improved performance and visual effects.
+      </p>
+    </div>
+    <div class="news-item">
+      <div class="news-date">2023.11.15</div>
+      <h3 class="news-title">Mobile Version Now Available</h3>
+      <p class="news-content">
+        Project Phantasia can now be experienced on mobile devices with a dedicated interface.
+      </p>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta">
+    <h2 class="cta-title">Choose Your Experience</h2>
+    <p class="cta-text">Select the version that best suits your device and preferences</p>
+    <div class="cta-buttons">
+      <button class="button primary" (click)="navigateTo('/introduction')">
+        <span class="button-icon">💻</span>
+        Desktop Experience
+        <span class="button-description">Full 3D immersive environment</span>
+      </button>
+      <button class="button secondary" (click)="navigateTo('/mobile')">
+        <span class="button-icon">📱</span>
+        Mobile Version
+        <span class="button-description">Optimized for touchscreens</span>
+      </button>
+    </div>
+    <p class="cta-note">You can always return to this page by clicking "Home" in the navigation</p>
+  </section>
+</div>

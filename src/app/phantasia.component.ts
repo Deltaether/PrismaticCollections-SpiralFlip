@@ -4,13 +4,14 @@ import { CommonModule } from '@angular/common';
 import { CDCasesComponent } from './tools/cd-cases/cd-cases.component';
 import { AudioService } from './tools/music-player/audio.service';
 import { DeviceDetectionService } from './services/device-detection.service';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MobileViewComponent } from './pages/mobile-view/mobile-view.component';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { SiteVersionSelectorComponent } from './components/site-version-selector/site-version-selector.component';
 import { HeaderComponent } from './components/header/header.component';
 import { DisclaimerComponent } from './components/disclaimer/disclaimer.component';
+import { SceneLoaderComponent } from './tools/cd-cases/scene-loader/scene-loader.component';
 
 // 【✓】 Define interfaces for type safety
 interface ViewportDimensions {
@@ -26,6 +27,11 @@ interface DesignDimensions {
 
 type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
 
+/**
+ * PhantasiaComponent - Handles the 3D experience of Project Phantasia
+ * This is NOT the main app component anymore but specifically for the 3D experience
+ * 【✓】
+ */
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -37,39 +43,50 @@ type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
     MobileViewComponent,
     SiteVersionSelectorComponent,
     HeaderComponent,
-    DisclaimerComponent
+    DisclaimerComponent,
+    SceneLoaderComponent
   ],
   template: `
-    <!-- Disclaimer (appears before anything else) -->
-    <app-disclaimer
-      *ngIf="showDisclaimer"
-      (acknowledged)="onDisclaimerAcknowledged()"
-    ></app-disclaimer>
-    
-    <!-- Site Version Selector (appears after disclaimer) -->
-    <app-site-version-selector
-      *ngIf="!showDisclaimer && showVersionSelector"
-      (versionSelected)="onVersionSelected($event)"
-      (selectorClosed)="onSelectorClosed()"
-    ></app-site-version-selector>
-    
-    <ng-container *ngIf="!isLoading && !showVersionSelector && !showDisclaimer">
-      <ng-container *ngIf="!isMobileView; else mobileTemplate">
-        <!-- Include the header for desktop view -->
-        <app-header *ngIf="!showHeaderForRoute"></app-header>
+    <!-- PhantasiaComponent - Only renders for specific routes -->
+    <ng-container *ngIf="shouldShowPhantasiaContent">
+      <!-- Global Loading Screen - highest z-index -->
+      <app-scene-loader *ngIf="showLoading"></app-scene-loader>
+      
+      <!-- Disclaimer Screen - appears before anything else -->
+      <app-disclaimer
+        *ngIf="showDisclaimer"
+        (acknowledged)="onDisclaimerAcknowledged()"
+      ></app-disclaimer>
+      
+      <!-- Site Version Selector - appears after disclaimer -->
+      <app-site-version-selector
+        *ngIf="!showDisclaimer && showVersionSelector"
+        (versionSelected)="onVersionSelected($event)"
+        (selectorClosed)="onSelectorClosed()"
+      ></app-site-version-selector>
+      
+      <!-- Main experience container - only render when not in loading state -->
+      <div class="main-container" #mainContent *ngIf="!showDisclaimer && !showVersionSelector && !isMobileView && showCDCasesForRoute">
+        <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
+      </div>
+      
+      <!-- Only show content when loading is complete -->
+      <ng-container *ngIf="!showLoading && !showVersionSelector && !showDisclaimer">
+        <ng-container *ngIf="!isMobileView; else mobileTemplate">
+          <!-- Router Outlet for standard pages (except introduction which shows CD cases) -->
+          <router-outlet *ngIf="!showCDCasesForRoute"></router-outlet>
+        </ng-container>
+        <ng-template #mobileTemplate>
+          <app-mobile-view></app-mobile-view>
+        </ng-template>
         
-        <!-- Router Outlet for standard pages -->
-        <router-outlet></router-outlet>
-        
-        <!-- 3D Container (only shown on introduction route) -->
-        <div class="main-container" #mainContent *ngIf="showCDCasesForRoute">
-          <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
-        </div>
+        <!-- Display the header only when loading is complete and after all other content -->
+        <app-header *ngIf="showHeaderForRoute"></app-header>
       </ng-container>
-      <ng-template #mobileTemplate>
-        <app-mobile-view></app-mobile-view>
-      </ng-template>
     </ng-container>
+    
+    <!-- For all other routes, just show the router outlet -->
+    <router-outlet *ngIf="!shouldShowPhantasiaContent"></router-outlet>
   `,
   styleUrls: ['./phantasia.component.scss'],
   styles: [`
@@ -83,7 +100,7 @@ type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1;
+      z-index: 500;
     }
     .scene-container {
       width: 1920px;
@@ -109,6 +126,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   isAnimating = false;
   isDebugMode = true;
   isLoading = true;
+  cdCasesLoading = true; // Add explicit tracking for CD cases loading state
   isMobileView = false;
   showVersionSelector = true;
   showDisclaimer = true;
@@ -127,6 +145,38 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
     public readonly router: Router,
     private readonly cdr: ChangeDetectorRef
   ) {
+    // Subscribe to router events to determine when to show PhantasiaComponent content
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      // This will force recheck of shouldShowPhantasiaContent when routes change
+      if (this.isDebugMode) {
+        console.log(`[PhantasiaComponent] Route changed: ${this.router.url}`);
+      }
+      this.initializeStateBasedOnRoute();
+      this.cdr.markForCheck();
+    });
+    
+    // Initialize state based on current route
+    this.initializeStateBasedOnRoute();
+  }
+  
+  /**
+   * Initialize component state based on current route
+   * 【✓】
+   */
+  private initializeStateBasedOnRoute(): void {
+    const currentUrl = this.router.url;
+    
+    // Skip initialization for routes that shouldn't show Phantasia content
+    if (!this.shouldShowPhantasiaContent) {
+      if (this.isDebugMode) {
+        console.log(`[PhantasiaComponent] Not on Phantasia route, skipping initialization`);
+      }
+      return;
+    }
+    
     // Check if user has already acknowledged the disclaimer
     const disclaimerAcknowledged = localStorage.getItem(this.DISCLAIMER_STORAGE_KEY);
     
@@ -141,6 +191,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
       this.checkVersionPreference();
     } else {
       // Show disclaimer first
+      this.showDisclaimer = true;
       if (this.isDebugMode) {
         console.log(`[PhantasiaComponent] Showing disclaimer`);
       }
@@ -166,6 +217,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
       this.initializeViewBasedOnPreference(savedPreference);
     } else {
       // Show version selector after disclaimer
+      this.showVersionSelector = true;
       if (this.isDebugMode) {
         console.log(`[PhantasiaComponent] No saved preference, showing version selector`);
       }
@@ -201,32 +253,53 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   }
   
   /**
-   * Hides header for specific routes that don't need it
+   * Determines if header should be shown for the current route and state
    * 【✓】
    */
   get showHeaderForRoute(): boolean {
-    // Hide header for mobile view or version selector
-    return false; // Always show the header
+    // Only show header when:
+    // 1. Not loading
+    // 2. Not showing disclaimer
+    // 3. Not showing version selector
+    // 4. Not on mobile view
+    return !this.showLoading && 
+           !this.showDisclaimer && 
+           !this.showVersionSelector && 
+           !this.isMobileView;
+  }
+
+  /**
+   * Determines if PhantasiaComponent content should be shown
+   * Only shows for introduction and its related routes
+   * 【✓】 
+   */
+  get shouldShowPhantasiaContent(): boolean {
+    const currentUrl = this.router.url;
+    // Show Phantasia content only for these specific routes
+    return currentUrl === '/introduction' || 
+           currentUrl === '/disc-1' || 
+           currentUrl === '/disc-2' || 
+           currentUrl === '/pv' || 
+           currentUrl === '/information';
+  }
+
+  // Compute derived loading state that considers all loading sources
+  get showLoading(): boolean {
+    // Show loading when any of these conditions are true
+    return this.isLoading || this.cdCasesLoading || this.showDisclaimer || this.showVersionSelector;
   }
 
   // 【✓】 Initialize view and handle initial routing
   private initializeView(): void {
-    const isFullHD = window.innerWidth === this.DESIGN_DIMENSIONS.width && 
-                    window.innerHeight === this.DESIGN_DIMENSIONS.height;
-    
-    if (isFullHD) {
-      this.isMobileView = false;
-      if (!this.router.url.includes('/introduction')) {
-        this.router.navigate(['/introduction'], { replaceUrl: true });
-      }
+    // Don't do anything if not on Phantasia route
+    if (!this.shouldShowPhantasiaContent) {
       return;
     }
     
-    this.isMobileView = this.deviceDetectionService.shouldUseMobileView();
-    
+    // Simply set loading to false after a delay
     setTimeout(() => {
       if (this.isDebugMode) {
-        console.log('[Loading] Setting loading state to false');
+        console.log('[Loading] Setting isLoading state to false');
       }
       this.isLoading = false;
       this.cdr.markForCheck();
@@ -235,6 +308,16 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // 【✓】 Initialize view based on saved preference
   private initializeViewBasedOnPreference(preference: string): void {
+    // Don't do anything if not on Phantasia route
+    if (!this.shouldShowPhantasiaContent) {
+      // Just set loading to false and exit immediately
+      setTimeout(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }, 500);
+      return;
+    }
+    
     if (preference === '3d') {
       this.isMobileView = false;
       if (!this.router.url.includes('/introduction')) {
@@ -262,6 +345,9 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
       console.log(`[PhantasiaComponent] User selected version: ${version}`);
     }
     
+    // Save the user's preference
+    localStorage.setItem(this.SELECTOR_STORAGE_KEY, version);
+    
     this.showVersionSelector = false;
     this.initializeViewBasedOnPreference(version);
     this.cdr.markForCheck();
@@ -273,14 +359,26 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
       console.log(`[PhantasiaComponent] Version selector closed without selection`);
     }
     
-    // Default to device detection if user closes without selection
+    // Just hide the selector without redirecting
     this.showVersionSelector = false;
-    this.initializeView();
-    this.cdr.markForCheck();
+    
+    // Set loading to false after a short delay
+    setTimeout(() => {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }, 500);
   }
 
   // 【✓】 Lifecycle hooks
   ngOnInit(): void {
+    // Skip initialization for non-Phantasia routes
+    if (!this.shouldShowPhantasiaContent) {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Not on Phantasia route, skipping ngOnInit');
+      }
+      return;
+    }
+    
     if (this.isDebugMode) {
       console.log('[Loading] OnInit - Current state:', {
         isLoading: this.isLoading,
@@ -296,6 +394,14 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    // Skip initialization for non-Phantasia routes
+    if (!this.shouldShowPhantasiaContent) {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Not on Phantasia route, skipping ngAfterViewInit');
+      }
+      return;
+    }
+    
     if (this.isDebugMode) {
       console.log('[Loading] AfterViewInit - isMobileView:', this.isMobileView);
     }
@@ -312,33 +418,13 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // 【✓】 View management
+  // 【✓】 View management - no longer automatically detects device type
   private checkDeviceAndSetView(): void {
-    const isFullHD = window.innerWidth === this.DESIGN_DIMENSIONS.width && 
-                    window.innerHeight === this.DESIGN_DIMENSIONS.height;
-    
-    if (isFullHD) {
-      this.isMobileView = false;
-      if (!this.router.url.includes('/introduction')) {
-        this.router.navigate(['/introduction'], { replaceUrl: true });
-      }
-      return;
-    }
-
-    const shouldBeMobile = this.deviceDetectionService.shouldUseMobileView();
-    
+    // This method is now deprecated and does nothing
+    // We no longer automatically detect device type
+    // User explicitly chooses via the home page
     if (this.isDebugMode) {
-      console.log(`[View Check] Current Aspect Ratio: ${this.viewport.aspectRatio.toFixed(3)}`);
-      console.log(`[View Check] Should Use Mobile: ${shouldBeMobile}`);
-      console.log(`[View Check] Viewport: ${this.viewport.width}x${this.viewport.height}`);
-      console.log(`[View Check] Screen Category: ${this.deviceDetectionService.getScreenCategory()}`);
-      console.log(`[View Check] Current Route: ${this.router.url}`);
-    }
-    
-    if (shouldBeMobile !== this.isMobileView) {
-      this.isMobileView = shouldBeMobile;
-      this.navigateToAppropriateView();
-      this.cdr.markForCheck();
+      console.log('[View Check] Automatic device detection disabled');
     }
   }
 
@@ -402,7 +488,7 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
     if (!mainElement) return;
 
     const closestSection = this.sections.reduce((closest, section) => {
-      const element = document.getElementById(section);
+    const element = document.getElementById(section);
       if (!element) return closest;
 
       const distance = Math.abs(element.getBoundingClientRect().top);
@@ -419,6 +505,9 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
   // 【✓】 Event handlers
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent): void {
+    // Only handle wheel events for Phantasia content
+    if (!this.shouldShowPhantasiaContent) return;
+    
     event.preventDefault();
     
     const now = Date.now();
@@ -436,6 +525,9 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('window:scroll')
   onScroll(): void {
+    // Only handle scroll events for Phantasia content
+    if (!this.shouldShowPhantasiaContent) return;
+    
     if (!this.isAnimating) {
       this.detectCurrentSection();
     }
@@ -443,6 +535,9 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('window:resize')
   onWindowResize(): void {
+    // Only handle resize events for Phantasia content
+    if (!this.shouldShowPhantasiaContent) return;
+    
     if (!this.isMobileView) {
       this.calculateViewportDimensions();
     }
@@ -450,12 +545,18 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('document:contextmenu', ['$event'])
   onContextMenu(event: Event): boolean {
+    // Only prevent context menu for Phantasia content
+    if (!this.shouldShowPhantasiaContent) return true;
+    
     event.preventDefault();
     return false;
   }
 
   // 【✓】 Public methods
   scrollTo(section: Section): void {
+    // Only handle section scrolling for Phantasia content
+    if (!this.shouldShowPhantasiaContent) return;
+    
     const element = document.getElementById(section);
     if (element && !this.isAnimating) {
       this.isAnimating = true;
@@ -470,11 +571,19 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Handles loading state changes from CD Cases component
+   * 【✓】
+   */
   onCDCasesLoadingChange(isLoading: boolean): void {
     if (this.isDebugMode) {
-      console.log('[Phantasia] CDCases loading state changed:', isLoading);
+      console.log(`[PhantasiaComponent] CD Cases loading state: ${isLoading}`);
     }
-    this.isLoading = isLoading;
+    
+    // Update the CD cases loading state
+    this.cdCasesLoading = isLoading;
+    
+    // Force change detection to update the UI immediately
     this.cdr.markForCheck();
   }
 

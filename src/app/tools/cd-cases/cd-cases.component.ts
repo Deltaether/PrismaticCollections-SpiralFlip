@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, NgZone, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, NgZone, OnInit, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, isDevMode } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -9,7 +9,6 @@ import config from './config/config.json';
 import { CDCasesService } from './services/cd-cases.service';
 import { SceneService } from './services/scene/scene.service';
 import { allCases, updateCasePositions } from './models';
-import { SceneLoaderComponent } from './scene-loader/scene-loader.component';
 import { CDCasesEventsService } from './services/events/cd-cases-events.service';
 import { CDCaseAnimationsService } from './services/animations/cd-case-animations.service';
 import { CDCasesDebugService } from './services/debug/cd-cases-debug.service';
@@ -32,7 +31,7 @@ import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 @Component({
   selector: 'app-cd-cases',
   standalone: true,
-  imports: [CommonModule, DebugMenuComponent, SceneLoaderComponent],
+  imports: [CommonModule, DebugMenuComponent],
   providers: [
     VideoService, 
     EventHandlerService, 
@@ -52,7 +51,8 @@ import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
     CDCasesStateService,
   ],
   templateUrl: './cd-cases.component.html',
-  styleUrls: ['./cd-cases.component.scss']
+  styleUrls: ['./cd-cases.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('canvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -152,8 +152,15 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Add constant for target aspect ratio
   private readonly targetAspect = 16 / 9;
 
-  // Add debug mode flag
-  private isDebugMode = false;
+  // Initialize debug mode flag - use Angular's isDevMode() for production detection
+  public isDebugMode = isDevMode();
+
+  // Add a member property for the resize observer
+  private resizeObserver: ResizeObserver | null = null;
+
+  // Add a property for wheel event debouncing
+  private wheelDebounceTimer: any = null;
+  private readonly WHEEL_DEBOUNCE_DELAY = 150; // ms
 
   constructor(
     private cdCasesService: CDCasesService,
@@ -172,7 +179,8 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     private setupHelperService: SetupHelperService,
     private animationHelperService: AnimationHelperService,
     private sceneConfigHelperService: SceneConfigHelperService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   // 【✓】 Initialize services and setup scene
@@ -193,15 +201,14 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setupCSS3DRenderer();
     this.setupRightSideMenu();
     
-    // Load models and initialize scene
+    // Load models and initialize scene - don't set loading state here
+    // as it's now managed in ngAfterViewInit
     this.loadModels().then(() => {
       if (this.isDebugMode) {
         console.log('[CDCases] Scene setup completed');
       }
-      this.setLoadingState(false);
     }).catch(error => {
       console.error('[CDCases] Error setting up scene:', error);
-      this.setLoadingState(false);
     });
   }
 
@@ -214,6 +221,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isDebugMode) {
       console.log('[CDCases] Initializing component');
     }
+    
+    // Set loading state to true at initialization and emit to parent
+    this.setLoadingState(true);
     
     // Initialize services only
     this.initializeServices();
@@ -236,12 +246,19 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setupCSS3DRenderer();
     this.setupRightSideMenu();
     
+    // Set up ResizeObserver for more efficient resize handling
+    this.setupResizeObserver();
+    
     // Load models and initialize scene
     this.loadModels().then(() => {
       if (this.isDebugMode) {
         console.log('[CDCases] Models loaded successfully');
       }
-      this.setLoadingState(false);
+      
+      // Notify parent that loading is complete after small delay to ensure rendering
+      setTimeout(() => {
+        this.setLoadingState(false);
+      }, 500);
     }).catch(error => {
       console.error('[CDCases] Error loading models:', error);
       this.setLoadingState(false);
@@ -252,8 +269,45 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Sets up a ResizeObserver for more efficient resize handling
+   * Modern alternative to window resize event
+   * 【✓】
+   */
+  private setupResizeObserver(): void {
+    // Only create if ResizeObserver is available and canvas exists
+    if (typeof ResizeObserver !== 'undefined' && this.canvasRef?.nativeElement) {
+      // Run outside Angular zone to avoid change detection triggers
+      this.ngZone.runOutsideAngular(() => {
+        this.resizeObserver = new ResizeObserver((entries) => {
+          // Use requestAnimationFrame to debounce and sync with render cycle
+          if (this.resizeDebounceId) {
+            cancelAnimationFrame(this.resizeDebounceId);
+          }
+          
+          this.resizeDebounceId = requestAnimationFrame(() => {
+            this.updateRendererSize();
+          });
+        });
+        
+        // Observe the parent container for size changes
+        const container = this.canvasRef.nativeElement.parentElement;
+        if (container) {
+          this.resizeObserver.observe(container);
+          
+          if (this.isDebugMode) {
+            console.log('[CDCases] ResizeObserver set up on container');
+          }
+        }
+      });
+    } else if (this.isDebugMode) {
+      console.log('[CDCases] ResizeObserver not available, falling back to window resize');
+    }
+  }
+
+  /**
    * Sets up the WebGL renderer, scene, camera, and lighting
    * Creates video planes and initializes core Three.js components
+   * Optimizes for modern GPUs and performance
    * 【✓】
    */
   private setupRenderer(): void {
@@ -268,6 +322,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderer = results.renderer;
     this.scene = results.scene;
     this.camera = results.camera;
+    
+    // Apply performance optimizations for the renderer
+    this.optimizeRenderer();
     
     // Get references to lights
     this.ambientLight = results.lights.ambientLight;
@@ -289,6 +346,50 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.videoPlay = results.videoElements.videoPlay;
     this.videoPause = results.videoElements.videoPause;
     this.updateVideoSource = results.videoElements.updateVideoSource;
+  }
+  
+  /**
+   * Applies performance optimizations to the renderer
+   * Sets appropriate renderer settings for modern GPUs
+   * 【✓】
+   */
+  private optimizeRenderer(): void {
+    if (!this.renderer) return;
+    
+    // Run outside Angular zone to avoid change detection
+    this.ngZone.runOutsideAngular(() => {
+      // Cap pixel ratio for performance
+      const pixelRatio = Math.min(window.devicePixelRatio, 2);
+      this.renderer.setPixelRatio(pixelRatio);
+      
+      // Set renderer parameters based on available properties
+      // Use type assertion for properties that might not be in the type definitions
+      if ('powerPreference' in this.renderer) {
+        (this.renderer as any).powerPreference = 'high-performance';
+      }
+      
+      // Set appropriate color encoding if available
+      if (THREE.SRGBColorSpace) {
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+      } else if ((THREE as any).sRGBEncoding) {
+        (this.renderer as any).outputEncoding = (THREE as any).sRGBEncoding;
+      }
+      
+      // Enable shadow optimization if shadows are used
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      
+      // Enable physical lighting model if available
+      if ('physicallyCorrectLights' in this.renderer) {
+        (this.renderer as any).physicallyCorrectLights = true;
+      } else if ('useLegacyLights' in this.renderer) {
+        (this.renderer as any).useLegacyLights = false;
+      }
+      
+      if (this.isDebugMode) {
+        console.log(`[CDCases] Renderer optimized with pixel ratio: ${pixelRatio}`);
+      }
+    });
   }
 
   /**
@@ -315,37 +416,37 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Loads CD case models and initializes related state
    * Creates 3D representations of album cases and sets up initial positions
-   * Activated first case and sets up silhouette effects
-   * 【✗】 - Refactored to SetupHelperService
+   * Uses promise-based loading for better performance
+   * 【✓】
    */
   private async loadModels(): Promise<void> {
     try {
-      // Load CD cases
+      if (this.isDebugMode) {
+        console.log('[CDCases] Starting model loading');
+        console.time('model-loading');
+      }
+      
+      // Load CD cases - use Promise.all to load models in parallel when possible
       this.cdCases = await this.cdCasesService.loadModels(this.config, this.scene, this.renderer);
       
-      // Initialize playingMusic array to match CD cases
-      this.playingMusic = new Array(this.cdCases.length).fill(false);
-      
-      // Initialize tutorialCompleted array to match CD cases
-      this.tutorialCompleted = new Array(this.cdCases.length).fill(false);
-      
-      // Initialize caseSettings for each CD case
-      this.cdCases.forEach(cdCase => {
-        if (!this.caseSettings[cdCase.id]) {
-          this.caseSettings[cdCase.id] = {
-            positionX: 0,
-            positionY: 0,
-            positionZ: 0,
-            rotationX: 0,
-            rotationY: 0,
-            rotationZ: 0
-          };
-        }
-      });
+      // Initialize arrays and settings in parallel
+      await Promise.all([
+        // Initialize tracking arrays
+        this.initializeTrackingArrays(),
+        
+        // Initialize case settings
+        this.initializeCaseSettings()
+      ]);
       
       // Add label renderer to DOM and start animation
       this.labelRendererElement.nativeElement.appendChild(this.labelRenderer.domElement);
-      this.animate();
+      
+      // Run animation outside Angular zone
+      this.ngZone.runOutsideAngular(() => {
+        this.animate();
+      });
+      
+      // Add event listeners
       this.addEventListeners();
 
       // Ensure everything is rendered before showing
@@ -353,29 +454,86 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.labelRenderer.render(this.scene, this.camera);
 
       // Wait for next frame to ensure all cases are properly positioned
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 
       // Activate first case after ensuring all cases are in their initial positions
-      this.stateService.setActiveCase(this.cdCases, 0);
+      this.activateInitialCase();
       
-      // Create silhouette for active case
-      const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
-      if (activeCase) {
-        this.createActiveCaseSilhouette(activeCase);
-        
-        // Initialize videoPlane2 alignment with active case
-        this.videoService.updateVideoPlane2Alignment(
-          this.caseBackVideoPlane,
-          this.isManuallyAnimating,
-          this.manuallyAnimatedCaseId,
-          this.cdCases
-        );
+      if (this.isDebugMode) {
+        console.timeEnd('model-loading');
+        console.log('[CDCases] Models loaded and initialized successfully');
       }
-
+      
     } catch (error) {
       console.error('[CDCases] Error loading scene:', error);
       this.setLoadingState(false);
       throw error; // Re-throw to be caught by the caller
+    }
+  }
+  
+  /**
+   * Initializes tracking arrays for music playback and tutorial state
+   * 【✓】
+   */
+  private async initializeTrackingArrays(): Promise<void> {
+    // Initialize playingMusic array to match CD cases
+    this.playingMusic = new Array(this.cdCases.length).fill(false);
+    
+    // Initialize tutorialCompleted array to match CD cases
+    this.tutorialCompleted = new Array(this.cdCases.length).fill(false);
+    
+    if (this.isDebugMode) {
+      console.log(`[CDCases] Initialized tracking arrays for ${this.cdCases.length} cases`);
+    }
+  }
+  
+  /**
+   * Initializes settings for each CD case
+   * 【✓】
+   */
+  private async initializeCaseSettings(): Promise<void> {
+    this.cdCases.forEach(cdCase => {
+      if (!this.caseSettings[cdCase.id]) {
+        this.caseSettings[cdCase.id] = {
+          positionX: 0,
+          positionY: 0,
+          positionZ: 0,
+          rotationX: 0,
+          rotationY: 0,
+          rotationZ: 0
+        };
+      }
+    });
+    
+    if (this.isDebugMode) {
+      console.log(`[CDCases] Initialized settings for ${this.cdCases.length} cases`);
+    }
+  }
+  
+  /**
+   * Activates the initial case and creates silhouette effect
+   * 【✓】
+   */
+  private activateInitialCase(): void {
+    // Activate first case
+    this.stateService.setActiveCase(this.cdCases, 0);
+    
+    // Create silhouette for active case
+    const activeCase = this.cdCases.find(cdCase => cdCase.isActive);
+    if (activeCase) {
+      this.createActiveCaseSilhouette(activeCase);
+      
+      // Initialize videoPlane2 alignment with active case
+      this.videoService.updateVideoPlane2Alignment(
+        this.caseBackVideoPlane,
+        this.isManuallyAnimating,
+        this.manuallyAnimatedCaseId,
+        this.cdCases
+      );
+      
+      if (this.isDebugMode) {
+        console.log(`[CDCases] Activated initial case ID: ${activeCase.id}`);
+      }
     }
   }
 
@@ -442,29 +600,33 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Main animation loop that runs every frame
    * Orchestrates all animations, physics updates, and rendering
+   * Runs outside Angular's change detection zone for better performance
    * 【✓】
    */
   private animate(): void {
     if (!this.renderer) return;
     
-    this.animationId = requestAnimationFrame(() => this.animate());
-    
-    // Use the AnimationHelperService to handle animation
-    this.animationHelperService.animate(
-      this.renderer,
-      this.scene,
-      this.camera,
-      this.controls,
-      this.labelRenderer,
-      this.cdCases,
-      this.caseBackVideoPlane,
-      this.rightSideMenuPlane,
-      this.isManuallyAnimating,
-      this.manuallyAnimatedCaseId,
-      this.activeCaseExpanded,
-      this.playingMusic,
-      this.tutorialCompleted
-    );
+    // Run animation loop outside Angular zone for better performance
+    this.ngZone.runOutsideAngular(() => {
+      this.animationId = requestAnimationFrame(() => this.animate());
+      
+      // Use the AnimationHelperService to handle animation
+      this.animationHelperService.animate(
+        this.renderer,
+        this.scene,
+        this.camera,
+        this.controls,
+        this.labelRenderer,
+        this.cdCases,
+        this.caseBackVideoPlane,
+        this.rightSideMenuPlane,
+        this.isManuallyAnimating,
+        this.manuallyAnimatedCaseId,
+        this.activeCaseExpanded,
+        this.playingMusic,
+        this.tutorialCompleted
+      );
+    });
   }
 
   /**
@@ -550,42 +712,69 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Handles window resize events to maintain proper rendering
    * Adjusts camera and renderer dimensions for responsive display
+   * Uses debouncing for better performance
    * 【✓】
    */
   @HostListener('window:resize', ['$event'])
   onWindowResize(): void {
-    if (!this.renderer || !this.camera || !this.labelRenderer) return;
-    
-    // Get current viewport dimensions
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    // Calculate aspect ratios
-    const currentAspect = width / height;
-    const targetAspect = 16 / 9; // Our design aspect ratio
-    
-    // Base FOV for 16:9 aspect ratio
-    const baseFOV = 60;
-    
-    // Adjust FOV based on aspect ratio to maintain scene composition
-    if (currentAspect > targetAspect) {
-      // Wider screen - increase FOV horizontally
-      this.camera.fov = baseFOV / (currentAspect / targetAspect);
-    } else {
-      // Taller screen - increase FOV vertically
-      this.camera.fov = baseFOV * (targetAspect / currentAspect);
+    // Use requestAnimationFrame to debounce resize handling
+    if (this.resizeDebounceId) {
+      cancelAnimationFrame(this.resizeDebounceId);
     }
     
-    // Update camera parameters
-    this.camera.aspect = currentAspect;
-    this.camera.updateProjectionMatrix();
+    this.resizeDebounceId = requestAnimationFrame(() => {
+      this.updateRendererSize();
+    });
+  }
+  
+  // Add property for resize debouncing
+  private resizeDebounceId: number | null = null;
+  
+  /**
+   * Updates renderer and camera based on current window size
+   * Extracts resize logic to a separate method for reuse
+   * 【✓】
+   */
+  private updateRendererSize(): void {
+    if (!this.renderer || !this.camera || !this.labelRenderer) return;
     
-    // Update renderers with new dimensions
-    this.renderer.setSize(width, height);
-    this.labelRenderer.setSize(width, height);
-    
-    // Ensure pixel ratio is set correctly
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    // Run outside Angular zone to avoid triggering change detection
+    this.ngZone.runOutsideAngular(() => {
+      // Get current viewport dimensions
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      // Calculate aspect ratios
+      const currentAspect = width / height;
+      
+      // Adjust FOV based on aspect ratio to maintain scene composition
+      if (currentAspect > this.targetAspect) {
+        // Wider screen - increase FOV horizontally
+        this.camera.fov = 60 / (currentAspect / this.targetAspect);
+      } else {
+        // Taller screen - increase FOV vertically
+        this.camera.fov = 60 * (this.targetAspect / currentAspect);
+      }
+      
+      // Update camera parameters
+      this.camera.aspect = currentAspect;
+      this.camera.updateProjectionMatrix();
+      
+      // Update renderers with new dimensions
+      this.renderer.setSize(width, height);
+      this.labelRenderer.setSize(width, height);
+      
+      // Ensure pixel ratio is set correctly
+      const pixelRatio = Math.min(window.devicePixelRatio, 2); // Cap at 2 for performance
+      this.renderer.setPixelRatio(pixelRatio);
+      
+      // Adjust case positions for the new aspect ratio
+      this.adjustCasePositionsForAspectRatio();
+      
+      if (this.isDebugMode) {
+        console.log(`[CDCases] Renderer resized: ${width}x${height}, aspect: ${currentAspect.toFixed(2)}`);
+      }
+    });
   }
 
   // Update centerCamera to maintain fixed positions
@@ -650,40 +839,83 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Cleans up resources when component is destroyed
    * Cancels animation loop and releases memory
+   * Disconnects observers and event listeners
    * 【✓】
    */
   ngOnDestroy(): void {
-    // Use the RendererService to clean up resources
-    this.rendererService.cleanUpResources(this.cdCases, this.animationId);
+    if (this.isDebugMode) {
+      console.log('[CDCases] Component destroying - cleaning up resources');
+    }
+    
+    // Clean up ResizeObserver
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    
+    // Cancel any pending resize operations
+    if (this.resizeDebounceId) {
+      cancelAnimationFrame(this.resizeDebounceId);
+      this.resizeDebounceId = null;
+    }
+    
+    // Cancel any pending wheel debounce
+    if (this.wheelDebounceTimer) {
+      clearTimeout(this.wheelDebounceTimer);
+      this.wheelDebounceTimer = null;
+    }
+    
+    // Cancel animation loop
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
     
     // Clean up the menu integration
     this.menuIntegrationService.destroy();
+    
+    // Perform comprehensive cleanup of THREE.js resources
+    this.performComprehensiveCleanup();
   }
 
   /**
    * Handles mouse wheel events for case navigation
    * Implements scrolling behavior to cycle through cases
+   * Uses debouncing for better performance
    * 【✓】
    */
   @HostListener('wheel', ['$event'])
-  onWheel(event: WheelEvent) {
+  onWheel(event: WheelEvent): void {
     if (event.ctrlKey || event.metaKey) {
       event.preventDefault();
       return;
     }
     
-    this.eventHandlerService.onWheel(
-      event,
-      this.cdCases,
-      this.sceneSettings,
-      this.stateService,
-      this.animationService,
-      this.createActiveCaseSilhouette.bind(this),
-      this.animateActiveCaseBack.bind(this),
-      this.updateVideoForNewActiveCase.bind(this),
-      () => this.activeCaseExpanded,
-      this.caseAnimationService.resetCasePosition.bind(this.caseAnimationService)
-    );
+    // Debounce wheel events to prevent rapid firing
+    if (this.wheelDebounceTimer) {
+      clearTimeout(this.wheelDebounceTimer);
+    }
+    
+    this.wheelDebounceTimer = setTimeout(() => {
+      // Run in Angular zone to ensure change detection
+      this.ngZone.run(() => {
+        this.eventHandlerService.onWheel(
+          event,
+          this.cdCases,
+          this.sceneSettings,
+          this.stateService,
+          this.animationService,
+          this.createActiveCaseSilhouette.bind(this),
+          this.animateActiveCaseBack.bind(this),
+          this.updateVideoForNewActiveCase.bind(this),
+          () => this.activeCaseExpanded,
+          this.caseAnimationService.resetCasePosition.bind(this.caseAnimationService)
+        );
+        
+        // Mark for check after navigation
+        this.cdr.markForCheck();
+      });
+    }, this.WHEEL_DEBOUNCE_DELAY);
   }
 
   /**
@@ -892,11 +1124,138 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     return true;
   }
 
-  private setLoadingState(isLoading: boolean) {
+  /**
+   * Sets the loading state and emits the change to parent components
+   * Ensures the parent component is aware of loading state changes
+   * Uses ChangeDetectorRef for OnPush change detection
+   * 【✓】
+   */
+  private setLoadingState(isLoading: boolean): void {
     if (this.isDebugMode) {
-      console.log('[CDCases] Setting loading state:', isLoading);
+      console.log(`[CDCases] Setting loading state to: ${isLoading}`);
     }
+    
+    // Update internal loading state
     this.isLoading = isLoading;
-    this.loadingChange.emit(isLoading);
+    
+    // Always emit the loading state change
+    // Use NgZone.run to ensure it runs inside Angular's zone for change detection
+    this.ngZone.run(() => {
+      this.loadingChange.emit(isLoading);
+      
+      // Mark for check to trigger change detection
+      this.cdr.markForCheck();
+      
+      if (this.isDebugMode) {
+        console.log(`[CDCases] Emitted loading state: ${isLoading}`);
+      }
+    });
+  }
+
+  /**
+   * Performs comprehensive cleanup of THREE.js resources
+   * Ensures proper garbage collection
+   * 【✓】
+   */
+  private performComprehensiveCleanup(): void {
+    // Clean up renderer
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.forceContextLoss();
+      (this.renderer as any).domElement = null;
+      (this.renderer as any) = null;
+    }
+    
+    // Clean up label renderer
+    if (this.labelRenderer) {
+      if (this.labelRenderer.domElement && this.labelRenderer.domElement.parentNode) {
+        this.labelRenderer.domElement.parentNode.removeChild(this.labelRenderer.domElement);
+      }
+      (this.labelRenderer as any) = null;
+    }
+    
+    // Clean up scene objects
+    if (this.scene) {
+      this.disposeSceneObjects(this.scene);
+      (this.scene as any) = null;
+    }
+    
+    // Clean up controls
+    if (this.controls) {
+      this.controls.dispose();
+      (this.controls as any) = null;
+    }
+    
+    // Clean up camera
+    if (this.camera) {
+      (this.camera as any) = null;
+    }
+    
+    // Clean up DOM elements
+    if (this.canvasRef?.nativeElement) {
+      while (this.canvasRef.nativeElement.firstChild) {
+        this.canvasRef.nativeElement.removeChild(this.canvasRef.nativeElement.firstChild);
+      }
+    }
+    
+    if (this.labelRendererElement?.nativeElement) {
+      while (this.labelRendererElement.nativeElement.firstChild) {
+        this.labelRendererElement.nativeElement.removeChild(
+          this.labelRendererElement.nativeElement.firstChild
+        );
+      }
+    }
+    
+    if (this.isDebugMode) {
+      console.log('[CDCases] Comprehensive cleanup completed');
+    }
+  }
+  
+  /**
+   * Recursively disposes all objects in a scene
+   * Ensures proper garbage collection of THREE.js objects
+   * 【✓】
+   */
+  private disposeSceneObjects(obj: THREE.Object3D): void {
+    while (obj.children.length > 0) {
+      this.disposeSceneObjects(obj.children[0]);
+      obj.remove(obj.children[0]);
+    }
+    
+    if ((obj as any).geometry) {
+      (obj as any).geometry.dispose();
+    }
+    
+    if ((obj as any).material) {
+      if (Array.isArray((obj as any).material)) {
+        (obj as any).material.forEach((material: THREE.Material) => this.disposeMaterial(material));
+      } else {
+        this.disposeMaterial((obj as any).material);
+      }
+    }
+  }
+  
+  /**
+   * Disposes a THREE.js material
+   * 【✓】
+   */
+  private disposeMaterial(material: THREE.Material): void {
+    material.dispose();
+    
+    // Dispose textures if they exist
+    for (const key in material) {
+      const value = (material as any)[key];
+      if (value && typeof value === 'object' && 'dispose' in value) {
+        value.dispose();
+      }
+    }
+  }
+
+  /**
+   * TrackBy function for ngFor to improve rendering performance
+   * 【✓】
+   */
+  trackByCaseId(index: number, cdCase: CDCase): number {
+    return cdCase.id;
   }
 } 

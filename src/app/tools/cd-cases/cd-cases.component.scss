@@ -2,12 +2,14 @@
   display: block;
   width: 100%;
   height: 100%;
+  position: relative;
+  background: #000;
   overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  transform: none;
+  filter: none;
+  perspective: none;
+  isolation: isolate;
+  z-index: 10;
 }
 
 .cd-container {
@@ -43,12 +45,15 @@ canvas {
   object-fit: cover;
   background: transparent;
   transition: opacity 0.5s ease;
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 /* Container for the label renderer */
 .label-renderer {
-  width: 100%;
-  height: 100%;
   position: absolute;
   top: 0;
   left: 0;
@@ -58,15 +63,12 @@ canvas {
 
 /* Updated container class name to match HTML */
 .cd-cases-container {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow: hidden;
+  background-color: #000;
+  will-change: transform;
 }
 
 canvas {
@@ -87,58 +89,46 @@ canvas {
 }
 
 .case-indicators {
-  position: fixed;
-  top: 20px;
+  position: absolute;
+  bottom: 20px;
   left: 20px;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 5px;
-  transition: opacity 0.5s ease;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 10;
+  transition: opacity 0.3s ease;
   max-width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.case-indicator {
-  color: white;
-  margin: 5px 0;
-  font-family: Arial, sans-serif;
-  transition: all 0.3s ease;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  border-left: 3px solid transparent;
+  max-height: 200px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
   
-  strong {
-    display: block;
-    font-size: 1.1rem;
-    margin-bottom: 2px;
-  }
+  // Better scrolling on touch devices
+  -webkit-overflow-scrolling: touch;
   
-  .status {
-    opacity: 0.6;
-    font-size: 0.8rem;
-    margin-left: 5px;
-  }
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  &.open {
-    color: #00ff00;
-    background-color: rgba(0, 255, 0, 0.1);
-    border-left: 3px solid #00ff00;
-  }
-  
-  &.active {
-    background-color: rgba(255, 215, 0, 0.2);
-    border-left: 3px solid gold;
-  }
-  
-  &.active.open {
-    background-color: rgba(0, 255, 50, 0.2);
-    border-left: 3px solid lime;
+  .case-indicator {
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgba(60, 60, 60, 0.7);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    
+    &:hover, &:focus {
+      background-color: rgba(80, 80, 80, 0.8);
+      transform: translateX(3px);
+    }
+    
+    &.active {
+      background-color: rgba(100, 100, 255, 0.6);
+    }
+    
+    &.open {
+      background-color: rgba(100, 255, 100, 0.6);
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 
@@ -316,4 +306,55 @@ canvas {
       transform: rotateY(180deg) translateY(-10px);
     }
   }
+}
+
+// 【✓】 Loading overlay with hardware-accelerated animations
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: #fff;
+  
+  // Use transform for hardware acceleration
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  animation: spin 1s infinite linear;
+  margin-bottom: 20px;
+  
+  // Hardware acceleration
+  will-change: transform;
+}
+
+.loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 } 

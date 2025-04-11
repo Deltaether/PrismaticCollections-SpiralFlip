@@ -1,5 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/phantasia.config';
+import { appConfig } from './app/app.config';
 import { PhantasiaComponent } from './app/phantasia.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
 

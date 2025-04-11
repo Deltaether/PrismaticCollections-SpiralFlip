@@ -21,12 +21,12 @@ export class HeaderComponent implements OnInit {
   ];
   
   readonly pages = [
-    { id: 'home', name: 'Home', active: true, route: '/introduction', description: '3D Experience' },
+    { id: 'experience', name: 'Experience', active: true, route: '/introduction', description: '3D Experience' },
     { id: 'collection', name: 'Collection', active: false, route: '/collection', description: 'Album Info' }
   ];
   
   activeCollectionId = 'phantasia';
-  activePageId = 'home';
+  activePageId = 'experience';
   isDebugMode = true;
 
   constructor(private router: Router) {}
@@ -108,6 +108,20 @@ export class HeaderComponent implements OnInit {
     
     if (this.isDebugMode) {
       console.log(`[Header] Navigated to page: ${pageId}`);
+    }
+  }
+  
+  /**
+   * Navigates to the home page
+   * This is separate from the Phantasia project navigation
+   * 【✓】
+   */
+  navigateToHome(): void {
+    // Navigate to root path with a hard reload to ensure complete state reset
+    window.location.href = '/';
+    
+    if (this.isDebugMode) {
+      console.log('[Header] Navigated to home page with window.location');
     }
   }
 } 

@@ -31,7 +31,7 @@ $border-glow: 0 0 10px rgba(255, 150, 70, 0.5);
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 900; /* Lower than loader's z-index (99999) */
   @include glassmorphism;
 
   .header-container {
@@ -56,6 +56,7 @@ $border-glow: 0 0 10px rgba(255, 150, 70, 0.5);
     justify-content: center;
     text-decoration: none;
     height: 100%;
+    cursor: pointer;
   }
   
   .logo-image {
@@ -118,6 +119,31 @@ $border-glow: 0 0 10px rgba(255, 150, 70, 0.5);
           box-shadow: $border-glow;
         }
       }
+    }
+  }
+}
+
+// Home Tabs Styles
+.home-tabs {
+  li {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5px;
+    
+    &:hover {
+      background-color: $tab-hover-color;
+    }
+    
+    .page-name {
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    
+    .page-description {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 2px;
     }
   }
 }

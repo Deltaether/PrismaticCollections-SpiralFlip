@@ -2,13 +2,23 @@
   <div class="header-container">
     <!-- Site Logo/Title -->
     <div class="logo-container">
-      <a href="/" class="logo-link">
+      <a (click)="navigateToHome()" class="logo-link">
         <img src="/assets/graphic/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
       </a>
     </div>
 
     <!-- Navigation -->
     <nav class="site-nav">
+      <!-- Home Link (styled like other navigation items) -->
+      <div class="nav-section home-tabs">
+        <ul>
+          <li class="home-tab" (click)="navigateToHome()">
+            <span class="page-name">Home</span>
+            <span class="page-description">Landing Page</span>
+          </li>
+        </ul>
+      </div>
+
       <!-- Collection Tabs -->
       <div class="nav-section collection-tabs">
         <h2 class="visually-hidden">Collections</h2>

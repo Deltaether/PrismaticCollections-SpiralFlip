@@ -12,7 +12,6 @@ import { MobileContactComponent } from './pages/mobile-view/pages/mobile-contact
 import { MobileCreditsComponent } from './pages/mobile-view/pages/mobile-credits/mobile-credits.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'introduction', pathMatch: 'full' },
   { 
     path: 'mobile', 
     component: MobileViewComponent,
@@ -48,6 +47,5 @@ export const routes: Routes = [
   { path: 'disc-1', component: DiscOneComponent },
   { path: 'disc-2', component: DiscTwoComponent },
   { path: 'pv', component: PvComponent },
-  { path: 'information', component: InformationComponent },
-  { path: '**', redirectTo: 'introduction' }
+  { path: 'information', component: InformationComponent }
 ];

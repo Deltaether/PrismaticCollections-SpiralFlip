@@ -83,7 +83,8 @@ interface RunePosition {
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
-      z-index: 9999;
+      z-index: 99999;
+      isolation: isolate;
     }
 
     .loader-container.visible {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Injectable } from '@angular/core';
 import { Config, SceneSettings } from '../../../shared/interfaces';
 import { vertexShader, fragmentShader } from './background-plane-shaders';
+import { LeyLinesEffect, defaultLeyLinesConfig } from '../effects/ley-lines.effect';
 
 /**
  * Manages visual effects for the CD cases scene
@@ -69,6 +70,12 @@ export class SceneEffectsService {
     filmGrain: true,
     vignette: true
   };
+  
+  /**
+   * Ley lines effect manager
+   * 【✓】 
+   */
+  private leyLinesEffect = new LeyLinesEffect();
   
   constructor() { }
 
@@ -299,7 +306,12 @@ export class SceneEffectsService {
         enableVideoInfluence: { value: this.effectToggles.videoInfluence ? 1.0 : 0.0 },
         enableBloom: { value: this.effectToggles.bloom ? 1.0 : 0.0 },
         enableFilmGrain: { value: this.effectToggles.filmGrain ? 1.0 : 0.0 },
-        enableVignette: { value: this.effectToggles.vignette ? 1.0 : 0.0 }
+        enableVignette: { value: this.effectToggles.vignette ? 1.0 : 0.0 },
+        // Add ley lines effect uniforms
+        leyLinesIntensity: { value: defaultLeyLinesConfig.intensity },
+        leyLinesSpeed: { value: defaultLeyLinesConfig.speed },
+        leyLinesDensity: { value: defaultLeyLinesConfig.density },
+        leyLinesColor: { value: new THREE.Vector3(0.7, 0.9, 1.0) } // Default blue color
       },
       vertexShader,
       fragmentShader,
@@ -354,24 +366,52 @@ export class SceneEffectsService {
    * Updates background visual effects based on scene settings
    * Controls colors, intensities, and animation parameters
    * Adjusts mood and atmosphere of the cosmic background
-   * 【✓】
+   * 【✓】 Updated to support both Config and SceneSettings types
    */
-  updateBackgroundEffects(settings: SceneSettings): void {
-    if (this.backgroundShaderMaterial) {
-      // Update all effect toggles based on settings
-      this.effectToggles.continents = settings.bgEffectContinents;
-      this.effectToggles.mountains = settings.bgEffectMountains;
-      this.effectToggles.waves = settings.bgEffectWaves;
-      this.effectToggles.borders = settings.bgEffectBorders;
-      this.effectToggles.swirls = settings.bgEffectSwirls;
-      this.effectToggles.lightRays = settings.bgEffectLightRays;
-      this.effectToggles.particles = settings.bgEffectParticles;
-      this.effectToggles.videoInfluence = settings.bgEffectVideoInfluence;
-      this.effectToggles.bloom = settings.bgEffectBloom;
-      this.effectToggles.filmGrain = settings.bgEffectFilmGrain;
-      this.effectToggles.vignette = settings.bgEffectVignette;
-      
-      // Update shader uniforms
+  updateBackgroundEffects(config: Config | SceneSettings): void {
+    if (!this.backgroundShaderMaterial) return;
+    
+    // Extract scene settings based on parameter type
+    const settings = this.extractSceneSettings(config);
+    
+    // Update effect toggles from settings
+    this.effectToggles = {
+      continents: settings.bgEffectContinents,
+      mountains: settings.bgEffectMountains,
+      waves: settings.bgEffectWaves,
+      borders: settings.bgEffectBorders,
+      swirls: settings.bgEffectSwirls,
+      lightRays: settings.bgEffectLightRays,
+      particles: settings.bgEffectParticles,
+      videoInfluence: settings.bgEffectVideoInfluence,
+      bloom: settings.bgEffectBloom,
+      filmGrain: settings.bgEffectFilmGrain,
+      vignette: settings.bgEffectVignette
+    };
+    
+    // Update the ley lines effect config
+    this.leyLinesEffect.updateConfig({
+      enabled: settings.bgEffectLightRays,
+      intensity: settings.leyLinesIntensity || defaultLeyLinesConfig.intensity,
+      speed: settings.leyLinesSpeed || defaultLeyLinesConfig.speed,
+      density: settings.leyLinesDensity || defaultLeyLinesConfig.density,
+      color: settings.leyLinesColor || defaultLeyLinesConfig.color
+    });
+    
+    // Apply uniforms from the ley lines effect
+    const leyLinesUniforms = this.leyLinesEffect.toShaderUniforms();
+    if (this.backgroundShaderMaterial && this.backgroundShaderMaterial.uniforms) {
+      Object.keys(leyLinesUniforms).forEach(key => {
+        if (this.backgroundShaderMaterial && 
+            this.backgroundShaderMaterial.uniforms && 
+            this.backgroundShaderMaterial.uniforms[key]) {
+          this.backgroundShaderMaterial.uniforms[key].value = leyLinesUniforms[key].value;
+        }
+      });
+    }
+    
+    // Update standard toggle uniforms
+    if (this.backgroundShaderMaterial && this.backgroundShaderMaterial.uniforms) {
       this.backgroundShaderMaterial.uniforms['enableContinents'].value = this.effectToggles.continents ? 1.0 : 0.0;
       this.backgroundShaderMaterial.uniforms['enableMountains'].value = this.effectToggles.mountains ? 1.0 : 0.0;
       this.backgroundShaderMaterial.uniforms['enableWaves'].value = this.effectToggles.waves ? 1.0 : 0.0;
@@ -387,5 +427,48 @@ export class SceneEffectsService {
       // Force material update
       this.backgroundShaderMaterial.needsUpdate = true;
     }
+  }
+  
+  /**
+   * Helper method to extract scene settings from either Config or SceneSettings
+   * 【✓】 
+   */
+  private extractSceneSettings(config: Config | SceneSettings): SceneSettings {
+    // If it's a Config object, extract the nested sceneSettings
+    if ('sceneSettings' in config) {
+      // Create a SceneSettings object from the Config object
+      const settings: Partial<SceneSettings> = {
+        bgEffectContinents: config.sceneSettings.bgEffectContinents !== undefined ? 
+          config.sceneSettings.bgEffectContinents : this.effectToggles.continents,
+        bgEffectMountains: config.sceneSettings.bgEffectMountains !== undefined ? 
+          config.sceneSettings.bgEffectMountains : this.effectToggles.mountains,
+        bgEffectWaves: config.sceneSettings.bgEffectWaves !== undefined ? 
+          config.sceneSettings.bgEffectWaves : this.effectToggles.waves,
+        bgEffectBorders: config.sceneSettings.bgEffectBorders !== undefined ? 
+          config.sceneSettings.bgEffectBorders : this.effectToggles.borders,
+        bgEffectSwirls: config.sceneSettings.bgEffectSwirls !== undefined ? 
+          config.sceneSettings.bgEffectSwirls : this.effectToggles.swirls,
+        bgEffectLightRays: config.sceneSettings.bgEffectLightRays !== undefined ? 
+          config.sceneSettings.bgEffectLightRays : this.effectToggles.lightRays,
+        bgEffectParticles: config.sceneSettings.bgEffectParticles !== undefined ? 
+          config.sceneSettings.bgEffectParticles : this.effectToggles.particles,
+        bgEffectVideoInfluence: config.sceneSettings.bgEffectVideoInfluence !== undefined ? 
+          config.sceneSettings.bgEffectVideoInfluence : this.effectToggles.videoInfluence,
+        bgEffectBloom: config.sceneSettings.bgEffectBloom !== undefined ? 
+          config.sceneSettings.bgEffectBloom : this.effectToggles.bloom,
+        bgEffectFilmGrain: config.sceneSettings.bgEffectFilmGrain !== undefined ? 
+          config.sceneSettings.bgEffectFilmGrain : this.effectToggles.filmGrain,
+        bgEffectVignette: config.sceneSettings.bgEffectVignette !== undefined ? 
+          config.sceneSettings.bgEffectVignette : this.effectToggles.vignette,
+        leyLinesIntensity: (config.sceneSettings as any).leyLinesIntensity,
+        leyLinesSpeed: (config.sceneSettings as any).leyLinesSpeed,
+        leyLinesDensity: (config.sceneSettings as any).leyLinesDensity,
+        leyLinesColor: (config.sceneSettings as any).leyLinesColor
+      };
+      return settings as SceneSettings;
+    }
+    
+    // Otherwise, return the SceneSettings object as is
+    return config as SceneSettings;
   }
 } 

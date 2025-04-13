@@ -292,7 +292,33 @@ export class DebugMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectWaves').name('Waves').onChange(() => this.updateBackgroundEffects.emit());
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBorders').name('Borders').onChange(() => this.updateBackgroundEffects.emit());
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectSwirls').name('Swirls').onChange(() => this.updateBackgroundEffects.emit());
-    backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectLightRays').name('Magical Ley Lines').onChange(() => this.updateBackgroundEffects.emit());
+    
+    // 【✓】 Create a separate folder for the magical ley lines effect for better organization
+    const leyLinesFolder = backgroundEffectsFolder.addFolder('Magical Ley Lines');
+    leyLinesFolder.add(this.sceneSettings, 'bgEffectLightRays').name('Enable Effect').onChange(() => this.updateBackgroundEffects.emit());
+    
+    // Add new controls for ley lines effect parameters
+    if (!this.sceneSettings.leyLinesIntensity) this.sceneSettings.leyLinesIntensity = 0.7;
+    if (!this.sceneSettings.leyLinesSpeed) this.sceneSettings.leyLinesSpeed = 1.0;
+    if (!this.sceneSettings.leyLinesDensity) this.sceneSettings.leyLinesDensity = 15.0;
+    if (!this.sceneSettings.leyLinesColor) this.sceneSettings.leyLinesColor = '#b4e0ff';
+    
+    leyLinesFolder.add(this.sceneSettings, 'leyLinesIntensity', 0.1, 2.0, 0.1)
+      .name('Intensity')
+      .onChange(() => this.updateBackgroundEffects.emit());
+      
+    leyLinesFolder.add(this.sceneSettings, 'leyLinesSpeed', 0.1, 3.0, 0.1)
+      .name('Speed')
+      .onChange(() => this.updateBackgroundEffects.emit());
+      
+    leyLinesFolder.add(this.sceneSettings, 'leyLinesDensity', 5.0, 30.0, 1.0)
+      .name('Density')
+      .onChange(() => this.updateBackgroundEffects.emit());
+      
+    leyLinesFolder.addColor(this.sceneSettings, 'leyLinesColor')
+      .name('Color')
+      .onChange(() => this.updateBackgroundEffects.emit());
+    
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectParticles').name('Particles').onChange(() => this.updateBackgroundEffects.emit());
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectVideoInfluence').name('Video Shimmer').onChange(() => this.updateBackgroundEffects.emit());
     backgroundEffectsFolder.add(this.sceneSettings, 'bgEffectBloom').name('Bloom').onChange(() => this.updateBackgroundEffects.emit());

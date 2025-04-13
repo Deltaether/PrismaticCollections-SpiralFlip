@@ -1,4 +1,7 @@
 // Background plane shaders
+// 【✓】 Import our new ley lines shader function
+import { leyLinesShaderFunction } from '../../services/effects/ley-lines.effect';
+
 export const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -30,7 +33,21 @@ export const fragmentShader = `
   uniform float enableFilmGrain;
   uniform float enableVignette;
   
+  // 【✓】 New ley lines effect uniforms
+  uniform float leyLinesIntensity;
+  uniform float leyLinesSpeed;
+  uniform float leyLinesDensity;
+  uniform vec3 leyLinesColor;
+  
   varying vec2 vUv;
+
+  // Ocean colors - different shades of blue and white for highlights
+  const vec3 deepOceanColor = vec3(0.0, 0.01, 0.04); // Even darker deep blue
+  const vec3 midOceanColor = vec3(0.0, 0.05, 0.15);  // Darker medium blue
+  const vec3 shallowOceanColor = vec3(0.03, 0.09, 0.2); // Darker light blue
+  const vec3 waveHighlightColor = vec3(0.5, 0.7, 0.9); // More intense blue-tinted white
+  const vec3 foamColor = vec3(1.0, 1.0, 1.0);        // Pure white for foam
+  const vec3 specularHighlight = vec3(0.9, 0.95, 1.0); // Bright specular highlight for water reflection
 
   // Hash function for pseudo-random values
   float hash(vec2 p) {
@@ -122,335 +139,134 @@ export const fragmentShader = `
   
   // Enhanced wave pattern for more realistic ocean waves
   float wavePattern(vec2 uv, float scale, float speed) {
-    // Use domain warping for more organic wave shapes
-    vec2 warpedUV = warp(uv);
-    float t = time * speed;
+    // Reduce the speed for slower wave movement
+    float adjustedSpeed = speed * 0.4; // 40% slower
+    float t = time * adjustedSpeed;
     
-    // Create circular/concentric wave patterns that expand outward
-    float concentricWaves = 0.0;
+    // Use domain warping for more organic wave shapes - emphasize horizontal warping for ocean waves
+    vec2 warpedUV = warp(uv);
+    warpedUV.x += sin(warpedUV.y * 2.5) * 0.03; // Add horizontal displacement based on vertical position
+    
+    // Create smaller, more natural wave patterns
+    float wavePattern = 0.0;
+    
+    // Create directional waves that move primarily in one direction (like ocean swells)
+    float directionalWaves = 0.0;
     for (int i = 0; i < 3; i++) {
-      // Create multiple wave centers with offsets
-      vec2 waveCenter = vec2(
-        0.5 + 0.3 * sin(time * 0.1 + float(i) * 2.1),
-        0.5 + 0.3 * cos(time * 0.15 + float(i) * 1.7)
+      float waveHeight = 0.02 + 0.01 * float(i);
+      float waveFreq = 10.0 + float(i) * 5.0;
+      float waveSpeed = t * (0.1 + 0.05 * float(i));
+      
+      // Create horizontal wave lines with subtle variations
+      float wave = sin(warpedUV.y * waveFreq + waveSpeed + sin(warpedUV.x * 2.0) * 0.8);
+      directionalWaves += smoothstep(0.7, 0.99, wave) * waveHeight;
+    }
+    
+    // Add subtle cross currents (smaller perpendicular waves)
+    float crossCurrents = 0.0;
+    for (int i = 0; i < 2; i++) {
+      float waveHeight = 0.01 + 0.005 * float(i);
+      float waveFreq = 8.0 + float(i) * 4.0;
+      float waveSpeed = t * (0.05 + 0.03 * float(i));
+      
+      // Create vertical wave lines with subtle variations
+      float wave = sin(warpedUV.x * waveFreq + waveSpeed + sin(warpedUV.y * 1.5) * 0.5);
+      crossCurrents += smoothstep(0.8, 0.99, wave) * waveHeight;
+    }
+    
+    // Create focused wave crests between continent areas
+    // Use detection of nearby continent edges to amplify wave intensity
+    float continentProximity = fbm(warpedUV * 1.5) * 0.2; // Low-frequency noise for general ocean areas
+    
+    // Create elongated waves that follow contours between continents
+    float elongatedWaves = 0.0;
+    for (int i = 0; i < 4; i++) {
+      float yOffset = float(i) * 0.2;
+      float xOffset = sin(time * 0.03 + yOffset * 3.0) * 0.1;
+      
+      // Create thin, elongated horizontal wave lines (whitecaps)
+      float waveSize = 0.003 + 0.002 * sin(time * 0.1 + float(i));
+      float waveLine = smoothstep(waveSize, 0.0, abs(fract(warpedUV.y * 2.0 + yOffset + time * 0.03) - 0.5));
+      
+      // Distort the wave line based on horizontal position
+      waveLine *= 0.7 + 0.3 * sin(warpedUV.x * 8.0 + time * 0.02);
+      
+      elongatedWaves += waveLine * 0.15;
+    }
+    
+    // Add some detailed ripples and small waves
+    float ripples = 0.0;
+    for (int i = 0; i < 3; i++) {
+      vec2 rippleCenter = vec2(
+        0.5 + 0.3 * sin(time * 0.01 + float(i)),
+        0.5 + 0.3 * cos(time * 0.015 + float(i) * 1.5)
       );
       
-      // Distance from center creates circular patterns
-      float dist = length(warpedUV - waveCenter) * (2.0 + float(i) * 0.5);
+      float dist = length(warpedUV - rippleCenter);
+      float ripplePattern = sin(dist * (20.0 + float(i) * 5.0) - time * 0.1);
       
-      // Create rippling circles
-      float rings = 0.5 + 0.5 * sin(dist * scale - t * (0.5 + float(i) * 0.2));
-      
-      // Apply falloff with distance
-      float falloff = smoothstep(1.0, 0.2, length(warpedUV - waveCenter) * 2.0);
-      
-      concentricWaves += rings * falloff * (0.5 - float(i) * 0.1);
+      // Fade out ripples with distance from center
+      ripples += smoothstep(0.0, 0.7, ripplePattern) * smoothstep(0.5, 0.1, dist) * 0.1;
     }
     
-    // Add swirling vortex patterns
-    float vortex = 0.0;
-    vec2 vortexCenter = vec2(0.7, 0.3);
-    float vortexDist = length(warpedUV - vortexCenter);
-    float vortexAngle = atan(warpedUV.y - vortexCenter.y, warpedUV.x - vortexCenter.x);
-    vortex = 0.5 + 0.5 * sin(vortexAngle * 5.0 + vortexDist * 10.0 - t * 1.5);
-    vortex = smoothstep(0.0, 0.7, vortex) * smoothstep(0.8, 0.0, vortexDist);
+    // Add subtle noise detail for water surface texture
+    float surfaceDetail = fbm(warpedUV * 10.0 + vec2(t * 0.1, 0.0)) * 0.03;
     
-    // Create cross-hatched wave lines
-    float waveLinesX = 0.5 + 0.5 * sin(warpedUV.x * scale * 2.0 + t);
-    float waveLinesY = 0.5 + 0.5 * sin(warpedUV.y * scale * 2.0 - t * 0.8);
-    float crossLines = smoothstep(0.4, 0.6, max(waveLinesX, waveLinesY));
+    // Create specific foam for wave crests
+    float foam = 0.0;
+    for (int i = 0; i < 4; i++) { // Added one more foam line
+      // Create horizontal wave lines that move slowly
+      float yPos = 0.2 + float(i) * 0.25;
+      float xOffset = sin(time * 0.04 + yPos * 2.0) * 0.1;
+      
+      // Create thin foam lines with varying width
+      float foamWidth = 0.002 + 0.001 * sin(time * 0.07 + float(i));
+      float foamLine = smoothstep(foamWidth, 0.0, abs(fract(warpedUV.y * 1.5 + yPos + time * 0.02) - 0.5));
+      
+      // Add curvature and variation to foam lines
+      foamLine *= 0.8 + 0.2 * sin(warpedUV.x * 10.0 + time * 0.05 + float(i));
+      
+      foam += foamLine * 0.25; // Increased foam intensity
+    }
     
-    // Create geometric wave patterns
-    float geometricPattern = 0.0;
+    // Add specular highlights (water reflections)
+    float specular = 0.0;
     for (int i = 0; i < 3; i++) {
-      float phase = float(i) * 0.5;
-      // Hex grid-like pattern
-      vec2 hexUV = warpedUV * scale * (1.0 + float(i) * 0.5);
-      hexUV.y *= 1.73; // Sqrt(3) for hexagonal scaling
+      // Create moving light reflections on water surface
+      vec2 specCenter = vec2(
+        0.3 + 0.4 * sin(time * 0.03 + float(i) * 2.1),
+        0.4 + 0.3 * cos(time * 0.04 + float(i) * 1.7)
+      );
       
-      vec2 gridPos = floor(hexUV);
-      vec2 gridFract = fract(hexUV);
+      float specDist = length(warpedUV - specCenter);
       
-      // Offset alternating rows
-      if (mod(gridPos.y, 2.0) == 1.0) {
-        gridFract.x = fract(gridFract.x + 0.5);
-      }
+      // Create sharp, directional highlights
+      float specStrength = 0.008 + 0.004 * sin(time * 0.2 + float(i));
+      float specShape = smoothstep(specStrength, 0.0, specDist - 0.1 * sin(time * 0.1 + warpedUV.x * 5.0));
       
-      // Create cell patterns
-      float cellPattern = length(gridFract - 0.5);
-      cellPattern = smoothstep(0.3 + 0.1 * sin(time + gridPos.x * 0.3 + gridPos.y * 0.5), 
-                               0.5, 
-                               cellPattern);
+      // Add directional stretching to simulate light reflection on waves
+      specShape *= smoothstep(0.1, 0.0, abs(sin(warpedUV.y * 20.0 + time * 0.5) - 0.5));
       
-      geometricPattern += cellPattern * (0.5 - float(i) * 0.15);
+      specular += specShape * 0.15;
     }
-    
-    // Add some fractal noise detail
-    float noiseDetail = fbm(warpedUV * scale * 0.5 + vec2(t * 0.2, t * 0.1)) * 0.3;
     
     // Combine all patterns with different weights
     float finalPattern = 
-      concentricWaves * 0.4 + 
-      vortex * 0.3 + 
-      crossLines * 0.25 + 
-      geometricPattern * 0.35 + 
-      noiseDetail;
-      
-    // Normalize to keep values in expected range
-    finalPattern = clamp(finalPattern, 0.0, 1.0);
+      directionalWaves * 0.4 +
+      crossCurrents * 0.15 +
+      elongatedWaves * 0.7 +
+      ripples * 0.3 +
+      surfaceDetail +
+      foam * 1.1 + // Enhance foam prominence
+      specular * 1.5; // Add strong specular highlights
     
-    return finalPattern;
+    // Normalize to keep values in expected range
+    return clamp(finalPattern, 0.0, 1.0);
   }
   
-  // Replace light rays with magical ley lines
-  float leyLines(vec2 uv, float density, float speed) {
-    float result = 0.0;
-    
-    // Create several ley line paths with different properties
-    for(int i = 0; i < 5; i++) {
-      float lineIndex = float(i);
-      
-      // Generate unique starting positions and movement directions for each node
-      // These are pre-calculated based on the lineIndex to ensure consistent behavior
-      vec2 startPosition = vec2(
-        0.3 + lineIndex * 0.15, 
-        0.3 + sin(lineIndex * 0.8) * 0.4
-      );
-      
-      vec2 moveDirection = vec2(
-        cos(lineIndex * 1.5 + 0.5) * 0.03,
-        sin(lineIndex * 1.7 + 0.3) * 0.03
-      );
-      
-      // Calculate time-based position with bouncing behavior
-      // Each point has a slightly different speed multiplier
-      float timeScale = 0.1 + lineIndex * 0.02;
-      float bounceTime = time * timeScale;
-      
-      // Calculate the bounce position - start with the initial position
-      vec2 bouncePos = startPosition;
-      
-      // Add movement based on time and direction
-      bouncePos += vec2(
-        sin(bounceTime) * moveDirection.x,
-        cos(bounceTime * 0.7) * moveDirection.y
-      ) * 5.0; // Scale the movement amount
-      
-      // Apply additional sinusoidal movement patterns for variety
-      bouncePos += vec2(
-        sin(bounceTime * 0.3 + lineIndex * 2.1) * 0.1,
-        sin(bounceTime * 0.5 + lineIndex * 1.3) * 0.1
-      );
-      
-      // Add bouncing behavior by using abs(sin) patterns with different frequencies
-      // MODIFIED: Enhanced TV screensaver-like bouncing with edge detection and velocity changes
-      float xBounce = 0.2 + abs(sin(bounceTime * 0.2 + lineIndex)) * 0.6;
-      float yBounce = 0.2 + abs(sin(bounceTime * 0.3 + lineIndex * 0.7)) * 0.6;
-      
-      // Create edge-aware bouncing behavior (like old TV screensavers)
-      // Detect if we're close to an "edge" and change direction
-      float edgeDetectX = smoothstep(0.75, 0.8, xBounce) - smoothstep(0.2, 0.15, xBounce);
-      float edgeDetectY = smoothstep(0.75, 0.8, yBounce) - smoothstep(0.2, 0.15, yBounce);
-      
-      // Add a slight pause at edges and momentum changes
-      float momentumX = 1.0 + 0.3 * sin(bounceTime * 0.7 + lineIndex * 2.5) * edgeDetectX;
-      float momentumY = 1.0 + 0.3 * sin(bounceTime * 0.5 + lineIndex * 1.9) * edgeDetectY;
-      
-      bouncePos = vec2(
-        0.2 + abs(sin(bounceTime * 0.2 * momentumX + lineIndex)) * 0.6,
-        0.2 + abs(sin(bounceTime * 0.3 * momentumY + lineIndex * 0.7)) * 0.6
-      );
-      
-      // Get current node center from the bouncing calculation
-      vec2 nodeCenter = bouncePos;
-      
-      // Create tornado-like curved paths using swirling patterns
-      // This creates a more dynamic, spiraling effect for the ley lines
-      vec2 toCenter = uv - nodeCenter;
-      float distToCenter = length(toCenter);
-      float angle = atan(toCenter.y, toCenter.x);
-      
-      // Create swirling, tornado-like pattern
-      float tornadoTime = time * (0.2 + lineIndex * 0.05);
-      float swirl = sin(angle * 3.0 + tornadoTime) * cos(distToCenter * 5.0 + tornadoTime * 0.7);
-      float verticalTwist = sin(uv.x * 7.0 + tornadoTime) * cos(uv.y * 8.0 - tornadoTime * 0.5);
-      
-      // Combine original curve pattern with tornado effect
-      float curve = sin(uv.x * 2.0 + time * (0.1 + lineIndex * 0.05) + lineIndex * 3.1415) * 
-                    sin(uv.y * 2.0 + time * (0.15 + lineIndex * 0.03) + lineIndex * 1.5);
-      
-      // Mix the original curve with the new tornado pattern
-      curve = mix(curve, swirl * 0.3 + verticalTwist * 0.3, 0.6);
-      
-      // Create turbulent eddies in the tornado ley lines
-      float turbulence = fbm(uv * 4.0 + vec2(time * 0.2, time * 0.15)) * 0.1;
-      
-      // Distance to the curved path with turbulence
-      float dist = abs(uv.y - nodeCenter.y - curve * 0.2 - turbulence) / 
-                   (density * (0.05 + 0.02 * sin(time * speed + lineIndex)));
-      
-      // Create twisting, rope-like structure with multiple strands
-      float strandCount = 3.0; // Number of energy strands in each ley line
-      float strandWidth = 0.2; // How tightly packed the strands are
-      float strandOffset = sin(distToCenter * 10.0 + time + angle * 5.0) * strandWidth;
-      
-      // Apply strand effect to distance calculation
-      float strandEffect = abs(sin(dist * strandCount * 3.14159 - time * 2.0 + strandOffset)) * 0.5 + 0.5;
-      strandEffect = pow(strandEffect, 0.7); // Adjust contrast of strands
-      
-      // Pulse effect along the ley lines
-      float pulse = 0.5 + 0.5 * sin(angle * 8.0 + time * (1.0 + lineIndex * 0.2));
-      
-      // Intensity falloff with distance from line center
-      float baseIntensity = 0.03 / (dist + 0.001);
-      float strandedIntensity = baseIntensity * strandEffect * 1.2;
-      
-      // Combine basic intensity with stranded effect
-      float intensity = mix(baseIntensity, strandedIntensity, 0.7) * pulse;
-      
-      // Add occasional energy bursts along the ley line
-      float burst = smoothstep(0.9, 1.0, sin(dist * 20.0 - time * 3.0) * 0.5 + 0.5) * 
-                    smoothstep(0.2, 0.0, dist) * 1.5;
-      intensity += burst * 0.3;
-      
-      // Fade based on x position to create flowing energy
-      float xFade = smoothstep(0.0, 0.2, uv.x) * smoothstep(1.0, 0.8, uv.x);
-      intensity *= xFade;
-      
-      // Create ethereal energy vortex/convergence points at intersections
-      vec2 toNode = uv - nodeCenter;
-      float distToNode = length(toNode);
-      
-      // Rest of the magical effect code remains unchanged
-      float magicalEffect = 0.0;
-      
-      // Spiraling energy that gets denser toward the center
-      float spiralAngle = atan(toNode.y, toNode.x) + time * (0.2 + lineIndex * 0.05);
-      float spiral = sin(spiralAngle * 4.0 + distToNode * 30.0 - time * 2.0);
-      
-      // Energy ripples/waves radiating from center point - INCREASED RANGE
-      float ripples = sin(distToNode * 40.0 - time * 3.0) * 0.5 + 0.5;
-      ripples *= smoothstep(0.25, 0.05, distToNode); // Fade out with distance - INCREASED RANGE
-      
-      // Magical runes/sigils that briefly appear and fade - INCREASED SIZE
-      float runePattern = 0.0;
-      float runeTime = fract(time * 0.2 + lineIndex * 0.3);
-      float runeOpacity = smoothstep(0.0, 0.3, runeTime) * smoothstep(1.0, 0.7, runeTime);
-      
-      // Continuous rotation angle for the four spikes
-      float rotationSpeed = 0.3 + lineIndex * 0.1; // MODIFIED: Reduced speed from 0.7 to 0.3 and factor from 0.2 to 0.1
-      float mainRotationAngle = time * rotationSpeed;
-      
-      // Create four rotating spikes/rays emanating from the center
-      float spikes = 0.0;
-      
-      // Create 4 rotating spikes (cross pattern)
-      for (int s = 0; s < 4; s++) {
-        float spikeAngle = float(s) * 3.14159 / 2.0 + mainRotationAngle; // 90 degree spacing + rotation
-        
-        // Create spike direction unit vector
-        vec2 spikeDir = vec2(cos(spikeAngle), sin(spikeAngle));
-        
-        // Project the node vector onto the spike direction
-        float projection = dot(toNode, spikeDir);
-        
-        // Get perpendicular distance from the spike line
-        vec2 projVector = spikeDir * projection;
-        float perpDistance = length(toNode - projVector);
-        
-        // Create a tapering spike that gets thinner away from center
-        float spikeThickness = 0.01 + 0.01 * smoothstep(0.2, 0.0, abs(projection));
-        float spikeLength = 0.2;
-        
-        // Create the spike with a smooth falloff and limited length
-        float spike = smoothstep(spikeThickness, 0.0, perpDistance) * smoothstep(spikeLength, spikeLength * 0.7, abs(projection));
-        
-        // Add some energy pulses along the spikes
-        spike *= 0.7 + 0.3 * sin(abs(projection) * 30.0 - time * 5.0);
-        
-        spikes += spike;
-      }
-      
-      // Apply spike opacity and size modulation
-      spikes *= 0.7 + 0.3 * sin(time * 2.0 + lineIndex);
-      
-      // Create several abstract rune-like patterns
-      for (int j = 0; j < 3; j++) {
-        float patternIndex = float(j);
-        float patternAngle = patternIndex * 2.1 + time * 0.1;
-        
-        // Create abstract sigil components - lines and curves - INCREASED SIZE
-        vec2 rotated = vec2(
-          toNode.x * cos(patternAngle) - toNode.y * sin(patternAngle),
-          toNode.x * sin(patternAngle) + toNode.y * cos(patternAngle)
-        );
-        
-        // Create larger line segments of the rune
-        float lineSeg = smoothstep(0.007, 0.001, abs(rotated.x)) * smoothstep(0.09, 0.01, abs(rotated.y));
-        lineSeg += smoothstep(0.007, 0.001, abs(rotated.y)) * smoothstep(0.09, 0.01, abs(rotated.x)); 
-        
-        // Create larger curved segments
-        float curvedSeg = smoothstep(0.005, 0.001, abs(length(rotated * vec2(1.0, 2.0)) - 0.06));
-        
-        runePattern += (lineSeg + curvedSeg) * 0.3;
-      }
-      runePattern *= runeOpacity * smoothstep(0.15, 0.03, distToNode); // INCREASED RANGE
-      
-      // Small energy particles that orbit the convergence point - WIDER ORBITS
-      float particles = 0.0;
-      for (int k = 0; k < 5; k++) { // Added one more particle
-        float particleTime = time * (0.5 + float(k) * 0.2) + lineIndex;
-        vec2 orbit = vec2(
-          cos(particleTime) * (0.06 + float(k) * 0.02), // LARGER ORBITS
-          sin(particleTime) * (0.06 + float(k) * 0.02)  // LARGER ORBITS
-        );
-        
-        float particleShape = smoothstep(0.008, 0.002, length(toNode - orbit));
-        particles += particleShape * 0.5;
-      }
-      
-      // Combine all the energy effects with smooth transitions
-      magicalEffect = ripples * 0.4 + 
-                      spiral * smoothstep(0.2, 0.02, distToNode) * 0.5 + // INCREASED RANGE
-                      runePattern * 0.5 + // Reduced weight to make room for spikes
-                      particles * 0.7 +
-                      spikes * 0.9; // Add the rotating spikes
-      
-      // Scale back based on distance to create focal points - INCREASED RANGE
-      magicalEffect *= smoothstep(0.25, 0.05, distToNode);
-      
-      // Add a subtle glow that extends much further
-      float glow = smoothstep(0.45, 0.1, distToNode) * 0.3 * (0.7 + 0.3 * sin(time + lineIndex));
-      magicalEffect += glow;
-      
-      // Trail effect - leave fading magical residue along the path
-      // Calculate previous positions
-      float prevTime = bounceTime - 0.3;
-      vec2 prevPos = vec2(
-        0.2 + abs(sin(prevTime * 0.3 + lineIndex)) * 0.6,
-        0.2 + abs(sin(prevTime * 0.5 + lineIndex * 0.7)) * 0.6
-      );
-      
-      // Distance to previous position
-      float trailDist = length(uv - prevPos);
-      float trail = smoothstep(0.2, 0.02, trailDist) * 0.4;
-      trail *= smoothstep(0.3, 0.0, bounceTime - prevTime); // Fade out with time
-      
-      magicalEffect += trail;
-      
-      // Add flickering effect
-      float flicker = 0.8 + 0.2 * sin(time * 5.0 + lineIndex * 10.0);
-      
-      // Apply a subtle color tint to the ley lines
-      vec3 leyLineColor = vec3(0.4, 0.8, 1.0); // Slight blue tint
-      float colorIntensity = intensity * flicker * 0.8;
-      
-      // Combine the ley line with the energy convergence, using color for the ley lines
-      result += colorIntensity + magicalEffect;
-    }
-    
-    return min(result, 1.0) * 0.6; // Cap and scale the effect
-  }
+  // Calculate ley lines energy paths
+  // 【✓】 Original implementation replaced with imported one from ley-lines.effect.ts
+  ${leyLinesShaderFunction}
   
   // Create soft gradient swirls
   float swirl(vec2 uv, vec2 center, float radius, float intensity) {
@@ -561,6 +377,10 @@ export const fragmentShader = `
     // Generate continent shapes with toggle
     float continent = enableContinents > 0.5 ? continentShape(uv) : 0.0;
     
+    // Get distance to nearest continent edge for wave intensity
+    float continentEdge = abs(continent - 0.5) * 2.0;
+    float distToCoast = 1.0 - smoothstep(0.0, 0.2, continentEdge);
+    
     // Create subtle rotating and flowing terrain details
     vec2 rotatedUV = vec2(
       uv.x * cos(time * 0.02) - uv.y * sin(time * 0.02),
@@ -572,7 +392,17 @@ export const fragmentShader = `
     float mountains = enableMountains > 0.5 ? terrainHeight(uv * 3.0 + time * 0.01) * continent : 0.0;
     
     // Base wave pattern for water/oceans with toggle
-    float waves = enableWaves > 0.5 ? wavePattern(uv, 3.0, 0.05 + videoMotion * 0.1) * (1.0 - continent * 0.7) : 0.0;
+    float waveIntensity = 0.03 + 0.1 * videoMotion + 0.15 * distToCoast; // Waves intensify near shores
+    float waves = enableWaves > 0.5 ? wavePattern(uv, 3.0, waveIntensity) * (1.0 - continent) : 0.0;
+    
+    // Extract foam pattern - more pronounced near continent edges
+    float foam = waves * distToCoast * 2.0; // Amplify foam near coasts
+    
+    // Create depth variations in the ocean - deeper areas further from land
+    float oceanDepth = smoothstep(0.0, 0.5, 1.0 - distToCoast) * (1.0 - continent);
+    
+    // Add subtle current patterns in deeper areas
+    float deepCurrents = fbm(warp(uv) * 2.0 + time * 0.003) * oceanDepth * 0.5;
     
     // Create subtle "kingdom borders" or territory lines with toggle
     float borders = 0.0;
@@ -603,8 +433,13 @@ export const fragmentShader = `
       swirlPattern *= 1.0 + terrainDetail * 0.2;
     }
     
-    // Replace light rays with ley lines
-    float leyLineEffect = enableLightRays > 0.5 ? leyLines(uv, 15.0, 0.3) * 0.7 : 0.0;
+    // Add ley line effects with toggle - MODIFIED: Updated to use new implementation
+    float leyLineEffect = enableLightRays > 0.5 ? 
+      leyLines(
+        uv, 
+        leyLinesDensity > 0.0 ? leyLinesDensity : 15.0, 
+        leyLinesSpeed > 0.0 ? leyLinesSpeed : 0.3
+      ) * (leyLinesIntensity > 0.0 ? leyLinesIntensity : 0.7) : 0.0;
     
     // Add subtle particles for magical dust with toggle
     float particleEffect = enableParticles > 0.5 ? particles(uv) * (0.5 + continent * 0.5) : 0.0;
@@ -612,22 +447,55 @@ export const fragmentShader = `
     // Soft vignette with toggle
     float vignette = enableVignette > 0.5 ? smoothstep(0.0, 0.7, 1.0 - length((uv - 0.5) * 1.3)) : 1.0;
     
-    // Base color gradient from deep to primary gold
-    vec3 baseColor = mix(deepColor, primaryGold, vignette * 0.7);
+    // Start with deep ocean color
+    vec3 baseColor = deepOceanColor;
     
     // Layer visual elements for fantasy map appearance
+    // Ocean water with depth variations and waves
+    baseColor = mix(deepOceanColor, midOceanColor, oceanDepth);
+    
+    // Add deep ocean currents
+    baseColor = mix(baseColor, midOceanColor * 1.2, deepCurrents);
+    
+    // Add wave effects to shallow areas
+    baseColor = mix(baseColor, shallowOceanColor, waves * 0.6 * (1.0 - oceanDepth));
+    
+    // Add stronger highlight near shores
+    baseColor = mix(baseColor, shallowOceanColor * 1.3, distToCoast * waves * 0.5);
+    
+    // White foam highlights on wave crests - stronger near shores
+    baseColor = mix(baseColor, waveHighlightColor, foam * foam * 1.3); // Enhanced foam
+    baseColor = mix(baseColor, foamColor, foam * foam * foam * 1.2); // Enhanced white foam
+    
+    // Add specular reflections for water surface (moonlight/sunlight reflections)
+    float specularReflection = waves * 1.2;
+    baseColor = mix(baseColor, specularHighlight, specularReflection * specularReflection * 0.3);
+    
     // Land areas
     baseColor = mix(baseColor, mix(secondaryGold, accentColor, terrainDetail), continent * 0.8);
+    
     // Mountains and elevated terrain
     baseColor = mix(baseColor, highlightColor * 0.9, mountains * 0.6);
-    // Water/ocean areas with wave patterns
-    baseColor = mix(baseColor, deepColor * 0.8 + secondaryGold * 0.2, waves * (1.0 - continent * 0.8));
+    
     // Kingdom/territory borders
     baseColor = mix(baseColor, highlightColor, borders);
+    
     // Magical elements
     baseColor = mix(baseColor, mix(accentColor, highlightColor, 0.6 + 0.4 * sin(time * 0.2)), swirlPattern * 0.4);
-    baseColor = mix(baseColor, vec3(0.7, 0.9, 1.0), leyLineEffect * 0.5);
-    baseColor = mix(baseColor, highlightColor, particleEffect * 0.4);
+    
+    // Use custom color for ley lines with a stronger glow effect
+    vec3 customLeyLineColor = vec3(0.7, 0.9, 1.0); // Default color
+    if (leyLinesColor.r > 0.0 || leyLinesColor.g > 0.0 || leyLinesColor.b > 0.0) {
+      customLeyLineColor = leyLinesColor;
+    }
+    
+    // Add a subtle bloom effect to the ley lines
+    float leyLineBloom = leyLineEffect * 0.1;
+    baseColor = mix(baseColor, customLeyLineColor, leyLineEffect * 0.3);
+    baseColor += leyLineBloom * customLeyLineColor * 0.7;
+    
+    // Add subtle particles for magical dust with toggle
+    baseColor = mix(baseColor, vec3(0.9, 0.9, 1.0), particleEffect * 0.4);
     
     // Add subtle video influence for magical shimmer with toggle
     if (enableVideoInfluence > 0.5) {
@@ -641,12 +509,16 @@ export const fragmentShader = `
       float luminance = dot(baseColor, vec3(0.2126, 0.7152, 0.0722));
       float bloom = smoothstep(0.7, 0.9, luminance);
       baseColor += bloom * highlightColor * 0.3;
+      
+      // Add enhanced bloom to wave crests and specular reflections
+      baseColor += foam * foam * waveHighlightColor * 0.3;
+      baseColor += waves * waves * specularHighlight * 0.15; // Add bloom to water reflections
     }
     
     // Apply gentle film grain with toggle
     if (enableFilmGrain > 0.5) {
       float grain = hash(uv + time) * 0.03;
-      baseColor = mix(baseColor, deepColor, grain);
+      baseColor = mix(baseColor, vec3(0.0, 0.0, 0.03), grain); // Even darker blue grain for water
     }
     
     // Final vignette

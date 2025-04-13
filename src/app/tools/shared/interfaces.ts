@@ -267,6 +267,25 @@ export interface Config {
         brown: string;
       };
     };
+    
+    // 【✓】 Background effect toggles
+    bgEffectContinents?: boolean;
+    bgEffectMountains?: boolean;
+    bgEffectWaves?: boolean;
+    bgEffectBorders?: boolean;
+    bgEffectSwirls?: boolean;
+    bgEffectLightRays?: boolean;
+    bgEffectParticles?: boolean;
+    bgEffectVideoInfluence?: boolean;
+    bgEffectBloom?: boolean;
+    bgEffectFilmGrain?: boolean;
+    bgEffectVignette?: boolean;
+    
+    // 【✓】 Ley Lines effect properties
+    leyLinesIntensity?: number;
+    leyLinesSpeed?: number;
+    leyLinesDensity?: number;
+    leyLinesColor?: string;
   };
   caseSettings: {
     basePosition: {
@@ -407,4 +426,10 @@ export interface SceneSettings {
   bgEffectBloom: boolean;
   bgEffectFilmGrain: boolean;
   bgEffectVignette: boolean;
+  
+  // 【✓】 Ley Lines effect properties
+  leyLinesIntensity?: number;
+  leyLinesSpeed?: number;
+  leyLinesDensity?: number;
+  leyLinesColor?: string;
 } 

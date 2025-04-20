@@ -1,0 +1,315 @@
+// Variables
+$primary-color: #ff5722;
+$secondary-color: #9c27b0;
+$dark-bg: #121212;
+$light-text: #ffffff;
+$gray-text: #cccccc;
+$header-height: 60px;
+$transition-speed: 0.3s;
+$nav-width: 280px;
+
+// Global Styles
+.mobile-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $dark-bg;
+  color: $light-text;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Header Styles
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $header-height;
+  background-color: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  
+  .header-container {
+    padding: 0 1rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    img {
+      height: 32px;
+    }
+  }
+  
+  .menu-toggle {
+    background: transparent;
+    border: none;
+    width: 30px;
+    height: 24px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    
+    .bar {
+      width: 100%;
+      height: 2px;
+      background-color: $light-text;
+      transition: transform $transition-speed ease, opacity $transition-speed ease;
+    }
+    
+    &.active {
+      .bar:first-child {
+        transform: translateY(11px) rotate(45deg);
+      }
+      
+      .bar:nth-child(2) {
+        opacity: 0;
+      }
+      
+      .bar:last-child {
+        transform: translateY(-11px) rotate(-45deg);
+      }
+    }
+  }
+}
+
+// Navigation Menu
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -$nav-width;
+  width: $nav-width;
+  height: 100vh;
+  background-color: darken($dark-bg, 3%);
+  z-index: 100;
+  transition: right $transition-speed ease;
+  display: flex;
+  flex-direction: column;
+  
+  &.open {
+    right: 0;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+  }
+  
+  .nav-header {
+    height: $header-height;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    img {
+      height: 32px;
+    }
+    
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: $light-text;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+  }
+  
+  .nav-items {
+    flex: 1;
+    list-style: none;
+    padding: 2rem 0;
+    margin: 0;
+    overflow-y: auto;
+    
+    .nav-item {
+      a {
+        display: block;
+        padding: 1rem 2rem;
+        color: $light-text;
+        text-decoration: none;
+        font-size: 18px;
+        transition: background-color $transition-speed ease;
+        position: relative;
+        
+        &:before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 0;
+          background: linear-gradient(to right, $primary-color, $secondary-color);
+          transition: width $transition-speed ease;
+        }
+        
+        &:hover, &.active {
+          background-color: rgba(255, 255, 255, 0.05);
+          
+          &:before {
+            width: 4px;
+          }
+        }
+      }
+    }
+  }
+  
+  .nav-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      
+      .social-link {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $light-text;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color $transition-speed ease;
+        
+        &:hover {
+          background-color: $primary-color;
+        }
+      }
+    }
+  }
+}
+
+// Overlay
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity $transition-speed ease, visibility $transition-speed ease;
+  
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Content Area
+.mobile-content {
+  flex: 1;
+  margin-top: $header-height;
+  padding: 1rem;
+}
+
+// Footer Styles
+.mobile-footer {
+  background-color: darken($dark-bg, 3%);
+  padding: 2rem 1rem 1.5rem;
+  
+  .footer-content {
+    .footer-logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      
+      img {
+        height: 30px;
+      }
+    }
+    
+    .quick-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      
+      a {
+        color: $gray-text;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color $transition-speed ease;
+        
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+    
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      
+      .social-link {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $light-text;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color $transition-speed ease;
+        
+        &:hover {
+          background-color: $primary-color;
+        }
+      }
+    }
+    
+    .copyright {
+      text-align: center;
+      color: $gray-text;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/**
+ * Animation Classes
+ * 【✓】
+ */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+} 

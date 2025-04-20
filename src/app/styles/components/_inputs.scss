@@ -1,0 +1,81 @@
+@use '../themes/variables' as vars;
+
+// 【✓】 Form Inputs
+input, textarea, select {
+  width: 100%;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border: 1px solid #ddd;
+  border-radius: vars.$border-radius-sm;
+  font-size: vars.$font-size-md;
+  transition: border-color vars.$transition-normal, box-shadow vars.$transition-normal;
+  
+  &:focus {
+    outline: none;
+    border-color: vars.$teal-primary;
+    box-shadow: 0 0 0 3px rgba(vars.$teal-primary, 0.1);
+  }
+  
+  &::placeholder {
+    color: #aaa;
+  }
+  
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+}
+
+// 【✓】 Custom Form Elements
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  
+  input {
+    flex: 1;
+  }
+  
+  .input-icon {
+    position: absolute;
+    right: vars.$spacing-md;
+    color: #888;
+    pointer-events: none;
+  }
+  
+  .input-addon {
+    padding: vars.$spacing-sm vars.$spacing-md;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    
+    &:first-child {
+      border-radius: vars.$border-radius-sm 0 0 vars.$border-radius-sm;
+      border-right: none;
+    }
+    
+    &:last-child {
+      border-radius: 0 vars.$border-radius-sm vars.$border-radius-sm 0;
+      border-left: none;
+    }
+  }
+}
+
+// 【✓】 Form Checkboxes and Radios
+.custom-checkbox, .custom-radio {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: vars.$spacing-sm;
+  
+  input {
+    width: auto;
+    margin-right: vars.$spacing-sm;
+  }
+  
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

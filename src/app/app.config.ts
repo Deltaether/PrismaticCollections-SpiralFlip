@@ -2,6 +2,7 @@ import { ApplicationConfig } from '@angular/core';
 import { provideRouter, withDebugTracing } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
+import { ScrollHelperService } from './shared/services/scroll-helper.service';
 
 /**
  * Main application configuration
@@ -14,6 +15,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withDebugTracing() // Enable router tracing for debugging
     ),
-    provideHttpClient()
+    provideHttpClient(),
+    ScrollHelperService
   ]
 }; 

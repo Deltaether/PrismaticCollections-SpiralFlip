@@ -51,31 +51,68 @@ export class CDCaseLoadingService {
   ): Promise<CDCase[]> {
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('assets/draco/');
+    
+    // Set the path to the Draco decoder files (with console logging for debugging)
+    const dracoPath = 'assets/draco/';
+    console.log('[CDCaseLoadingService] Setting Draco decoder path:', dracoPath);
+    dracoLoader.setDecoderPath(dracoPath);
     loader.setDRACOLoader(dracoLoader);
 
     const cdCases: CDCase[] = [];
     const loadingPromises: Promise<any>[] = [];
 
     try {
+      // Log the start of model loading
+      console.log('[CDCaseLoadingService] Loading 3D model: assets/3d/CD_Case/CD_Case.glb');
+      
       // Load the GLTF model
-      const modelPromise = loader.loadAsync('assets/3d/CD_Case/CD_Case.glb');
+      const modelPromise = loader.loadAsync('assets/3d/CD_Case/CD_Case.glb')
+        .catch(error => {
+          console.error('[CDCaseLoadingService] Error loading GLB model:', error);
+          throw new Error('Failed to load CD Case model: ' + error.message);
+        });
       loadingPromises.push(modelPromise);
 
       // Load environment map
-      const envMapPromise = new Promise<void>((resolve) => {
-        new THREE.TextureLoader().load('assets/graphic/composite.png', (texture) => {
-          this.materialsService.setupEnvironmentMap(scene, renderer, texture);
-          resolve();
-        });
+      const envMapPromise = new Promise<void>((resolve, reject) => {
+        console.log('[CDCaseLoadingService] Loading environment map: assets/graphic/composite.png');
+        new THREE.TextureLoader().load(
+          'assets/graphic/composite.png', 
+          (texture) => {
+            console.log('[CDCaseLoadingService] Environment map loaded successfully');
+            this.materialsService.setupEnvironmentMap(scene, renderer, texture);
+            resolve();
+          },
+          (progress) => {
+            // Loading progress
+            if (progress.total > 0) {
+              const percent = Math.round((progress.loaded / progress.total) * 100);
+              console.log(`[CDCaseLoadingService] Environment map loading: ${percent}%`);
+            }
+          },
+          (error) => {
+            console.error('[CDCaseLoadingService] Error loading environment map:', error);
+            // Continue even if environment map fails - just reject the specific promise
+            reject(error);
+          }
+        );
+      }).catch(error => {
+        console.warn('[CDCaseLoadingService] Continuing without environment map:', error);
+        // Return null instead of rejecting to allow the process to continue
+        return null;
       });
       loadingPromises.push(envMapPromise);
 
       // Wait for model and environment map to load
-      const [gltf] = await Promise.all(loadingPromises);
+      const results = await Promise.all(loadingPromises);
+      const gltf = results[0];
+      
+      if (!gltf) {
+        throw new Error('Failed to load 3D model');
+      }
       
       // Log loaded animations and bones
-      console.log('Loaded animations:', gltf.animations);
+      console.log('[CDCaseLoadingService] Loaded animations:', gltf.animations);
       this.logBones(gltf.scene);
 
       // Create CD cases from config

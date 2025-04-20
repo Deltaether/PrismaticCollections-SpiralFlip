@@ -1,0 +1,61 @@
+@use '../themes/variables' as vars;
+
+// 【✓】 Button Base
+button, .button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border-radius: vars.$border-radius-sm;
+  transition: all vars.$transition-normal;
+  font-size: vars.$font-size-md;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  &:active {
+    transform: translateY(1px);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 【✓】 Custom Button Variants
+.btn-teal {
+  background-color: vars.$teal-primary;
+  color: white;
+  border: 1px solid vars.$teal-dark;
+  
+  &:hover {
+    background-color: vars.$teal-secondary;
+  }
+}
+
+.btn-gold {
+  background-color: vars.$gold-accent;
+  color: vars.$text-dark;
+  border: 1px solid vars.$gold-dark;
+  
+  &:hover {
+    background-color: vars.$gold-light;
+  }
+}
+
+// 【✓】 Icon Buttons
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+  
+  i, svg {
+    font-size: 1.2rem;
+  }
+}

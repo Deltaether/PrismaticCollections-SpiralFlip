@@ -5,8 +5,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 /**
- * Main homepage component for Project Phantasia
- * Provides navigation to different site sections
+ * Main homepage component for Prismatic Collections
+ * Provides navigation to different projects and site sections
  * 【✓】
  */
 @Component({
@@ -27,25 +27,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Featured content sections
   readonly featuredSections = [
     {
-      id: 'experience',
-      title: 'Interactive Experience',
-      description: 'Explore the full 3D music experience with interactive CD cases',
+      id: 'phantasia',
+      title: 'Project Phantasia',
+      description: 'A revolutionary musical experience with interactive 3D environments',
       image: 'assets/images/experience-preview.jpg',
-      route: '/introduction',
+      route: '/collections/phantasia',
       isMain: true
     },
     {
-      id: 'collection',
-      title: 'Music Collection',
+      id: 'collections',
+      title: 'Music Collections',
       description: 'Browse our complete collection of albums and tracks',
       image: 'assets/images/collection-preview.jpg',
-      route: '/collection',
+      route: '/collections',
       isMain: false
     },
     {
       id: 'mobile',
-      title: 'Mobile Experience',
-      description: 'Switch to our mobile-optimized experience',
+      title: 'Mobile Access',
+      description: 'Access our projects through our mobile-optimized interface',
       image: 'assets/images/mobile-preview.jpg',
       route: '/mobile',
       isMain: false
@@ -62,6 +62,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.isDebugMode) {
       console.log('[Home] Component initialized');
     }
+    console.log('HOME COMPONENT LOADED - VERSION 2');
+    
+    // Log the featuredSections to verify the correct data
+    console.log('Featured Sections:', this.featuredSections);
   }
 
   /**

@@ -1,0 +1,25 @@
+// 【✓】 Import Variables and Mixins first (dependencies)
+@use 'themes/variables';
+@use 'utilities/mixins';
+
+// 【✓】 Base styles
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/base';
+
+// 【✓】 Layout styles
+@use 'layout/grid';
+@use 'layout/page';
+@use 'layout/section';
+
+// 【✓】 Component styles
+@use 'components/scrollbar';
+@use 'components/buttons';
+@use 'components/inputs';
+
+// 【✓】 Theme styles
+@use 'themes/common';
+// Don't import phantasia theme here as per user's request
+
+// 【✓】 Utility styles (animations, etc)
+@use 'utilities/animations';

@@ -12,17 +12,20 @@ import { Router, RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  styleUrls: [
+    './header.component.scss',
+    '../../pages/collections/phantasia/pages/collection/phantasia-header.scss'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent implements OnInit {
   readonly collections = [
-    { id: 'phantasia', name: 'Phantasia Project', active: true, route: '/introduction' }
+    { id: 'phantasia', name: 'Prismatic Collections', active: true, route: '/introduction' }
   ];
   
   readonly pages = [
     { id: 'experience', name: 'Experience', active: true, route: '/introduction', description: '3D Experience' },
-    { id: 'collection', name: 'Collection', active: false, route: '/collection', description: 'Album Info' }
+    { id: 'collection', name: 'Collection', active: false, route: '/collections', description: 'Album Info' }
   ];
   
   activeCollectionId = 'phantasia';

@@ -1,0 +1,117 @@
+@use 'variables' as vars;
+@use 'sass:color';
+
+// 【✓】 Common Button Styles
+.btn {
+  display: inline-block;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border-radius: vars.$border-radius-sm;
+  font-weight: vars.$font-weight-normal;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color vars.$transition-normal, color vars.$transition-normal, border-color vars.$transition-normal;
+  
+  &-primary {
+    background-color: vars.$primary-color;
+    color: vars.$text-light;
+    border: 1px solid vars.$primary-color;
+    
+    &:hover {
+      background-color: color.adjust(vars.$primary-color, $lightness: -10%);
+      border-color: color.adjust(vars.$primary-color, $lightness: -10%);
+    }
+  }
+  
+  &-secondary {
+    background-color: vars.$secondary-color;
+    color: vars.$text-light;
+    border: 1px solid vars.$secondary-color;
+    
+    &:hover {
+      background-color: color.adjust(vars.$secondary-color, $lightness: -10%);
+      border-color: color.adjust(vars.$secondary-color, $lightness: -10%);
+    }
+  }
+  
+  &-outline {
+    background-color: transparent;
+    
+    &-primary {
+      color: vars.$primary-color;
+      border: 1px solid vars.$primary-color;
+      
+      &:hover {
+        background-color: vars.$primary-color;
+        color: vars.$text-light;
+      }
+    }
+    
+    &-secondary {
+      color: vars.$secondary-color;
+      border: 1px solid vars.$secondary-color;
+      
+      &:hover {
+        background-color: vars.$secondary-color;
+        color: vars.$text-light;
+      }
+    }
+  }
+}
+
+// 【✓】 Common Card Styles
+.card {
+  background-color: vars.$background-light;
+  border-radius: vars.$border-radius-md;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform vars.$transition-normal, box-shadow vars.$transition-normal;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  &-header {
+    padding: vars.$spacing-md;
+    border-bottom: 1px solid vars.$light-color;
+    font-weight: vars.$font-weight-bold;
+  }
+  
+  &-body {
+    padding: vars.$spacing-md;
+  }
+  
+  &-footer {
+    padding: vars.$spacing-md;
+    border-top: 1px solid vars.$light-color;
+  }
+}
+
+// 【✓】 Common Form Styles
+.form-control {
+  display: block;
+  width: 100%;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  font-size: vars.$font-size-md;
+  line-height: 1.5;
+  color: vars.$text-dark;
+  background-color: vars.$background-light;
+  border: 1px solid vars.$secondary-color;
+  border-radius: vars.$border-radius-sm;
+  transition: border-color vars.$transition-normal, box-shadow vars.$transition-normal;
+  
+  &:focus {
+    border-color: vars.$primary-color;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(vars.$primary-color, 0.25);
+  }
+}
+
+.form-group {
+  margin-bottom: vars.$spacing-md;
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: vars.$spacing-xs;
+}

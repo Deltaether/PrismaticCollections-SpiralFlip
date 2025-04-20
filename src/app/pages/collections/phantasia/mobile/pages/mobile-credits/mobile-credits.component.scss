@@ -1,0 +1,157 @@
+.mobile-credits {
+  padding: 1rem;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: #f0f0f0;
+}
+
+// 【✓】 Header styling
+.credits-header {
+  text-align: center;
+  padding: 1rem 0;
+  
+  .title {
+    font-size: 2rem;
+    margin: 0;
+    background: linear-gradient(to right, #f5d884, #bfa26f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(245, 216, 132, 0.5);
+    letter-spacing: 2px;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
+    color: #a0a0a0;
+  }
+}
+
+// 【✓】 Section styling
+.credits-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.credits-section {
+  background: rgba(26, 26, 46, 0.7);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border: 1px solid rgba(88, 180, 255, 0.2);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: rgba(88, 180, 255, 0.4);
+  }
+  
+  .section-title {
+    font-size: 1.4rem;
+    margin: 0 0 1rem;
+    color: #58b4ff;
+    border-bottom: 1px solid rgba(88, 180, 255, 0.3);
+    padding-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(88, 180, 255, 0.5);
+  }
+}
+
+// 【✓】 Credits list styling
+.credits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.credits-person {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .person-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(88, 180, 255, 0.3);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  .person-details {
+    flex: 1;
+    
+    .person-name {
+      font-size: 1.1rem;
+      margin: 0;
+      color: #f0f0f0;
+    }
+    
+    .person-role {
+      font-size: 0.9rem;
+      margin: 0.2rem 0 0;
+      color: #a0a0a0;
+    }
+  }
+}
+
+// 【✓】 Footer styling
+.credits-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(88, 180, 255, 0.1);
+  font-size: 0.8rem;
+  color: #707070;
+  
+  .copyright, .version {
+    margin: 0.2rem 0;
+  }
+}
+
+// 【✓】 Animation for section hover
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(88, 180, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(88, 180, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(88, 180, 255, 0.2);
+  }
+}
+
+// 【✓】 Media queries for responsive design
+@media (max-width: 480px) {
+  .credits-header .title {
+    font-size: 1.8rem;
+  }
+  
+  .credits-section .section-title {
+    font-size: 1.2rem;
+  }
+  
+  .credits-person .person-details .person-name {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-credits {
+    padding: 2rem;
+  }
+  
+  .credits-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+} 

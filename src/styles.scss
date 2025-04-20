@@ -1,3 +1,13 @@
+/* Main styles file */
+@use './app/styles/main.scss';
+@use './app/shared/styles/scroll-animations.scss' as scroll;
+@use './app/pages/collections/phantasia/pages/collection/collection-header-global.scss' as phantasia;
+
+/* We're keeping the existing Phantasia Project styles in their original location
+   and only organizing the common/shared styles into a more maintainable structure */
+
+/* Any additional global styles that don't fit elsewhere can be added here */
+
 /* You can add global styles to this file, and also import other style files */
 
 /* Global styles */
@@ -25,7 +35,7 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden !important; /* Prevent scrolling on the body */
   position: relative;
 }
 
@@ -34,6 +44,7 @@ body {
   line-height: 1.6;
   color: #333;
   background: #fff;
+  min-height: 100%;
 }
 
 /* Custom Scrollbar Styles */
@@ -71,8 +82,8 @@ body {
   scrollbar-color: rgba(110, 80, 60, 0.5) transparent;
 }
 
-/* Active link style */
-.active {
+/* Active link style - this is overridden for collections */
+.active:not(.collections-page .active):not(.nav-link.active) {
   color: #000 !important;
   font-weight: 600 !important;
 }
@@ -80,10 +91,10 @@ body {
 /* Ensure app-root takes full height */
 app-root {
   display: block;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  height: 100%;
+  width: 100%;
   position: relative;
+  overflow: hidden !important; /* Prevent scrolling on the root app container */
 }
 
 /* Page styles */
@@ -92,14 +103,14 @@ app-root {
   width: 100%;
   padding: 2rem;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
 
 /* Section styles */
 section {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   position: relative;
   scroll-snap-align: start;

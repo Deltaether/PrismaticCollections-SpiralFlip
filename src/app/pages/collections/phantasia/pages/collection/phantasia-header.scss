@@ -1,0 +1,132 @@
+// 【✓】 Phantasia Header Styles
+// Overrides for the header component specifically for the Phantasia collection pages
+
+// Import the collection variables for consistency
+@use './collection-scrollable.scss' as collections;
+
+// Variables to match our new JRPG-inspired theme
+$header-height: 90px;
+$background-color: rgba(5, 2, 31, 0.85);
+$text-color: #e0f7ff;
+$primary-color: #4b0082; // Deep indigo to match our theme
+$accent-color: #00ffff; // Cyan blue
+$secondary-color: #7b00ff; // Electric purple
+$active-tab-gradient: linear-gradient(to right, 
+                      rgba(75, 0, 130, 0.75), 
+                      rgba(123, 0, 255, 0.75));
+$tab-hover-color: rgba(0, 255, 255, 0.1);
+$border-glow: 0 0 15px rgba(0, 255, 255, 0.4);
+
+// Direct selectors - don't rely on host-context
+.phantasia-collection-page .site-header,
+body.collections-page .site-header {
+  backdrop-filter: blur(15px) !important;
+  background-color: $background-color !important;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2) !important;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5) !important;
+  
+  .header-container {
+    padding: 0 30px;
+  }
+  
+  // Logo Styles
+  .logo-container {
+    .logo-image {
+      filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.4)) !important;
+      
+      &:hover {
+        filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.6)) !important;
+      }
+    }
+  }
+  
+  // Navigation Section
+  .site-nav {
+    .nav-section {
+      li {
+        color: $text-color !important;
+        letter-spacing: 0.5px;
+        
+        &:hover {
+          background-color: $tab-hover-color !important;
+          color: $accent-color !important;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important;
+        }
+        
+        &.active {
+          background: $active-tab-gradient !important;
+          color: white !important;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
+          
+          &::after {
+            background-color: $accent-color !important;
+            height: 3px;
+            box-shadow: $border-glow !important;
+          }
+        }
+      }
+    }
+  }
+  
+  // Collection Tabs - specific styling for collection links
+  .collection-tabs {
+    li {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -10px;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(to bottom, 
+                    transparent,
+                    rgba(0, 255, 255, 0.5),
+                    transparent);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+      
+      &:hover {
+        border-color: rgba(0, 255, 255, 0.2);
+        
+        &::before {
+          opacity: 1;
+          left: 0;
+        }
+      }
+      
+      &.active {
+        font-weight: 700 !important;
+        border: 1px solid rgba(0, 255, 255, 0.3) !important;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
+        background: linear-gradient(135deg,
+                    rgba(75, 0, 130, 0.7) 0%,
+                    rgba(45, 10, 80, 0.7) 100%) !important;
+                    
+        &::before {
+          opacity: 1;
+          left: 0;
+          background: linear-gradient(to bottom, 
+                      transparent,
+                      $accent-color,
+                      transparent);
+        }
+      }
+    }
+  }
+}
+
+// Home and Page tabs special styling
+.phantasia-collection-page .home-tabs li.active,
+.phantasia-collection-page .page-tabs li.active,
+body.collections-page .home-tabs li.active,
+body.collections-page .page-tabs li.active {
+  background: linear-gradient(135deg,
+              rgba(45, 10, 80, 0.7) 0%,
+              rgba(75, 0, 130, 0.7) 100%) !important;
+} 

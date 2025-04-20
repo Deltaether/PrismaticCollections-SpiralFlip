@@ -1,0 +1,29 @@
+<div class="mobile-credits">
+  <div class="credits-header">
+    <h1 class="title">Credits</h1>
+    <p class="subtitle">The amazing people behind Project Phantasia</p>
+  </div>
+  
+  <div class="credits-content">
+    <div class="credits-section" *ngFor="let section of creditsSections" (click)="handleSectionClick(section)">
+      <h2 class="section-title">{{section.title}}</h2>
+      
+      <div class="credits-list">
+        <div class="credits-person" *ngFor="let person of section.people">
+          <div class="person-avatar" *ngIf="person.avatar">
+            <img [src]="person.avatar" [alt]="person.name">
+          </div>
+          <div class="person-details">
+            <h3 class="person-name">{{person.name}}</h3>
+            <p class="person-role">{{person.role}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="credits-footer">
+    <p class="copyright">© 2023 Project Phantasia</p>
+    <p class="version">Version 1.0</p>
+  </div>
+</div> 

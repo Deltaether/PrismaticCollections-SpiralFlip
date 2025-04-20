@@ -1,0 +1,108 @@
+// 【✓】 Scroll container styles
+.scrollable-container {
+  overflow-y: auto;
+  height: calc(100vh - 80px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(155, 155, 155, 0.5);
+    border-radius: 6px;
+  }
+}
+
+// 【✓】 Base animation properties
+.fade-in, .slide-in, .zoom-in, .bounce-in {
+  opacity: 0;
+  transition: opacity 0.6s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+// 【✓】 Fade in from bottom animation
+.fade-in {
+  transform: translateY(30px);
+}
+
+// 【✓】 Slide in from left animation
+.slide-in {
+  transform: translateX(-50px);
+  transition: opacity 0.7s ease-out, transform 0.9s ease-out;
+}
+
+// 【✓】 Zoom in animation
+.zoom-in {
+  transform: scale(0.85);
+  transition: opacity 0.5s ease-out, transform 0.7s ease-out;
+}
+
+// 【✓】 Bounce in animation
+.bounce-in {
+  transform: scale(0.9);
+  transition: opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+// 【✗】 Experimental flip in animation (not currently in use)
+.flip-in {
+  opacity: 0;
+  transform: perspective(400px) rotateY(90deg);
+  transform-origin: center right;
+  transition: opacity 0.6s ease-out, transform 0.8s ease-out;
+  
+  &.visible {
+    opacity: 1;
+    transform: perspective(400px) rotateY(0deg);
+  }
+}
+
+// 【✓】 Staggered animation for collection items
+@for $i from 1 through 10 {
+  .collection-item:nth-child(#{$i}) {
+    transition-delay: #{$i * 0.1}s;
+  }
+}
+
+// 【✓】 Highlight animation for scrolled-to elements
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+.highlight {
+  animation: highlight-pulse 1.5s 1;
+  z-index: 1;
+  position: relative;
+}
+
+// 【✓】 Intersection Observer utility class
+.observe-element {
+  transition: all 0.5s ease;
+  will-change: opacity, transform;
+}
+
+// 【✓】 Mobile responsive adjustments
+@media (max-width: 768px) {
+  .scrollable-container {
+    height: calc(100vh - 60px);
+  }
+} 

@@ -4,30 +4,78 @@ import { HomeComponent } from './pages/home/home.component';
 
 /**
  * Main application routes
- * HomeComponent serves both root and /home paths
- * No automatic redirects
+ * Organized by layout components
  * 【✓】
  */
 export const routes: Routes = [
+  // Main Layout routes
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    children: [
+      {
+        path: '',
+        component: HomeComponent,
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        component: HomeComponent
+      },
+      {
+        path: 'scroll-demo',
+        loadComponent: () => import('./shared/components/scroll-demo.component').then(m => m.ScrollDemoComponent)
+      }
+    ]
+  },
+  
+  // Phantasia Layout routes
+  {
+    path: 'phantasia',
+    loadComponent: () => import('./layout/phantasia-layout/phantasia-layout.component').then(m => m.PhantasiaLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'introduction',
+        pathMatch: 'full'
+      },
+      {
+        path: 'introduction',
+        loadComponent: () => import('./pages/collections/phantasia/pages/introduction/introduction.component').then(m => m.IntroductionComponent)
+      },
+      {
+        path: 'collections',
+        loadComponent: () => import('./pages/collections/phantasia/pages/collection/collection.component').then(m => m.CollectionComponent)
+      }
+    ]
+  },
+  
+  // Mobile Layout routes
+  {
+    path: 'mobile',
+    loadComponent: () => import('./layout/mobile-layout/mobile-layout.component').then(m => m.MobileLayoutComponent),
+    children: [
+      {
+        path: '',
+        component: MobileViewComponent
+      }
+    ]
+  },
+  
+  // For backward compatibility, redirect old paths to new structured paths
+  {
+    path: 'introduction',
+    redirectTo: 'phantasia/introduction',
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    component: HomeComponent
-  },
-  {
-    path: 'mobile',
-    component: MobileViewComponent
-  },
-  {
-    path: 'introduction',
-    loadComponent: () => import('./pages/introduction/introduction.component').then(m => m.IntroductionComponent)
+    path: 'collections',
+    redirectTo: 'phantasia/collections',
+    pathMatch: 'full'
   },
   {
     path: 'collection',
-    loadComponent: () => import('./pages/collection/collection.component').then(m => m.CollectionComponent)
+    redirectTo: 'phantasia/collections',
+    pathMatch: 'full'
   }
 ]; 

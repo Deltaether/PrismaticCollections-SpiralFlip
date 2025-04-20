@@ -1,0 +1,19 @@
+// 【✓】 Base styles - imports reset and typography
+@use 'reset';
+@use 'typography';
+
+// 【✓】 Common base styling
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}

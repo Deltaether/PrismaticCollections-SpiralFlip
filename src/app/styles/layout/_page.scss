@@ -1,0 +1,10 @@
+【✓】 /* Page Layout Styles */
+.page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}

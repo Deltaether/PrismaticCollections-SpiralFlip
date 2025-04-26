@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { AudioService } from '../../../services/music-player/audio.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

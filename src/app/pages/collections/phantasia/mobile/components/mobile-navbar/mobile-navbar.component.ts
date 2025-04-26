@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { UISoundService } from '../../../services/music-player/ui-sound.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -220,7 +220,7 @@ export class MobileNavbarComponent implements OnInit, OnDestroy {
   
   constructor(
     private readonly router: Router,
-    private readonly audioService: AudioService,
+    private readonly uiSoundService: UISoundService,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
@@ -263,7 +263,8 @@ export class MobileNavbarComponent implements OnInit, OnDestroy {
       isMenuOpen: newState
     };
     
-    this.playUISound('menu-click');
+    // Play menu sound
+    this.uiSoundService.playUISound('menu-click');
     
     // Prevent body scrolling when menu is open
     document.body.style.overflow = newState ? 'hidden' : '';
@@ -299,7 +300,7 @@ export class MobileNavbarComponent implements OnInit, OnDestroy {
     this.closeMenu();
     
     // Play sound and navigate
-    this.playUISound('menu-click');
+    this.uiSoundService.playUISound('page-turn');
     this.router.navigate([route]);
     
     if (this.isDebugMode) {
@@ -316,11 +317,6 @@ export class MobileNavbarComponent implements OnInit, OnDestroy {
   isActiveRoute(route: string): boolean {
     return this.router.url === route || 
            (route === '/mobile' && this.router.url === '/mobile/');
-  }
-
-  // 【✓】 Play UI sound
-  private playUISound(soundName: string): void {
-    this.audioService.playUISound(soundName);
   }
 
   // 【✓】 Handle scroll event

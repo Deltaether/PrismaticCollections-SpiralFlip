@@ -4,17 +4,92 @@
 // Use the variables from the main SCSS file
 @use './collection.component.scss' as collections;
 
-// 【✓】 New futuristic JRPG color scheme with teal and gold
-$background-color: #01141e; // Deep space blue-teal
-$primary-color: #003b4f; // Deep teal
-$secondary-color: #ffd700; // Gold
-$accent-color: #00e5ff; // Teal blue
-$accent-secondary: #008b8b; // Dark cyan
-$text-color: #e0f7ff; // Soft blueish white
-$light-text: #ffffff; // Pure white
-$card-background: rgba(3, 23, 35, 0.75); // Semi-transparent deep blue-teal
-$dark-bg: #011824; // Darker space blue
-$highlight-color: #ffd700; // Gold highlight
+// 【✓】 Updated color scheme to match the design in the image
+$background-color: #121212; 
+$primary-color: #5557f7; 
+$secondary-color: #9d55f7; 
+$accent-color: #5557f7;
+$accent-secondary: #2a9df4;
+$card-background: rgba(30, 30, 42, 0.95);
+$dark-bg: #0c0c14;
+$text-color: #e9ecef;
+$light-text: #ffffff;
+
+// 【✓】 Main container
+.phantasia-collection-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: $secondary-color transparent;
+  min-height: 100vh;
+  padding: 0 20px;
+  background: $background-color;
+  position: relative;
+  
+  /* Remove grid and pattern overlays */
+  &::before, &::after {
+    display: none;
+  }
+}
+
+// 【✓】 Collection item styling - match the image
+.collection-item {
+  display: flex;
+  background: $card-background;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Collection tags styling to match the image
+.collection-tags {
+  .tag {
+    background: rgba(85, 87, 247, 0.15);
+    color: #ffffff;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+// Explore button styling to match the image
+.action-button.primary {
+  background: #5557f7;
+  color: white;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(85, 87, 247, 0.3);
+  
+  &:hover {
+    background: #4041c7;
+    box-shadow: 0 6px 15px rgba(85, 87, 247, 0.4);
+  }
+  
+  i {
+    margin-right: 8px;
+  }
+}
+
+// Collection metadata styling to match the image
+.collection-metadata {
+  margin: 10px 0 16px;
+  
+  span {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 20px;
+  }
+}
 
 // 【✓】 Navbar styles
 .collection-navbar {
@@ -148,138 +223,6 @@ $highlight-color: #ffd700; // Gold highlight
     position: absolute;
     bottom: 0;
     left: 0;
-  }
-}
-
-// 【✓】 Scrollable Container with futuristic background
-.phantasia-collection-container {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: $secondary-color transparent;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0 20px;
-  
-  /* Force the background to use our new teal theme instead of violet/magenta */
-  background: linear-gradient(135deg, 
-               rgba(1, 20, 30, 1) 0%, 
-               rgba(0, 59, 79, 1) 50%,
-               rgba(1, 20, 30, 1) 100%) !important;
-  background-size: 400% 400% !important;
-  animation: gradientBG 15s ease infinite;
-  
-  @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  /* Add gold orbs instead of violet/magenta orbs */
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    background-image: 
-      linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    z-index: 1;
-  }
-  
-  // Star field
-  &::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(1px 1px at 25px 5px, $light-text, rgba(255, 255, 255, 0)),
-      radial-gradient(1px 1px at 50px 25px, $light-text, rgba(255, 255, 255, 0)),
-      radial-gradient(1px 1px at 125px 20px, $light-text, rgba(255, 255, 255, 0)),
-      radial-gradient(1.5px 1.5px at 50px 75px, $light-text, rgba(255, 255, 255, 0)),
-      radial-gradient(2px 2px at 15px 125px, $light-text, rgba(255, 255, 255, 0)),
-      radial-gradient(2.5px 2.5px at 110px 80px, $light-text, rgba(255, 255, 255, 0));
-    background-size: 250px 250px;
-    background-repeat: repeat;
-    opacity: 0.4;
-    z-index: 0;
-    pointer-events: none;
-    animation: starsAnimation 100s linear infinite;
-  }
-  
-  @keyframes starsAnimation {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-250px); }
-  }
-  
-  // Orbiting light effects
-  .light-orb {
-    position: fixed;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    z-index: 0;
-    pointer-events: none;
-    
-    &:nth-child(1) {
-      top: 10%;
-      left: 5%;
-      background: rgba(0, 139, 139, 0.5); // Dark teal
-      animation: orbMove1 20s ease-in-out infinite alternate;
-    }
-    
-    &:nth-child(2) {
-      bottom: 20%;
-      right: 10%;
-      background: rgba(255, 215, 0, 0.3); // Gold
-      animation: orbMove2 23s ease-in-out infinite alternate;
-    }
-  }
-  
-  @keyframes orbMove1 {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(100px, 50px); }
-  }
-  
-  @keyframes orbMove2 {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(-100px, -70px); }
-  }
-  
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba($secondary-color, 0.5);
-    border-radius: 4px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    box-shadow: 0 0 10px rgba($secondary-color, 0.5);
-    
-    &:hover {
-      background-color: rgba($secondary-color, 0.8);
-    }
   }
 }
 

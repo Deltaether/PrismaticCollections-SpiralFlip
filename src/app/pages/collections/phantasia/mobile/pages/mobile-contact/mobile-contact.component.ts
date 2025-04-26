@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { UISoundService } from '../../../services/music-player/ui-sound.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -349,7 +349,7 @@ export class MobileContactComponent implements OnInit, OnDestroy {
   
   constructor(
     private readonly fb: FormBuilder,
-    private readonly audioService: AudioService,
+    private readonly uiSoundService: UISoundService,
     private readonly cdr: ChangeDetectorRef
   ) {
     this.contactForm = this.fb.group({
@@ -406,7 +406,7 @@ export class MobileContactComponent implements OnInit, OnDestroy {
   submitForm(): void {
     if (this.contactForm.invalid) {
       this.highlightFormErrors();
-      this.audioService.playUISound('error');
+      this.uiSoundService.playUISound('error');
       return;
     }
     
@@ -426,7 +426,7 @@ export class MobileContactComponent implements OnInit, OnDestroy {
         isSubmitted: true
       });
       
-      this.audioService.playUISound('success');
+      this.uiSoundService.playUISound('success');
     }, 1500);
   }
   
@@ -475,7 +475,7 @@ export class MobileContactComponent implements OnInit, OnDestroy {
   openSocialLink(event: Event, url: string): void {
     event.preventDefault();
     window.open(url, '_blank');
-    this.audioService.playUISound('menu-click');
+    this.uiSoundService.playUISound('menu-click');
     
     if (this.isDebugMode) {
       console.log(`[MobileContact] Opening social link: ${url}`);

@@ -2,10 +2,10 @@ import { Component, HostListener, ElementRef, ViewChild, AfterViewInit, OnInit, 
 import { CommonModule } from '@angular/common';
 // import { MusicPlayerComponent } from '../../../tools/music-player/music-player.component'; // Removed - now in right-side menu
 import { CDCasesComponent } from '../../../tools/cd-cases/cd-cases.component';
-import { AudioService } from '../../../tools/music-player/audio.service';
+import { AudioService } from './services/music-player/audio.service';
 import { DeviceDetectionService } from '../../../services/device-detection.service';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { MobileViewComponent } from '../../mobile-view/mobile-view.component';
+import { MobileViewComponent } from './mobile/mobile-view.component';
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { SiteVersionSelectorComponent } from '../../../components/site-version-selector/site-version-selector.component';

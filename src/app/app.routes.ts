@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { MobileViewComponent } from './pages/mobile-view/mobile-view.component';
 import { HomeComponent } from './pages/home/home.component';
 
 /**
@@ -46,6 +45,22 @@ export const routes: Routes = [
       {
         path: 'collections',
         loadComponent: () => import('./pages/collections/phantasia/pages/collection/collection.component').then(m => m.CollectionComponent)
+      },
+      {
+        path: 'disc-one',
+        loadComponent: () => import('./pages/collections/phantasia/pages/disc-one/disc-one.component').then(m => m.DiscOneComponent)
+      },
+      {
+        path: 'disc-two',
+        loadComponent: () => import('./pages/collections/phantasia/pages/disc-two/disc-two.component').then(m => m.DiscTwoComponent)
+      },
+      {
+        path: 'information',
+        loadComponent: () => import('./pages/collections/phantasia/pages/information/information.component').then(m => m.InformationComponent)
+      },
+      {
+        path: 'pv',
+        loadComponent: () => import('./pages/collections/phantasia/pages/pv/pv.component').then(m => m.PvComponent)
       }
     ]
   },
@@ -57,7 +72,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: MobileViewComponent
+        loadComponent: () => import('./pages/collections/phantasia/mobile/mobile-view.component').then(m => m.MobileViewComponent)
       }
     ]
   },
@@ -76,6 +91,26 @@ export const routes: Routes = [
   {
     path: 'collection',
     redirectTo: 'phantasia/collections',
+    pathMatch: 'full'
+  },
+  {
+    path: 'disc-one',
+    redirectTo: 'phantasia/disc-one',
+    pathMatch: 'full'
+  },
+  {
+    path: 'disc-two',
+    redirectTo: 'phantasia/disc-two',
+    pathMatch: 'full'
+  },
+  {
+    path: 'information',
+    redirectTo: 'phantasia/information',
+    pathMatch: 'full'
+  },
+  {
+    path: 'pv',
+    redirectTo: 'phantasia/pv',
     pathMatch: 'full'
   }
 ]; 

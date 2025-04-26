@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { AudioService } from '../../../services/music-player/audio.service';
 import { MobileNavigationService } from '../../services/mobile-navigation.service';
 
 // 【✓】 Define interfaces for type safety

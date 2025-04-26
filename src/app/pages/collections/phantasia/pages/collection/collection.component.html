@@ -9,96 +9,85 @@
       <div class="nav-links">
         <a routerLink="/" class="nav-link">Home</a>
         <a routerLink="/collections" class="nav-link active">Collections</a>
-        <a routerLink="/scroll-demo" class="nav-link">Demo</a>
+        <a routerLink="/about" class="nav-link">About</a>
       </div>
     </div>
-    <div class="cyberpunk-accent-line"></div>
   </nav>
 
   <!-- Collection Header -->
   <div class="collection-header">
-    <h1 class="fade-in">Music Collections</h1>
-    <p class="subtitle collection-description fade-in">Explore our curated collection of music releases, from classic albums to rare compilations.</p>
+    <h1>Collections</h1>
+    <p class="subtitle collection-description">Discover curated sound collections from our library</p>
   </div>
 
   <!-- Collection List -->
   <div class="scrollable-collections">
-    <!-- Collection Item (will be repeated) -->
+    <!-- Project Phantasia Collection Item -->
     <div class="collection-row collection-item" 
-         *ngFor="let collection of collections; let i = index" 
-         [class.active-collection]="collection.id === activeCollectionId"
-         (click)="setActiveCollection(collection.id); navigateToCollection(collection.id)"
-         [id]="'collection-' + collection.id"
+         (click)="setActiveCollection('phantasia'); navigateToCollection('phantasia')"
+         id="collection-phantasia"
          #collectionItem>
-      <div class="collection-track" *ngIf="collection.id === activeCollectionId"></div>
-      <div class="collection-image collection-header-image">
-        <img [src]="collection.imagePath" [alt]="collection.title">
+      <div class="collection-image">
+        <img src="assets/images/collections/phantasia-cover.jpg" alt="Project Phantasia">
       </div>
       
       <div class="collection-info">
-        <h2>{{ collection.title }}</h2>
+        <h2>Project Phantasia</h2>
         
         <div class="collection-metadata">
-          <span class="artist">{{ collection.artist }}</span>
-          <span class="year">{{ collection.year }}</span>
+          <span class="tracks">12 Tracks</span>
+          <span class="year">2023 Year</span>
         </div>
+        
+        <p class="description">Our flagship collection featuring a blend of orchestral and electronic music. Experience our immersive 3D interface with stunning visual effects and interactive elements.</p>
         
         <div class="collection-tags">
-          <span class="tag" *ngFor="let tag of collection.tags">{{ tag }}</span>
+          <span class="tag">Orchestral</span>
+          <span class="tag">Electronic</span>
+          <span class="tag">Ambient</span>
+          <span class="tag">3D Experience</span>
         </div>
         
-        <p class="description">{{ collection.description }}</p>
+        <div class="collection-actions">
+          <button class="action-button primary" (click)="navigateToPhantasia($event)">
+            <i class="fas fa-play"></i> Explore Collection
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ethereal Soundscapes Collection Item -->
+    <div class="collection-row collection-item" 
+         (click)="setActiveCollection('ethereal'); navigateToCollection('ethereal')"
+         id="collection-ethereal"
+         #collectionItem>
+      <div class="collection-image">
+        <img src="assets/images/collections/ethereal-soundscapes.jpg" alt="Ethereal Soundscapes">
+      </div>
+      
+      <div class="collection-info">
+        <h2>Ethereal Soundscapes</h2>
+        
+        <div class="collection-metadata">
+          <span class="tracks">18 tracks</span>
+          <span class="year">2023</span>
+        </div>
+        
+        <p class="description">Immersive ambient compositions that blend electronic elements with organic textures.</p>
+        
+        <div class="collection-tags">
+          <span class="tag">Ambient</span>
+          <span class="tag">Electronic</span>
+        </div>
         
         <div class="collection-actions">
           <button class="action-button primary">
-            <i class="fas fa-play"></i> Explore Collection
-          </button>
-          <button class="action-button secondary">
-            <i class="far fa-heart"></i> Add to Favorites
+            <i class="fas fa-play"></i> Explore
           </button>
         </div>
       </div>
-      
-      <!-- Featured Badge for special collections -->
-      <div class="status-indicator" *ngIf="collection.featured">
-        <span class="featured-badge">Featured</span>
-      </div>
     </div>
   </div>
-
-  <!-- Coming Soon Section -->
-  <div class="coming-soon-section" id="coming-soon">
-    <h2 class="fade-in">Coming Soon</h2>
-    
-    <div class="upcoming-releases">
-      <div class="upcoming-item stagger-item">
-        <div class="upcoming-icon">
-          <i class="fas fa-compact-disc"></i>
-        </div>
-        <h3>New Releases</h3>
-        <p>Latest additions to our collection</p>
-      </div>
-      
-      <div class="upcoming-item stagger-item">
-        <div class="upcoming-icon">
-          <i class="fas fa-headphones"></i>
-        </div>
-        <h3>Exclusive Content</h3>
-        <p>Member-only access to rare tracks</p>
-      </div>
-      
-      <div class="upcoming-item stagger-item">
-        <div class="upcoming-icon">
-          <i class="fas fa-microphone-alt"></i>
-        </div>
-        <h3>Artist Interviews</h3>
-        <p>Behind the scenes with creators</p>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Extra space at bottom for better scrolling -->
-  <div style="height: 40px;"></div>
 </div>
 
 <!-- Scroll to Top Button -->

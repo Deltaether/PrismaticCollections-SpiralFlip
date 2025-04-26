@@ -255,6 +255,18 @@ export class CollectionComponent implements OnInit, AfterViewInit, OnDestroy {
     this.scrollHelper.scrollToElement(itemId, -80);
   }
 
+  /**
+   * Navigate directly to Phantasia collection
+   * 【✓】
+   */
+  navigateToPhantasia(event: Event): void {
+    // Prevent the parent div click handler from firing
+    event.stopPropagation();
+    
+    // Navigate to the Phantasia collection page
+    this.router.navigate(['/collections/phantasia']);
+  }
+
   ngOnDestroy(): void {
     // 【✓】 Clean up observers and event listeners
     this.scrollHelper.cleanUpObservers();

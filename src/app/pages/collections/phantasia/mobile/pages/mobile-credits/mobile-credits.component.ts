@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { UISoundService } from '../../../services/music-player/ui-sound.service';
 
 // 【✓】 Define interfaces for type safety
 interface CreditsPerson {
@@ -57,7 +57,7 @@ export class MobileCreditsComponent implements OnInit, OnDestroy {
   ];
 
   constructor(
-    private readonly audioService: AudioService,
+    private readonly uiSoundService: UISoundService,
     private readonly cdr: ChangeDetectorRef
   ) {
     if (this.isDebugMode) {
@@ -82,9 +82,10 @@ export class MobileCreditsComponent implements OnInit, OnDestroy {
 
   // 【✓】 UI interaction handler
   handleSectionClick(section: CreditsSection): void {
-    this.audioService.playUISound('menu-click');
     if (this.isDebugMode) {
       console.log(`[MobileCredits] Section clicked: ${section.title}`);
     }
+    
+    this.uiSoundService.playUISound('menu-click');
   }
 } 

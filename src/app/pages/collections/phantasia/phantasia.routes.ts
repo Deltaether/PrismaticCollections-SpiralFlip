@@ -4,16 +4,20 @@ import { DiscOneComponent } from './pages/disc-one/disc-one.component';
 import { DiscTwoComponent } from './pages/disc-two/disc-two.component';
 import { PvComponent } from './pages/pv/pv.component';
 import { InformationComponent } from './pages/information/information.component';
-import { MobileViewComponent } from '../../../pages/mobile-view/mobile-view.component';
-import { MobileHomeComponent } from '../../../pages/mobile-view/pages/mobile-home/mobile-home.component';
-import { MobileMusicComponent } from '../../../pages/mobile-view/pages/mobile-music/mobile-music.component';
-import { MobileAboutComponent } from '../../../pages/mobile-view/pages/mobile-about/mobile-about.component';
-import { MobileContactComponent } from '../../../pages/mobile-view/pages/mobile-contact/mobile-contact.component';
-import { MobileCreditsComponent } from '../../../pages/mobile-view/pages/mobile-credits/mobile-credits.component';
+import { MobileViewComponent } from './mobile/mobile-view.component';
+import { MobileHomeComponent } from './mobile/pages/mobile-home/mobile-home.component';
+import { MobileMusicComponent } from './mobile/pages/mobile-music/mobile-music.component';
+import { MobileAboutComponent } from './mobile/pages/mobile-about/mobile-about.component';
+import { MobileContactComponent } from './mobile/pages/mobile-contact/mobile-contact.component';
+import { MobileCreditsComponent } from './mobile/pages/mobile-credits/mobile-credits.component';
 import { CollectionComponent } from './pages/collection/collection.component';
 import { HomeComponent } from '../../../pages/home/home.component';
 import { TestHomeComponent } from '../../../pages/test-home/test-home.component';
 
+/**
+ * Routes specific to the Phantasia project
+ * 【✓】
+ */
 export const routes: Routes = [
   {
     path: '',

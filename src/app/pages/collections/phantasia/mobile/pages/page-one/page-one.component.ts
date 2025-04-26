@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdJacketComponent } from '../../components/cd-jacket/cd-jacket.component';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { AudioService } from '../../../services/music-player/audio.service';
 
 @Component({
   selector: 'app-page-one',

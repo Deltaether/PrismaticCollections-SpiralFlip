@@ -1,4 +1,5 @@
 /* Main styles file */
+@use './sass-options.scss';
 @use './app/styles/main.scss';
 @use './app/shared/styles/scroll-animations.scss' as scroll;
 @use './app/pages/collections/phantasia/pages/collection/collection-header-global.scss' as phantasia;

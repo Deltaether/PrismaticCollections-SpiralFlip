@@ -1,0 +1,15 @@
+// 【✓】 Silence SASS legacy API deprecation warnings
+// See: https://sass-lang.com/documentation/breaking-changes/legacy-js-api/#silencing-warnings
+// Reference: https://github.com/vercel/next.js/issues/71638
+
+// Import sass:meta module to use variable-exists function
+@use "sass:meta";
+
+// Define variables at stylesheet root as recommended
+$sass-major-version: 0 !default;
+$silenceDeprecations: null;
+
+// Set silenceDeprecations to include legacy-js-api
+@if meta.variable-exists(sass-major-version) {
+  $silenceDeprecations: ['legacy-js-api'] !global;
+} 

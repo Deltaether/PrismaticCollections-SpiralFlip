@@ -4,7 +4,7 @@ import { CDCasesComponent } from '../../../../../tools/cd-cases/cd-cases.compone
 import { SiteVersionSelectorComponent } from '../../../../../components/site-version-selector/site-version-selector.component';
 import { DisclaimerComponent } from '../../../../../components/disclaimer/disclaimer.component';
 import { SceneLoaderComponent } from '../../../../../tools/cd-cases/scene-loader/scene-loader.component';
-import { MobileViewComponent } from '../../mobile/mobile-view.component';
+import { MobileViewComponent } from '../../../../../pages/mobile-view/mobile-view.component';
 
 /**
  * Introduction component that shows the 3D experience and version selector

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AudioService } from '../../../../tools/music-player/audio.service';
+import { UISoundService } from '../../../services/music-player/ui-sound.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -220,7 +220,7 @@ export class MobileHomeComponent implements OnInit, OnDestroy {
   
   constructor(
     private readonly router: Router,
-    private readonly audioService: AudioService,
+    private readonly uiSoundService: UISoundService,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
@@ -257,7 +257,7 @@ export class MobileHomeComponent implements OnInit, OnDestroy {
       console.log(`[MobileHome] Navigating to: ${route}`);
     }
     
-    this.audioService.playUISound('menu-click');
+    this.uiSoundService.playUISound('page-turn');
     this.router.navigate([route]);
   }
 

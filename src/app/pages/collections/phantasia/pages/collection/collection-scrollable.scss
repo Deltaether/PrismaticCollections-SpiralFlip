@@ -3,6 +3,7 @@
 
 // Use the variables from the main SCSS file
 @use './collection.component.scss' as collections;
+@use 'sass:color';
 
 // 【✓】 Updated color scheme to match the design in the image
 $background-color: #121212; 
@@ -71,7 +72,7 @@ $light-text: #ffffff;
   box-shadow: 0 4px 10px rgba(85, 87, 247, 0.3);
   
   &:hover {
-    background: #4041c7;
+    background: color.adjust(#5557f7, $lightness: -10%);
     box-shadow: 0 6px 15px rgba(85, 87, 247, 0.4);
   }
   
@@ -226,7 +227,7 @@ $light-text: #ffffff;
   }
 }
 
-// 【✓】 Collection Header
+// 【✓】 Collection Header - simplified to match image
 .collection-header {
   text-align: center;
   position: relative;
@@ -235,26 +236,12 @@ $light-text: #ffffff;
   margin-top: 20px;
   
   h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1.2rem;
     color: $light-text;
-    text-shadow: 0 0 20px rgba($accent-color, 0.8);
     position: relative;
     display: inline-block;
-    letter-spacing: 2px;
-    
-    &::before {
-      content: attr(data-text);
-      position: absolute;
-      left: 3px;
-      top: 3px;
-      width: 100%;
-      z-index: -1;
-      color: $secondary-color;
-      opacity: 0.5;
-      filter: blur(8px);
-    }
     
     &::after {
       content: '';
@@ -262,35 +249,30 @@ $light-text: #ffffff;
       bottom: -10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 150px;
-      height: 3px;
-      background: linear-gradient(to right, 
-                transparent, 
-                $accent-color, 
-                transparent);
-      border-radius: 3px;
-      box-shadow: 0 0 10px $accent-color;
+      width: 50px;
+      height: 2px;
+      background: $primary-color;
     }
   }
   
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     max-width: 700px;
     margin: 0 auto;
     color: $text-color;
     opacity: 0.9;
     line-height: 1.6;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
 }
 
 // 【✓】 Scrollable Collections Container
 .scrollable-collections {
-  @include collections.flex-column;
-  gap: collections.$space-xl;
-  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 4rem;
+  padding: 0 20px 4rem;
   position: relative;
   z-index: 2;
 }
@@ -713,33 +695,20 @@ $light-text: #ffffff;
   }
 }
 
-// 【✓】 Animated Progress Bar - updated for more futuristic look
+// 【✓】 Scroll Progress
 .scroll-progress {
   position: fixed;
   top: 0;
   left: 0;
   width: 0%;
-  height: 4px;
+  height: 2px;
   background: linear-gradient(to right, $accent-color, $secondary-color);
   z-index: 1001;
   transition: width 0.1s ease-out;
-  box-shadow: 0 0 15px rgba($secondary-color, 0.7);
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100px;
-    height: 100%;
-    background: linear-gradient(to right, 
-                transparent, 
-                rgba(255, 255, 255, 0.8));
-    filter: blur(3px);
-  }
+  box-shadow: 0 0 10px rgba($secondary-color, 0.5);
 }
 
-// 【✓】 Scroll Indicator - updated for JRPG aesthetic
+// 【✓】 Scroll Indicator
 .scroll-indicator {
   position: fixed;
   bottom: 30px;
@@ -747,70 +716,29 @@ $light-text: #ffffff;
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, $accent-color, $accent-secondary);
+  background: $primary-color;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba($accent-color, 0.5),
-              0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   opacity: 0;
   transition: all 0.3s ease;
   z-index: 100;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, 
-                $accent-color, 
-                $secondary-color, 
-                $accent-secondary, 
-                $accent-color);
-    background-size: 400%;
-    z-index: -1;
-    animation: rotate 15s linear infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  @keyframes rotate {
-    0% { transform: rotate(0deg); background-position: 0% 50%; }
-    100% { transform: rotate(360deg); background-position: 100% 50%; }
-  }
   
   &.visible {
     opacity: 1;
     transform: translateY(0);
-    
-    &::before {
-      opacity: 1;
-    }
   }
   
   &:hover {
-    transform: translateY(-8px) scale(1.1);
-    background: linear-gradient(135deg, $accent-secondary, $secondary-color);
-    
-    i {
-      animation: bounce 1s infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
+    background: color.adjust($primary-color, $lightness: 10%);
+    transform: translateY(-5px);
   }
   
   i {
     font-size: 1.3rem;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
 }
 

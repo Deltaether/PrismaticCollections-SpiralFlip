@@ -82,8 +82,8 @@ $transition-slow: 0.5s ease;
   }
 }
 
-// Base styles
-.collections-page {
+// 【✓】 Base styles - cleaned up to match the image
+.phantasia-collection-container {
   @include flex-column;
   min-height: 100vh;
   background-color: $background-color;
@@ -94,14 +94,14 @@ $transition-slow: 0.5s ease;
   padding: 40px 0 80px;
 }
 
-// Header Section
+// 【✓】 Header Section - simplified to match image
 .collection-header {
   text-align: center;
   position: relative;
   z-index: 1;
   margin-top: 60px;
   margin-bottom: $space-lg;
-  @include section-padding;
+  padding: $space-md 0;
   
   h1 {
     font-size: 2.5rem;
@@ -109,7 +109,6 @@ $transition-slow: 0.5s ease;
     margin-bottom: 1rem;
     color: $light-text;
     letter-spacing: 1px;
-    position: relative;
     display: inline-block;
     
     &::after {
@@ -129,216 +128,11 @@ $transition-slow: 0.5s ease;
     margin: 0 auto;
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba($text-color, 0.9);
+    color: rgba($text-color, 0.85);
   }
 }
 
-// Main Collections Container
-.collections-container {
-  @include flex-column;
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 $space-md $space-xl;
-}
-
-// 【✓】 Scrollable Collections Container
-.scrollable-collections {
-  display: flex;
-  flex-direction: column;
-  gap: $space-xl;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto 4rem;
-  position: relative;
-  z-index: 5;
-}
-
-// 【✓】 List-based Collection Row
-.collection-row {
-  display: flex;
-  position: relative;
-  padding: $space-md;
-  border-radius: $border-radius-md;
-  background: $card-background;
-  overflow: hidden;
-  transition: $transition-standard;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  border: none;
-  margin-bottom: $space-md;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    background: $card-hover;
-    
-    .collection-image img {
-      transform: scale(1.03);
-    }
-  }
-}
-
-// 【✓】 Collection Track Indicator
-.collection-track {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, $accent-color, $secondary-color);
-  opacity: 0.7;
-  transition: opacity $transition-medium;
-  box-shadow: 0 0 10px rgba($accent-color, 0.5);
-}
-
-// 【✓】 Collection Image
-.collection-image {
-  flex: 0 0 300px;
-  height: 300px;
-  overflow: hidden;
-  border-radius: $border-radius-sm;
-  margin-right: $space-md;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-}
-
-// 【✓】 Collection Info
-.collection-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: $space-sm 0;
-  
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: $space-sm;
-    color: $light-text;
-  }
-  
-  .description {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: rgba($text-color, 0.9);
-    margin-bottom: $space-md;
-  }
-  
-  .collection-metadata {
-    display: flex;
-    gap: $space-md;
-    margin-bottom: $space-sm;
-    
-    span {
-      font-size: 1rem;
-      color: $gray-200;
-    }
-  }
-  
-  .collection-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-xs;
-    margin-bottom: $space-md;
-    
-    .tag {
-      padding: 4px 12px;
-      border-radius: 20px;
-      background-color: rgba($primary-color, 0.2);
-      color: $light-text;
-      font-size: 0.8rem;
-      margin-bottom: 5px;
-    }
-  }
-  
-  .collection-actions {
-    display: flex;
-    gap: $space-sm;
-    
-    .action-button {
-      padding: 10px 20px;
-      border-radius: 50px;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: $transition-medium;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      &.primary {
-        background-color: $primary-color;
-        color: $light-text;
-        
-        &:hover {
-          background-color: color.adjust($primary-color, $lightness: -10%);
-          box-shadow: 0 0 15px rgba($primary-color, 0.4);
-        }
-      }
-      
-      i {
-        font-size: 0.9rem;
-      }
-    }
-  }
-}
-
-// 【✓】 Scroll Progress
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 2px;
-  background: linear-gradient(to right, $primary-color, $secondary-color);
-  z-index: 1500;
-  width: 0%;
-  transition: width 0.1s ease;
-}
-
-// 【✓】 Scroll to Top Button
-.scroll-indicator {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: $primary-color;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: translateY(20px);
-  z-index: 100;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  
-  &.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  &:hover {
-    background: color.adjust($primary-color, $lightness: 10%);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  i {
-    font-size: 20px;
-  }
-}
-
-// 【✓】 Navbar styles
+// 【✓】 Navbar styles - simplified to match image
 .collection-navbar {
   position: fixed;
   top: 0;
@@ -387,6 +181,202 @@ $transition-slow: 0.5s ease;
       color: $primary-color;
       font-weight: 500;
     }
+  }
+}
+
+// 【✓】 Scrollable Collections Container 
+.scrollable-collections {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xl;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+  padding: 0 $space-md;
+}
+
+// 【✓】 Collection Item - updated to match image
+.collection-row, 
+.collection-item {
+  display: flex;
+  position: relative;
+  padding: $space-md;
+  border-radius: $border-radius-md;
+  background: $card-background;
+  overflow: hidden;
+  transition: $transition-standard;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  border: none;
+  margin-bottom: $space-md;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    background: $card-hover;
+    
+    .collection-image img {
+      transform: scale(1.03);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+// 【✓】 Collection Image - updated to match image
+.collection-image {
+  flex: 0 0 300px;
+  height: 300px;
+  overflow: hidden;
+  border-radius: $border-radius-sm;
+  margin-right: $space-md;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  @media (max-width: 768px) {
+    flex: 0 0 200px;
+    height: 200px;
+    margin-right: 0;
+    margin-bottom: $space-md;
+  }
+}
+
+// 【✓】 Collection Info - updated to match image
+.collection-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: $space-sm;
+    color: $light-text;
+  }
+  
+  .description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba($text-color, 0.9);
+    margin-bottom: $space-md;
+  }
+  
+  .collection-metadata {
+    display: flex;
+    gap: $space-md;
+    margin-bottom: $space-sm;
+    
+    span {
+      font-size: 0.9rem;
+      color: $gray-200;
+    }
+  }
+  
+  // 【✓】 Collection Tags - updated to match image
+  .collection-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-xs;
+    margin-bottom: $space-md;
+    
+    .tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      background-color: rgba($primary-color, 0.2);
+      color: $light-text;
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+  }
+  
+  // 【✓】 Collection Actions - updated to match image
+  .collection-actions {
+    display: flex;
+    gap: $space-sm;
+    
+    .action-button {
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition-medium;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &.primary {
+        background-color: $primary-color;
+        color: $light-text;
+        
+        &:hover {
+          background-color: color.adjust($primary-color, $lightness: -10%);
+          box-shadow: 0 0 15px rgba($primary-color, 0.4);
+        }
+      }
+      
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// 【✓】 Scroll Progress 
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(to right, $primary-color, $secondary-color);
+  z-index: 1500;
+  width: 0%;
+  transition: width 0.1s ease;
+}
+
+// 【✓】 Scroll to Top Button 
+.scroll-indicator {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: $primary-color;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  &:hover {
+    background: color.adjust($primary-color, $lightness: 10%);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  i {
+    font-size: 20px;
   }
 }
 

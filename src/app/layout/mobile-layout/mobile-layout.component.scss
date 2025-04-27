@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Variables
 $primary-color: #ff5722;
 $secondary-color: #9c27b0;
@@ -87,7 +89,7 @@ $nav-width: 280px;
   right: -$nav-width;
   width: $nav-width;
   height: 100vh;
-  background-color: darken($dark-bg, 3%);
+  background-color: color.adjust($dark-bg, $lightness: -3%);
   z-index: 100;
   transition: right $transition-speed ease;
   display: flex;
@@ -217,7 +219,7 @@ $nav-width: 280px;
 
 // Footer Styles
 .mobile-footer {
-  background-color: darken($dark-bg, 3%);
+  background-color: color.adjust($dark-bg, $lightness: -3%);
   padding: 2rem 1rem 1.5rem;
   
   .footer-content {

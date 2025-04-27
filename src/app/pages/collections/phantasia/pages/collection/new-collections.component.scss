@@ -1,0 +1,243 @@
+// 【✓】 Variables
+@use 'sass:color';
+
+$background-color: #11141d;  // Dark navy background
+$card-background: #1b1e2b;  // Card navy background
+$text-color: #e9ecef;
+$primary-color: #5557f7;
+$secondary-color: #9d55f7;
+$accent-color: #7240ff;  // Purple accent for buttons
+$light-text: #ffffff;
+$gray-text: rgba(255, 255, 255, 0.7);
+$tag-background: rgba(30, 30, 58, 0.7);
+$header-gradient: linear-gradient(90deg, #006064, #00796B);
+
+// 【✓】 Override important global styles 
+html, body {
+  background-color: $background-color !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: 'Roboto', Arial, sans-serif !important;
+  color: $text-color !important;
+  min-height: 100vh !important;
+}
+
+// 【✓】 Force any router outlet container to take full height
+router-outlet + * {
+  display: block !important;
+  min-height: 100vh !important;
+  background-color: $background-color !important;
+}
+
+// 【✓】 Main container
+body, :host {
+  margin: 0 !important;
+  font-family: 'Roboto', Arial, sans-serif !important;
+  background-color: $background-color !important;
+  color: $text-color !important;
+}
+
+// 【✓】 Component Host
+:host {
+  display: block !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  background-color: $background-color !important;
+}
+
+// 【✓】 Header navigation
+.phantasia-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: $header-gradient !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 100 !important;
+  position: relative !important;
+  
+  .logo {
+    color: $light-text !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+  }
+  
+  .nav-links {
+    display: flex !important;
+    gap: 1.5rem !important;
+    
+    a {
+      color: $light-text !important;
+      text-decoration: none !important;
+      font-size: 0.95rem !important;
+      padding: 0.5rem 0 !important;
+      
+      &.active {
+        border-bottom: 2px solid $light-text !important;
+      }
+    }
+  }
+}
+
+// 【✓】 Collections header
+.collection-header {
+  text-align: center !important;
+  margin-top: 60px !important;
+  margin-bottom: 40px !important;
+  
+  h1 {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+    color: $light-text !important;
+    position: relative !important;
+    display: inline-block !important;
+    
+    &::after {
+      content: '' !important;
+      position: absolute !important;
+      bottom: -10px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 50px !important;
+      height: 2px !important;
+      background: $primary-color !important;
+    }
+  }
+  
+  .subtitle {
+    max-width: 700px !important;
+    margin: 0 auto !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    color: $gray-text !important;
+  }
+}
+
+// 【✓】 Collection cards container
+.collections-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 1.5rem !important;
+  background-color: $background-color !important;
+}
+
+// 【✓】 Collection card
+.collection-card {
+  display: flex !important;
+  background: $card-background !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+  transition: transform 0.3s ease !important;
+  
+  &:hover {
+    transform: translateY(-5px) !important;
+  }
+  
+  .collection-image {
+    flex: 0 0 200px !important;
+    
+    img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+  }
+  
+  .collection-content {
+    flex: 1 !important;
+    padding: 1.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    
+    h2 {
+      font-size: 1.8rem !important;
+      margin-bottom: 0.5rem !important;
+      color: $light-text !important;
+    }
+    
+    .metadata {
+      display: flex !important;
+      gap: 1rem !important;
+      margin-bottom: 1rem !important;
+      
+      .tracks, .year {
+        display: inline-block !important;
+        font-size: 0.9rem !important;
+        padding: 0.2rem 0.5rem !important;
+        border-radius: 1rem !important;
+        background: $tag-background !important;
+        color: $gray-text !important;
+      }
+    }
+    
+    .description {
+      margin-bottom: 1rem !important;
+      line-height: 1.6 !important;
+      color: $gray-text !important;
+    }
+    
+    .tags {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+      margin-bottom: 1.5rem !important;
+      
+      .tag {
+        font-size: 0.8rem !important;
+        padding: 0.3rem 0.7rem !important;
+        border-radius: 1rem !important;
+        background: $tag-background !important;
+        color: $light-text !important;
+      }
+    }
+    
+    .explore-button {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      background: $accent-color !important;
+      color: $light-text !important;
+      border: none !important;
+      padding: 0.6rem 1.5rem !important;
+      border-radius: 2rem !important;
+      font-weight: 500 !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      transition: background 0.3s ease !important;
+      width: fit-content !important;
+      
+      &:hover {
+        background: color.adjust($accent-color, $lightness: -10%) !important;
+      }
+      
+      i {
+        font-size: 0.9rem !important;
+      }
+    }
+  }
+}
+
+// 【✓】 Media queries for responsive design
+@media (max-width: 768px) {
+  .collection-card {
+    flex-direction: column !important;
+    
+    .collection-image {
+      flex: 0 0 200px !important;
+      height: 200px !important;
+    }
+  }
+}
+
+// 【✓】 Override any conflicting styles from global stylesheets
+html body {
+  background-color: $background-color !important;
+  color: $text-color !important;
+  overflow: auto !important; // Override any overflow: hidden
+} 

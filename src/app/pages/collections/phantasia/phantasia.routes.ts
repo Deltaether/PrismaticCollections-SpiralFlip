@@ -68,5 +68,6 @@ export const routes: Routes = [
   { path: 'disc-2', component: DiscTwoComponent },
   { path: 'pv', component: PvComponent },
   { path: 'information', component: InformationComponent },
-  { path: 'collections', component: CollectionComponent }
+  // Commenting out to prevent conflict with main app routes
+  // { path: 'collections', component: CollectionComponent }
 ];

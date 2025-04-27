@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 
 /**
  * Main homepage component for Prismatic Collections
@@ -12,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SiteHeaderComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,24 +30,24 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       id: 'phantasia',
       title: 'Project Phantasia',
-      description: 'A revolutionary musical experience with interactive 3D environments',
-      image: 'assets/images/experience-preview.jpg',
-      route: '/collections/phantasia',
+      description: 'Our flagship 3D music experience with interactive CD cases and immersive visuals',
+      image: 'assets/images/featured/phantasia.jpg',
+      route: '/phantasia/introduction',
       isMain: true
     },
     {
       id: 'collections',
-      title: 'Music Collections',
-      description: 'Browse our complete collection of albums and tracks',
-      image: 'assets/images/collection-preview.jpg',
+      title: 'Collections',
+      description: 'Browse our curated collection of musical albums and experiences',
+      image: 'assets/images/featured/collections.jpg',
       route: '/collections',
       isMain: false
     },
     {
       id: 'mobile',
-      title: 'Mobile Access',
-      description: 'Access our projects through our mobile-optimized interface',
-      image: 'assets/images/mobile-preview.jpg',
+      title: 'Mobile Experience',
+      description: 'Optimized interfaces for mobile devices',
+      image: 'assets/images/featured/mobile.jpg',
       route: '/mobile',
       isMain: false
     }
@@ -73,7 +74,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * 【✓】
    */
   navigateTo(route: string): void {
-    this.router.navigateByUrl(route);
+    this.router.navigate([route]);
   }
 
   /**

@@ -1,7 +1,10 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer2, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { StyleOverrideDirective } from './style-override.directive';
+import { Title } from '@angular/platform-browser';
+import { ScrollHelperService } from '../../../../../shared/services/scroll-helper.service';
+import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 
 /**
  * Interface for tracking stylesheet conflicts
@@ -22,8 +25,23 @@ interface ConflictMap {
 }
 
 /**
+ * Interface for collection item
+ * 【✓】
+ */
+interface Collection {
+  id: string;
+  title: string;
+  artist: string;
+  year: string;
+  tracks: number;
+  imagePath: string;
+  description: string;
+  tags: string[];
+}
+
+/**
  * NewCollectionsComponent
- * This component displays the collections in a layout that matches the screenshot
+ * Displays the collection cards with proper styling
  * 【✓】
  */
 @Component({
@@ -41,7 +59,7 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
   @ViewChild('collectionCard') collectionCard!: ElementRef;
   
   // All available collections
-  collections = [
+  collections: Collection[] = [
     {
       id: 'phantasia',
       title: 'Project Phantasia',
@@ -53,7 +71,7 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
       tags: ['Orchestral', 'Electronic', 'Ambient', '3D Experience']
     },
     {
-      id: 'ethereal-soundscapes',
+      id: 'ethereal',
       title: 'Ethereal Soundscapes',
       artist: 'Audio Architects',
       year: '2023',
@@ -61,32 +79,43 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
       imagePath: 'assets/images/collections/ethereal-soundscapes.jpg',
       description: 'Immersive ambient compositions that blend electronic elements with organic textures.',
       tags: ['Ambient', 'Electronic']
+    },
+    {
+      id: 'artifacts',
+      title: 'Digital Artifacts',
+      artist: 'Glitch Collective',
+      year: '2022',
+      tracks: 24,
+      imagePath: 'assets/images/collections/digital-artifacts.jpg',
+      description: 'Glitchy electronica from the early digital era, carefully remastered for modern listeners.',
+      tags: ['Electronic', 'Glitch', 'Experimental']
     }
   ];
 
-  constructor(private renderer: Renderer2) { }
+  // 【✓】 Track if we're in mobile view
+  isMobile = false;
+  
+  constructor(
+    private renderer: Renderer2, 
+    private router: Router,
+    private titleService: Title,
+    private scrollHelper: ScrollHelperService
+  ) { }
 
   /**
    * Initialize component
    * 【✓】
    */
   ngOnInit(): void {
+    this.titleService.setTitle('Music Collections | Project Phantasia');
     console.log('[DEBUG] NewCollections component initializing');
-    console.log('[DEBUG] Expected body background color: #11141d');
-    console.log('[DEBUG] Expected header background: linear-gradient(90deg, #006064, #00796B)');
-    
-    // Debug global styles
-    const bodyStyles = window.getComputedStyle(document.body);
-    console.log('[DEBUG] Actual body background:', bodyStyles.backgroundColor);
-    console.log('[DEBUG] Body classes:', document.body.classList);
     
     // Check for imported or global styles
     const styleSheets = document.styleSheets;
-    console.log('[DEBUG] Total stylesheets loaded:', styleSheets.length);
     
     // Forcefully apply styles to body
     this.renderer.addClass(document.body, 'new-collections-page');
-    this.renderer.setStyle(document.body, 'background-color', '#11141d');
+    this.renderer.setStyle(document.body, 'background-color', '#10121b');
     this.renderer.setStyle(document.body, 'margin', '0');
     this.renderer.setStyle(document.body, 'padding', '0');
     this.renderer.setStyle(document.body, 'color', '#e9ecef');
@@ -101,6 +130,9 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
     ];
     
     this.logConflictingSelectors(styleSheets, conflictingSelectors);
+    
+    this.checkViewportSize();
+    window.addEventListener('resize', this.checkViewportSize.bind(this));
   }
   
   /**
@@ -143,6 +175,9 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
       
       // Document any style inheritance issues
       this.checkStyleInheritance();
+      
+      // Add any animations or post-rendering logic here
+      this.initCardAnimations();
     }, 100);
   }
   
@@ -253,6 +288,47 @@ export class NewCollectionsComponent implements OnInit, AfterViewInit {
    */
   exploreCollection(collectionId: string): void {
     console.log(`[DEBUG] Exploring collection: ${collectionId}`);
-    // Add navigation logic here
+    
+    // Navigate to the collection detail page
+    this.router.navigate(['/collections', collectionId]);
+  }
+
+  /**
+   * Check if we're in mobile view
+   * 【✓】
+   */
+  isMobileView(): boolean {
+    return this.isMobile;
+  }
+
+  /**
+   * Get current route for debugging
+   * 【✓】
+   */
+  getCurrentRoute(): string {
+    return this.router.url;
+  }
+
+  /**
+   * Check viewport size and update isMobile flag
+   * 【✓】
+   */
+  private checkViewportSize(): void {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  /**
+   * Initialize card animations if needed
+   * 【✓】
+   */
+  private initCardAnimations(): void {
+    // Any card initialization animations would go here
+    // Example: fade in cards sequentially
+    const cards = document.querySelectorAll('.collection-card');
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add('visible');
+      }, 100 * index);
+    });
   }
 } 

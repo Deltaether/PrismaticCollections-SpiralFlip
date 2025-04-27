@@ -1,97 +1,102 @@
-<div class="home-container">
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="title">PRISMATIC COLLECTIONS</h1>
-      <p class="subtitle">Discover Our Curated Musical Experiences</p>
-      <div class="hero-buttons">
-        <button class="button primary" (click)="navigateTo('/collections')">
-          Explore Collections NOW
-        </button>
-        <button class="button secondary" (click)="navigateTo('/collections/albums')">
-          Browse Collection
-        </button>
-      </div>
-    </div>
-    <div class="hero-background">
-      <div class="overlay"></div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section class="features">
-    <h2 class="section-title">Featured Projects</h2>
-    
-    <div class="featured-grid">
-      <div *ngFor="let section of featuredSections" 
-          class="feature-card" 
-          [class.main-feature]="section.isMain"
-          (click)="navigateTo(section.route)">
-        <div class="card-image" [style.backgroundImage]="'url(' + section.image + ')'">
-          <div class="card-overlay"></div>
+<div class="home-page">
+  <!-- Site Header -->
+  <app-site-header></app-site-header>
+  
+  <div class="home-container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="title">PRISMATIC COLLECTIONS</h1>
+        <p class="subtitle">Discover Our Curated Musical Experiences</p>
+        <div class="hero-buttons">
+          <button class="button primary" (click)="navigateTo('/collections')">
+            Explore Collections NOW
+          </button>
+          <button class="button secondary" (click)="navigateTo('/phantasia/introduction')">
+            3D Experience
+          </button>
         </div>
-        <div class="card-content">
-          <h3 class="card-title">{{ section.title }}</h3>
-          <p class="card-description">{{ section.description }}</p>
-          <div class="card-action">
-            <span class="explore-link">Explore</span>
+      </div>
+      <div class="hero-background">
+        <div class="overlay"></div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <h2 class="section-title">Featured Projects</h2>
+      
+      <div class="featured-grid">
+        <div *ngFor="let section of featuredSections" 
+            class="feature-card" 
+            [class.main-feature]="section.isMain"
+            (click)="navigateTo(section.route)">
+          <div class="card-image" [style.backgroundImage]="'url(' + section.image + ')'">
+            <div class="card-overlay"></div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{{ section.title }}</h3>
+            <p class="card-description">{{ section.description }}</p>
+            <div class="card-action">
+              <span class="explore-link">Explore</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- About Section -->
-  <section class="about">
-    <div class="about-content">
-      <h2 class="section-title">About Prismatic Collections</h2>
-      <p class="about-text">
-        Prismatic Collections is a platform showcasing innovative musical experiences 
-        and projects, including Project Phantasia. We curate and develop interactive 
-        environments that transform how you experience music.
-      </p>
-      <p class="about-text">
-        Each project in our collection offers unique ways to engage with music through 
-        visual art, 3D environments, and original compositions.
-      </p>
-    </div>
-  </section>
+    <!-- About Section -->
+    <section class="about">
+      <div class="about-content">
+        <h2 class="section-title">About Prismatic Collections</h2>
+        <p class="about-text">
+          Prismatic Collections is a platform showcasing innovative musical experiences 
+          and projects, including Project Phantasia. We curate and develop interactive 
+          environments that transform how you experience music.
+        </p>
+        <p class="about-text">
+          Each project in our collection offers unique ways to engage with music through 
+          visual art, 3D environments, and original compositions.
+        </p>
+      </div>
+    </section>
 
-  <!-- Latest News Section -->
-  <section class="news">
-    <h2 class="section-title">Latest Updates</h2>
-    <div class="news-item">
-      <div class="news-date">2023.12.20</div>
-      <h3 class="news-title">Project Phantasia Updates</h3>
-      <p class="news-content">
-        We've enhanced the Project Phantasia 3D experience with improved performance and visual effects.
-      </p>
-    </div>
-    <div class="news-item">
-      <div class="news-date">2023.11.15</div>
-      <h3 class="news-title">Mobile Interface Available</h3>
-      <p class="news-content">
-        All Prismatic Collections projects can now be accessed through our mobile-optimized interface.
-      </p>
-    </div>
-  </section>
+    <!-- Latest News Section -->
+    <section class="news">
+      <h2 class="section-title">Latest Updates</h2>
+      <div class="news-item">
+        <div class="news-date">2023.12.20</div>
+        <h3 class="news-title">Project Phantasia Updates</h3>
+        <p class="news-content">
+          We've enhanced the Project Phantasia 3D experience with improved performance and visual effects.
+        </p>
+      </div>
+      <div class="news-item">
+        <div class="news-date">2023.11.15</div>
+        <h3 class="news-title">Mobile Interface Available</h3>
+        <p class="news-content">
+          All Prismatic Collections projects can now be accessed through our mobile-optimized interface.
+        </p>
+      </div>
+    </section>
 
-  <!-- Call to Action -->
-  <section class="cta">
-    <h2 class="cta-title">Choose Your Experience</h2>
-    <p class="cta-text">Select the project and interface that best suits your device and preferences</p>
-    <div class="cta-buttons">
-      <button class="button primary" (click)="navigateTo('/collections')">
-        <span class="button-icon">💻</span>
-        Collections
-        <span class="button-description">Browse all our interactive experiences</span>
-      </button>
-      <button class="button secondary" (click)="navigateTo('/mobile')">
-        <span class="button-icon">📱</span>
-        Mobile Interface
-        <span class="button-description">Optimized for touchscreens</span>
-      </button>
-    </div>
-    <p class="cta-note">You can always return to this page by clicking "Home" in the navigation</p>
-  </section>
+    <!-- Call to Action -->
+    <section class="cta">
+      <h2 class="cta-title">Choose Your Experience</h2>
+      <p class="cta-text">Select the project and interface that best suits your device and preferences</p>
+      <div class="cta-buttons">
+        <button class="button primary" (click)="navigateTo('/collections')">
+          <span class="button-icon">💻</span>
+          Collections
+          <span class="button-description">Browse all our interactive experiences</span>
+        </button>
+        <button class="button secondary" (click)="navigateTo('/mobile')">
+          <span class="button-icon">📱</span>
+          Mobile Interface
+          <span class="button-description">Optimized for touchscreens</span>
+        </button>
+      </div>
+      <p class="cta-note">You can always return to this page by clicking "Home" in the navigation</p>
+    </section>
+  </div>
 </div>

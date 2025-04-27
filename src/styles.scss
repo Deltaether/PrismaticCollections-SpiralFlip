@@ -31,6 +31,32 @@ img {
   pointer-events: none;
 }
 
+/* Layout overrides */
+app-main-layout {
+  margin: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Target specific nested app-new-collections component */
+app-main-layout > div > main > div > app-new-collections,
+body > app-root > app-main-layout > div > main > div > app-new-collections {
+  margin: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Remove margin and padding from main content container */
+app-main-layout > div > main > div,
+body > app-root > app-main-layout > div > main > div {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Target main content of layouts */
+app-main-layout > div > main {
+  margin-top: 0 !important;
+}
+
 html, body {
   height: 100%;
   width: 100%;
@@ -116,4 +142,40 @@ section {
   position: relative;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+/* Remove ALL top margins in the entire app */
+.main-layout > .main-content,
+.main-content,
+main,
+.main-layout,
+app-new-collections,
+app-new-collections > div,
+.collection-header,
+.phantasia-header,
+.collections-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Override for any divs with style attribute containing background-color */
+div[style*="background-color"] {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Remove margin-top from app-new-collections when direct child of main */
+app-main-layout > div > main > app-new-collections,
+body > app-root > app-main-layout > div > main > app-new-collections {
+  margin-top: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Remove margin-top from app-home when direct child of main */
+app-main-layout > div > main > app-home,
+body > app-root > app-main-layout > div > main > app-home {
+  margin-top: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
 }

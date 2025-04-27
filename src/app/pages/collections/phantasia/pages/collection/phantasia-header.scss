@@ -1,9 +1,6 @@
 // 【✓】 Phantasia Header Styles
 // Overrides for the header component specifically for the Phantasia collection pages
 
-// Import the collection variables for consistency
-@use './collection-scrollable.scss' as collections;
-
 // Variables to match our new JRPG-inspired theme
 $header-height: 90px;
 $background-color: rgba(5, 2, 31, 0.85);

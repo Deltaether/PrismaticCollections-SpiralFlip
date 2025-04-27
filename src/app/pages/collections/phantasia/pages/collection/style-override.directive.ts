@@ -12,11 +12,11 @@ import { Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
 export class StyleOverrideDirective implements OnInit {
   // Collection page style variables
   private readonly styles = {
-    backgroundDark: '#11141d',
-    cardBackground: '#1b1e2b',
+    backgroundDark: '#10121b',
+    cardBackground: '#161a2b',
     textColor: '#e9ecef',
-    accentColor: '#7240ff',
-    headerGradient: 'linear-gradient(90deg, #006064, #00796B)'
+    accentColor: '#7e55f3',
+    headerBackground: 'rgba(0, 0, 0, 0.9)'
   };
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
@@ -29,6 +29,7 @@ export class StyleOverrideDirective implements OnInit {
     console.log('[StyleOverrideDirective] Applying global styles for collections');
     this.applyGlobalStyles();
     this.applyComponentStyles();
+    this.createDecorativeElements();
   }
 
   /**
@@ -41,7 +42,8 @@ export class StyleOverrideDirective implements OnInit {
       `background-color: ${this.styles.backgroundDark} !important; 
        color: ${this.styles.textColor} !important; 
        margin: 0 !important; 
-       padding: 0 !important;`
+       padding: 0 !important;
+       overflow-x: hidden !important;`
     );
     this.renderer.addClass(document.body, 'collections-themed-page');
     
@@ -88,21 +90,24 @@ export class StyleOverrideDirective implements OnInit {
        color: ${this.styles.textColor} !important;
        min-height: 100vh !important;
        display: block !important;
-       width: 100% !important;`
+       width: 100% !important;
+       position: relative !important;
+       overflow-x: hidden !important;`
     );
     
     // Style header if present
     const header = this.el.nativeElement.querySelector('.phantasia-header');
     if (header) {
       header.setAttribute('style',
-        `background: ${this.styles.headerGradient} !important;
+        `background: ${this.styles.headerBackground} !important;
          width: 100% !important;
          z-index: 100 !important;
          display: flex !important;
          align-items: center !important;
          justify-content: space-between !important;
-         padding: 0.5rem 1rem !important;
-         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;`
+         padding: 0.8rem 2rem !important;
+         position: sticky !important;
+         top: 0 !important;`
       );
     }
     
@@ -114,10 +119,47 @@ export class StyleOverrideDirective implements OnInit {
          display: flex !important;
          border-radius: 0.5rem !important;
          overflow: hidden !important;
-         margin-bottom: 2rem !important;
-         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;`
+         margin-bottom: 3rem !important;
+         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
+         transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
       );
+      
+      // Add hover effect with JS
+      card.addEventListener('mouseenter', () => {
+        card.setAttribute('style',
+          `background: ${this.styles.cardBackground} !important;
+           display: flex !important;
+           border-radius: 0.5rem !important;
+           overflow: hidden !important;
+           margin-bottom: 3rem !important;
+           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+           transform: translateY(-5px) !important;
+           transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
+        );
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.setAttribute('style',
+          `background: ${this.styles.cardBackground} !important;
+           display: flex !important;
+           border-radius: 0.5rem !important;
+           overflow: hidden !important;
+           margin-bottom: 3rem !important;
+           box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
+           transform: translateY(0) !important;
+           transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
+        );
+      });
     });
+  }
+  
+  /**
+   * Create decorative elements for background
+   * 【✓】
+   */
+  private createDecorativeElements() {
+    // This function is now taken care of in the HTML template
+    // Additional decorative elements could be created here if needed
   }
   
   /**
@@ -134,11 +176,12 @@ export class StyleOverrideDirective implements OnInit {
       html body, html .collections-themed-page, body .collections-themed-page {
         background-color: ${this.styles.backgroundDark} !important;
         color: ${this.styles.textColor} !important;
+        overflow-x: hidden !important;
       }
       
       html body .phantasia-header, 
       body.collections-themed-page .phantasia-header {
-        background: ${this.styles.headerGradient} !important;
+        background: ${this.styles.headerBackground} !important;
         color: white !important;
       }
       
@@ -149,7 +192,23 @@ export class StyleOverrideDirective implements OnInit {
       
       html body .collections-container,
       body.collections-themed-page .collections-container {
-        background-color: ${this.styles.backgroundDark} !important;
+        background-color: transparent !important;
+      }
+      
+      html body .explore-button,
+      body.collections-themed-page .explore-button {
+        background: ${this.styles.accentColor} !important;
+        color: white !important;
+      }
+      
+      /* Hide any duplicate headers */
+      .main-layout .main-header {
+        display: none !important;
+      }
+      
+      .main-layout .main-content {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
       }
     `;
     

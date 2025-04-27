@@ -53,7 +53,7 @@ export const routes: Routes = [
       },
       {
         path: 'collections',
-        loadComponent: () => import('./pages/collections/phantasia/pages/collection/collection.component').then(m => m.CollectionComponent)
+        loadComponent: () => import('./pages/collections/phantasia/pages/collection/new-collections.component').then(m => m.NewCollectionsComponent)
       },
       {
         path: 'disc-one',

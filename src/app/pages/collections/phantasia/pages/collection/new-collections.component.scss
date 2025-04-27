@@ -1,243 +1,338 @@
-// 【✓】 Variables
+// Collections SCSS Variables
 @use 'sass:color';
 
-$background-color: #11141d;  // Dark navy background
-$card-background: #1b1e2b;  // Card navy background
-$text-color: #e9ecef;
-$primary-color: #5557f7;
-$secondary-color: #9d55f7;
-$accent-color: #7240ff;  // Purple accent for buttons
-$light-text: #ffffff;
-$gray-text: rgba(255, 255, 255, 0.7);
-$tag-background: rgba(30, 30, 58, 0.7);
-$header-gradient: linear-gradient(90deg, #006064, #00796B);
+$background-color: #ffffff; // Changed from dark to white
+$text-color-primary: #333333; // Changed to darker text for better contrast on white
+$text-color-secondary: #666666; // Changed to medium gray
+$accent-color: #5d4fff; // Kept the accent color
+$card-bg-color: #f8f8f8; // Changed to light gray for cards
+$card-hover-bg: #f0f0f0; // Changed to slightly darker light gray for hover
+$header-bg: rgba(255, 255, 255, 0.95); // Changed to white with opacity
 
-// 【✓】 Override important global styles 
+// Global Styles - Light Theme for Collections Page
 html, body {
-  background-color: $background-color !important;
+  margin: 0;
+  padding: 0;
+  background-color: $background-color;
+  color: $text-color-primary;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+// 【✓】 Override layout margin
+app-main-layout, :host ::ng-deep app-main-layout {
+  margin-top: 0 !important;
+  margin: 0 !important;
+}
+
+// 【✓】 Target the specific deeply nested component
+:host {
+  display: block;
   margin: 0 !important;
   padding: 0 !important;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  color: $text-color !important;
-  min-height: 100vh !important;
-}
-
-// 【✓】 Force any router outlet container to take full height
-router-outlet + * {
-  display: block !important;
-  min-height: 100vh !important;
-  background-color: $background-color !important;
-}
-
-// 【✓】 Main container
-body, :host {
-  margin: 0 !important;
-  font-family: 'Roboto', Arial, sans-serif !important;
-  background-color: $background-color !important;
-  color: $text-color !important;
-}
-
-// 【✓】 Component Host
-:host {
-  display: block !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  background-color: $background-color !important;
-}
-
-// 【✓】 Header navigation
-.phantasia-header {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  background: $header-gradient !important;
-  padding: 0.5rem 1rem !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  z-index: 100 !important;
-  position: relative !important;
   
-  .logo {
-    color: $light-text !important;
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    text-decoration: none !important;
-  }
-  
-  .nav-links {
-    display: flex !important;
-    gap: 1.5rem !important;
+  /* Ensure no margins at any level of the component tree */
+  ::ng-deep {
+    body > app-root > app-main-layout > div > main > div > app-new-collections {
+      margin: 0 !important;
+      padding-top: 0 !important;
+    }
     
+    div[appStyleOverride] {
+      margin-top: 0 !important;
+    }
+    
+    .collections-container {
+      margin-top: 0 !important;
+      padding-top: 100px; /* To account for fixed header height of 90px with a small buffer */
+    }
+  }
+}
+
+// 【✓】 Header Navigation
+.phantasia-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: $header-bg;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  margin: 0; // Removed margin to fix spacing issue
+
+  .logo {
+    img {
+      height: 40px;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+
     a {
-      color: $light-text !important;
-      text-decoration: none !important;
-      font-size: 0.95rem !important;
-      padding: 0.5rem 0 !important;
-      
-      &.active {
-        border-bottom: 2px solid $light-text !important;
+      color: $text-color-primary;
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+
+      &:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: $accent-color;
+        transition: width 0.3s ease;
+      }
+
+      &:hover, &.active {
+        color: $accent-color;
+        
+        &:after {
+          width: 100%;
+        }
       }
     }
   }
 }
 
-// 【✓】 Collections header
+// 【✓】 Collection Header Styles
 .collection-header {
-  text-align: center !important;
-  margin-top: 60px !important;
-  margin-bottom: 40px !important;
+  text-align: center;
+  margin: 0;
+  padding-top: 1rem;
   
   h1 {
-    font-size: 2.5rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 1rem !important;
-    color: $light-text !important;
-    position: relative !important;
-    display: inline-block !important;
-    
-    &::after {
-      content: '' !important;
-      position: absolute !important;
-      bottom: -10px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      width: 50px !important;
-      height: 2px !important;
-      background: $primary-color !important;
-    }
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: $text-color-primary;
   }
   
   .subtitle {
-    max-width: 700px !important;
-    margin: 0 auto !important;
-    font-size: 1rem !important;
-    line-height: 1.6 !important;
-    color: $gray-text !important;
+    font-size: 1.2rem;
+    color: $text-color-secondary;
+    max-width: 600px;
+    margin: 0 auto;
   }
 }
 
-// 【✓】 Collection cards container
+// 【✓】 Collections Container
 .collections-container {
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 1.5rem !important;
-  background-color: $background-color !important;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+  padding-top: 100px; /* To account for fixed header */
 }
 
-// 【✓】 Collection card
+// 【✓】 Collection Cards
+.collection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2.5rem;
+}
+
 .collection-card {
-  display: flex !important;
-  background: $card-background !important;
-  border-radius: 0.5rem !important;
-  overflow: hidden !important;
-  margin-bottom: 2rem !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-  transition: transform 0.3s ease !important;
+  background: $card-bg-color;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   
   &:hover {
-    transform: translateY(-5px) !important;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    background: $card-hover-bg;
   }
   
   .collection-image {
-    flex: 0 0 200px !important;
+    height: 220px;
+    overflow: hidden;
     
     img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    &:hover img {
+      transform: scale(1.05);
     }
   }
   
   .collection-content {
-    flex: 1 !important;
-    padding: 1.5rem !important;
-    display: flex !important;
-    flex-direction: column !important;
+    padding: 1.5rem;
     
     h2 {
-      font-size: 1.8rem !important;
-      margin-bottom: 0.5rem !important;
-      color: $light-text !important;
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: $text-color-primary;
     }
     
     .metadata {
-      display: flex !important;
-      gap: 1rem !important;
-      margin-bottom: 1rem !important;
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: $text-color-secondary;
       
-      .tracks, .year {
-        display: inline-block !important;
-        font-size: 0.9rem !important;
-        padding: 0.2rem 0.5rem !important;
-        border-radius: 1rem !important;
-        background: $tag-background !important;
-        color: $gray-text !important;
+      span {
+        display: flex;
+        align-items: center;
+        
+        &:before {
+          content: '';
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          margin-right: 0.5rem;
+          background-color: $accent-color;
+          border-radius: 50%;
+        }
       }
     }
     
     .description {
-      margin-bottom: 1rem !important;
-      line-height: 1.6 !important;
-      color: $gray-text !important;
+      margin-bottom: 1.25rem;
+      color: $text-color-secondary;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
     
     .tags {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      gap: 0.5rem !important;
-      margin-bottom: 1.5rem !important;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
       
       .tag {
-        font-size: 0.8rem !important;
-        padding: 0.3rem 0.7rem !important;
-        border-radius: 1rem !important;
-        background: $tag-background !important;
-        color: $light-text !important;
+        background: rgba($accent-color, 0.1);
+        color: $accent-color;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
       }
     }
     
     .explore-button {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 0.5rem !important;
-      background: $accent-color !important;
-      color: $light-text !important;
-      border: none !important;
-      padding: 0.6rem 1.5rem !important;
-      border-radius: 2rem !important;
-      font-weight: 500 !important;
-      font-size: 0.9rem !important;
-      cursor: pointer !important;
-      transition: background 0.3s ease !important;
-      width: fit-content !important;
+      background-color: $accent-color;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: fit-content;
       
       &:hover {
-        background: color.adjust($accent-color, $lightness: -10%) !important;
+        background-color: color.adjust($accent-color, $lightness: -10%);
+        transform: translateY(-2px);
       }
       
       i {
-        font-size: 0.9rem !important;
+        font-size: 0.9rem;
       }
     }
   }
 }
 
-// 【✓】 Media queries for responsive design
-@media (max-width: 768px) {
-  .collection-card {
-    flex-direction: column !important;
+// 【✓】 Decorative Elements
+.decorative-element {
+  position: fixed;
+  z-index: -1;
+  opacity: 0.05;
+  
+  &.square {
+    width: 300px;
+    height: 300px;
+    border: 15px solid $accent-color;
     
-    .collection-image {
-      flex: 0 0 200px !important;
-      height: 200px !important;
+    &.top-right {
+      top: -100px;
+      right: -100px;
+      transform: rotate(15deg);
+    }
+  }
+  
+  &.rhombus {
+    width: 250px;
+    height: 250px;
+    border: 15px solid $accent-color;
+    transform: rotate(45deg);
+    
+    &.bottom-left {
+      bottom: -100px;
+      left: -100px;
     }
   }
 }
 
-// 【✓】 Override any conflicting styles from global stylesheets
-html body {
-  background-color: $background-color !important;
-  color: $text-color !important;
-  overflow: auto !important; // Override any overflow: hidden
+// 【✓】 Debug Info Box
+.debug-info {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 9999;
+}
+
+// 【✓】 Responsive Styles
+@media (max-width: 768px) {
+  .phantasia-header {
+    flex-direction: column;
+    padding: 1rem;
+    
+    .logo {
+      margin-bottom: 1rem;
+    }
+    
+    .nav-links {
+      gap: 1rem;
+    }
+  }
+  
+  .collection-header {
+    h1 {
+      font-size: 2.2rem;
+    }
+  }
+  
+  .collection-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .collection-header h1 {
+    font-size: 2rem;
+  }
+  
+  .collection-card .collection-content {
+    padding: 1.5rem;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
 } 

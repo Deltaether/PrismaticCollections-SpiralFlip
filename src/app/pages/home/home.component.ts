@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, Inject } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -28,32 +28,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Featured content sections
   readonly featuredSections = [
     {
-      id: 'phantasia',
-      title: 'Project Phantasia',
-      description: 'Our flagship 3D music experience with interactive CD cases and immersive visuals',
-      image: 'assets/images/featured/phantasia.jpg',
-      route: '/phantasia/introduction',
+      id: 'phantasia-album',
+      title: 'Project Phantasia - CD Album',
+      description: 'Experience our immersive musical album with 3D interactive CD cases and visual storytelling',
+      image: 'assets/images/albums/phantasia-cd-cover.jpg',
+      route: '/phantasia/phantasia',
       isMain: true
     },
     {
-      id: 'collections',
-      title: 'Collections',
-      description: 'Browse our curated collection of musical albums and experiences',
-      image: 'assets/images/featured/collections.jpg',
-      route: '/collections',
-      isMain: false
-    },
-    {
-      id: 'mobile',
-      title: 'Mobile Experience',
-      description: 'Optimized interfaces for mobile devices',
-      image: 'assets/images/featured/mobile.jpg',
-      route: '/mobile',
+      id: 'unknown-cd',
+      title: '???',
+      description: 'CD UNREADABLE - This disc appears to be corrupted ./restoration in progress...',
+      image: 'assets/images/featured/cd-unreadable.svg',
+      route: '/phantasia/phantasia',
       isMain: false
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, @Inject(DOCUMENT) private document: Document) {}
 
   /**
    * Initialize component 
@@ -64,6 +56,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       console.log('[Home] Component initialized');
     }
     console.log('HOME COMPONENT LOADED - VERSION 2');
+    
+    // Enable scrolling for home page by adding body class and direct style override
+    this.document.body.classList.add('home-page-active');
+    this.document.documentElement.style.overflow = 'auto';
+    this.document.body.style.overflow = 'auto';
+    const appRoot = this.document.querySelector('app-root') as HTMLElement;
+    if (appRoot) {
+      appRoot.style.overflow = 'auto';
+    }
     
     // Log the featuredSections to verify the correct data
     console.log('Featured Sections:', this.featuredSections);
@@ -84,6 +85,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.isDebugMode) {
       console.log('[Home] Component destroyed');
+    }
+    
+    // Restore original overflow settings when leaving home page
+    this.document.body.classList.remove('home-page-active');
+    this.document.documentElement.style.overflow = 'hidden';
+    this.document.body.style.overflow = 'hidden';
+    const appRoot = this.document.querySelector('app-root') as HTMLElement;
+    if (appRoot) {
+      appRoot.style.overflow = 'hidden';
     }
     
     this.destroy$.next();

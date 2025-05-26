@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 /**
  * Shared site header component
  * Provides navigation between different views and collections
- * Based on the Phantasia header design
+ * Uses global styles from collection-header-global.scss
  * 【✓】
  */
 @Component({
@@ -34,27 +34,22 @@ import { Router, RouterModule } from '@angular/router';
             </ul>
           </div>
 
-          <!-- Collection Tabs -->
-          <div class="nav-section collection-tabs">
-            <h2 class="visually-hidden">Collections</h2>
+          <!-- Experience Tab -->
+          <div class="nav-section experience-tabs">
             <ul>
-              <li [class.active]="isActiveRoute('/collections')" [routerLink]="['/collections']">
-                <span>Prismatic Collections</span>
+              <li [class.active]="isActiveRoute('/phantasia')" [routerLink]="['/phantasia/phantasia']">
+                <span class="page-name">Circles</span>
+                <span class="page-description">Socials</span>
               </li>
             </ul>
           </div>
 
-          <!-- Page Tabs -->
-          <div class="nav-section page-tabs">
-            <h2 class="visually-hidden">Pages</h2>
+          <!-- Collection Tab -->
+          <div class="nav-section collection-tabs">
             <ul>
-              <li [class.active]="isActiveRoute('/phantasia/introduction')" [routerLink]="['/phantasia/introduction']">
-                <span class="page-name">Experience</span>
-                <span class="page-description">3D Experience</span>
-              </li>
               <li [class.active]="isActiveRoute('/collections')" [routerLink]="['/collections']">
-                <span class="page-name">Collection</span>
-                <span class="page-description">Album Info</span>
+                <span class="page-name">Gallery</span>
+                <span class="page-description">Library</span>
               </li>
             </ul>
           </div>
@@ -62,41 +57,28 @@ import { Router, RouterModule } from '@angular/router';
       </div>
     </header>
   `,
+  styleUrls: ['../../../pages/collections-page/collection-header-global.scss'],
   styles: [`
-    // Variables
-    $header-height: 90px;
-    $primary-color: #f5d884;
-    $background-color: rgba(0, 0, 0, 0.8);
-    $accent-color: #ff4081;
-    $text-color: white;
-    $active-tab-color: linear-gradient(to right, rgba(255, 100, 50, 0.8), rgba(255, 150, 70, 0.8));
-    $inactive-tab-color: rgba(255, 255, 255, 0.1);
-    $tab-hover-color: rgba(255, 255, 255, 0.2);
-    $tab-transition: all 0.3s ease;
-    $border-glow: 0 0 10px rgba(255, 150, 70, 0.5);
-
-    // Header Styles
+    // Basic Header Styles - detailed styling in collection-header-global.scss
     .site-header {
       width: 100%;
-      height: $header-height;
+      height: 90px;
       position: fixed;
       top: 0;
       left: 0;
       z-index: 900;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      background-color: $background-color;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      background-color: rgba(17, 17, 17, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.3);
 
       .header-container {
-        max-width: 1400px;
+        width: 100%;
         height: 100%;
-        margin: 0 auto;
-        padding: 0 30px 0 10px;
+        margin: 0;
+        padding: 0;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
     }
 
@@ -105,7 +87,7 @@ import { Router, RouterModule } from '@angular/router';
       display: flex;
       align-items: center;
       height: 100%;
-      padding-left: 15px;
+      padding-left: 50px;
       
       .logo-link {
         display: flex;
@@ -118,17 +100,11 @@ import { Router, RouterModule } from '@angular/router';
       }
       
       .logo-image {
-        height: 60px;
+        height: 55px;
         width: auto;
         object-fit: contain;
-        max-width: 300px;
+        max-width: 280px;
         display: block;
-        filter: drop-shadow(0 0 5px rgba(245, 216, 132, 0.3));
-        transition: filter 0.3s ease;
-        
-        &:hover {
-          filter: drop-shadow(0 0 8px rgba(245, 216, 132, 0.5));
-        }
       }
     }
 
@@ -137,7 +113,9 @@ import { Router, RouterModule } from '@angular/router';
       display: flex;
       align-items: center;
       height: 100%;
-      gap: 30px;
+      gap: 50px;
+      margin-left: auto;
+      padding-right: 50px;
       
       .nav-section {
         height: 100%;
@@ -160,112 +138,40 @@ import { Router, RouterModule } from '@angular/router';
           cursor: pointer;
           position: relative;
           transition: all 0.3s ease;
-          color: white;
+          color: #e0f7ff;
+          flex-direction: column;
+          justify-content: center;
           
           &:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
           }
           
           &.active {
-            background: linear-gradient(to right, rgba(255, 100, 50, 0.8), rgba(255, 150, 70, 0.8));
-            
-            &::after {
-              content: '';
-              position: absolute;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              height: 3px;
-              background-color: #f5d884;
-              box-shadow: 0 0 10px rgba(255, 150, 70, 0.5);
-            }
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+          }
+      
+          .page-name {
+            font-size: 1rem;
+            font-weight: 500;
+          }
+          
+          .page-description {
+            font-size: 0.7rem;
+            opacity: 0.8;
           }
         }
       }
-    }
-
-    // Home Tabs Styles
-    .home-tabs li {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding-top: 5px;
-      
-      .page-name {
-        font-weight: 500;
-        font-size: 1rem;
-      }
-      
-      .page-description {
-        font-size: 0.7rem;
-        opacity: 0.6;
-        margin-top: 2px;
-      }
-    }
-
-    // Collection Tabs Styles
-    .collection-tabs li {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    // Page Tabs Styles
-    .page-tabs li {
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding-top: 5px;
-      
-      .page-name {
-        font-weight: 500;
-        font-size: 1rem;
-      }
-      
-      .page-description {
-        font-size: 0.7rem;
-        opacity: 0.6;
-        margin-top: 2px;
-      }
-    }
-
-    // Accessibility Helper
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      margin: -1px;
-      padding: 0;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      border: 0;
     }
 
     // Media Queries
     @media (max-width: 768px) {
-      .site-header {
-        height: auto;
-        padding: 10px 0;
-        
-        .header-container {
-          flex-direction: column;
-          padding: 10px;
-        }
-      }
-      
       .site-nav {
-        width: 100%;
-        margin-top: 15px;
-        flex-direction: column;
-        gap: 10px;
-        
-        .nav-section ul {
-          width: 100%;
-          justify-content: center;
-        }
+        display: none; // Hide on mobile - would need to add mobile menu
       }
       
-      .logo-container .logo-image {
-        height: 45px;
+      .logo-container {
+        margin: 0 auto;
       }
     }
   `],
@@ -277,11 +183,10 @@ export class SiteHeaderComponent implements OnInit {
   ngOnInit(): void {}
 
   /**
-   * Check if the current route matches the provided route
+   * Check if the given route is active
    * 【✓】
    */
   isActiveRoute(route: string): boolean {
-    return this.router.url === route || 
-           (route === '/' && this.router.url === '/home');
+    return this.router.url.includes(route);
   }
 } 

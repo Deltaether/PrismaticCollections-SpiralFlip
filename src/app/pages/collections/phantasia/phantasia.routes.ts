@@ -10,7 +10,7 @@ import { MobileMusicComponent } from './mobile/pages/mobile-music/mobile-music.c
 import { MobileAboutComponent } from './mobile/pages/mobile-about/mobile-about.component';
 import { MobileContactComponent } from './mobile/pages/mobile-contact/mobile-contact.component';
 import { MobileCreditsComponent } from './mobile/pages/mobile-credits/mobile-credits.component';
-import { CollectionComponent } from './pages/collection/collection.component';
+import { CollectionComponent } from '../../collections-page/collection.component';
 import { HomeComponent } from '../../../pages/home/home.component';
 import { TestHomeComponent } from '../../../pages/test-home/test-home.component';
 

@@ -1,6 +1,9 @@
 <!-- Background Container -->
 <div class="bg-container"></div>
 
+<!-- App Header - Add for both mobile and desktop views -->
+<app-site-header></app-site-header>
+
 <!-- MOBILE VIEW -->
 <app-mobile-view *ngIf="deviceDetectionService.shouldUseMobileView() || router.url === '/mobile'"></app-mobile-view>
 

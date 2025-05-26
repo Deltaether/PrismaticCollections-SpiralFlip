@@ -2,7 +2,8 @@
 @use './sass-options.scss';
 @use './app/styles/main.scss';
 @use './app/shared/styles/scroll-animations.scss' as scroll;
-@use './app/pages/collections/phantasia/pages/collection/collection-header-global.scss' as phantasia;
+@use './app/shared/styles/header-styles.scss' as header;
+@use './app/pages/collections-page/collection-header-global.scss' as phantasia;
 
 /* We're keeping the existing Phantasia Project styles in their original location
    and only organizing the common/shared styles into a more maintainable structure */
@@ -31,30 +32,48 @@ img {
   pointer-events: none;
 }
 
-/* Layout overrides */
-app-main-layout {
+/* Layout overrides - Use class-based selectors with high specificity */
+/* Add main-header-styles class to main layout for these to work properly */
+.main-layout.main-header-styles {
   margin: 0 !important;
   margin-top: 0 !important;
+  
+  .main-header {
+    height: header.$header-height-main !important; /* Use consistent header height */
+  }
 }
 
 /* Target specific nested app-new-collections component */
-app-main-layout > div > main > div > app-new-collections,
-body > app-root > app-main-layout > div > main > div > app-new-collections {
+.main-layout.main-header-styles > div > main > div > app-new-collections {
   margin: 0 !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
 
 /* Remove margin and padding from main content container */
-app-main-layout > div > main > div,
-body > app-root > app-main-layout > div > main > div {
+.main-layout.main-header-styles > div > main > div {
   margin: 0 !important;
   padding: 0 !important;
 }
 
 /* Target main content of layouts */
-app-main-layout > div > main {
+.main-layout.main-header-styles > div > main {
   margin-top: 0 !important;
+}
+
+/* Remove padding-top from app-home component in main layout */
+body > app-root > app-main-layout > div > main > app-home,
+.main-layout > main > app-home,
+app-main-layout > div > main > app-home {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Override the home-container padding-top in the home component */
+body > app-root > app-main-layout > div > main > app-home .home-container,
+.main-layout > main > app-home .home-container,
+app-main-layout > div > main > app-home .home-container {
+  padding-top: 0 !important;
 }
 
 html, body {
@@ -64,6 +83,17 @@ html, body {
   padding: 0;
   overflow: hidden !important; /* Prevent scrolling on the body */
   position: relative;
+}
+
+/* Allow scrolling when home page is active */
+body.home-page-active,
+body.home-page-active html {
+  overflow: auto !important;
+  overflow-x: hidden !important;
+}
+
+body.home-page-active {
+  padding-top: 90px !important; /* Prevent navbar from covering content and scrollbar */
 }
 
 body {
@@ -109,8 +139,9 @@ body {
   scrollbar-color: rgba(110, 80, 60, 0.5) transparent;
 }
 
-/* Active link style - this is overridden for collections */
-.active:not(.collections-page .active):not(.nav-link.active) {
+/* Active link style - restrict to non-collection areas by using more specific selectors */
+body:not(.collections-page) .active:not(.nav-link.active),
+body:not(.phantasia-collection-page) .active:not(.nav-link.active) {
   color: #000 !important;
   font-weight: 600 !important;
 }
@@ -122,6 +153,12 @@ app-root {
   width: 100%;
   position: relative;
   overflow: hidden !important; /* Prevent scrolling on the root app container */
+}
+
+/* Allow scrolling on app-root when home page is active */
+body.home-page-active app-root {
+  overflow: auto !important;
+  overflow-x: hidden !important;
 }
 
 /* Page styles */
@@ -144,38 +181,24 @@ section {
   scroll-snap-stop: always;
 }
 
-/* Remove ALL top margins in the entire app */
+/* Clean up top margins but use classes for better targeting */
+.no-top-margin,
 .main-layout > .main-content,
-.main-content,
-main,
-.main-layout,
-app-new-collections,
-app-new-collections > div,
-.collection-header,
-.phantasia-header,
+.collections-container,
+.collection-header {
+  margin-top: 0 !important;
+}
+
+/* Remove top padding but use classes for better targeting */
+.no-top-padding,
 .collections-container {
-  margin-top: 0 !important;
   padding-top: 0 !important;
 }
 
-/* Override for any divs with style attribute containing background-color */
-div[style*="background-color"] {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Remove margin-top from app-new-collections when direct child of main */
-app-main-layout > div > main > app-new-collections,
-body > app-root > app-main-layout > div > main > app-new-collections {
-  margin-top: 0 !important;
-  margin: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Remove margin-top from app-home when direct child of main */
-app-main-layout > div > main > app-home,
-body > app-root > app-main-layout > div > main > app-home {
-  margin-top: 0 !important;
-  margin: 0 !important;
-  padding-top: 0 !important;
+/* Separate collection pages with distinct class for styling isolation */
+body.collections-page {
+  /* Styles specific to collections only */
+  .collections-container {
+    padding-top: header.$header-height-site !important; /* Use consistent header height + buffer */
+  }
 }

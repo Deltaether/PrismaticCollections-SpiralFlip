@@ -1,0 +1,145 @@
+<!-- Collections Page Root with style override -->
+<div appStyleOverride style="margin-top: 0 !important; padding-top: 0 !important;">
+  <!-- Site Header -->
+  <app-site-header></app-site-header>
+  
+  <!-- Add style to override app-main-layout margin and all nested elements -->
+  <style>
+    app-main-layout {
+      margin-top: 0 !important;
+    }
+    
+    body > app-root > app-main-layout > div > main > app-new-collections {
+      margin: 0 !important;
+      padding-top: 0 !important;
+    }
+    
+    div[appStyleOverride] {
+      margin-top: 0 !important;
+    }
+    
+    .collections-container {
+      margin-top: 0 !important;
+    }
+
+    /* Target main content area */
+    app-main-layout > div > main {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    
+    /* Target collection header */
+    .collection-header {
+      margin-top: 0 !important;
+    }
+    
+    /* Ensure root component has no margin/padding */
+    :host {
+      margin: 0 !important;
+      padding: 0 !important;
+      display: block;
+    }
+    
+    /* Override any element with violet/purple background */
+    [style*="background-color: #"] {
+      margin-top: 0 !important;
+    }
+  </style>
+
+  <!-- Debug Info Container - Hidden in production -->
+  <div class="debug-info" #debugContainer style="display: none;">
+    <p>Current route: {{ getCurrentRoute() }}</p>
+    <p>Is mobile view: {{ isMobileView() }}</p>
+  </div>
+
+  <!-- Decorative Elements -->
+  <div class="decorative-element square top-right"></div>
+  <div class="decorative-element rhombus bottom-left"></div>
+
+  <!-- Collections Container -->
+  <div class="collections-container" #cardContainer>
+    <!-- Collection Header -->
+    <div class="collection-header" #pageHeader>
+      <h1>Music Collections</h1>
+      <p class="subtitle">Explore our curated collections of music, each with its own unique theme and atmosphere.</p>
+    </div>
+
+    <!-- Collections List -->
+    <div class="collection-list">
+      <!-- Project Phantasia Collection -->
+      <div class="collection-card" #collectionCard>
+        <div class="collection-image">
+          <img src="assets/graphic/phantasia_1_cover_final.png" alt="Project Phantasia Cover">
+        </div>
+        <div class="collection-content">
+          <h2>Project Phantasia</h2>
+          <div class="metadata">
+            <span class="tracks">12 Tracks</span>
+            <span class="year">2023</span>
+          </div>
+          <p class="description">
+            Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies that transcend conventional electronic music genres.
+          </p>
+          <div class="tags">
+            <span class="tag">Ambient</span>
+            <span class="tag">Electronic</span>
+            <span class="tag">Experimental</span>
+          </div>
+          <button class="explore-button" (click)="exploreCollection('phantasia')">
+            Explore <i class="fa fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ethereal Soundscapes Collection -->
+      <div class="collection-card">
+        <div class="collection-image">
+          <img src="assets/collections/ethereal-soundscapes.jpg" alt="Ethereal Soundscapes Cover">
+        </div>
+        <div class="collection-content">
+          <h2>Ethereal Soundscapes</h2>
+          <div class="metadata">
+            <span class="tracks">8 Tracks</span>
+            <span class="year">2022</span>
+          </div>
+          <p class="description">
+            Immerse yourself in ambient textures and atmospheric compositions designed to transport listeners to otherworldly realms of sound.
+          </p>
+          <div class="tags">
+            <span class="tag">Ambient</span>
+            <span class="tag">Atmospheric</span>
+            <span class="tag">Meditative</span>
+          </div>
+          <button class="explore-button" (click)="exploreCollection('ethereal')">
+            Explore <i class="fa fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Digital Artifacts Collection -->
+      <div class="collection-card">
+        <div class="collection-image">
+          <img src="assets/collections/digital-artifacts.jpg" alt="Digital Artifacts Cover">
+        </div>
+        <div class="collection-content">
+          <h2>Digital Artifacts</h2>
+          <div class="metadata">
+            <span class="tracks">10 Tracks</span>
+            <span class="year">2023</span>
+          </div>
+          <p class="description">
+            A bold exploration of glitchy textures, digital processing, and experimental sound design that pushes the boundaries of modern electronic music.
+          </p>
+          <div class="tags">
+            <span class="tag">Glitch</span>
+            <span class="tag">IDM</span>
+            <span class="tag">Experimental</span>
+          </div>
+          <button class="explore-button" (click)="exploreCollection('artifacts')">
+            Explore <i class="fa fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

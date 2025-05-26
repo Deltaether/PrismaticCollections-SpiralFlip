@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/pages/collections/phantasia/phantasia.config';
-import { PhantasiaComponent } from './app/pages/collections/phantasia/phantasia.component';
+import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { ScrollHelperService } from './app/shared/services/scroll-helper.service';
 
@@ -14,5 +14,5 @@ const updatedConfig = {
   ]
 };
 
-bootstrapApplication(PhantasiaComponent, updatedConfig)
+bootstrapApplication(AppComponent, updatedConfig)
   .catch((err) => console.error(err));

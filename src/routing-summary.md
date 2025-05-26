@@ -15,21 +15,20 @@ bootstrapApplication(PhantasiaComponent, updatedConfig)
 
 ## Routing Configuration
 
-The project now uses a consolidated routing configuration in a single file:
+The project now uses a consolidated routing configuration with a per-page layout approach:
 
 ### Consolidated Routes (`app.routes.ts`)
 
-The application routes have been unified and organized by layout components:
+The application routes have been organized by sections and use per-page layouts:
 
-- **Main Layout Routes**:
-  - `/` and `/home` - Home component
-  - `/scroll-demo` - Scroll demo component
+- **Main Routes** (using direct component loading):
+  - `/` and `/home` - Home component (includes its own header)
   - `/collections` - New collections component
   - `/test-home` - Test home component
 
-- **Phantasia Layout Routes**:
-  - `/phantasia` - Redirects to `/phantasia/introduction`
-  - `/phantasia/introduction` - Introduction component
+- **Phantasia Routes** (using PhantasiaLayoutComponent):
+  - `/phantasia` - Redirects to `/phantasia/phantasia`
+  - `/phantasia/phantasia` - Phantasia component
   - `/phantasia/collections` - Collection component
   - `/phantasia/disc-one` - Disc One component
   - `/phantasia/disc-two` - Disc Two component
@@ -37,13 +36,13 @@ The application routes have been unified and organized by layout components:
   - `/phantasia/pv` - PV component
 
 - **Direct Access Routes**:
-  - `/collections/phantasia` - Introduction component
+  - `/collections/phantasia` - Phantasia component
   - `/disc-1` - Disc One component
   - `/disc-2` - Disc Two component
   - `/pv` - PV component
   - `/information` - Information component
 
-- **Mobile Layout Routes** with named outlets:
+- **Mobile Routes**:
   - `/mobile` - Mobile view component with nested routes:
     - `front` outlet: MobileHomeComponent
     - `right` outlet: MobileMusicComponent
@@ -52,17 +51,18 @@ The application routes have been unified and organized by layout components:
     - `top` outlet: MobileCreditsComponent
 
 - **Legacy Redirects** for backward compatibility:
-  - `/introduction` → `/phantasia/introduction`
+  - `/introduction` → `/phantasia/phantasia`
   - `/collection` → `/phantasia/collections`
   - `/disc-one` → `/phantasia/disc-one`
   - `/disc-two` → `/phantasia/disc-two`
 
 ## Important Changes
 
-- The previously separate routing configurations have been consolidated into a single file
-- Both `phantasia.routes.ts` and `app.routes.ts` were merged to eliminate conflicts
-- The `phantasia.config.ts` file now references the consolidated routes from `app.routes.ts`
-- This resolves navigation errors related to routes like `/collections` that were causing conflicts
+- Moved from global app-wide layouts to section-specific layouts
+- PhantasiaLayoutComponent is now located in `src/app/pages/collections/phantasia/layout/`
+- Removed the global layout structure for a more targeted per-page approach
+- Each section manages its own header and layout needs directly
+- This resolves navigation errors and provides better organization
 
 ## PhantasiaComponent Structure
 
@@ -76,5 +76,6 @@ The `PhantasiaComponent` is a complex component that:
 
 - `src/main.ts` - Application bootstrap
 - `src/app/app.routes.ts` - Consolidated application routes
-- `src/app/pages/collections/phantasia/phantasia.config.ts` - Phantasia application configuration (now using consolidated routes)
-- `src/app/pages/collections/phantasia/phantasia.component.ts` - Main Phantasia component 
+- `src/app/pages/collections/phantasia/phantasia.config.ts` - Phantasia application configuration
+- `src/app/pages/collections/phantasia/phantasia.component.ts` - Main Phantasia component
+- `src/app/pages/collections/phantasia/layout/layout.component.ts` - Layout for Phantasia pages 

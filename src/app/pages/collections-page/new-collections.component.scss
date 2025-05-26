@@ -1,0 +1,392 @@
+// Collections SCSS Variables
+@use 'sass:color';
+
+$background-color: #ffffff; // Changed from dark to white
+$text-color-primary: #333333; // Changed to darker text for better contrast on white
+$text-color-secondary: #666666; // Changed to medium gray
+$accent-color: #5d4fff; // Kept the accent color
+$card-bg-color: #f8f8f8; // Changed to light gray for cards
+$card-hover-bg: #f0f0f0; // Changed to slightly darker light gray for hover
+$header-bg: rgba(255, 255, 255, 0.95); // Changed to white with opacity
+
+// Global Styles - Light Theme for Collections Page
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: $background-color;
+  color: $text-color-primary;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+// 【✓】 Override layout margin
+app-main-layout, :host ::ng-deep app-main-layout {
+  margin-top: 0 !important;
+  margin: 0 !important;
+}
+
+// 【✓】 Global style injection to hide main-header at the app root level
+:host, app-root, body {
+  // Apply at the highest possible level to handle page refreshes
+  ::ng-deep {
+    // Target the app-root level to ensure these styles apply even on refresh
+    app-root header.main-header,
+    app-main-layout header.main-header,
+    .main-header-styles,
+    .main-header,
+    .phantasia-header,
+    div.main-header,
+    app-root app-main-layout > div > header:not(.site-header),
+    app-root app-home > header:not(.site-header),
+    header:not(.site-header):not(.header-container) {
+      display: none !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      max-height: 0 !important;
+      overflow: hidden !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    
+    // Ensure these selectors have the highest specificity
+    header.site-header,
+    .site-header,
+    .header-container,
+    app-site-header .header-container,
+    div.header-container,
+    app-home app-site-header header.site-header {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  }
+}
+
+// 【✓】 Target the specific deeply nested component
+:host {
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* Ensure no margins at any level of the component tree */
+  ::ng-deep {
+    // 【✓】 Hide the main-header but keep the site-header
+    header.main-header,
+    .main-header-styles,
+    .main-header,
+    .phantasia-header {
+      display: none !important;
+    }
+    
+    // 【✓】 Keep the site-header and header-container visible
+    header.site-header,
+    .site-header,
+    .header-container {
+      display: flex !important;
+    }
+    
+    body > app-root > app-main-layout > div > main > div > app-new-collections {
+      margin: 0 !important;
+      padding-top: 0 !important;
+    }
+    
+    div[appStyleOverride] {
+      margin-top: 0 !important;
+    }
+    
+    .collections-container {
+      margin-top: 0 !important;
+      padding-top: 20px; /* Reduced since we only have one header now */
+    }
+  }
+}
+
+// 【✗】 Header Navigation - No longer needed since we're keeping only the site-header
+.phantasia-header {
+  display: none !important;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: $header-bg;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  margin: 0; // Removed margin to fix spacing issue
+
+  .logo {
+    img {
+      height: 40px;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+
+    a {
+      color: $text-color-primary;
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      padding-bottom: 5px;
+      transition: color 0.3s ease;
+
+      &:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: $accent-color;
+        transition: width 0.3s ease;
+      }
+
+      &:hover, &.active {
+        color: $accent-color;
+        
+        &:after {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// 【✓】 Collection Header Styles
+.collection-header {
+  text-align: center;
+  margin: 0;
+  padding-top: 1rem;
+  
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: $text-color-primary;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    color: $text-color-secondary;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+// 【✓】 Collections Container
+.collections-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+  padding-top: 20px; /* Reduced from 100px since we only have one header now */
+}
+
+// 【✓】 Collection Cards
+.collection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2.5rem;
+}
+
+.collection-card {
+  background: $card-bg-color;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    background: $card-hover-bg;
+  }
+  
+  .collection-image {
+    height: 220px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+  
+  .collection-content {
+    padding: 1.5rem;
+    
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: $text-color-primary;
+    }
+    
+    .metadata {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: $text-color-secondary;
+      
+      span {
+        display: flex;
+        align-items: center;
+        
+        &:before {
+          content: '';
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          margin-right: 0.5rem;
+          background-color: $accent-color;
+          border-radius: 50%;
+        }
+      }
+    }
+    
+    .description {
+      margin-bottom: 1.25rem;
+      color: $text-color-secondary;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      
+      .tag {
+        background: rgba($accent-color, 0.1);
+        color: $accent-color;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+    }
+    
+    .explore-button {
+      background-color: $accent-color;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: fit-content;
+      
+      &:hover {
+        background-color: color.adjust($accent-color, $lightness: -10%);
+        transform: translateY(-2px);
+      }
+      
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// 【✓】 Decorative Elements
+.decorative-element {
+  position: fixed;
+  z-index: -1;
+  opacity: 0.05;
+  
+  &.square {
+    width: 300px;
+    height: 300px;
+    border: 15px solid $accent-color;
+    
+    &.top-right {
+      top: -100px;
+      right: -100px;
+      transform: rotate(15deg);
+    }
+  }
+  
+  &.rhombus {
+    width: 250px;
+    height: 250px;
+    border: 15px solid $accent-color;
+    transform: rotate(45deg);
+    
+    &.bottom-left {
+      bottom: -100px;
+      left: -100px;
+    }
+  }
+}
+
+// 【✓】 Debug Info Box
+.debug-info {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 9999;
+}
+
+// 【✓】 Responsive Styles
+@media (max-width: 768px) {
+  .phantasia-header {
+    flex-direction: column;
+    padding: 1rem;
+    
+    .logo {
+      margin-bottom: 1rem;
+    }
+    
+    .nav-links {
+      gap: 1rem;
+    }
+  }
+  
+  .collection-header {
+    h1 {
+      font-size: 2.2rem;
+    }
+  }
+  
+  .collection-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .collection-header h1 {
+    font-size: 2rem;
+  }
+  
+  .collection-card .collection-content {
+    padding: 1.5rem;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+} 

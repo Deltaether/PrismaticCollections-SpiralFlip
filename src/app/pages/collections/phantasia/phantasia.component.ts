@@ -9,9 +9,9 @@ import { MobileViewComponent } from './mobile/mobile-view.component';
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { SiteVersionSelectorComponent } from '../../../components/site-version-selector/site-version-selector.component';
-import { HeaderComponent } from '../../../components/header/header.component';
 import { DisclaimerComponent } from '../../../components/disclaimer/disclaimer.component';
 import { SceneLoaderComponent } from '../../../tools/cd-cases/scene-loader/scene-loader.component';
+import { SiteHeaderComponent } from '../../../shared/components/site-header/site-header.component';
 
 // 【✓】 Define interfaces for type safety
 interface ViewportDimensions {
@@ -42,13 +42,16 @@ type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
     RouterModule,
     MobileViewComponent,
     SiteVersionSelectorComponent,
-    HeaderComponent,
     DisclaimerComponent,
-    SceneLoaderComponent
+    SceneLoaderComponent,
+    SiteHeaderComponent
   ],
   template: `
     <!-- PhantasiaComponent - Only renders for specific routes -->
     <ng-container *ngIf="shouldShowPhantasiaContent">
+      <!-- Site Header - Add for both mobile and desktop views -->
+      <app-site-header></app-site-header>
+      
       <!-- Global Loading Screen - highest z-index -->
       <app-scene-loader *ngIf="showLoading"></app-scene-loader>
       
@@ -79,9 +82,6 @@ type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
         <ng-template #mobileTemplate>
           <app-mobile-view></app-mobile-view>
         </ng-template>
-        
-        <!-- Display the header only when loading is complete and after all other content -->
-        <app-header *ngIf="showHeaderForRoute"></app-header>
       </ng-container>
     </ng-container>
     
@@ -253,22 +253,6 @@ export class PhantasiaComponent implements AfterViewInit, OnInit, OnDestroy {
    */
   get showCDCasesForRoute(): boolean {
     return this.router.url === '/collections/phantasia';
-  }
-  
-  /**
-   * Determines if header should be shown for the current route and state
-   * 【✓】
-   */
-  get showHeaderForRoute(): boolean {
-    // Only show header when:
-    // 1. Not loading
-    // 2. Not showing disclaimer
-    // 3. Not showing version selector
-    // 4. Not on mobile view
-    return !this.showLoading && 
-           !this.showDisclaimer && 
-           !this.showVersionSelector && 
-           !this.isMobileView;
   }
 
   /**

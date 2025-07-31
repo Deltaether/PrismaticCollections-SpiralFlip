@@ -36,9 +36,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       isMain: true
     },
     {
-      id: 'unknown-cd',
+      id: 'unknown-prism',
       title: '???',
-      description: 'CD UNREADABLE - This disc appears to be corrupted ./restoration in progress...',
+      description: 'PRISM UNREADABLE - This prism appears to be corrupted ./restoration in progress...',
       image: 'assets/images/featured/cd-unreadable.svg',
       route: '/phantasia/phantasia',
       isMain: false

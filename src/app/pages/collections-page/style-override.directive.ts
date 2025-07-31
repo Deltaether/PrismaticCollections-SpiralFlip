@@ -1,7 +1,7 @@
 import { Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
 
 /**
- * StyleOverrideDirective
+ * StyleOverrideDirective - Lightweight Performance Optimized
  * Forces the correct styles for collections page design
  * 【✓】
  */
@@ -10,209 +10,28 @@ import { Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
   selector: '[appStyleOverride]'
 })
 export class StyleOverrideDirective implements OnInit {
-  // Collection page style variables
-  private readonly styles = {
-    backgroundDark: '#10121b',
-    cardBackground: '#161a2b',
-    textColor: '#e9ecef',
-    accentColor: '#7e55f3',
-    headerBackground: 'rgba(0, 0, 0, 0.9)'
-  };
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
 
   /**
-   * Apply styles on init
+   * Apply styles on init - Minimal operations for performance
    * 【✓】
    */
   ngOnInit() {
-    console.log('[StyleOverrideDirective] Applying global styles for collections');
-    this.applyGlobalStyles();
-    this.applyComponentStyles();
-    this.createDecorativeElements();
+    this.applyOptimizedStyles();
   }
 
   /**
-   * Apply styles to global elements
+   * Apply only essential styles without heavy DOM operations
    * 【✓】
    */
-  private applyGlobalStyles() {
-    // Apply to document body with !important flag
-    document.body.setAttribute('style', 
-      `background-color: ${this.styles.backgroundDark} !important; 
-       color: ${this.styles.textColor} !important; 
-       margin: 0 !important; 
-       padding: 0 !important;
-       overflow-x: hidden !important;`
-    );
+  private applyOptimizedStyles() {
+    // Apply essential styles to body with minimal operations
     this.renderer.addClass(document.body, 'collections-themed-page');
     
-    // Apply to html
-    document.documentElement.setAttribute('style',
-      `background-color: ${this.styles.backgroundDark} !important;`
-    );
-    
-    // Find and override any parent containers
-    let parent = this.el.nativeElement.parentElement;
-    while (parent) {
-      parent.setAttribute('style', 
-        `background-color: ${this.styles.backgroundDark} !important;`
-      );
-      parent = parent.parentElement;
-    }
-    
-    // Force any router-outlet to take full width/height
-    const routerOutlets = document.querySelectorAll('router-outlet');
-    routerOutlets.forEach(outlet => {
-      // Get next sibling which is the rendered component
-      let sibling = outlet.nextElementSibling;
-      if (sibling) {
-        sibling.setAttribute('style',
-          `background-color: ${this.styles.backgroundDark} !important;
-           min-height: 100vh !important;
-           width: 100% !important;`
-        );
-      }
-    });
-    
-    // Create a style element with high-specificity rules
-    this.injectGlobalStyles();
-  }
-
-  /**
-   * Apply styles to component elements
-   * 【✓】
-   */
-  private applyComponentStyles() {
-    // Style the host element
-    this.el.nativeElement.setAttribute('style',
-      `background-color: ${this.styles.backgroundDark} !important;
-       color: ${this.styles.textColor} !important;
-       min-height: 100vh !important;
-       display: block !important;
-       width: 100% !important;
-       position: relative !important;
-       overflow-x: hidden !important;`
-    );
-    
-    // Style header if present
-    const header = this.el.nativeElement.querySelector('.phantasia-header');
-    if (header) {
-      header.setAttribute('style',
-        `background: ${this.styles.headerBackground} !important;
-         width: 100% !important;
-         z-index: 100 !important;
-         display: flex !important;
-         align-items: center !important;
-         justify-content: space-between !important;
-         padding: 0.8rem 2rem !important;
-         position: sticky !important;
-         top: 0 !important;`
-      );
-    }
-    
-    // Style collection cards
-    const cards = this.el.nativeElement.querySelectorAll('.collection-card');
-    cards.forEach((card: Element) => {
-      card.setAttribute('style',
-        `background: ${this.styles.cardBackground} !important;
-         display: flex !important;
-         border-radius: 0.5rem !important;
-         overflow: hidden !important;
-         margin-bottom: 3rem !important;
-         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
-         transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
-      );
-      
-      // Add hover effect with JS
-      card.addEventListener('mouseenter', () => {
-        card.setAttribute('style',
-          `background: ${this.styles.cardBackground} !important;
-           display: flex !important;
-           border-radius: 0.5rem !important;
-           overflow: hidden !important;
-           margin-bottom: 3rem !important;
-           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
-           transform: translateY(-5px) !important;
-           transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
-        );
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        card.setAttribute('style',
-          `background: ${this.styles.cardBackground} !important;
-           display: flex !important;
-           border-radius: 0.5rem !important;
-           overflow: hidden !important;
-           margin-bottom: 3rem !important;
-           box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3) !important;
-           transform: translateY(0) !important;
-           transition: transform 0.3s ease, box-shadow 0.3s ease !important;`
-        );
-      });
-    });
-  }
-  
-  /**
-   * Create decorative elements for background
-   * 【✓】
-   */
-  private createDecorativeElements() {
-    // This function is now taken care of in the HTML template
-    // Additional decorative elements could be created here if needed
-  }
-  
-  /**
-   * Inject global styles with high specificity
-   * 【✓】
-   */
-  private injectGlobalStyles() {
-    // Create style element
-    const styleEl = document.createElement('style');
-    styleEl.setAttribute('id', 'collection-override-styles');
-    
-    // Add CSS rules with high specificity
-    styleEl.innerHTML = `
-      html body, html .collections-themed-page, body .collections-themed-page {
-        background-color: ${this.styles.backgroundDark} !important;
-        color: ${this.styles.textColor} !important;
-        overflow-x: hidden !important;
-      }
-      
-      html body .phantasia-header, 
-      body.collections-themed-page .phantasia-header {
-        background: ${this.styles.headerBackground} !important;
-        color: white !important;
-      }
-      
-      html body .collection-card,
-      body.collections-themed-page .collection-card {
-        background: ${this.styles.cardBackground} !important;
-      }
-      
-      html body .collections-container,
-      body.collections-themed-page .collections-container {
-        background-color: transparent !important;
-      }
-      
-      html body .explore-button,
-      body.collections-themed-page .explore-button {
-        background: ${this.styles.accentColor} !important;
-        color: white !important;
-      }
-      
-      /* Hide any duplicate headers */
-      .main-layout .main-header {
-        display: none !important;
-      }
-      
-      .main-layout .main-content {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-      }
-    `;
-    
-    // Add to head
-    document.head.appendChild(styleEl);
+    // Style the host element only
+    this.renderer.setStyle(this.el.nativeElement, 'display', 'block');
+    this.renderer.setStyle(this.el.nativeElement, 'min-height', '100vh');
+    this.renderer.setStyle(this.el.nativeElement, 'position', 'relative');
   }
 }

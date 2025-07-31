@@ -62,7 +62,7 @@
   
   <!-- Main error text -->
   <text x="200" y="280" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#ff4444" filter="url(#redGlow)">
-    DISC READ ERROR
+    PRISM READ ERROR
   </text>
   
   <!-- Secondary text -->

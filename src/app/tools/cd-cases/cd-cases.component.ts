@@ -371,8 +371,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
       // Set appropriate color encoding if available
       if ('outputColorSpace' in this.renderer) {
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-      } else if ('sRGBEncoding' in THREE) {
-        (this.renderer as any).outputEncoding = (THREE as any).sRGBEncoding;
+      } else if ('outputEncoding' in this.renderer) {
+        // Fallback for older Three.js versions
+        (this.renderer as any).outputEncoding = THREE.SRGBColorSpace;
       }
       
       // Enable shadow optimization if shadows are used

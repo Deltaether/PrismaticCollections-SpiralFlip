@@ -1,334 +1,147 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { StyleOverrideDirective } from './style-override.directive';
-import { Title } from '@angular/platform-browser';
-import { ScrollHelperService } from '../../shared/services/scroll-helper.service';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 
-/**
- * Interface for tracking stylesheet conflicts
- * 【✓】
- */
-interface StyleConflict {
-  stylesheet: string;
-  selector: string;
-  cssText: string;
-}
-
-/**
- * Interface for conflict tracking object
- * 【✓】
- */
-interface ConflictMap {
-  [selector: string]: StyleConflict[];
-}
-
-/**
- * Interface for collection item
- * 【✓】
- */
+/* 【✓】 Collection Interface Definition */
 interface Collection {
   id: string;
   title: string;
-  artist: string;
-  year: string;
+  image: string;
   tracks: number;
-  imagePath: string;
+  year: number;
   description: string;
   tags: string[];
 }
 
+/* 【✓】 Triangle Animation Interface - Matching Home Page */
+interface Triangle {
+  left: number;    // Horizontal position (0-100%)
+  delay: number;   // Animation delay in seconds
+  size: number;    // Triangle width in pixels
+  height: number;  // Triangle height in pixels
+  duration: number; // Animation duration in seconds
+}
+
 /**
- * NewCollectionsComponent
- * Displays the collection cards with proper styling
+ * NewCollectionsComponent - Fresh Implementation
+ * Clean, optimized standalone component with inverted triangle animations
  * 【✓】
  */
 @Component({
   selector: 'app-new-collections',
   standalone: true,
-  imports: [CommonModule, RouterModule, StyleOverrideDirective, SiteHeaderComponent],
+  imports: [CommonModule, SiteHeaderComponent],
   templateUrl: './new-collections.component.html',
-  styleUrls: ['./new-collections.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./new-collections.component.scss']
 })
-export class NewCollectionsComponent implements OnInit, AfterViewInit {
-  @ViewChild('debugContainer') debugContainer!: ElementRef;
-  @ViewChild('pageHeader') pageHeader!: ElementRef;
-  @ViewChild('cardContainer') cardContainer!: ElementRef;
-  @ViewChild('collectionCard') collectionCard!: ElementRef;
+export class NewCollectionsComponent implements OnInit, OnDestroy {
   
-  // All available collections
+  /* 【✓】 Collections Data */
   collections: Collection[] = [
     {
       id: 'phantasia',
       title: 'Project Phantasia',
-      artist: 'Various Artists',
-      year: '2023',
+      image: 'assets/graphic/phantasia_1_cover_final.png',
       tracks: 12,
-      imagePath: 'assets/images/collections/phantasia-cover.jpg',
-      description: 'Our flagship collection featuring a blend of orchestral and electronic music. Experience our immersive 3D interface with stunning visual effects and interactive elements.',
-      tags: ['Orchestral', 'Electronic', 'Ambient', '3D Experience']
+      year: 2023,
+      description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies that transcend conventional electronic music genres.',
+      tags: ['Ambient', 'Electronic', 'Experimental']
     },
     {
       id: 'ethereal',
       title: 'Ethereal Soundscapes',
-      artist: 'Audio Architects',
-      year: '2023',
-      tracks: 18,
-      imagePath: 'assets/images/collections/ethereal-soundscapes.jpg',
-      description: 'Immersive ambient compositions that blend electronic elements with organic textures.',
-      tags: ['Ambient', 'Electronic']
+      image: 'assets/collections/ethereal-soundscapes.jpg',
+      tracks: 8,
+      year: 2022,
+      description: 'Immerse yourself in ambient textures and atmospheric compositions designed to transport listeners to otherworldly realms of sound.',
+      tags: ['Ambient', 'Atmospheric', 'Meditative']
     },
     {
       id: 'artifacts',
       title: 'Digital Artifacts',
-      artist: 'Glitch Collective',
-      year: '2022',
-      tracks: 24,
-      imagePath: 'assets/images/collections/digital-artifacts.jpg',
-      description: 'Glitchy electronica from the early digital era, carefully remastered for modern listeners.',
-      tags: ['Electronic', 'Glitch', 'Experimental']
+      image: 'assets/collections/digital-artifacts.jpg',
+      tracks: 10,
+      year: 2023,
+      description: 'A bold exploration of glitchy textures, digital processing, and experimental sound design that pushes the boundaries of modern electronic music.',
+      tags: ['Glitch', 'IDM', 'Experimental']
     }
   ];
 
-  // 【✓】 Track if we're in mobile view
-  isMobile = false;
+  /* 【✓】 Triangle Animation System - Matching Home Page Behavior */
+  triangles: Triangle[] = [];
   
-  constructor(
-    private renderer: Renderer2, 
-    private router: Router,
-    private titleService: Title,
-    private scrollHelper: ScrollHelperService
-  ) { }
+  constructor(private router: Router) {}
 
-  /**
-   * Initialize component
-   * 【✓】
-   */
+  /* 【✓】 Component Initialization */
   ngOnInit(): void {
-    this.titleService.setTitle('Music Collections | Project Phantasia');
-    console.log('[DEBUG] NewCollections component initializing');
-    
-    // Check for imported or global styles
-    const styleSheets = document.styleSheets;
-    
-    // Forcefully apply styles to body
-    this.renderer.addClass(document.body, 'new-collections-page');
-    this.renderer.setStyle(document.body, 'background-color', '#10121b');
-    this.renderer.setStyle(document.body, 'margin', '0');
-    this.renderer.setStyle(document.body, 'padding', '0');
-    this.renderer.setStyle(document.body, 'color', '#e9ecef');
-    
-    // Check for potentially conflicting selectors
-    const conflictingSelectors = [
-      '.phantasia-header', 
-      '.collection-header', 
-      '.collections-container', 
-      '.collection-card',
-      'body'
+    this.initializeTriangles();
+  }
+  
+  /* 【✓】 Component Cleanup */
+  ngOnDestroy(): void {
+    // Clean up any subscriptions or intervals if needed
+  }
+  
+  /* 【✓】 Initialize Triangle Animation System - Home Page Style */
+  private initializeTriangles(): void {
+    // Predefined positions and timing to match home page density
+    const triangleConfigs = [
+      { left: 4.2, size: 70, height: 60, duration: 8, delay: 0 },
+      { left: 14.7, size: 56, height: 48, duration: 9, delay: 0.5 },
+      { left: 24.1, size: 80, height: 70, duration: 10, delay: 1 },
+      { left: 33.8, size: 64, height: 56, duration: 8.5, delay: 1.5 },
+      { left: 46.3, size: 76, height: 65, duration: 9.5, delay: 2 },
+      { left: 55, size: 60, height: 52, duration: 10.5, delay: 2.5 },
+      { left: 65, size: 84, height: 72, duration: 8, delay: 3 },
+      { left: 75, size: 68, height: 58, duration: 9, delay: 3.5 },
+      { left: 85, size: 72, height: 62, duration: 10, delay: 4 },
+      { left: 95, size: 58, height: 50, duration: 8.5, delay: 4.5 },
+      
+      // Second wave
+      { left: 10, size: 66, height: 57, duration: 9.5, delay: 5 },
+      { left: 20, size: 74, height: 64, duration: 10, delay: 5.5 },
+      { left: 30, size: 62, height: 54, duration: 8, delay: 6 },
+      { left: 40, size: 78, height: 68, duration: 9, delay: 6.5 },
+      { left: 50, size: 70, height: 60, duration: 10.5, delay: 7 },
+      { left: 60, size: 82, height: 71, duration: 8.5, delay: 7.5 },
+      { left: 70, size: 66, height: 57, duration: 9.5, delay: 8 },
+      { left: 80, size: 76, height: 66, duration: 10, delay: 8.5 },
+      { left: 90, size: 64, height: 55, duration: 8, delay: 9 },
+      { left: 12, size: 72, height: 63, duration: 9, delay: 9.5 },
+      
+      // Third wave for more density
+      { left: 8, size: 65, height: 58, duration: 8.5, delay: 1.2 },
+      { left: 18, size: 70, height: 62, duration: 9.2, delay: 2.3 },
+      { left: 28, size: 58, height: 50, duration: 10.2, delay: 3.7 },
+      { left: 38, size: 75, height: 67, duration: 8.8, delay: 4.8 },
+      { left: 48, size: 63, height: 55, duration: 9.8, delay: 6.2 }
     ];
     
-    this.logConflictingSelectors(styleSheets, conflictingSelectors);
-    
-    this.checkViewportSize();
-    window.addEventListener('resize', this.checkViewportSize.bind(this));
-  }
-  
-  /**
-   * After view initialization, log computed styles
-   * 【✓】
-   */
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      console.log('[DEBUG] Component view initialized');
-      
-      // Check header styles
-      if (this.pageHeader?.nativeElement) {
-        const headerStyles = window.getComputedStyle(this.pageHeader.nativeElement);
-        console.log('[DEBUG] Header element background:', headerStyles.background);
-        console.log('[DEBUG] Header element computed styles:', {
-          background: headerStyles.background,
-          color: headerStyles.color,
-          boxShadow: headerStyles.boxShadow
-        });
-      } else {
-        console.log('[DEBUG] Header element not found');
-      }
-      
-      // Check card container styles
-      if (this.cardContainer?.nativeElement) {
-        const containerStyles = window.getComputedStyle(this.cardContainer.nativeElement);
-        console.log('[DEBUG] Card container background:', containerStyles.background);
-      }
-      
-      // Check card styles
-      if (this.collectionCard?.nativeElement) {
-        const cardStyles = window.getComputedStyle(this.collectionCard.nativeElement);
-        console.log('[DEBUG] Collection card background:', cardStyles.background);
-        console.log('[DEBUG] Collection card computed styles:', {
-          background: cardStyles.background,
-          borderRadius: cardStyles.borderRadius,
-          boxShadow: cardStyles.boxShadow
-        });
-      }
-      
-      // Document any style inheritance issues
-      this.checkStyleInheritance();
-      
-      // Add any animations or post-rendering logic here
-      this.initCardAnimations();
-    }, 100);
-  }
-  
-  /**
-   * Log conflicting selectors across stylesheets
-   * 【✓】
-   */
-  private logConflictingSelectors(styleSheets: StyleSheetList, selectors: string[]): void {
-    console.log('[DEBUG] Checking for conflicting selectors...');
-    
-    try {
-      // Track conflicts by selector
-      const conflicts: ConflictMap = {};
-      
-      // Initialize conflict tracking
-      selectors.forEach(selector => {
-        conflicts[selector] = [];
-      });
-      
-      // Check each stylesheet
-      for (let i = 0; i < styleSheets.length; i++) {
-        try {
-          const sheet = styleSheets[i];
-          
-          // Skip external stylesheets
-          if (!sheet.href || sheet.href.includes('localhost')) {
-            const rules = sheet.cssRules || sheet.rules;
-            
-            if (rules) {
-              for (let j = 0; j < rules.length; j++) {
-                const rule = rules[j];
-                
-                // Check if this is a style rule
-                if (rule.type === 1) { // CSSStyleRule
-                  const styleRule = rule as CSSStyleRule;
-                  const selectorText = styleRule.selectorText;
-                  
-                  // Check if this selector conflicts with our components
-                  selectors.forEach(selector => {
-                    if (selectorText && 
-                        (selectorText === selector || 
-                         selectorText.includes(selector + ' ') || 
-                         selectorText.includes(' ' + selector))) {
-                           
-                      conflicts[selector].push({
-                        stylesheet: sheet.href || 'inline',
-                        selector: selectorText,
-                        cssText: styleRule.cssText
-                      });
-                    }
-                  });
-                }
-              }
-            }
-          }
-        } catch (e) {
-          console.log('[DEBUG] Error accessing stylesheet', i, e);
-        }
-      }
-      
-      // Log conflicts found
-      Object.keys(conflicts).forEach(selector => {
-        if (conflicts[selector].length > 0) {
-          console.log(`[DEBUG] Conflicts for selector "${selector}":`, conflicts[selector]);
-        } else {
-          console.log(`[DEBUG] No conflicts found for selector "${selector}"`);
-        }
-      });
-    } catch (e) {
-      console.error('[DEBUG] Error checking for conflicts:', e);
-    }
-  }
-  
-  /**
-   * Check for style inheritance issues
-   * 【✓】
-   */
-  private checkStyleInheritance(): void {
-    console.log('[DEBUG] Checking for style inheritance issues...');
-    
-    // Get body and key element style properties
-    const bodyStyles = window.getComputedStyle(document.body);
-    const bodyColor = bodyStyles.backgroundColor;
-    
-    // Log which parent elements might be influencing the styles
-    const parents = [];
-    let parentElement = document.querySelector('.collections-container')?.parentElement;
-    
-    while (parentElement) {
-      const styles = window.getComputedStyle(parentElement);
-      parents.push({
-        tagName: parentElement.tagName,
-        id: parentElement.id,
-        classes: parentElement.className,
-        backgroundColor: styles.backgroundColor,
-        position: styles.position,
-        zIndex: styles.zIndex
-      });
-      parentElement = parentElement.parentElement;
-    }
-    
-    console.log('[DEBUG] Parent element hierarchy that might affect styles:', parents);
+    this.triangles = triangleConfigs.map(config => ({
+      left: config.left,
+      delay: config.delay,
+      size: config.size,
+      height: config.height,
+      duration: config.duration
+    }));
   }
 
-  /**
-   * Navigate to collection details
-   * 【✓】
-   */
+  /* 【✓】 Navigate to Collection Details */
   exploreCollection(collectionId: string): void {
-    console.log(`[DEBUG] Exploring collection: ${collectionId}`);
+    console.log(`Exploring collection: ${collectionId}`);
     
-    // Navigate to the collection detail page
-    this.router.navigate(['/collections', collectionId]);
+    // Navigate to collection detail page
+    this.router.navigate(['/collection', collectionId]);
   }
 
-  /**
-   * Check if we're in mobile view
-   * 【✓】
-   */
-  isMobileView(): boolean {
-    return this.isMobile;
+  /* 【✓】 Track by Function for Performance */
+  trackByCollectionId(index: number, collection: Collection): string {
+    return collection.id;
   }
 
-  /**
-   * Get current route for debugging
-   * 【✓】
-   */
-  getCurrentRoute(): string {
-    return this.router.url;
-  }
-
-  /**
-   * Check viewport size and update isMobile flag
-   * 【✓】
-   */
-  private checkViewportSize(): void {
-    this.isMobile = window.innerWidth < 768;
-  }
-
-  /**
-   * Initialize card animations if needed
-   * 【✓】
-   */
-  private initCardAnimations(): void {
-    // Any card initialization animations would go here
-    // Example: fade in cards sequentially
-    const cards = document.querySelectorAll('.collection-card');
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.classList.add('visible');
-      }, 100 * index);
-    });
+  /* 【✓】 Track by Function for Triangles */
+  trackByTriangleIndex(index: number, triangle: Triangle): number {
+    return index;
   }
 } 

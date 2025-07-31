@@ -1,145 +1,92 @@
-<!-- Collections Page Root with style override -->
-<div appStyleOverride style="margin-top: 0 !important; padding-top: 0 !important;">
+<!-- Collections Page - Fresh Implementation -->
+<div class="collections-page">
+  
   <!-- Site Header -->
   <app-site-header></app-site-header>
   
-  <!-- Add style to override app-main-layout margin and all nested elements -->
-  <style>
-    app-main-layout {
-      margin-top: 0 !important;
-    }
-    
-    body > app-root > app-main-layout > div > main > app-new-collections {
-      margin: 0 !important;
-      padding-top: 0 !important;
-    }
-    
-    div[appStyleOverride] {
-      margin-top: 0 !important;
-    }
-    
-    .collections-container {
-      margin-top: 0 !important;
-    }
-
-    /* Target main content area */
-    app-main-layout > div > main {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-    }
-    
-    /* Target collection header */
-    .collection-header {
-      margin-top: 0 !important;
-    }
-    
-    /* Ensure root component has no margin/padding */
-    :host {
-      margin: 0 !important;
-      padding: 0 !important;
-      display: block;
-    }
-    
-    /* Override any element with violet/purple background */
-    [style*="background-color: #"] {
-      margin-top: 0 !important;
-    }
-  </style>
-
-  <!-- Debug Info Container - Hidden in production -->
-  <div class="debug-info" #debugContainer style="display: none;">
-    <p>Current route: {{ getCurrentRoute() }}</p>
-    <p>Is mobile view: {{ isMobileView() }}</p>
+  <!-- Exact Same Triangle Structure as Home Page -->
+  <div class="triangle-container">
+    <div class="triangle triangle-1"></div>
+    <div class="triangle triangle-2"></div>
+    <div class="triangle triangle-3"></div>
+    <div class="triangle triangle-4"></div>
+    <div class="triangle triangle-5"></div>
+    <div class="triangle triangle-6"></div>
+    <div class="triangle triangle-7"></div>
+    <div class="triangle triangle-8"></div>
+    <div class="triangle triangle-9"></div>
+    <div class="triangle triangle-10"></div>
+    <div class="triangle triangle-11"></div>
+    <div class="triangle triangle-12"></div>
+    <div class="triangle triangle-13"></div>
+    <div class="triangle triangle-14"></div>
+    <div class="triangle triangle-15"></div>
+    <div class="triangle triangle-16"></div>
+    <div class="triangle triangle-17"></div>
+    <div class="triangle triangle-18"></div>
+    <div class="triangle triangle-19"></div>
+    <div class="triangle triangle-20"></div>
+    <div class="triangle triangle-21"></div>
+    <div class="triangle triangle-22"></div>
+    <div class="triangle triangle-23"></div>
+    <div class="triangle triangle-24"></div>
+    <div class="triangle triangle-25"></div>
   </div>
 
-  <!-- Decorative Elements -->
-  <div class="decorative-element square top-right"></div>
-  <div class="decorative-element rhombus bottom-left"></div>
-
-  <!-- Collections Container -->
-  <div class="collections-container" #cardContainer>
-    <!-- Collection Header -->
-    <div class="collection-header" #pageHeader>
+  <!-- Main Content -->
+  <main class="collections-main">
+    
+    <!-- Page Header -->
+    <header class="page-header">
       <h1>Music Collections</h1>
-      <p class="subtitle">Explore our curated collections of music, each with its own unique theme and atmosphere.</p>
-    </div>
+      <p>Explore our curated collections of music, each with its own unique theme and atmosphere.</p>
+    </header>
 
-    <!-- Collections List -->
-    <div class="collection-list">
-      <!-- Project Phantasia Collection -->
-      <div class="collection-card" #collectionCard>
-        <div class="collection-image">
-          <img src="assets/graphic/phantasia_1_cover_final.png" alt="Project Phantasia Cover">
+    <!-- Collections Grid -->
+    <section class="collections-grid">
+      
+      <!-- Collection Card -->
+      <article class="collection-card" *ngFor="let collection of collections; trackBy: trackByCollectionId">
+        
+        <!-- Album Cover -->
+        <div class="album-cover">
+          <img [src]="collection.image" [alt]="collection.title + ' Cover'" loading="lazy">
         </div>
-        <div class="collection-content">
-          <h2>Project Phantasia</h2>
+        
+        <!-- Collection Info -->
+        <div class="collection-info">
+          
+          <!-- Title -->
+          <h2>{{ collection.title }}</h2>
+          
+          <!-- Metadata -->
           <div class="metadata">
-            <span class="tracks">12 Tracks</span>
-            <span class="year">2023</span>
+            <span class="tracks">{{ collection.tracks }} Tracks</span>
+            <span class="year">{{ collection.year }}</span>
           </div>
-          <p class="description">
-            Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies that transcend conventional electronic music genres.
-          </p>
+          
+          <!-- Description -->
+          <p class="description">{{ collection.description }}</p>
+          
+          <!-- Tags -->
           <div class="tags">
-            <span class="tag">Ambient</span>
-            <span class="tag">Electronic</span>
-            <span class="tag">Experimental</span>
+            <span class="tag" *ngFor="let tag of collection.tags">{{ tag }}</span>
           </div>
-          <button class="explore-button" (click)="exploreCollection('phantasia')">
-            Explore <i class="fa fa-arrow-right"></i>
+          
+          <!-- Explore Button -->
+          <button class="explore-btn" (click)="exploreCollection(collection.id)">
+            <span>Explore</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
+          
         </div>
-      </div>
-
-      <!-- Ethereal Soundscapes Collection -->
-      <div class="collection-card">
-        <div class="collection-image">
-          <img src="assets/collections/ethereal-soundscapes.jpg" alt="Ethereal Soundscapes Cover">
-        </div>
-        <div class="collection-content">
-          <h2>Ethereal Soundscapes</h2>
-          <div class="metadata">
-            <span class="tracks">8 Tracks</span>
-            <span class="year">2022</span>
-          </div>
-          <p class="description">
-            Immerse yourself in ambient textures and atmospheric compositions designed to transport listeners to otherworldly realms of sound.
-          </p>
-          <div class="tags">
-            <span class="tag">Ambient</span>
-            <span class="tag">Atmospheric</span>
-            <span class="tag">Meditative</span>
-          </div>
-          <button class="explore-button" (click)="exploreCollection('ethereal')">
-            Explore <i class="fa fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Digital Artifacts Collection -->
-      <div class="collection-card">
-        <div class="collection-image">
-          <img src="assets/collections/digital-artifacts.jpg" alt="Digital Artifacts Cover">
-        </div>
-        <div class="collection-content">
-          <h2>Digital Artifacts</h2>
-          <div class="metadata">
-            <span class="tracks">10 Tracks</span>
-            <span class="year">2023</span>
-          </div>
-          <p class="description">
-            A bold exploration of glitchy textures, digital processing, and experimental sound design that pushes the boundaries of modern electronic music.
-          </p>
-          <div class="tags">
-            <span class="tag">Glitch</span>
-            <span class="tag">IDM</span>
-            <span class="tag">Experimental</span>
-          </div>
-          <button class="explore-button" (click)="exploreCollection('artifacts')">
-            Explore <i class="fa fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+        
+      </article>
+      
+    </section>
+    
+  </main>
+  
 </div> 

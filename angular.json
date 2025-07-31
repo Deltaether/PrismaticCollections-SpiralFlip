@@ -35,7 +35,10 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "howler"
+            ]
           },
           "configurations": {
             "production": {
@@ -47,8 +50,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb",
-                  "maximumError": "30kb"
+                  "maximumWarning": "30kb",
+                  "maximumError": "40kb"
                 },
                 {
                   "type": "anyScript",
@@ -58,8 +61,8 @@
                 {
                   "type": "bundle",
                   "name": "css-inline-fonts:*",
-                  "maximumWarning": "16kb",
-                  "maximumError": "24kb"
+                  "maximumWarning": "24kb",
+                  "maximumError": "32kb"
                 }
               ],
               "outputHashing": "all"

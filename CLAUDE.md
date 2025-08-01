@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Starting Development
 - `npm start` or `ng serve` - Start development server on port 4300
 - `ng serve --port 4300` - Explicitly set port (configured in angular.json)
+- **PACKAGE MANAGER NOTE**: instead of using npm, use pnpm
 
 ### Building
 - `npm run build` or `ng build` - Build for production
@@ -23,9 +24,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Architecture
 
 ### Core Structure
-This is a Prismatic Collections website featuring an Angular 19 application with a complex 3D interactive experience called "Phantasia". The project uses:
+This is a Prismatic Collections website featuring an Angular 20 application with a complex 3D interactive experience called "Phantasia". The project uses:
 
-- **Angular 19** with standalone components and explicit imports
+- **Angular 20** with standalone components and explicit imports
 - **Three.js** for 3D graphics and WebGL rendering
 - **GSAP** for animations
 - **Howler.js** for audio management
@@ -38,16 +39,16 @@ This is a Prismatic Collections website featuring an Angular 19 application with
 - **Routes**: Consolidated routing in `app.routes.ts` with lazy loading
 - **Components**: Global shared components in `components/`
 - **Pages**: Main page components in `pages/`
-- **Services**: Application-wide services for device detection, etc.
+- **Services**: Application-wide services for device detection
 - **Shared**: Reusable components and utilities
 
 #### 2. Phantasia Project (`src/app/pages/collections/phantasia/`)
 The main feature - a complex 3D interactive experience with:
 - **Layout Component**: `layout/layout.component.ts` - Provides consistent layout for all Phantasia pages
 - **Pages**: Individual sections (disc-one, disc-two, information, pv, phantasia)
-- **Mobile View**: Separate mobile interface with named outlets
-- **Services**: Audio management, navigation services
-- **3D Tools**: CD cases component with complex Three.js setup
+- **Mobile View**: Mobile interface with named outlets at `mobile/`
+- **Services**: Audio management and navigation services
+- **3D Integration**: Uses tools system for 3D functionality
 
 #### 3. Tools System (`src/app/tools/`)
 Sophisticated 3D visualization tools:
@@ -113,7 +114,20 @@ The CD Cases component demonstrates complex Three.js integration:
 2. Follow the established patterns for Howler.js integration
 3. Consider mobile compatibility for audio features
 
+## Important Notes
+
+### Recent Code Cleanup (2025-07-31)
+- **Obsolete code moved to OBSOLETE_CODE folder** - Including duplicate mobile-view components and unused phantasia root files
+- **Active routing uses only:** `src/app/app.routes.ts` - All other route configurations are obsolete
+- **Mobile interface location:** `src/app/pages/collections/phantasia/mobile/` - Old mobile-view folder was duplicate
+
+### Project Structure Status
+- **Clean active codebase** - All obsolete duplicates removed
+- **Single source of truth** - No duplicate components or services
+- **Simplified imports** - Import paths point to active components only
+
 ## Architecture Files
+- `CODEBASE_ANALYSIS.md` - Recent analysis of active vs obsolete code
 - `src/ARCHITECTURE.md` - Detailed architecture documentation
 - `src/routing-summary.md` - Comprehensive routing information
 - `src/app/pages/collections/phantasia/LAYOUT.md` - Phantasia layout architecture

@@ -1,0 +1,17 @@
+<div class="page-one-container">
+  <!-- Top section with CD Jacket -->
+  <div class="top-section">
+    <app-cd-jacket [isSecret]="false"></app-cd-jacket>
+  </div>
+  
+  <!-- Bottom section with right-side-menu -->
+  <div class="bottom-section">
+    <div class="menu-container">
+      <app-right-side-menu 
+        [cdCases]="cdCases"
+        [activeCaseIndex]="activeCaseIndex"
+        (trackSelected)="onTrackSelected($event)">
+      </app-right-side-menu>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RightSideMenuComponent } from '../../../../tools/right-side-menu/right-side-menu.component';
+import { RightSideMenuComponent } from '../../../tools/right-side-menu/right-side-menu.component';
 import { CdJacketComponent } from '../../components/cd-jacket/cd-jacket.component';
 import { AudioService } from '../../../services/audio.service';
 

@@ -1,0 +1,574 @@
+.mobile-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  color: #f0f0f0;
+  font-family: 'Orbitron', sans-serif;
+  position: relative;
+  background: linear-gradient(135deg, #7a3d1d, #b05c2d, #e87d38); /* More orange gradient background */
+
+  /* WebKit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(122, 61, 29, 0.3);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(252, 170, 85, 0.4);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(252, 170, 85, 0.3);
+    box-shadow: 
+      inset 0 0 15px rgba(252, 170, 85, 0.7),
+      0 0 5px rgba(252, 170, 85, 0.4);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(252, 170, 85, 0.6);
+    box-shadow: 
+      inset 0 0 20px rgba(252, 170, 85, 0.9),
+      0 0 7px rgba(252, 170, 85, 0.5);
+  }
+  
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(252, 170, 85, 0.5) rgba(122, 61, 29, 0.3);
+}
+
+/* Canvas Background */
+.background-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.75; /* Slightly increased opacity for better visibility */
+}
+
+/* Header Styles */
+.mobile-header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: rgba(122, 61, 29, 0.6);
+  border-bottom: 1px solid rgba(252, 170, 85, 0.4);
+  box-shadow: 0 2px 15px rgba(232, 125, 56, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.mobile-title {
+  font-size: 2.2rem;
+  margin: 0;
+  background: linear-gradient(to right, #f5d884, #bfa26f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(245, 216, 132, 0.5);
+  letter-spacing: 3px;
+}
+
+.mobile-subtitle {
+  font-size: 1rem;
+  margin: 0.5rem 0 0;
+  color: #a0a0a0;
+}
+
+/* Main Content Area */
+.mobile-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 60px; /* Match the navbar height */
+  min-height: 100vh;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Multi-level UI Decoration */
+.edge-highlight {
+  position: absolute;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+  border: 1px solid rgba(252, 170, 85, 0.35);
+  box-shadow: 0 0 15px rgba(252, 170, 85, 0.1);
+  transition: all 0.8s ease;
+}
+
+/* CD Jacket Frame Highlight */
+.jacket-frame {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 340px;
+  border: 2px solid rgba(255, 210, 117, 0.4);
+  background: linear-gradient(135deg, 
+    rgba(232, 125, 56, 0.05) 0%, 
+    rgba(232, 125, 56, 0.02) 100%
+  );
+  border-radius: 16px;
+}
+
+/* Menu Frame Highlight */
+.menu-frame {
+  top: 370px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 540px;
+  height: 420px;
+  border: 1px solid rgba(252, 170, 85, 0.3);
+  background: linear-gradient(135deg, 
+    rgba(232, 125, 56, 0.03) 0%, 
+    rgba(232, 125, 56, 0.01) 100%
+  );
+  border-radius: 12px;
+}
+
+/* Level Accent Corners - Outer */
+.level-accent {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.level-corner-tl {
+  top: 10px;
+  left: 10px;
+  border-top: 2px solid rgba(255, 210, 117, 0.8);
+  border-left: 2px solid rgba(255, 210, 117, 0.8);
+  border-radius: 8px 0 0 0;
+}
+
+.level-corner-tr {
+  top: 10px;
+  right: 10px;
+  border-top: 2px solid rgba(255, 210, 117, 0.8);
+  border-right: 2px solid rgba(255, 210, 117, 0.8);
+  border-radius: 0 8px 0 0;
+}
+
+.level-corner-bl {
+  bottom: 10px;
+  left: 10px;
+  border-bottom: 2px solid rgba(255, 210, 117, 0.8);
+  border-left: 2px solid rgba(255, 210, 117, 0.8);
+  border-radius: 0 0 0 8px;
+}
+
+.level-corner-br {
+  bottom: 10px;
+  right: 10px;
+  border-bottom: 2px solid rgba(255, 210, 117, 0.8);
+  border-right: 2px solid rgba(255, 210, 117, 0.8);
+  border-radius: 0 0 8px 0;
+}
+
+/* Multi-layered edge lines */
+.edge-line {
+  position: absolute;
+  z-index: 1;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(252, 170, 85, 0.5) 20%, 
+    rgba(252, 170, 85, 0.7) 50%,
+    rgba(252, 170, 85, 0.5) 80%,
+    transparent
+  );
+}
+
+.top-edge {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.bottom-edge {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.left-edge {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, 
+    transparent, 
+    rgba(252, 170, 85, 0.5) 20%, 
+    rgba(252, 170, 85, 0.7) 50%,
+    rgba(252, 170, 85, 0.5) 80%,
+    transparent
+  );
+}
+
+.right-edge {
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, 
+    transparent, 
+    rgba(252, 170, 85, 0.5) 20%, 
+    rgba(252, 170, 85, 0.7) 50%,
+    rgba(252, 170, 85, 0.5) 80%,
+    transparent
+  );
+}
+
+/* Inner glow for components */
+.inner-glow {
+  position: absolute;
+  border-radius: 12px;
+  background: radial-gradient(
+    circle at center,
+    rgba(252, 170, 85, 0.15) 0%,
+    transparent 70%
+  );
+  z-index: 0;
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* CD Jacket Display - Enhanced with multi-level effects */
+.cd-jacket-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  margin-top: 30px;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  z-index: 3;
+}
+
+.cd-jacket-square {
+  width: 240px;
+  height: 240px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(252, 170, 85, 0.5);
+  background: rgba(122, 61, 29, 0.6);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(252, 170, 85, 0.3);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(252, 170, 85, 0.3), transparent);
+    pointer-events: none;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border-bottom-right-radius: 10px;
+    background: radial-gradient(circle at bottom right, rgba(255, 210, 117, 0.3), transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.cd-jacket-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cd-jacket-info {
+  margin-top: 15px;
+  text-align: center;
+  
+  .album-title {
+    font-size: 1.6rem;
+    margin: 0;
+    background: linear-gradient(to right, #ffcc66, #e87d38);
+    background-size: 200% 100%;
+    background-image: linear-gradient(
+      to right,
+      #ffcc66 0%,
+      #e87d38 25%,
+      #ffcc66 50%,
+      #e87d38 75%,
+      #ffcc66 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(252, 170, 85, 0.6);
+    letter-spacing: 2px;
+    animation: shimmer 3s infinite linear;
+  }
+  
+  .album-subtitle {
+    font-size: 0.9rem;
+    margin: 5px 0 0;
+    color: rgba(255, 210, 117, 0.9);
+    letter-spacing: 1px;
+  }
+}
+
+/* Centered Menu Container with multi-level effect */
+.centered-menu-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  margin-top: 50px; /* Increased space from the CD jacket */
+  padding: 0 1rem;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Override right-side-menu styles for mobile view */
+:host ::ng-deep app-right-side-menu {
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  
+  .futuristic-menu {
+    width: 100%;
+    height: auto;
+    max-height: 70vh; /* Limit height on mobile */
+    min-height: 400px; /* Ensure minimum height */
+    margin: 0 auto;
+    background: rgba(122, 61, 29, 0.75);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(252, 170, 85, 0.4);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      left: -30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(252, 170, 85, 0.25), transparent 70%);
+      z-index: 0;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 210, 117, 0.2), transparent 70%);
+      z-index: 0;
+    }
+  }
+  
+  .tracklist-container {
+    max-height: 300px; /* Fixed height for tracklist */
+    overflow-y: auto;
+  }
+  
+  /* Adjust menu title to be more prominent */
+  .menu-header {
+    padding: 1.2rem 1rem 1rem;
+    
+    .menu-title {
+      font-size: 1.8rem;
+    }
+    
+    .menu-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Footer Styles */
+.mobile-footer {
+  padding: 1rem;
+  background: rgba(122, 61, 29, 0.6);
+  border-top: 1px solid rgba(252, 170, 85, 0.3);
+  text-align: center;
+  font-size: 0.8rem;
+  color: #ffcc66;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-info {
+  p {
+    margin: 0.3rem 0;
+  }
+}
+
+/* Menu Background */
+.menu-background {
+  width: 100%;
+  background: rgba(122, 61, 29, 0.8);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(252, 170, 85, 0.3);
+}
+
+/* Cubic Container Frame */
+.cubic-frame {
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  height: 70vh;
+  border: 1px solid rgba(252, 170, 85, 0.35);
+  background: linear-gradient(135deg, 
+    rgba(232, 125, 56, 0.02) 0%, 
+    rgba(232, 125, 56, 0.01) 100%
+  );
+  border-radius: 12px;
+  z-index: 1;
+}
+
+/* Cubic Container Wrapper */
+.cubic-container-wrapper {
+  position: relative;
+  width: 100%;
+  height: 80vh; /* Control the height better */
+  margin-top: 60px; /* More space between menu and cubic container */
+  overflow: hidden;
+}
+
+/* Page Indicators */
+.page-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 10;
+  
+  .indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(226, 156, 80, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: rgba(226, 156, 80, 0.8);
+      transform: scale(1.2);
+    }
+  }
+}
+
+/* Decorative Lines */
+.mobile-content::before {
+  content: '';
+  position: absolute;
+  top: 100px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(226, 156, 80, 0.1) 20%, 
+    rgba(226, 156, 80, 0.2) 50%,
+    rgba(226, 156, 80, 0.1) 80%,
+    transparent
+  );
+  z-index: 2;
+}
+
+.mobile-content::after {
+  content: '';
+  position: absolute;
+  top: 350px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(184, 166, 130, 0.1) 20%, 
+    rgba(184, 166, 130, 0.2) 50%,
+    rgba(184, 166, 130, 0.1) 80%,
+    transparent
+  );
+  z-index: 2;
+}
+
+/* Footer highlight frame */
+.footer-frame {
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 20px);
+  height: 45px;
+  border: 1px solid rgba(252, 170, 85, 0.25);
+  border-radius: 8px;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+/* Mobile optimizations for decorative elements */
+@media (max-width: 480px) {
+  .decorative-rectangle {
+    &.top-right, &.bottom-left {
+      display: none; /* Hide some decorative elements on very small screens */
+    }
+  }
+  
+  .cd-jacket-square {
+    width: 200px; /* Smaller album cover on very small screens */
+    height: 200px;
+  }
+}
+
+/* Mobile Navbar */
+app-mobile-navbar {
+  background: rgba(122, 61, 29, 0.7);
+  border-bottom: 1px solid rgba(252, 170, 85, 0.4);
+}
+
+/* Shimmering album title animation */
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+} 

@@ -1,0 +1,30 @@
+.page-one-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.top-section {
+  flex: 0 0 auto;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-bottom: 40px; /* Space for indicators */
+}
+
+.menu-container {
+  width: 100%;
+  max-width: 450px;
+}

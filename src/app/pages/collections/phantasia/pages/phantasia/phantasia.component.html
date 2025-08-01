@@ -1,4 +1,4 @@
-<div class="phantasia-experience">
+<div class="phantasia-experience" [class.loading]="isLoading">
   <!-- Site Header - only shown when not inside the phantasia layout -->
   <app-site-header *ngIf="!isInsidePhantasiaLayout"></app-site-header>
 
@@ -18,8 +18,8 @@
   ></app-site-version-selector>
   
   <!-- Desktop Experience with CD Cases -->
-  <ng-container *ngIf="!isLoading && !showDisclaimer && !showVersionSelector && !isMobileView">
-    <!-- CD Cases -->
+  <ng-container *ngIf="!showDisclaimer && !showVersionSelector && !isMobileView">
+    <!-- CD Cases - Always rendered but visually hidden during loading -->
     <div class="cd-cases-container">
       <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
     </div>

@@ -1,0 +1,152 @@
+.page-two-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(10, 10, 32, 0.95));
+}
+
+.top-section {
+  flex: 0 0 auto;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-bottom: 40px; /* Space for indicators */
+}
+
+.secret-menu-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+  background: rgba(10, 10, 32, 0.8);
+  border-radius: 10px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 0 10px rgba(88, 180, 255, 0.2);
+  border: 1px solid rgba(88, 180, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.secret-title {
+  position: relative;
+  margin-bottom: 20px;
+  text-align: center;
+  
+  h2 {
+    font-size: 1.5rem;
+    color: rgba(245, 216, 132, 0.8);
+    letter-spacing: 3px;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 5px rgba(245, 216, 132, 0.5);
+    font-weight: normal;
+  }
+}
+
+.question-mark-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-size: 100px;
+  color: rgba(245, 216, 132, 0.1);
+  z-index: -1;
+  font-family: 'Impact', sans-serif;
+}
+
+.tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.track-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 5px;
+  border: 1px solid rgba(88, 180, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  
+  &::after {
+    content: "?";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-size: 30px;
+    color: rgba(245, 216, 132, 0.2);
+    z-index: -1;
+    font-family: 'Impact', sans-serif;
+  }
+}
+
+.track-number {
+  flex: 0 0 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10, 10, 32, 0.6);
+  border-radius: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  margin-right: 10px;
+  color: rgba(245, 216, 132, 0.9);
+}
+
+.track-data {
+  flex: 1;
+}
+
+.track-title {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: rgba(88, 180, 255, 0.9);
+}
+
+.track-artist {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: rgba(245, 216, 132, 0.7);
+  margin-top: 2px;
+}
+
+.secret-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(10, 10, 32, 0.6);
+  border-radius: 8px;
+  border-top: 1px solid rgba(88, 180, 255, 0.3);
+}
+
+.lock-icon {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+.message {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: rgba(245, 216, 132, 0.9);
+  letter-spacing: 1px;
+}

@@ -1,0 +1,360 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  transform: none;
+  filter: none;
+  perspective: none;
+  isolation: isolate;
+  z-index: 10;
+}
+
+.cd-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+// Accessibility helper
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: none;
+  z-index: 1;
+  object-fit: cover;
+  background: transparent;
+  transition: opacity 0.5s ease;
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* Container for the label renderer */
+.label-renderer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Updated container class name to match HTML */
+.cd-cases-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000;
+  will-change: transform;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.label-renderer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+}
+
+.case-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+  max-width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+  
+  // Better scrolling on touch devices
+  -webkit-overflow-scrolling: touch;
+  
+  .case-indicator {
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgba(60, 60, 60, 0.7);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    
+    &:hover, &:focus {
+      background-color: rgba(80, 80, 80, 0.8);
+      transform: translateX(3px);
+    }
+    
+    &.active {
+      background-color: rgba(100, 100, 255, 0.6);
+    }
+    
+    &.open {
+      background-color: rgba(100, 255, 100, 0.6);
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.cd-case {
+  position: absolute;
+  width: 280px;
+  height: 248px;
+  pointer-events: all;
+  cursor: grab;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+
+  &:active {
+    cursor: grabbing;
+    transition: transform 0.1s ease-out;
+    
+    .cd-cover {
+      box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.4);
+    }
+
+    &::after {
+      opacity: 0.2;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    left: -50%;
+    top: -50%;
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.2) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    transform: translateZ(-20px);
+  }
+
+  .cd-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('/assets/graphic/jewel-case-_640.png');
+    background-size: 100% 100%;
+    background-position: center;
+    border-radius: 4px;
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    transform: translateZ(1px) rotateY(0deg);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 100%
+      );
+      transform: translateZ(1px);
+      pointer-events: none;
+    }
+
+    img {
+      width: 92%;
+      height: 92%;
+      margin: 4%;
+      object-fit: cover;
+      pointer-events: none;
+      backface-visibility: hidden;
+      border-radius: 2px;
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+      );
+      pointer-events: none;
+      backface-visibility: hidden;
+    }
+  }
+
+  .cd-info {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    backface-visibility: hidden;
+
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 8px 0 0;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+  }
+
+  &:hover {
+    .cd-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cd-cover {
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  // Stack effect
+  &[style*="stackId"] {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    .cd-cover {
+      box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.3);
+    }
+
+    &:hover {
+      transform: translateZ(5px) !important;
+    }
+  }
+
+  // Flip effect
+  &[style*="rotateY(180deg)"] {
+    .cd-cover {
+      transform: translateZ(1px) rotateY(180deg);
+    }
+
+    .cd-back {
+      transform: translateZ(-10px) rotateY(0deg);
+    }
+
+    .cd-info {
+      transform: rotateY(180deg) translateY(-10px);
+    }
+  }
+}
+
+// 【✓】 Loading overlay with hardware-accelerated animations
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: #fff;
+  
+  // Use transform for hardware acceleration
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  animation: spin 1s infinite linear;
+  margin-bottom: 20px;
+  
+  // Hardware acceleration
+  will-change: transform;
+}
+
+.loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+} 

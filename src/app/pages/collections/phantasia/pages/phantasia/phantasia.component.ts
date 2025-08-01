@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CDCasesComponent } from '../../../../../tools/cd-cases/cd-cases.component';
+import { CDCasesComponent } from '../../tools/cd-cases/cd-cases.component';
 import { SiteVersionSelectorComponent } from '../../../../../components/site-version-selector/site-version-selector.component';
 import { DisclaimerComponent } from '../../../../../components/disclaimer/disclaimer.component';
-import { SceneLoaderComponent } from '../../../../../tools/cd-cases/scene-loader/scene-loader.component';
+import { SceneLoaderComponent } from '../../tools/cd-cases/scene-loader/scene-loader.component';
 import { MobileViewComponent } from '../../mobile/mobile-view.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 
@@ -75,16 +75,16 @@ export class PhantasiaComponent implements OnInit {
       }
     }
     
-    // Add a fallback timeout to ensure loading doesn't get stuck forever
+    // Add a reasonable fallback timeout to prevent infinite loading
     setTimeout(() => {
       if (this.isLoading) {
         if (this.isDebugMode) {
-          console.log('[PhantasiaComponent] Fallback timeout - forcing loading to false');
+          console.warn('[PhantasiaComponent] Fallback timeout - forcing loading to false after 10 seconds');
         }
         this.isLoading = false;
         this.cdr.markForCheck();
       }
-    }, 5000); // 5 second fallback timeout
+    }, 10000); // 10 second fallback timeout
   }
 
   /**
@@ -114,14 +114,14 @@ export class PhantasiaComponent implements OnInit {
       
       this.isMobileView = savedPreference === 'mobile';
       
-      // Set a timeout to ensure loading doesn't get stuck
-      setTimeout(() => {
-        this.isLoading = false;
-        if (this.isDebugMode) {
-          console.log(`[PhantasiaComponent] Loading timeout - setting isLoading to false`);
-        }
-        this.cdr.markForCheck();
-      }, 1000); // 1 second timeout
+      // For mobile view, we can hide loading after a short delay since it doesn't load 3D assets
+      if (this.isMobileView) {
+        setTimeout(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }, 800); // Short delay for mobile
+      }
+      // For desktop, wait for CD Cases to load
       
     } else {
       // Show version selector after disclaimer
@@ -168,14 +168,14 @@ export class PhantasiaComponent implements OnInit {
     this.showVersionSelector = false;
     this.isMobileView = version === 'mobile';
     
-    // Set a timeout to ensure loading doesn't get stuck after version selection
-    setTimeout(() => {
-      this.isLoading = false;
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Version selected - setting isLoading to false`);
-      }
-      this.cdr.markForCheck();
-    }, 500); // 500ms timeout
+    // For mobile view, we can hide loading after a short delay since it doesn't load 3D assets
+    if (this.isMobileView) {
+      setTimeout(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }, 800); // Short delay for mobile
+    }
+    // For desktop, wait for CD Cases to load
     
     this.cdr.markForCheck();
   }
@@ -186,15 +186,18 @@ export class PhantasiaComponent implements OnInit {
    */
   onCDCasesLoadingChange(isLoading: boolean): void {
     if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] CD Cases loading state: ${isLoading}`);
+      console.log(`[PhantasiaComponent] CD Cases loading state received: ${isLoading}, current isLoading: ${this.isLoading}, isMobileView: ${this.isMobileView}`);
     }
     
     // Update loading state only if CD Cases are done loading
-    if (!isLoading) {
+    if (!isLoading && !this.isMobileView) {
+      // Only update for desktop view - mobile doesn't use CD Cases
       this.isLoading = false;
       if (this.isDebugMode) {
         console.log(`[PhantasiaComponent] CD Cases finished loading - setting isLoading to false`);
       }
+    } else if (this.isDebugMode) {
+      console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}, isMobileView: ${this.isMobileView}`);
     }
     this.cdr.markForCheck();
   }

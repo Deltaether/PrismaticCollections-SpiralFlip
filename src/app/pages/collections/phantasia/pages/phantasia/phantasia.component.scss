@@ -50,6 +50,15 @@ p {
   background-color: #000;
   color: #fff;
   font-family: 'Exo 2', sans-serif;
+  
+  // Hide the 3D experience content while loading
+  &.loading {
+    .cd-cases-container,
+    .intro-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 }
 
 // CD Cases container
@@ -60,6 +69,8 @@ p {
   height: 100vh;
   overflow: hidden;
   z-index: 2;
+  opacity: 1;
+  transition: opacity 0.8s ease-in-out;
 }
 
 // Introduction content styling
@@ -71,6 +82,7 @@ p {
   margin: 0 auto;
   padding: 20px;
   opacity: 0.9;
+  transition: opacity 0.8s ease-in-out;
   
   // Positioned in a way that doesn't interfere with CD cases
   margin-top: 30vh;

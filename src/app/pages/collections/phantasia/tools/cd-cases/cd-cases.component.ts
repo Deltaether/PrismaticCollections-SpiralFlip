@@ -162,6 +162,11 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private wheelDebounceTimer: any = null;
   private readonly WHEEL_DEBOUNCE_DELAY = 150; // ms
 
+  // TEMPORARY: CSS placeholder properties
+  public questScrollsEnabled = true; // Flag to enable CSS quest scroll mode
+  public currentScrollIndex = 0; // Track active scroll
+  private mockCDCases: CDCase[] = []; // Mock data for CSS placeholders
+
   constructor(
     private cdCasesService: CDCasesService,
     private sceneService: SceneService,
@@ -237,13 +242,22 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Sets up the 3D environment after the view is initialized
    * Creates renderers, controls, and loads 3D models
    * Configures menu system as DOM overlay
-   * 【✓】
+   * 【✓】 TEMPORARILY DISABLED FOR CSS QUEST SCROLL PLACEHOLDERS
    */
   ngAfterViewInit(): void {
     if (this.isDebugMode) {
-      console.log('[CDCases] AfterViewInit - Setting up renderers and controls');
+      console.log('[CDCases] AfterViewInit - Using CSS quest scroll placeholders (3D disabled)');
     }
     
+    // TEMPORARY: Skip 3D initialization and use CSS placeholders
+    this.initializeCSSPlaceholders();
+    
+    // Immediately set loading to false since CSS loads instantly
+    setTimeout(() => {
+      this.setLoadingState(false);
+    }, 100); // Small delay to show loading briefly
+    
+    /* TEMPORARILY COMMENTED OUT - 3D INITIALIZATION
     // Setup renderers and controls
     this.setupRenderer();
     this.setupControls();
@@ -276,6 +290,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Set the expand function for use after scrolling
     this.caseAnimationService.setExpandFunction(this.expandActiveCase.bind(this));
+    */
   }
 
   /**
@@ -893,7 +908,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Handles mouse wheel events for case navigation
    * Implements scrolling behavior to cycle through cases
    * Uses debouncing for better performance
-   * 【✓】
+   * 【✓】 MODIFIED FOR CSS QUEST SCROLL PLACEHOLDERS
    */
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent): void {
@@ -910,6 +925,15 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.wheelDebounceTimer = setTimeout(() => {
       // Run in Angular zone to ensure change detection
       this.ngZone.run(() => {
+        
+        // TEMPORARY: Use CSS quest scroll navigation instead of 3D
+        if (this.questScrollsEnabled) {
+          const direction = event.deltaY > 0 ? 'down' : 'up';
+          this.navigateQuestScrolls(direction);
+          return;
+        }
+
+        /* TEMPORARILY COMMENTED OUT - 3D WHEEL NAVIGATION
         this.eventHandlerService.onWheel(
           event,
           this.cdCases,
@@ -925,6 +949,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
         
         // Mark for check after navigation
         this.cdr.markForCheck();
+        */
       });
     }, this.WHEEL_DEBOUNCE_DELAY);
   }
@@ -1272,5 +1297,141 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   trackByCaseId(index: number, cdCase: CDCase): number {
     return cdCase.id;
+  }
+
+  /**
+   * TEMPORARY: Initialize CSS quest scroll placeholders
+   * Creates mock CD case data for CSS-based display
+   * Maintains same functionality without 3D loading
+   * 【✓】
+   */
+  private initializeCSSPlaceholders(): void {
+    if (this.isDebugMode) {
+      console.log('[CDCases] Initializing CSS quest scroll placeholders');
+    }
+
+    // Create mock CD case data matching the actual CDCase interface
+    this.mockCDCases = [
+      {
+        id: 1,
+        title: 'Echoes of Tomorrow',
+        artist: 'Prismatic Collective',
+        imageUrl: '', // Not needed for CSS mode
+        model: null as any, // Not needed for CSS mode
+        isFlipped: false,
+        position: new THREE.Vector3(-2, 0, 0),
+        rotation: new THREE.Euler(0, 0, 0),
+        isOpen: false,
+        carouselIndex: 0,
+        targetPosition: new THREE.Vector3(-2, 0, 0),
+        isActive: true,
+        isDeactivating: false,
+        currentLerpAlpha: 0,
+        initialPosition: new THREE.Vector3(-2, 0, 0)
+      },
+      {
+        id: 2,
+        title: 'Digital Dreams',
+        artist: 'Synth Architects',
+        imageUrl: '', // Not needed for CSS mode
+        model: null as any, // Not needed for CSS mode
+        isFlipped: false,
+        position: new THREE.Vector3(0, 0, 0),
+        rotation: new THREE.Euler(0, 0, 0),
+        isOpen: false,
+        carouselIndex: 1,
+        targetPosition: new THREE.Vector3(0, 0, 0),
+        isActive: false,
+        isDeactivating: false,
+        currentLerpAlpha: 0,
+        initialPosition: new THREE.Vector3(0, 0, 0)
+      },
+      {
+        id: 3,
+        title: 'Neon Frequencies',
+        artist: 'Digital Harmonics',
+        imageUrl: '', // Not needed for CSS mode
+        model: null as any, // Not needed for CSS mode
+        isFlipped: false,
+        position: new THREE.Vector3(2, 0, 0),
+        rotation: new THREE.Euler(0, 0, 0),
+        isOpen: false,
+        carouselIndex: 2,
+        targetPosition: new THREE.Vector3(2, 0, 0),
+        isActive: false,
+        isDeactivating: false,
+        currentLerpAlpha: 0,
+        initialPosition: new THREE.Vector3(2, 0, 0)
+      }
+    ];
+
+    // Set the mock data as the main cdCases array
+    this.cdCases = this.mockCDCases;
+
+    // Initialize tracking arrays
+    this.playingMusic = new Array(this.cdCases.length).fill(false);
+    this.tutorialCompleted = new Array(this.cdCases.length).fill(false);
+
+    // Set first case as active
+    this.currentScrollIndex = 0;
+    this.cdCases[0].isActive = true;
+
+    if (this.isDebugMode) {
+      console.log(`[CDCases] CSS placeholders initialized with ${this.cdCases.length} quest scrolls`);
+    }
+  }
+
+  /**
+   * TEMPORARY: Handle quest scroll navigation with CSS placeholders
+   * Maintains same wheel navigation behavior as 3D version
+   * 【✓】
+   */
+  public navigateQuestScrolls(direction: 'up' | 'down'): void {
+    if (!this.questScrollsEnabled || this.cdCases.length === 0) return;
+
+    const previousIndex = this.currentScrollIndex;
+    
+    if (direction === 'down') {
+      this.currentScrollIndex = (this.currentScrollIndex + 1) % this.cdCases.length;
+    } else {
+      this.currentScrollIndex = (this.currentScrollIndex - 1 + this.cdCases.length) % this.cdCases.length;
+    }
+
+    // Update active states
+    this.cdCases[previousIndex].isActive = false;
+    this.cdCases[this.currentScrollIndex].isActive = true;
+
+    if (this.isDebugMode) {
+      console.log(`[CDCases] Navigated from scroll ${previousIndex} to ${this.currentScrollIndex}`);
+    }
+
+    // Trigger change detection
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * TEMPORARY: Handle quest scroll click/selection
+   * Maintains same click behavior as 3D version
+   * 【✓】
+   */
+  public selectQuestScroll(index: number): void {
+    if (!this.questScrollsEnabled || index < 0 || index >= this.cdCases.length) return;
+
+    const previousIndex = this.currentScrollIndex;
+    this.currentScrollIndex = index;
+
+    // Update active states
+    if (previousIndex !== index) {
+      this.cdCases[previousIndex].isActive = false;
+    }
+    this.cdCases[index].isActive = true;
+    this.cdCases[index].isOpen = !this.cdCases[index].isOpen; // Toggle open state
+
+    if (this.isDebugMode) {
+      console.log(`[CDCases] Selected quest scroll ${index}: ${this.cdCases[index].title}`);
+    }
+
+    // Trigger change detection
+    this.cdr.markForCheck();
   }
 } 

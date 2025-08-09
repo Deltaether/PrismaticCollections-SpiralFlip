@@ -1,0 +1,86 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- PS1-style gradient for the disc -->
+    <radialGradient id="discGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#2a2a2a;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#0a0a0a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Center hole gradient -->
+    <radialGradient id="holeGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Error text glow -->
+    <filter id="redGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Static noise pattern -->
+    <pattern id="noise" patternUnits="userSpaceOnUse" width="4" height="4">
+      <rect width="4" height="4" fill="#1a1a1a"/>
+      <rect x="0" y="0" width="1" height="1" fill="#2a2a2a" opacity="0.5"/>
+      <rect x="2" y="1" width="1" height="1" fill="#2a2a2a" opacity="0.3"/>
+      <rect x="1" y="2" width="1" height="1" fill="#2a2a2a" opacity="0.7"/>
+      <rect x="3" y="3" width="1" height="1" fill="#2a2a2a" opacity="0.4"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="400" fill="#0a0a0a"/>
+  
+  <!-- Static noise overlay -->
+  <rect width="400" height="400" fill="url(#noise)" opacity="0.3"/>
+  
+  <!-- Main disc -->
+  <circle cx="200" cy="200" r="180" fill="url(#discGradient)" stroke="#333" stroke-width="2"/>
+  
+  <!-- Disc reflection lines (PS1 style) -->
+  <circle cx="200" cy="200" r="160" fill="none" stroke="#333" stroke-width="1" opacity="0.3"/>
+  <circle cx="200" cy="200" r="140" fill="none" stroke="#333" stroke-width="1" opacity="0.2"/>
+  <circle cx="200" cy="200" r="120" fill="none" stroke="#333" stroke-width="1" opacity="0.1"/>
+  
+  <!-- Center hole -->
+  <circle cx="200" cy="200" r="25" fill="url(#holeGradient)" stroke="#000" stroke-width="2"/>
+  
+  <!-- Scratches and damage marks -->
+  <path d="M 80 150 Q 200 140 320 160" stroke="#444" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 90 220 Q 180 210 290 230" stroke="#444" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M 120 180 Q 200 175 280 185" stroke="#444" stroke-width="1" fill="none" opacity="0.5"/>
+  
+  <!-- Error symbol (PlayStation style X) -->
+  <g transform="translate(200,120)">
+    <path d="M -15 -15 L 15 15 M 15 -15 L -15 15" stroke="#ff4444" stroke-width="4" stroke-linecap="round" filter="url(#redGlow)"/>
+  </g>
+  
+  <!-- Main error text -->
+  <text x="200" y="280" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#ff4444" filter="url(#redGlow)">
+    PRISM READ ERROR
+  </text>
+  
+  <!-- Secondary text -->
+  <text x="200" y="310" text-anchor="middle" font-family="monospace" font-size="14" fill="#cc3333">
+    UNRECOGNIZED FORMAT
+  </text>
+  
+  <!-- PlayStation-style warning -->
+  <text x="200" y="340" text-anchor="middle" font-family="monospace" font-size="12" fill="#888">
+    PLEASE CHECK DISC
+  </text>
+  
+  <!-- Scanlines effect -->
+  <defs>
+    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="1" height="4">
+      <rect width="1" height="2" fill="#000" opacity="0.1"/>
+      <rect y="2" width="1" height="2" fill="transparent"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="400" fill="url(#scanlines)"/>
+</svg> 

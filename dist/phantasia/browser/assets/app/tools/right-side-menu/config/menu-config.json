@@ -1,0 +1,17 @@
+{
+  "rightSideMenu": {
+    "position": {
+      "rightPercentage": 10,
+      "topPercentage": 25,
+      "minRightPercentage": 5,
+      "maxRightPercentage": 15
+    },
+    "size": {
+      "maxWidth": 600,
+      "widthPercentage": 30,
+      "heightPercentage": 85
+    },
+    "transformOrigin": "top right",
+    "zIndex": 1000
+  }
+} 

@@ -45,3 +45,7 @@ Thumbs.db
 ssh_login.sh
 deploy.sh
 remote_ssh/
+*.mp4
+dist/
+*.mp4
+dist/

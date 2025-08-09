@@ -46,4 +46,4 @@ Thumbs.db
 ssh_login.sh
 deploy.sh
 remote_ssh/
-dist/
+# dist/ - COMMENTED OUT: Pre-built files needed for vCPU deployment

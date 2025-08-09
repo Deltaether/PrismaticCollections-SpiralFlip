@@ -36,6 +36,7 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+/images_for_context
 
 # System files
 .DS_Store
@@ -45,3 +46,4 @@ Thumbs.db
 ssh_login.sh
 deploy.sh
 remote_ssh/
+dist/

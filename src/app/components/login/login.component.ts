@@ -10,31 +10,26 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="login-container">
       <div class="login-card">
-        <div class="login-header">
-          <h1>🔐 Phantasia Testing Site</h1>
-          <p>Access Restricted - Please Login</p>
-        </div>
-        
         <form (ngSubmit)="onLogin()" class="login-form">
           <div class="form-group">
-            <label for="username">Username:</label>
             <input 
               type="text" 
               id="username"
               [(ngModel)]="username"
               name="username"
+              placeholder="Username"
               autocomplete="username"
               required
             >
           </div>
           
           <div class="form-group">
-            <label for="password">Password:</label>
             <input 
               type="password" 
               id="password"
               [(ngModel)]="password"
               name="password"
+              placeholder="Password"
               autocomplete="current-password"
               required
             >
@@ -48,19 +43,12 @@ import { AuthService } from '../../services/auth.service';
           
           <button type="submit" class="login-button" [disabled]="isLoading()">
             @if (isLoading()) {
-              Logging in...
+              ...
             } @else {
-              Login
+              →
             }
           </button>
         </form>
-        
-        <div class="auth-info">
-          <h3>🔐 Authentication Info:</h3>
-          <p><strong>URL:</strong> {{ authInfo.url }}</p>
-          <p><strong>Username:</strong> {{ authInfo.username }}</p>
-          <p><strong>Password:</strong> {{ authInfo.password }}</p>
-        </div>
       </div>
     </div>
   `,
@@ -75,106 +63,73 @@ import { AuthService } from '../../services/auth.service';
     }
     
     .login-card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      padding: 40px;
-      max-width: 400px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 32px;
+      max-width: 320px;
       width: 100%;
     }
     
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .login-header h1 {
-      color: #333;
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-    
-    .login-header p {
-      color: #666;
-      margin: 0;
-    }
-    
     .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 500;
+      margin-bottom: 16px;
     }
     
     .form-group input {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e1e5e9;
+      padding: 16px;
+      border: 1px solid rgba(0,0,0,0.1);
       border-radius: 8px;
       font-size: 16px;
       box-sizing: border-box;
-      transition: border-color 0.3s;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .form-group input::placeholder {
+      color: rgba(0,0,0,0.4);
     }
     
     .form-group input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
     }
     
     .error-message {
-      background: #ff6b6b;
+      background: rgba(255, 107, 107, 0.9);
       color: white;
       padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      border-radius: 6px;
+      margin-bottom: 16px;
       text-align: center;
+      font-size: 14px;
     }
     
     .login-button {
       width: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: white;
-      border: none;
-      padding: 14px;
+      padding: 16px;
       border-radius: 8px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.2s ease;
+      margin-top: 8px;
     }
     
     .login-button:hover:not(:disabled) {
-      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
     }
     
     .login-button:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
-    }
-    
-    .auth-info {
-      margin-top: 30px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-    }
-    
-    .auth-info h3 {
-      margin: 0 0 15px 0;
-      color: #333;
-      font-size: 16px;
-    }
-    
-    .auth-info p {
-      margin: 5px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      color: #555;
     }
   `]
 })
@@ -183,8 +138,6 @@ export class LoginComponent {
   password = '';
   errorMessage = signal<string>('');
   isLoading = signal<boolean>(false);
-  
-  authInfo = this.authService.getAuthInfo();
   
   constructor(private authService: AuthService) {}
   

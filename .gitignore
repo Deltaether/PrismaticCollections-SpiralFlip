@@ -45,4 +45,3 @@ Thumbs.db
 ssh_login.sh
 deploy.sh
 remote_ssh/
-dist/

@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+
+# Expect script for SCP upload with password
+set timeout 60
+set server_ip "212.227.85.148"
+set username "root"
+set password "voan6B86"
+
+# Upload the deployment package
+spawn scp -P 22 phantasia-deploy.tar.gz $username@$server_ip:~/
+
+# Handle password prompt
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "Password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "(yes/no)?" {
+        send "yes\r"
+        exp_continue
+    }
+    eof {
+        puts "Upload completed"
+    }
+}

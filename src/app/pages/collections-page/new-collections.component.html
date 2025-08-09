@@ -42,50 +42,44 @@
       <p>Explore our curated collections of music, each with its own unique theme and atmosphere.</p>
     </header>
 
-    <!-- Collections Grid -->
-    <section class="collections-grid">
+    <!-- Album Cards Container -->
+    <div class="albums-container">
       
-      <!-- Collection Card -->
-      <article class="collection-card" *ngFor="let collection of collections; trackBy: trackByCollectionId">
-        
-        <!-- Album Cover -->
-        <div class="album-cover">
-          <img [src]="collection.image" [alt]="collection.title + ' Cover'" loading="lazy">
-        </div>
-        
-        <!-- Collection Info -->
-        <div class="collection-info">
+      <!-- Albums Grid -->
+      <div class="albums-grid">
+        <div class="album-card" 
+             *ngFor="let album of albums" 
+             (click)="navigateToAlbum(album.id)"
+             [class.featured]="album.featured">
           
-          <!-- Title -->
-          <h2>{{ collection.title }}</h2>
-          
-          <!-- Metadata -->
-          <div class="metadata">
-            <span class="tracks">{{ collection.tracks }} Tracks</span>
-            <span class="year">{{ collection.year }}</span>
+          <div class="card-image">
+            <img [src]="album.coverImage" [alt]="album.title" />
+            <div class="card-overlay">
+              <div class="play-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
           </div>
           
-          <!-- Description -->
-          <p class="description">{{ collection.description }}</p>
-          
-          <!-- Tags -->
-          <div class="tags">
-            <span class="tag" *ngFor="let tag of collection.tags">{{ tag }}</span>
+          <div class="card-content">
+            <h3 class="album-title">{{ album.title }}</h3>
+            <p class="album-artist">{{ album.artist }}</p>
+            <div class="album-meta">
+              <span class="track-count">{{ album.trackCount }} tracks</span>
+              <span class="year">{{ album.year }}</span>
+            </div>
+            <p class="album-description">{{ album.description }}</p>
+            <div class="album-tags">
+              <span class="tag" *ngFor="let tag of album.tags">{{ tag }}</span>
+            </div>
           </div>
           
-          <!-- Explore Button -->
-          <button class="explore-btn" (click)="exploreCollection(collection.id)">
-            <span>Explore</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          
         </div>
-        
-      </article>
+      </div>
       
-    </section>
+    </div>
     
   </main>
   

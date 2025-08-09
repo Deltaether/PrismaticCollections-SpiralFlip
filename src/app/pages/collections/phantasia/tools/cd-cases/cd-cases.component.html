@@ -1,81 +1,7 @@
 <div class="cd-cases-container">
   
-  <!-- TEMPORARY: CSS Quest Scroll Placeholders (3D Canvas Hidden) -->
-  <div class="quest-scrolls-container" *ngIf="questScrollsEnabled">
-    <div class="quest-scroll-viewport">
-      <div 
-        *ngFor="let cdCase of cdCases; let i = index; trackBy: trackByCaseId"
-        class="quest-scroll"
-        [class.active]="cdCase.isActive"
-        [class.open]="cdCase.isOpen"
-        [style.transform]="'translateX(' + ((i - currentScrollIndex) * 250) + 'px)'"
-        (click)="selectQuestScroll(i)"
-        role="button"
-        tabindex="0"
-        [attr.aria-label]="'Select ' + cdCase.title + ' by ' + cdCase.artist">
-        
-        <!-- Scroll Parchment -->
-        <div class="scroll-parchment">
-          
-          <!-- Scroll Top Roll -->
-          <div class="scroll-roll scroll-roll-top"></div>
-          
-          <!-- Scroll Content -->
-          <div class="scroll-content">
-            
-            <!-- Neo-futuristic elements -->
-            <div class="digital-corner digital-corner-tl"></div>
-            <div class="digital-corner digital-corner-tr"></div>
-            <div class="digital-corner digital-corner-bl"></div>
-            <div class="digital-corner digital-corner-br"></div>
-            
-            <!-- Musical wave pattern -->
-            <div class="wave-pattern"></div>
-            
-            <!-- Main content -->
-            <div class="scroll-text">
-              <h3 class="scroll-title">{{ cdCase.title }}</h3>
-              <p class="scroll-artist">{{ cdCase.artist }}</p>
-              
-              <!-- Musical symbols -->
-              <div class="musical-symbols">
-                <span class="treble-clef">𝄞</span>
-                <span class="note">♪</span>
-                <span class="note">♫</span>
-              </div>
-              
-              <!-- Status indicator -->
-              <div class="scroll-status" [class.expanded]="cdCase.isOpen">
-                {{ cdCase.isOpen ? 'Unrolled' : 'Sealed' }}
-              </div>
-            </div>
-            
-            <!-- Frequency visualization -->
-            <div class="frequency-bars">
-              <div class="freq-bar" *ngFor="let bar of [1,2,3,4,5,6,7,8]"></div>
-            </div>
-            
-          </div>
-          
-          <!-- Scroll Bottom Roll -->
-          <div class="scroll-roll scroll-roll-bottom"></div>
-          
-        </div>
-        
-        <!-- Active glow effect -->
-        <div class="scroll-glow" *ngIf="cdCase.isActive"></div>
-        
-      </div>
-    </div>
-    
-    <!-- Navigation hints -->
-    <div class="navigation-hints">
-      <span class="hint">Scroll to navigate • Click to open</span>
-    </div>
-  </div>
-
-  <!-- TEMPORARILY HIDDEN: Original 3D Canvas -->
-  <div class="original-3d-container" [hidden]="questScrollsEnabled">
+  <!-- 3D CD Cases Canvas -->
+  <div class="original-3d-container">
     <canvas #canvas></canvas>
     <div #labelRenderer class="label-renderer"></div>
   </div>
@@ -83,12 +9,12 @@
   <!-- Loading indicator overlay -->
   <div class="loading-overlay" *ngIf="isLoading" aria-live="polite">
     <div class="loading-spinner"></div>
-    <div class="loading-text">{{ questScrollsEnabled ? 'Preparing Quest Scrolls...' : 'Loading 3D Experience...' }}</div>
+    <div class="loading-text">Loading 3D CD Cases...</div>
   </div>
   
   <!-- Debug menu with OnPush change detection -->
   <app-debug-menu
-    *ngIf="isDebugMode && !questScrollsEnabled"
+    *ngIf="isDebugMode"
     [sceneSettings]="sceneSettings"
     [caseSettings]="caseSettings"
     [cdCases]="cdCases"
@@ -105,16 +31,16 @@
 
 <!-- Case status indicators with title and artist information -->
 <div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'" aria-live="polite">
-  <h2 class="visually-hidden">{{ questScrollsEnabled ? 'Quest Scroll Status' : 'CD Case Status' }}</h2>
+  <h2 class="visually-hidden">CD Case Status</h2>
   <div *ngFor="let cdCase of cdCases; let i = index; trackBy: trackByCaseId" 
        class="case-indicator"
        [class.open]="cdCase.isOpen"
        [class.active]="cdCase.isActive"
-       (click)="questScrollsEnabled ? selectQuestScroll(i) : handleTrackSelection(i)"
+       (click)="handleTrackSelection(i)"
        role="button"
        tabindex="0"
        [attr.aria-label]="'Select ' + cdCase.title + ' by ' + cdCase.artist">
     <strong>{{cdCase.title}}</strong> by {{cdCase.artist}}
-    <span class="status">({{ questScrollsEnabled ? (cdCase.isOpen ? 'Unrolled' : 'Sealed') : (cdCase.isOpen ? 'Open' : 'Closed') }})</span>
+    <span class="status">({{ cdCase.isOpen ? 'Open' : 'Closed' }})</span>
   </div>
 </div> 

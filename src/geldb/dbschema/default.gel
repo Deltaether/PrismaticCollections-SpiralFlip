@@ -1,0 +1,108 @@
+module default {
+    
+    # Artist type - represents musical artists
+    type Artist {
+        required name: str {
+            constraint exclusive;
+        };
+        bio: str;
+        country: str;
+        genre: str;
+        website: str;
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+        
+        # Reverse relationship to albums
+        multi albums := .<artist[is Album];
+        multi songs := .<artist[is Song];
+    }
+    
+    # Album type - represents music albums
+    type Album {
+        required title: str;
+        required artist: Artist;
+        release_date: cal::local_date;
+        genre: str;
+        description: str;
+        cover_art_url: str;
+        track_count: int32;
+        duration_seconds: int32;
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+        
+        # Reverse relationship to songs
+        multi songs := .<album[is Song];
+    }
+    
+    # Song type - represents individual songs
+    type Song {
+        required title: str;
+        required artist: Artist;
+        album: Album;
+        track_number: int32;
+        duration_seconds: int32;
+        genre: str;
+        lyrics: str;
+        audio_file_url: str;
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+    }
+    
+    # Collection type - represents curated collections of songs/albums
+    type Collection {
+        required name: str {
+            constraint exclusive;
+        };
+        description: str;
+        cover_image_url: str;
+        is_public: bool {
+            default := true;
+        };
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+        
+        # Many-to-many relationships with songs and albums
+        multi songs: Song;
+        multi albums: Album;
+    }
+    
+    # Prism type - represents the main prismatic collections entity
+    type Prism {
+        required name: str {
+            constraint exclusive;
+        };
+        description: str;
+        color_scheme: str;
+        theme: str;
+        is_featured: bool {
+            default := false;
+        };
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+        
+        # Many-to-many relationships
+        multi collections: Collection;
+        multi featured_artists: Artist;
+    }
+    
+}

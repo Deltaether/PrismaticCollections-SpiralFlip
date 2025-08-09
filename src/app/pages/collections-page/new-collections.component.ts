@@ -1,32 +1,36 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 
-/* 【✓】 Collection Interface Definition */
-interface Collection {
+/* Album/Prism Interface Definition */
+interface Album {
   id: string;
   title: string;
-  image: string;
-  tracks: number;
+  artist: string;
+  coverImage: string;
+  trackCount: number;
   year: number;
   description: string;
   tags: string[];
+  featured: boolean;
+  route: string;
 }
 
-/* 【✓】 Triangle Animation Interface - Matching Home Page */
+/* Triangle Animation Interface - Matching Home Page */
 interface Triangle {
-  left: number;    // Horizontal position (0-100%)
-  delay: number;   // Animation delay in seconds
-  size: number;    // Triangle width in pixels
-  height: number;  // Triangle height in pixels
-  duration: number; // Animation duration in seconds
+  left: number;
+  top: number;
+  size: number;
+  duration: number;
+  delay: number;
 }
 
 /**
- * NewCollectionsComponent - Fresh Implementation
- * Clean, optimized standalone component with inverted triangle animations
- * 【✓】
+ * Collections Page Component
+ * 
+ * Displays album cards (Prisms) in a grid layout with navigation to individual albums.
+ * Each album is considered a "Prism" in the Prismatic Collections terminology.
  */
 @Component({
   selector: 'app-new-collections',
@@ -35,113 +39,95 @@ interface Triangle {
   templateUrl: './new-collections.component.html',
   styleUrls: ['./new-collections.component.scss']
 })
-export class NewCollectionsComponent implements OnInit, OnDestroy {
+export class NewCollectionsComponent implements OnInit {
   
-  /* 【✓】 Collections Data */
-  collections: Collection[] = [
+  /* Albums/Prisms Data */
+  albums: Album[] = [
     {
       id: 'phantasia',
       title: 'Project Phantasia',
-      image: 'assets/graphic/phantasia_1_cover_final.png',
-      tracks: 12,
+      artist: 'Prismatic Collections',
+      coverImage: 'assets/graphic/phantasia_1_cover_final.png',
+      trackCount: 12,
       year: 2023,
-      description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies that transcend conventional electronic music genres.',
-      tags: ['Ambient', 'Electronic', 'Experimental']
+      description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies.',
+      tags: ['Ambient', 'Electronic', 'Experimental'],
+      featured: true,
+      route: '/phantasia'
     },
     {
       id: 'ethereal',
-      title: 'Ethereal Soundscapes',
-      image: 'assets/collections/ethereal-soundscapes.jpg',
-      tracks: 8,
+      title: 'Ethereal Soundscapes', 
+      artist: 'Various Artists',
+      coverImage: 'assets/graphic/composite.png',
+      trackCount: 8,
       year: 2022,
-      description: 'Immerse yourself in ambient textures and atmospheric compositions designed to transport listeners to otherworldly realms of sound.',
-      tags: ['Ambient', 'Atmospheric', 'Meditative']
+      description: 'Immerse yourself in ambient textures and atmospheric compositions.',
+      tags: ['Ambient', 'Atmospheric', 'Meditative'],
+      featured: false,
+      route: '/collections/ethereal'
     },
     {
-      id: 'artifacts',
-      title: 'Digital Artifacts',
-      image: 'assets/collections/digital-artifacts.jpg',
-      tracks: 10,
-      year: 2023,
-      description: 'A bold exploration of glitchy textures, digital processing, and experimental sound design that pushes the boundaries of modern electronic music.',
-      tags: ['Glitch', 'IDM', 'Experimental']
+      id: 'experimental',
+      title: 'Digital Frontiers',
+      artist: 'Electronic Collective', 
+      coverImage: 'assets/graphic/composite_bg.png',
+      trackCount: 10,
+      year: 2024,
+      description: 'Pushing the boundaries of electronic music with innovative soundscapes.',
+      tags: ['Experimental', 'Electronic', 'Futuristic'],
+      featured: false,
+      route: '/collections/experimental'
     }
   ];
 
-  /* 【✓】 Triangle Animation System - Matching Home Page Behavior */
+  /* Triangle Animation Data */
   triangles: Triangle[] = [];
-  
+
   constructor(private router: Router) {}
 
-  /* 【✓】 Component Initialization */
   ngOnInit(): void {
     this.initializeTriangles();
   }
-  
-  /* 【✓】 Component Cleanup */
-  ngOnDestroy(): void {
-    // Clean up any subscriptions or intervals if needed
-  }
-  
-  /* 【✓】 Initialize Triangle Animation System - Home Page Style */
+
+  /* Initialize Triangle Animation System - Home Page Style */
   private initializeTriangles(): void {
-    // Predefined positions and timing to match home page density
     const triangleConfigs = [
-      { left: 4.2, size: 70, height: 60, duration: 8, delay: 0 },
-      { left: 14.7, size: 56, height: 48, duration: 9, delay: 0.5 },
-      { left: 24.1, size: 80, height: 70, duration: 10, delay: 1 },
-      { left: 33.8, size: 64, height: 56, duration: 8.5, delay: 1.5 },
-      { left: 46.3, size: 76, height: 65, duration: 9.5, delay: 2 },
-      { left: 55, size: 60, height: 52, duration: 10.5, delay: 2.5 },
-      { left: 65, size: 84, height: 72, duration: 8, delay: 3 },
-      { left: 75, size: 68, height: 58, duration: 9, delay: 3.5 },
-      { left: 85, size: 72, height: 62, duration: 10, delay: 4 },
-      { left: 95, size: 58, height: 50, duration: 8.5, delay: 4.5 },
-      
-      // Second wave
-      { left: 10, size: 66, height: 57, duration: 9.5, delay: 5 },
-      { left: 20, size: 74, height: 64, duration: 10, delay: 5.5 },
-      { left: 30, size: 62, height: 54, duration: 8, delay: 6 },
-      { left: 40, size: 78, height: 68, duration: 9, delay: 6.5 },
-      { left: 50, size: 70, height: 60, duration: 10.5, delay: 7 },
-      { left: 60, size: 82, height: 71, duration: 8.5, delay: 7.5 },
-      { left: 70, size: 66, height: 57, duration: 9.5, delay: 8 },
-      { left: 80, size: 76, height: 66, duration: 10, delay: 8.5 },
-      { left: 90, size: 64, height: 55, duration: 8, delay: 9 },
-      { left: 12, size: 72, height: 63, duration: 9, delay: 9.5 },
-      
-      // Third wave for more density
-      { left: 8, size: 65, height: 58, duration: 8.5, delay: 1.2 },
-      { left: 18, size: 70, height: 62, duration: 9.2, delay: 2.3 },
-      { left: 28, size: 58, height: 50, duration: 10.2, delay: 3.7 },
-      { left: 38, size: 75, height: 67, duration: 8.8, delay: 4.8 },
-      { left: 48, size: 63, height: 55, duration: 9.8, delay: 6.2 }
+      { left: 4.2, top: 15, size: 70, duration: 8, delay: 0 },
+      { left: 14.7, top: 25, size: 56, duration: 9, delay: 0.5 },
+      { left: 24.1, top: 35, size: 80, duration: 10, delay: 1 },
+      { left: 33.8, top: 20, size: 64, duration: 8.5, delay: 1.5 },
+      { left: 46.3, top: 40, size: 76, duration: 9.5, delay: 2 },
+      { left: 55, top: 30, size: 60, duration: 10.5, delay: 2.5 },
+      { left: 65, top: 18, size: 84, duration: 8, delay: 3 },
+      { left: 75, top: 45, size: 72, duration: 11, delay: 3.5 },
+      { left: 85, top: 22, size: 68, duration: 9, delay: 4 },
+      { left: 8, top: 60, size: 58, duration: 10, delay: 0.8 },
+      { left: 18, top: 70, size: 74, duration: 8.5, delay: 1.3 },
+      { left: 28, top: 65, size: 66, duration: 9.5, delay: 1.8 },
+      { left: 38, top: 75, size: 78, duration: 10.5, delay: 2.3 },
+      { left: 48, top: 80, size: 62, duration: 8, delay: 2.8 },
+      { left: 58, top: 68, size: 82, duration: 11.5, delay: 3.3 },
+      { left: 68, top: 85, size: 70, duration: 9, delay: 3.8 },
+      { left: 78, top: 72, size: 64, duration: 10, delay: 4.3 },
+      { left: 88, top: 78, size: 76, duration: 8.5, delay: 4.8 },
+      { left: 12, top: 88, size: 68, duration: 9.5, delay: 1.2 },
+      { left: 22, top: 92, size: 54, duration: 10.5, delay: 1.7 },
+      { left: 32, top: 95, size: 72, duration: 8, delay: 2.2 },
+      { left: 42, top: 90, size: 66, duration: 11, delay: 2.7 },
+      { left: 52, top: 88, size: 80, duration: 9, delay: 3.2 },
+      { left: 62, top: 95, size: 58, duration: 10, delay: 3.7 },
+      { left: 92, top: 95, size: 74, duration: 8.5, delay: 4.2 }
     ];
-    
-    this.triangles = triangleConfigs.map(config => ({
-      left: config.left,
-      delay: config.delay,
-      size: config.size,
-      height: config.height,
-      duration: config.duration
-    }));
+
+    this.triangles = triangleConfigs;
   }
 
-  /* 【✓】 Navigate to Collection Details */
-  exploreCollection(collectionId: string): void {
-    console.log(`Exploring collection: ${collectionId}`);
-    
-    // Navigate to collection detail page
-    this.router.navigate(['/collection', collectionId]);
+  /* Navigate to Album */
+  navigateToAlbum(albumId: string): void {
+    const album = this.albums.find(a => a.id === albumId);
+    if (album) {
+      this.router.navigate([album.route]);
+    }
   }
-
-  /* 【✓】 Track by Function for Performance */
-  trackByCollectionId(index: number, collection: Collection): string {
-    return collection.id;
-  }
-
-  /* 【✓】 Track by Function for Triangles */
-  trackByTriangleIndex(index: number, triangle: Triangle): number {
-    return index;
-  }
-} 
+}

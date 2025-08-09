@@ -63,10 +63,10 @@ export class CDCaseLoadingService {
 
     try {
       // Log the start of model loading
-      console.log('[CDCaseLoadingService] Loading 3D model: assets/3d/CD_Case/CD_Case.glb');
+      console.log('[CDCaseLoadingService] Loading 3D model: assets/3d/CD_Case/untitled.glb');
       
       // Load the GLTF model
-      const modelPromise = loader.loadAsync('assets/3d/CD_Case/CD_Case.glb')
+      const modelPromise = loader.loadAsync('assets/3d/CD_Case/untitled.glb')
         .catch(error => {
           console.error('[CDCaseLoadingService] Error loading GLB model:', error);
           throw new Error('Failed to load CD Case model: ' + error.message);

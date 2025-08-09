@@ -132,3 +132,142 @@ The CD Cases component demonstrates complex Three.js integration:
 - `src/routing-summary.md` - Comprehensive routing information
 - `src/app/pages/collections/phantasia/LAYOUT.md` - Phantasia layout architecture
 - `src/app/pages/collections/phantasia/REORGANIZATION.md` - Recent structural changes
+
+# DEPLOYMENT & SERVER CONFIGURATION
+
+## Live Server Details
+- **Production URL**: http://212.227.85.148/
+- **Server Location**: VPS with nginx web server
+- **Web Root**: `/var/www/phantasia/` (active website files)
+- **Server OS**: Ubuntu with nginx/1.24.0
+- **Authentication**: Angular-based login system (implemented Aug 2025)
+
+## 🔐 AUTHENTICATION SYSTEM
+
+### Current Implementation (August 2025)
+The website now uses **Angular-based authentication** instead of nginx basic auth:
+
+**Access Credentials:**
+- **URL**: http://212.227.85.148/
+- **Username**: `phantasia_dev`
+- **Password**: `i1Si1SbOEkgK`
+
+### Authentication Architecture
+- **Service**: `src/app/services/auth.service.ts` - Handles login/logout and session management
+- **Component**: `src/app/components/login/login.component.ts` - Login UI with credentials displayed
+- **Guard**: Main app component (`app.component.ts`) shows login screen until authenticated
+- **Storage**: Uses localStorage to persist authentication state
+- **UI**: Beautiful login screen with gradient background and credential display
+
+### Authentication Features
+- ✅ Login form with username/password validation
+- ✅ Credential information displayed on login screen
+- ✅ Session persistence with localStorage
+- ✅ Logout functionality with header button
+- ✅ Authentication status indicator when logged in
+- ✅ Automatic redirect protection for all routes
+
+## Server Configuration
+
+### nginx Configuration
+- **Config Location**: `/etc/nginx/sites-available/default`
+- **No authentication** - nginx serves files directly without basic auth
+- **Angular Routing Support**: `try_files $uri $uri/ /index.html;` for SPA routing
+- **Static Assets**: Proper caching headers for js/css/images/audio/3D files
+- **Status**: nginx authentication REMOVED (Aug 2025) in favor of Angular auth
+
+### File Structure on Server
+```
+/var/www/phantasia/               # Active website (nginx serves from here)
+├── index.html                   # Main Angular entry point with auth
+├── main-*.js                    # Angular application bundle
+├── chunk-*.js                   # Lazy-loaded components
+├── styles-*.css                 # Compiled SCSS styles
+├── assets/                      # Static assets
+│   ├── 3d/                     # 3D models (.glb files)
+│   ├── audio/                  # Music files (.mp3)
+│   └── graphic/                # Images and graphics
+└── (other Angular build files)
+
+/root/Projects/ProjectPhantasia/  # REMOVED (Aug 2025) - was duplicate
+/root/browser/                   # REMOVED (Aug 2025) - was duplicate
+```
+
+### Deployment Process
+1. **Build**: `pnpm run build` - Creates `dist/phantasia/` with all files
+2. **Package**: `tar -czf phantasia-auth.tar.gz -C dist/phantasia .` (~600MB)
+3. **Upload**: SSH upload to server as `/root/phantasia-auth.tar.gz`
+4. **Deploy**: Extract to `/var/www/phantasia/` and set permissions
+5. **Permissions**: `chown -R www-data:www-data /var/www/phantasia && chmod -R 755`
+
+### SSH Access
+- **Scripts**: `ssh_login.sh` (with sshpass) - configured and in .gitignore
+- **Credentials**: Stored in `remote_ssh/remote` file
+- **Connection**: `ssh -p 22 root@212.227.85.148` 
+- **Automated Scripts**: Multiple deployment scripts available (Python-based)
+
+## Development to Production Workflow
+
+### Local Development
+```bash
+pnpm install                    # Install dependencies
+pnpm start                     # Dev server on localhost:4300
+pnpm run build                 # Production build
+```
+
+### Deployment to Live Server
+```bash
+# Automated deployment (recommended)
+python3 quick_deploy.py        # Fast deployment script
+# OR manual steps:
+tar -czf phantasia-auth.tar.gz -C dist/phantasia .
+scp phantasia-auth.tar.gz root@212.227.85.148:~/ 
+ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.gz"
+```
+
+### Authentication Testing
+1. Visit http://212.227.85.148/
+2. Should see login screen with credentials displayed
+3. Enter: `phantasia_dev` / `i1Si1SbOEkgK`
+4. Should access full Phantasia website
+5. Logout button in top-right when authenticated
+
+## Critical Implementation Details
+
+### Authentication Security
+- **Client-side only**: Authentication is handled in Angular, not server-side
+- **Purpose**: For testing access control, not production security
+- **Persistence**: localStorage maintains session across browser sessions
+- **Bypass**: Technical users could bypass by manipulating localStorage
+- **Suitable for**: Development/testing scenarios, not production security
+
+### Performance Considerations
+- **Bundle Size**: ~600MB deployment (includes 3D models, audio, graphics)
+- **Lazy Loading**: Angular routes use lazy loading for performance
+- **Static Caching**: nginx configured with 1-year cache for static assets
+- **3D Assets**: Large .glb files in assets/3d/ directory
+
+### Known Issues & Solutions
+- **nginx 500 errors**: Fixed by removing nginx authentication, using Angular auth instead
+- **File permissions**: Must set `www-data:www-data` ownership on server files
+- **Deployment size**: Large due to 3D assets and audio files (~1GB total)
+- **Redirect loops**: Avoided with proper nginx try_files configuration
+
+## Troubleshooting Guide
+
+### Authentication Issues
+- **Can't access site**: Check if login screen appears at http://212.227.85.148/
+- **Login fails**: Verify exact credentials: `phantasia_dev` / `i1Si1SbOEkgK`
+- **Lost session**: Clear localStorage or use logout button and re-login
+
+### Deployment Issues  
+- **nginx 500 errors**: Check file permissions and nginx config
+- **Upload failures**: Use Python deployment scripts, not manual scp
+- **Large file issues**: 600MB deployment may timeout, use background deployment
+
+### Development Issues
+- **Build failures**: Ensure all imports are correct after auth system addition
+- **Missing dependencies**: Run `pnpm install` after pulling changes
+- **Port conflicts**: Use `ng serve --port 4300` as configured
+
+This comprehensive documentation covers all critical aspects of the project's current state, authentication system, server configuration, and deployment processes as of August 2025.

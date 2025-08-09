@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# SSH and Deployment Scripts (Security)
+ssh_login.sh
+deploy.sh
+remote_ssh/

@@ -33,6 +33,10 @@ export class PhantasiaComponent implements OnInit {
   // Flag to control loading state
   isLoading = true;
 
+  // Track when loading started for minimum display time
+  private loadingStartTime = Date.now();
+  private readonly MINIMUM_LOADING_TIME = 3000; // 3 seconds minimum for aesthetic
+
   // Storage keys
   private readonly SELECTOR_STORAGE_KEY = 'prismatic_collections_site_version_preference';
   private readonly DISCLAIMER_STORAGE_KEY = 'prismatic_collections_disclaimer_acknowledged';
@@ -114,12 +118,15 @@ export class PhantasiaComponent implements OnInit {
       
       this.isMobileView = savedPreference === 'mobile';
       
-      // For mobile view, we can hide loading after a short delay since it doesn't load 3D assets
+      // For mobile view, ensure minimum loading time for aesthetic
       if (this.isMobileView) {
+        const loadingDuration = Date.now() - this.loadingStartTime;
+        const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
+        
         setTimeout(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        }, 800); // Short delay for mobile
+        }, remainingTime);
       }
       // For desktop, wait for CD Cases to load
       
@@ -168,12 +175,15 @@ export class PhantasiaComponent implements OnInit {
     this.showVersionSelector = false;
     this.isMobileView = version === 'mobile';
     
-    // For mobile view, we can hide loading after a short delay since it doesn't load 3D assets
+    // For mobile view, ensure minimum loading time for aesthetic
     if (this.isMobileView) {
+      const loadingDuration = Date.now() - this.loadingStartTime;
+      const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
+      
       setTimeout(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      }, 800); // Short delay for mobile
+      }, remainingTime);
     }
     // For desktop, wait for CD Cases to load
     
@@ -191,10 +201,29 @@ export class PhantasiaComponent implements OnInit {
     
     // Update loading state only if CD Cases are done loading
     if (!isLoading && !this.isMobileView) {
-      // Only update for desktop view - mobile doesn't use CD Cases
-      this.isLoading = false;
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] CD Cases finished loading - setting isLoading to false`);
+      // Calculate how long loading has been shown
+      const loadingDuration = Date.now() - this.loadingStartTime;
+      const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
+      
+      if (remainingTime > 0) {
+        // Wait for the remaining time to ensure minimum display duration
+        if (this.isDebugMode) {
+          console.log(`[PhantasiaComponent] Waiting ${remainingTime}ms to maintain minimum loading display time (3s aesthetic)`);
+        }
+        setTimeout(() => {
+          this.isLoading = false;
+          if (this.isDebugMode) {
+            console.log(`[PhantasiaComponent] Loading screen shown for aesthetic minimum time - hiding now`);
+          }
+          this.cdr.markForCheck();
+        }, remainingTime);
+      } else {
+        // Already shown for minimum time, hide immediately
+        this.isLoading = false;
+        if (this.isDebugMode) {
+          console.log(`[PhantasiaComponent] CD Cases finished loading - setting isLoading to false`);
+        }
+        this.cdr.markForCheck();
       }
     } else if (this.isDebugMode) {
       console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}, isMobileView: ${this.isMobileView}`);

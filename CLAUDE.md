@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Starting Development
 - `npm start` or `ng serve` - Start development server on port 4300
 - `ng serve --port 4300` - Explicitly set port (configured in angular.json)
-- **PACKAGE MANAGER NOTE**: instead of using npm, use uv
+- **PACKAGE MANAGER NOTE**: instead of using npm, use pnpm
 
 ### Building
 - `npm run build` or `ng build` - Build for production
@@ -194,7 +194,7 @@ The website now uses **Angular-based authentication** instead of nginx basic aut
 ```
 
 ### Deployment Process
-1. **Build**: `uv run build` - Creates `dist/phantasia/` with all files
+1. **Build**: `pnpm run build` - Creates `dist/phantasia/` with all files
 2. **Package**: `tar -czf phantasia-auth.tar.gz -C dist/phantasia .` (~600MB)
 3. **Upload**: SSH upload to server as `/root/phantasia-auth.tar.gz`
 4. **Deploy**: Extract to `/var/www/phantasia/` and set permissions
@@ -229,8 +229,8 @@ The server is configured for automated deployment from GitHub:
 2. **Server Deploy**: SSH to server, run `deploy-phantasia` or `/root/deploy_from_github.sh`  
 3. **Automated Process**:
    - Clones/updates repository from GitHub
-   - Installs Node.js and uv if needed
-   - Runs `uv install && uv run build`
+   - Installs Node.js and pnpm if needed
+   - Runs `pnpm install && pnpm run build`
    - Deploys built files to `/var/www/phantasia/`
    - Sets proper permissions (www-data:www-data)
    - Tests deployment with curl
@@ -240,9 +240,9 @@ The server is configured for automated deployment from GitHub:
 
 ### Local Development
 ```bash
-uv install                      # Install dependencies
-uv run start                   # Dev server on localhost:4300
-uv run build                   # Production build
+pnpm install                    # Install dependencies
+pnpm start                     # Dev server on localhost:4300
+pnpm run build                 # Production build
 ```
 
 ### Deployment to Live Server
@@ -297,7 +297,7 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 
 ### Development Issues
 - **Build failures**: Ensure all imports are correct after auth system addition
-- **Missing dependencies**: Run `uv install` after pulling changes
+- **Missing dependencies**: Run `pnpm install` after pulling changes
 - **Port conflicts**: Use `ng serve --port 4300` as configured
 
 ## Recent Critical Changes & Implementation Details (August 2025)
@@ -362,8 +362,8 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 - ✅ **Smart Deploy Script**: `/root/deploy_from_github.sh` with full automation
 - ✅ **Deploy Alias**: `deploy-phantasia` command for easy deployment
 - ✅ **Backup System**: Automatic backup of current version before deployment
-- ✅ **Dependency Management**: Auto-installs Node.js, uv if needed
-- ✅ **Build Process**: Automated `uv install && uv run build`
+- ✅ **Dependency Management**: Auto-installs Node.js, pnpm if needed
+- ✅ **Build Process**: Automated `pnpm install && pnpm run build`
 - ✅ **Testing**: Automatic curl test after deployment
 
 **Modern Workflow Established:**
@@ -409,7 +409,7 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 
 **Server Infrastructure:**
 - **Web Server**: nginx/1.24.0 on Ubuntu
-- **Node.js**: Version 20.x with uv package manager
+- **Node.js**: Version 20.x with pnpm package manager
 - **File Permissions**: www-data:www-data ownership model
 - **Backup Strategy**: Timestamped backups before each deployment
 - **Monitoring**: Automatic curl testing after deployment
@@ -454,8 +454,8 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 - Documentation: Comprehensive coverage in CLAUDE.md
 
 **🔄 DEPLOYMENT WORKFLOW:**
-- **Development**: Local Angular development with `uv run start`
-- **Build**: `uv run build` creates production assets
+- **Development**: Local Angular development with `pnpm start`
+- **Build**: `pnpm run build` creates production assets
 - **Version Control**: Git commit and push to GitHub
 - **Deploy**: `deploy-phantasia` command on server
 - **Live**: Immediate website update with authentication

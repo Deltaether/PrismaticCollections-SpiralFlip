@@ -10,31 +10,8 @@ $box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 $transition: all 0.3s ease;
 
 /* 【✓】 Global style injection to hide main-header at the app root level */
-:host, app-root, body {
-  /* Apply at the highest possible level to handle page refreshes */
+:host {
   ::ng-deep {
-    /* Override global overflow hidden for home page */
-    html, body {
-      overflow: auto !important;
-      overflow-x: hidden !important;
-    }
-    
-    app-root {
-      overflow: auto !important;
-      overflow-x: hidden !important;
-    }
-    
-    /* Force scrolling for home page using body class */
-    body.home-page-active {
-      overflow: auto !important;
-      overflow-x: hidden !important;
-      padding-top: 90px !important; /* Add padding to prevent navbar from covering scrollbar */
-    }
-    
-    body.home-page-active app-root {
-      overflow: auto !important;
-      overflow-x: hidden !important;
-    }
     
     /* Target the app-root level to ensure these styles apply even on refresh */
     app-root header.main-header,
@@ -76,9 +53,8 @@ $transition: all 0.3s ease;
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 25%, #1e1e1e 50%, #242424 75%, #1a1a1a 100%);
   color: $light-text;
-  overflow-y: auto;
-  overflow-x: hidden;
   position: relative;
+  width: 100%;
   
   // 【✓】 Container for individual triangle elements
   .triangle-container {

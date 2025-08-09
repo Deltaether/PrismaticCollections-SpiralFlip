@@ -57,14 +57,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     console.log('HOME COMPONENT LOADED - VERSION 2');
     
-    // Enable scrolling for home page by adding body class and direct style override
+    // Enable scrolling for home page by adding body class only
     this.document.body.classList.add('home-page-active');
-    this.document.documentElement.style.overflow = 'auto';
-    this.document.body.style.overflow = 'auto';
-    const appRoot = this.document.querySelector('app-root') as HTMLElement;
-    if (appRoot) {
-      appRoot.style.overflow = 'auto';
-    }
     
     // Log the featuredSections to verify the correct data
     console.log('Featured Sections:', this.featuredSections);
@@ -89,12 +83,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     
     // Restore original overflow settings when leaving home page
     this.document.body.classList.remove('home-page-active');
-    this.document.documentElement.style.overflow = 'hidden';
-    this.document.body.style.overflow = 'hidden';
-    const appRoot = this.document.querySelector('app-root') as HTMLElement;
-    if (appRoot) {
-      appRoot.style.overflow = 'hidden';
-    }
     
     this.destroy$.next();
     this.destroy$.complete();

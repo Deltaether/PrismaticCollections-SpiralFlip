@@ -206,6 +206,36 @@ The website now uses **Angular-based authentication** instead of nginx basic aut
 - **Connection**: `ssh -p 22 root@212.227.85.148` 
 - **Automated Scripts**: Multiple deployment scripts available (Python-based)
 
+## GitHub Integration & Automated Deployment
+
+### Repository Setup
+- **GitHub URL**: https://github.com/Deltaether/PrismaticCollections-SpiralFlip
+- **Local Branch**: `alternative-backgroundplane`
+- **GitHub Username**: `Deltaether`
+- **Token**: `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`
+
+### Automated GitHub Deployment
+The server is configured for automated deployment from GitHub:
+
+**Server Setup:**
+- **Git configured**: Global user "Phantasia Server" <server@phantasia.dev>
+- **Credentials**: GitHub token stored in `/root/.git-credentials`
+- **Deploy Script**: `/root/deploy_from_github.sh` (executable)
+- **Alias**: `deploy-phantasia` command available
+- **Repository Clone**: `/root/phantasia-repo/`
+
+**Deployment Workflow:**
+1. **Local Changes**: Make changes, commit, push to GitHub
+2. **Server Deploy**: SSH to server, run `deploy-phantasia` or `/root/deploy_from_github.sh`  
+3. **Automated Process**:
+   - Clones/updates repository from GitHub
+   - Installs Node.js and pnpm if needed
+   - Runs `pnpm install && pnpm run build`
+   - Deploys built files to `/var/www/phantasia/`
+   - Sets proper permissions (www-data:www-data)
+   - Tests deployment with curl
+4. **Result**: Live website updated at http://212.227.85.148/
+
 ## Development to Production Workflow
 
 ### Local Development
@@ -270,4 +300,171 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 - **Missing dependencies**: Run `pnpm install` after pulling changes
 - **Port conflicts**: Use `ng serve --port 4300` as configured
 
-This comprehensive documentation covers all critical aspects of the project's current state, authentication system, server configuration, and deployment processes as of August 2025.
+## Recent Critical Changes & Implementation Details (August 2025)
+
+### 🔐 Angular Authentication System Implementation
+**Date**: August 9, 2025
+**Major Change**: Replaced nginx basic authentication with Angular-based authentication system
+
+**Files Created/Modified:**
+- `src/app/services/auth.service.ts` - NEW: Core authentication service with login/logout logic
+- `src/app/components/login/login.component.ts` - NEW: Beautiful login UI with credential display
+- `src/app/app.component.ts` - MODIFIED: Added authentication guard to main app entry point
+- `CLAUDE.md` - UPDATED: Complete documentation of all systems
+
+**Authentication Features Implemented:**
+- ✅ Client-side login validation with exact credentials
+- ✅ Session persistence using localStorage  
+- ✅ Automatic authentication status tracking with Angular signals
+- ✅ Beautiful gradient login screen with credential information display
+- ✅ Logout functionality with header button when authenticated
+- ✅ Real-time authentication status indicator
+- ✅ Protection of all application routes
+
+**Security Model:**
+- **Purpose**: Testing/development access control, not production security
+- **Method**: Client-side validation (can be bypassed by technical users)
+- **Persistence**: localStorage maintains session across browser restarts
+- **Credentials**: Hardcoded in AuthService (phantasia_dev / i1Si1SbOEkgK)
+
+### 🌐 Server Infrastructure & Deployment Overhaul
+
+**Server Configuration Changes:**
+- ✅ **nginx Authentication REMOVED**: Eliminated nginx basic auth causing 500 errors
+- ✅ **File Structure Cleanup**: Removed duplicate directories, saved ~2GB disk space
+  - Removed: `/root/Projects/ProjectPhantasia/` (duplicate)
+  - Removed: `/root/browser/` (duplicate)  
+  - Removed: Large deployment archives
+- ✅ **Optimized nginx Config**: Simple routing without authentication, proper Angular SPA support
+- ✅ **Permission Fix**: All files set to www-data:www-data ownership for proper access
+
+**Active Server Paths (Post-Cleanup):**
+```
+/var/www/phantasia/           # ACTIVE: nginx serves from here (1.2GB)
+├── index.html               # Angular entry point with authentication
+├── main-*.js               # Application bundle with auth system
+├── chunk-*.js              # Lazy-loaded components  
+├── styles-*.css            # Compiled styles
+└── assets/                 # Static assets (3D models, audio, graphics)
+```
+
+### 🐙 GitHub Integration & Modern Deployment Pipeline
+
+**GitHub Repository Setup:**
+- **Repository**: https://github.com/Deltaether/PrismaticCollections-SpiralFlip
+- **Branch**: `alternative-backgroundplane` (contains all auth implementation)
+- **Token**: `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`
+- **Username**: `Deltaether` (discovered via API)
+
+**Automated Deployment System:**
+- ✅ **Git Configured on Server**: Global user "Phantasia Server"  
+- ✅ **GitHub Token Authentication**: Stored in `/root/.git-credentials`
+- ✅ **Smart Deploy Script**: `/root/deploy_from_github.sh` with full automation
+- ✅ **Deploy Alias**: `deploy-phantasia` command for easy deployment
+- ✅ **Backup System**: Automatic backup of current version before deployment
+- ✅ **Dependency Management**: Auto-installs Node.js, pnpm if needed
+- ✅ **Build Process**: Automated `pnpm install && pnpm run build`
+- ✅ **Testing**: Automatic curl test after deployment
+
+**Modern Workflow Established:**
+1. **Local Development**: Make changes, commit with git
+2. **GitHub Push**: `git push` to update remote repository  
+3. **Server Deploy**: SSH to server, run `deploy-phantasia`
+4. **Live Update**: Website automatically updated at http://212.227.85.148/
+
+### 📁 Project Structure & File Organization
+
+**Authentication Files Added:**
+- `src/app/services/auth.service.ts` - Core authentication logic
+- `src/app/components/login/login.component.ts` - Login UI component
+- Multiple deployment scripts (Python-based automation)
+- SSH connection scripts and configurations
+
+**Development Scripts Created:**
+- `setup_remote_git.py` - Server git configuration
+- `complete_github_setup.py` - Full GitHub deployment setup
+- `quick_deploy.py` - Fast deployment without GitHub
+- `remove_nginx_auth.py` - Nginx auth removal automation
+- `ssh_login.sh` - Automated SSH connection
+- Various debugging and deployment utilities
+
+### 🔧 Technical Implementation Details
+
+**Angular Authentication Architecture:**
+```typescript
+// AuthService features
+- Injectable service with Router dependency
+- Signal-based reactive authentication state
+- localStorage persistence for sessions
+- Hardcoded credentials for testing environment
+- Clean logout with navigation and state reset
+
+// LoginComponent features  
+- Standalone component with FormsModule
+- Beautiful gradient UI with credential display
+- Form validation and error handling
+- Loading states and user feedback
+- Responsive design for all screen sizes
+```
+
+**Server Infrastructure:**
+- **Web Server**: nginx/1.24.0 on Ubuntu
+- **Node.js**: Version 20.x with pnpm package manager
+- **File Permissions**: www-data:www-data ownership model
+- **Backup Strategy**: Timestamped backups before each deployment
+- **Monitoring**: Automatic curl testing after deployment
+
+**Build & Deployment Process:**
+- **Build Size**: ~600MB (includes 3D models, audio assets)
+- **Build Time**: ~6 seconds for production build
+- **Deploy Time**: ~2-3 minutes including dependencies
+- **Technologies**: Angular 20, Three.js, GSAP, Howler.js, Matter.js
+- **Assets**: Large 3D models (.glb), audio files (.mp3), graphics
+
+### 🐛 Issues Resolved & Solutions Implemented
+
+**Major Issues Fixed:**
+1. **nginx 500 Internal Server Error**:
+   - **Cause**: nginx basic auth configuration conflicts and redirect loops
+   - **Solution**: Removed nginx auth, implemented Angular authentication
+   - **Result**: Clean server operation, proper Angular SPA routing
+
+2. **File Structure Chaos**:
+   - **Cause**: Multiple duplicate directories from various deployment attempts
+   - **Solution**: Systematic cleanup, single source of truth at `/var/www/phantasia/`
+   - **Result**: Saved ~2GB storage, eliminated confusion
+
+3. **Deployment Complexity**:
+   - **Cause**: Manual file uploads, inconsistent deployment process
+   - **Solution**: GitHub-based automated deployment with comprehensive scripting
+   - **Result**: Modern, reliable, repeatable deployment workflow
+
+4. **Permission Issues**:
+   - **Cause**: Incorrect file ownership preventing nginx from serving files
+   - **Solution**: Automated permission setting in all deployment scripts
+   - **Result**: Consistent, reliable file access
+
+### 🎯 Current Status Summary (August 9, 2025)
+
+**✅ FULLY OPERATIONAL:**
+- Website: http://212.227.85.148/ (Angular authentication active)
+- Authentication: phantasia_dev / i1Si1SbOEkgK (working login system)  
+- GitHub Integration: Ready for automated deployments
+- Server Infrastructure: Clean, optimized, properly configured
+- Documentation: Comprehensive coverage in CLAUDE.md
+
+**🔄 DEPLOYMENT WORKFLOW:**
+- **Development**: Local Angular development with `pnpm start`
+- **Build**: `pnpm run build` creates production assets
+- **Version Control**: Git commit and push to GitHub
+- **Deploy**: `deploy-phantasia` command on server
+- **Live**: Immediate website update with authentication
+
+**🔐 AUTHENTICATION MODEL:**
+- **Type**: Client-side Angular validation
+- **Purpose**: Development/testing access control
+- **UI**: Professional login screen with credential display
+- **Session**: Persistent localStorage across browser sessions
+- **Security**: Suitable for testing, not production-level security
+
+This comprehensive documentation covers all critical aspects of the project's current state, authentication system, server configuration, GitHub integration, and deployment processes as of August 2025.

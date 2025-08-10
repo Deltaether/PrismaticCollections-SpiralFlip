@@ -51,6 +51,7 @@ $transition: all 0.3s ease;
 /* Home Page Container */
 .home-page {
   min-height: 100vh;
+  height: auto; /* Allow height to grow with content */
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 25%, #1e1e1e 50%, #242424 75%, #1a1a1a 100%);
   color: $light-text;
   position: relative;
@@ -1070,13 +1071,14 @@ $transition: all 0.3s ease;
 
 /* Main Container */
 .home-container {
-  padding-top: 0; /* Remove padding since body now has padding-top */
+  padding-top: 2rem; /* Add some top padding for breathing room */
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding-bottom: 3rem;
+  padding-bottom: 5rem; /* Increase bottom padding to ensure scrollable content */
   position: relative;
   z-index: 1;
+  min-height: calc(100vh - 90px); /* Ensure container is tall enough to scroll */
 }
 
 /* Hero Section */

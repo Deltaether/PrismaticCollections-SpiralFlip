@@ -152,8 +152,8 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Add constant for target aspect ratio
   private readonly targetAspect = 16 / 9;
 
-  // Initialize debug mode flag - use Angular's isDevMode() for production detection
-  public isDebugMode = isDevMode();
+  // Initialize debug mode flag - always enable for recording functionality
+  public isDebugMode = true; // Changed from isDevMode() to always show recording button
 
   // Recording mode - hides all UI elements for clean 3D recording
   public isRecordingMode = false;

@@ -90,6 +90,8 @@ body.home-page-active {
   overflow: auto !important;
   overflow-x: hidden !important;
   padding-top: 90px !important; /* Prevent navbar from covering content */
+  height: auto !important; /* Allow body to expand with content */
+  min-height: 100vh !important; /* Ensure minimum height */
 }
 
 body {

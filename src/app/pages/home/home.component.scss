@@ -1078,7 +1078,7 @@ $transition: all 0.3s ease;
   padding-bottom: 5rem; /* Increase bottom padding to ensure scrollable content */
   position: relative;
   z-index: 1;
-  min-height: calc(100vh - 90px); /* Ensure container is tall enough to scroll */
+  min-height: calc(100vh + 200px); /* Ensure container is definitely taller than viewport for scrolling */
 }
 
 /* Hero Section */

@@ -96,9 +96,11 @@ body.phantasia-3d-page {
 body.home-page-active {
   overflow: auto !important;
   overflow-x: hidden !important;
+  overflow-y: auto !important;
   padding-top: 90px !important; /* Prevent navbar from covering content */
   height: auto !important; /* Allow body to expand with content */
   min-height: 100vh !important; /* Ensure minimum height */
+  position: relative !important; /* Ensure proper positioning context */
 }
 
 body {
@@ -151,13 +153,20 @@ body:not(.phantasia-collection-page) .active:not(.nav-link.active) {
   font-weight: 600 !important;
 }
 
-/* Ensure app-root takes full height and never scrolls */
+/* Ensure app-root takes full height - allow scrolling on home page */
 app-root {
   display: block;
   height: 100%;
   width: 100%;
   position: relative;
-  overflow: hidden; /* Never allow scrolling on app-root */
+  overflow: hidden; /* Prevent scrolling on 3D pages */
+}
+
+/* Allow scrolling on app-root when home page is active */
+body.home-page-active app-root {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 100% !important;
 }
 
 /* Page styles */

@@ -55,10 +55,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.isDebugMode) {
       console.log('[Home] Component initialized');
     }
-    console.log('HOME COMPONENT LOADED - VERSION 2');
+    console.log('HOME COMPONENT LOADED - VERSION 3 (Scroll Fix Applied)');
     
     // Enable scrolling for home page by adding body class only
     this.document.body.classList.add('home-page-active');
+    
+    // Debug scrolling setup
+    setTimeout(() => {
+      const body = this.document.body;
+      const appRoot = this.document.querySelector('app-root') as HTMLElement;
+      console.log('Body classes:', body.className);
+      console.log('Body computed overflow:', getComputedStyle(body).overflow);
+      console.log('App-root computed overflow:', appRoot ? getComputedStyle(appRoot).overflow : 'not found');
+      console.log('Body scrollHeight vs clientHeight:', body.scrollHeight, 'vs', body.clientHeight);
+    }, 100);
     
     // Log the featuredSections to verify the correct data
     console.log('Featured Sections:', this.featuredSections);

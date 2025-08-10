@@ -10,6 +10,59 @@
   perspective: none;
   isolation: isolate;
   z-index: 10;
+  
+  /* Recording mode styles - hide all UI elements globally */
+  ::ng-deep {
+    /* Hide UI elements when body has recording-mode class */
+    body.recording-mode {
+      /* Hide app header and auth status */
+      .app-header,
+      .auth-status {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Hide site header/navbar */
+      app-site-header,
+      .site-header,
+      .header-container,
+      .phantasia-header,
+      header {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Hide any footers or other UI elements */
+      footer,
+      .footer {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Ensure only the 3D canvas is visible */
+      app-cd-cases {
+        .cd-cases-container {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          z-index: 9999 !important;
+          background: #000 !important;
+          
+          .original-3d-container {
+            width: 100% !important;
+            height: 100% !important;
+            
+            canvas {
+              width: 100% !important;
+              height: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .cd-container {
@@ -59,6 +112,48 @@ canvas {
   left: 0;
   pointer-events: none;
   z-index: 2;
+}
+
+/* Recording controls styling */
+.recording-controls {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10000;
+  
+  .record-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: #ff3333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+    }
+    
+    &:disabled {
+      background: #888;
+      cursor: not-allowed;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Updated container class name to match HTML */

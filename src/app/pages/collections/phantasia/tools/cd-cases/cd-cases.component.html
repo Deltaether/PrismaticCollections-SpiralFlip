@@ -7,14 +7,14 @@
   </div>
   
   <!-- Loading indicator overlay -->
-  <div class="loading-overlay" *ngIf="isLoading" aria-live="polite">
+  <div class="loading-overlay" *ngIf="isLoading && !isRecordingMode" aria-live="polite">
     <div class="loading-spinner"></div>
     <div class="loading-text">Loading 3D CD Cases...</div>
   </div>
   
   <!-- Debug menu with OnPush change detection -->
   <app-debug-menu
-    *ngIf="isDebugMode"
+    *ngIf="isDebugMode && !isRecordingMode"
     [sceneSettings]="sceneSettings"
     [caseSettings]="caseSettings"
     [cdCases]="cdCases"
@@ -27,10 +27,23 @@
     (resetToDefault)="resetToDefault()"
     (updateBackgroundEffects)="updateBackgroundEffects()">
   </app-debug-menu>
+  
+  <!-- Recording control button -->
+  <div class="recording-controls" *ngIf="isDebugMode && !isLoading">
+    <button 
+      class="record-btn" 
+      (click)="startRecording()"
+      [disabled]="isRecordingMode">
+      {{ isRecordingMode ? 'Recording... (60s)' : 'Start 60s Recording' }}
+    </button>
+  </div>
 </div>
 
 <!-- Case status indicators with title and artist information -->
-<div class="case-indicators" [style.opacity]="isLoading ? '0' : '1'" aria-live="polite">
+<div class="case-indicators" 
+     *ngIf="!isRecordingMode"
+     [style.opacity]="isLoading ? '0' : '1'" 
+     aria-live="polite">
   <h2 class="visually-hidden">CD Case Status</h2>
   <div *ngFor="let cdCase of cdCases; let i = index; trackBy: trackByCaseId" 
        class="case-indicator"

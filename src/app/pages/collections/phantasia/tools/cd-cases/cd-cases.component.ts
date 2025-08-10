@@ -155,6 +155,9 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Initialize debug mode flag - use Angular's isDevMode() for production detection
   public isDebugMode = isDevMode();
 
+  // Recording mode - hides all UI elements for clean 3D recording
+  public isRecordingMode = false;
+
   // Add a member property for the resize observer
   private resizeObserver: ResizeObserver | null = null;
 
@@ -1278,6 +1281,140 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   trackByCaseId(index: number, cdCase: CDCase): number {
     return cdCase.id;
+  }
+
+  /**
+   * Enables recording mode - hides all UI elements for clean 3D recording
+   * 【✓】
+   */
+  public enableRecordingMode(): void {
+    console.log('[CDCases] Enabling recording mode - hiding all UI elements');
+    
+    // Enable recording mode flag
+    this.isRecordingMode = true;
+    
+    // Hide the right side menu plane (3D object)
+    if (this.rightSideMenuPlane) {
+      this.rightSideMenuPlane.visible = false;
+      console.log('[CDCases] Hidden right side menu 3D plane');
+    }
+    
+    // Hide the map/scroll 3D object - unload background plane
+    if (this.backgroundPlane) {
+      this.backgroundPlane.visible = false;
+      console.log('[CDCases] Hidden background plane 3D object');
+    }
+    
+    // Hide case back video plane
+    if (this.caseBackVideoPlane) {
+      this.caseBackVideoPlane.visible = false;
+      console.log('[CDCases] Hidden case back video plane');
+    }
+    
+    // Hide app header and auth status (using global styles)
+    document.body.classList.add('recording-mode');
+    
+    // Mark for change detection
+    this.cdr.markForCheck();
+    
+    console.log('[CDCases] Recording mode enabled - all UI elements hidden');
+  }
+
+  /**
+   * Disables recording mode - restores all UI elements
+   * 【✓】
+   */
+  public disableRecordingMode(): void {
+    console.log('[CDCases] Disabling recording mode - restoring UI elements');
+    
+    // Disable recording mode flag
+    this.isRecordingMode = false;
+    
+    // Show the right side menu plane
+    if (this.rightSideMenuPlane) {
+      this.rightSideMenuPlane.visible = true;
+    }
+    
+    // Show the background plane
+    if (this.backgroundPlane) {
+      this.backgroundPlane.visible = true;
+    }
+    
+    // Show case back video plane
+    if (this.caseBackVideoPlane) {
+      this.caseBackVideoPlane.visible = true;
+    }
+    
+    // Remove recording mode class
+    document.body.classList.remove('recording-mode');
+    
+    // Mark for change detection
+    this.cdr.markForCheck();
+    
+    console.log('[CDCases] Recording mode disabled - UI elements restored');
+  }
+
+  /**
+   * Starts 60-second Three.js camera recording
+   * 【✓】
+   */
+  public startRecording(): void {
+    console.log('[CDCases] Starting 60-second Three.js recording');
+    
+    // Enable recording mode first
+    this.enableRecordingMode();
+    
+    // Set up MediaRecorder for canvas recording
+    const canvas = this.canvasRef.nativeElement;
+    
+    // Create a stream from the canvas
+    const stream = canvas.captureStream(60); // 60 FPS
+    
+    // Set up MediaRecorder
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm;codecs=vp9'
+    });
+    
+    const recordedChunks: Blob[] = [];
+    
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+    
+    mediaRecorder.onstop = () => {
+      console.log('[CDCases] Recording stopped, processing video');
+      
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      
+      // Create download link
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `phantasia-3d-recording-${Date.now()}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      // Disable recording mode
+      this.disableRecordingMode();
+      
+      console.log('[CDCases] Recording saved and recording mode disabled');
+    };
+    
+    // Start recording
+    mediaRecorder.start();
+    console.log('[CDCases] Recording started for 60 seconds');
+    
+    // Stop recording after 60 seconds
+    setTimeout(() => {
+      mediaRecorder.stop();
+      console.log('[CDCases] 60 seconds elapsed, stopping recording');
+    }, 60000);
   }
 
 

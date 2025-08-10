@@ -81,11 +81,18 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scrolling by default */
+  overflow: auto; /* Allow scrolling by default */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   position: relative;
 }
 
-/* Allow scrolling only on body when home page is active */
+/* Prevent scrolling only on specific pages that need it (like 3D Phantasia pages) */
+body.phantasia-3d-page {
+  overflow: hidden !important; /* Prevent scrolling on 3D pages */
+  height: 100vh !important;
+}
+
+/* Allow scrolling on home page with proper navbar spacing */
 body.home-page-active {
   overflow: auto !important;
   overflow-x: hidden !important;

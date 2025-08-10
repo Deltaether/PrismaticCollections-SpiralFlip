@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { CDCasesComponent } from '../../tools/cd-cases/cd-cases.component';
 import { SiteVersionSelectorComponent } from '../../../../../components/site-version-selector/site-version-selector.component';
@@ -29,7 +29,7 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
   styleUrls: ['./phantasia.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PhantasiaComponent implements OnInit {
+export class PhantasiaComponent implements OnInit, OnDestroy {
   // Flag to control loading state
   isLoading = true;
 
@@ -51,12 +51,20 @@ export class PhantasiaComponent implements OnInit {
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
-    private readonly router: Router
+    private readonly router: Router,
+    @Inject(DOCUMENT) private readonly document: Document
   ) {}
 
   ngOnInit(): void {
     if (this.isDebugMode) {
       console.log(`[PhantasiaComponent] Current URL: ${this.router.url}`);
+    }
+
+    // Add phantasia-3d-page class to body to prevent scrolling during 3D experience
+    this.document.body.classList.add('phantasia-3d-page');
+    
+    if (this.isDebugMode) {
+      console.log(`[PhantasiaComponent] Added phantasia-3d-page class to body`);
     }
 
     // Check if user has already acknowledged the disclaimer
@@ -229,5 +237,14 @@ export class PhantasiaComponent implements OnInit {
       console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}, isMobileView: ${this.isMobileView}`);
     }
     this.cdr.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    // Remove phantasia-3d-page class from body to restore normal scrolling
+    this.document.body.classList.remove('phantasia-3d-page');
+    
+    if (this.isDebugMode) {
+      console.log(`[PhantasiaComponent] Removed phantasia-3d-page class from body - scrolling restored`);
+    }
   }
 }

@@ -61,19 +61,10 @@ img {
   margin-top: 0 !important;
 }
 
-/* Remove padding-top from app-home component in main layout */
-body > app-root > app-main-layout > div > main > app-home,
-.main-layout > main > app-home,
-app-main-layout > div > main > app-home {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Override the home-container padding-top in the home component */
-body > app-root > app-main-layout > div > main > app-home .home-container,
-.main-layout > main > app-home .home-container,
-app-main-layout > div > main > app-home .home-container {
-  padding-top: 0 !important;
+/* Simple home page layout - let component handle its own spacing */
+app-home {
+  display: block;
+  width: 100%;
 }
 
 html, body {
@@ -81,8 +72,7 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: auto; /* Allow scrolling by default */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow: hidden; /* Hide default scrollbar on html/body */
   position: relative;
 }
 
@@ -90,17 +80,13 @@ html, body {
 body.phantasia-3d-page {
   overflow: hidden !important; /* Prevent scrolling on 3D pages */
   height: 100vh !important;
+  padding-top: 0 !important; /* Remove padding on 3D pages to utilize full viewport */
 }
 
-/* Allow scrolling on home page with proper navbar spacing */
+/* Home page layout: simple and clean like collections */
 body.home-page-active {
-  overflow: auto !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  padding-top: 90px !important; /* Prevent navbar from covering content */
-  height: auto !important; /* Allow body to expand with content */
-  min-height: 100vh !important; /* Ensure minimum height */
-  position: relative !important; /* Ensure proper positioning context */
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 body {
@@ -123,18 +109,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(110, 80, 60, 0.3);
+  background: rgba(110, 80, 60, 0.6); /* Increased opacity from 0.3 to 0.6 for better visibility */
   border-radius: 10px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(110, 80, 60, 0.2);
+  border: 1px solid rgba(110, 80, 60, 0.4); /* Increased border opacity too */
   box-shadow: 
     inset 0 0 15px rgba(110, 80, 60, 0.6),
     0 0 5px rgba(110, 80, 60, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(110, 80, 60, 0.5);
+  background: rgba(110, 80, 60, 0.8); /* Increased hover opacity from 0.5 to 0.8 */
   box-shadow: 
     inset 0 0 20px rgba(110, 80, 60, 0.8),
     0 0 7px rgba(110, 80, 60, 0.4);
@@ -153,20 +139,79 @@ body:not(.phantasia-collection-page) .active:not(.nav-link.active) {
   font-weight: 600 !important;
 }
 
-/* Ensure app-root takes full height - allow scrolling on home page */
+/* App-root layout structure for proper scrollbar positioning */
 app-root {
-  display: block;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   width: 100%;
   position: relative;
-  overflow: hidden; /* Prevent scrolling on 3D pages */
+  overflow: hidden; /* No scrolling at app-root level */
 }
 
-/* Allow scrolling on app-root when home page is active */
+/* Prevent scrolling only on specific 3D Phantasia pages */
+body.phantasia-3d-page app-root {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+/* Simple app-root layout for home page */
 body.home-page-active app-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Main scrollable content area - positioned below fixed header */
+app-root > * {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh; /* Full viewport height */
+}
+
+/* Remove scrollbar from app-home specifically */
+app-home {
   overflow: visible !important;
-  height: auto !important;
-  min-height: 100% !important;
+}
+
+/* Home page specific layout */
+body.home-page-active .home-page {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Main content area - starts from top, header overlays it */
+body.home-page-active .home-main {
+  margin-top: 0; /* No margin - header overlays content */
+  min-height: 100vh; /* Content fills full viewport */
+}
+
+/* Ensure header stays fixed at top above all content */
+app-site-header,
+.site-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 900 !important;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* For main header (82px height) */
+.main-header-styles .home-main {
+  margin-top: 82px;
+  min-height: calc(100vh - 82px);
+}
+
+.main-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 900 !important;
 }
 
 /* Page styles */
@@ -207,6 +252,6 @@ section {
 body.collections-page {
   /* Styles specific to collections only */
   .collections-container {
-    padding-top: header.$header-height-site !important; /* Use consistent header height + buffer */
+    padding-top: 1rem !important; /* Reduced from header height since body now has 90px padding-top */
   }
 }

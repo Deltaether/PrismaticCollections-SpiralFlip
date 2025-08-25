@@ -23,15 +23,29 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden !important; /* Prevent scrolling on the body */
+  overflow: auto; /* Allow scrolling by default */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   position: relative;
 }
 
-/* Ensure app-root takes full height */
+/* Only prevent scrolling on specific 3D Phantasia pages that need it */
+body.phantasia-3d-page {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+/* Ensure app-root takes full height but allows scrolling */
 app-root {
   display: block;
-  height: 100%;
+  height: auto; /* Allow height to grow with content */
+  min-height: 100%;
   width: 100%;
   position: relative;
-  overflow: hidden !important; /* Prevent scrolling on the root app container */
+  overflow: visible; /* Allow scrolling on main app container */
+}
+
+/* Only prevent scrolling on app-root for specific 3D Phantasia pages */
+body.phantasia-3d-page app-root {
+  overflow: hidden !important;
+  height: 100vh !important;
 }

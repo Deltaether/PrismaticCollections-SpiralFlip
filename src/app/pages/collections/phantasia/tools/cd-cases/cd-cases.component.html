@@ -19,7 +19,8 @@
       (canplay)="onVideoCanPlay()"
       (loadedmetadata)="onVideoMetadataLoaded()"
       (playing)="onVideoPlaying()"
-      (pause)="onVideoPaused()">
+      (pause)="onVideoPaused()"
+      (error)="onVideoError($event)">
     </video>
     
     <!-- Fallback click-to-play overlay if autoplay fails -->
@@ -34,7 +35,7 @@
     </div>
     <div class="video-overlay-text">
       <p>Using Pre-recorded Video Background</p>
-      <small>Set usePreRecordedVideo = false to re-enable 3D</small>
+      <small>Click "Enable 3D Rendering" to switch to live 3D</small>
     </div>
   </div>
 

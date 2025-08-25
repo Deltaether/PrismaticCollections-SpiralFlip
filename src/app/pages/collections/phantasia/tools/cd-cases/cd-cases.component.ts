@@ -166,7 +166,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly WHEEL_DEBOUNCE_DELAY = 150; // ms
 
   // Video background replacement system
-  public usePreRecordedVideo = true; // Set to false to re-enable 3D
+  public usePreRecordedVideo = false; // Set to true when you have actual video files
   @ViewChild('backgroundVideo') backgroundVideoRef?: ElementRef<HTMLVideoElement>;
   public videoPlaybackFailed = false;
   public autoplayAttempted = false;
@@ -1480,6 +1480,20 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.setLoadingState(false);
       });
     }
+  }
+
+  public onVideoError(event: any): void {
+    console.error('[CDCases] Video loading error:', event);
+    console.log('[CDCases] Falling back to 3D rendering due to video error');
+    
+    // Fallback to 3D mode if video fails to load
+    this.usePreRecordedVideo = false;
+    this.cdr.markForCheck();
+    
+    // Initialize 3D rendering
+    setTimeout(() => {
+      this.ngAfterViewInit();
+    }, 100);
   }
 
   public onVideoLoadStart(): void {

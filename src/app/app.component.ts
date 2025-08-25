@@ -14,8 +14,8 @@ import { LoginComponent } from './components/login/login.component';
   standalone: true,
   imports: [RouterOutlet, CommonModule, LoginComponent],
   template: `
-    @if (authService.isAuthenticated()) {
-      <!-- Show main app when authenticated -->
+    <!-- Temporarily disabled authentication for development testing -->
+    <!-- @if (authService.isAuthenticated()) {
       <div class="app-header">
         <div class="auth-status">
           🔐 Authenticated as: {{ authService.getAuthInfo().username }}
@@ -24,9 +24,11 @@ import { LoginComponent } from './components/login/login.component';
       </div>
       <router-outlet></router-outlet>
     } @else {
-      <!-- Show login screen when not authenticated -->
       <app-login></app-login>
-    }
+    } -->
+    
+    <!-- Direct access to main app for development -->
+    <router-outlet></router-outlet>
   `,
   styles: [`
     .app-header {

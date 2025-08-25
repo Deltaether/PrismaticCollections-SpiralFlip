@@ -48,6 +48,9 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
 
   // Debug flag
   private readonly isDebugMode = true;
+  
+  // Development mode - bypass all loading screens for testing recording controls
+  private readonly isDevelopmentMode = true;
 
   constructor(
     private readonly cdr: ChangeDetectorRef,

@@ -23,6 +23,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/collections-page/new-collections.component').then(m => m.NewCollectionsComponent)
   },
   {
+    path: 'socials',
+    loadComponent: () => import('./pages/social-links/social-links').then(m => m.SocialLinksComponent)
+  },
+  {
+    path: 'news',
+    loadComponent: () => import('./pages/news/news').then(m => m.News)
+  },
+  {
     path: 'test-home',
     component: TestHomeComponent
   },

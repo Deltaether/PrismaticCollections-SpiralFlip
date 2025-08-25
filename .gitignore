@@ -47,3 +47,6 @@ ssh_login.sh
 deploy.sh
 remote_ssh/
 # dist/ - COMMENTED OUT: Pre-built files needed for vCPU deployment
+# Large video files excluded from git
+dist/**/twitter_crossfade.mp4
+dist/**/twitter_crossfade2.mp4

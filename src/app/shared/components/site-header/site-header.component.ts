@@ -34,22 +34,32 @@ import { Router, RouterModule } from '@angular/router';
             </ul>
           </div>
 
-          <!-- Experience Tab -->
-          <div class="nav-section experience-tabs">
-            <ul>
-              <li [class.active]="isActiveRoute('/phantasia')" [routerLink]="['/phantasia/phantasia']">
-                <span class="page-name">Circles</span>
-                <span class="page-description">Socials</span>
-              </li>
-            </ul>
-          </div>
-
           <!-- Collection Tab -->
           <div class="nav-section collection-tabs">
             <ul>
               <li [class.active]="isActiveRoute('/collections')" [routerLink]="['/collections']">
                 <span class="page-name">Gallery</span>
                 <span class="page-description">Library</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- News Tab -->
+          <div class="nav-section news-tabs">
+            <ul>
+              <li [class.active]="isActiveRoute('/news')" [routerLink]="['/news']">
+                <span class="page-name">News</span>
+                <span class="page-description">Updates</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Social Links Tab -->
+          <div class="nav-section experience-tabs">
+            <ul>
+              <li [class.active]="isActiveRoute('/socials')" [routerLink]="['/socials']">
+                <span class="page-name">Circles</span>
+                <span class="page-description">Socials</span>
               </li>
             </ul>
           </div>

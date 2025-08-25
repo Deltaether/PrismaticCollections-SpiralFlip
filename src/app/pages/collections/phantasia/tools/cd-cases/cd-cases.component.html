@@ -1,7 +1,45 @@
 <div class="cd-cases-container">
   
-  <!-- 3D CD Cases Canvas -->
-  <div class="original-3d-container">
+  <!-- Pre-recorded video background (TEMPORARY REPLACEMENT) -->
+  <div class="video-background-container" *ngIf="usePreRecordedVideo">
+    <video 
+      #backgroundVideo 
+      class="background-video"
+      [src]="'assets/3d/CD_Case/pregen_bg_small.webm'"
+      autoplay 
+      loop 
+      muted
+      playsinline
+      preload="auto"
+      webkit-playsinline
+      x5-playsinline
+      [attr.data-object-fit]="'cover'"
+      (loadstart)="onVideoLoadStart()"
+      (loadeddata)="onVideoLoadedData()"
+      (canplay)="onVideoCanPlay()"
+      (loadedmetadata)="onVideoMetadataLoaded()"
+      (playing)="onVideoPlaying()"
+      (pause)="onVideoPaused()">
+    </video>
+    
+    <!-- Fallback click-to-play overlay if autoplay fails -->
+    <div 
+      class="video-play-overlay" 
+      *ngIf="videoPlaybackFailed"
+      (click)="forceVideoPlay()">
+      <div class="play-button">
+        <div class="play-icon">▶</div>
+        <div class="play-text">Click to start background video</div>
+      </div>
+    </div>
+    <div class="video-overlay-text">
+      <p>Using Pre-recorded Video Background</p>
+      <small>Set usePreRecordedVideo = false to re-enable 3D</small>
+    </div>
+  </div>
+
+  <!-- 3D CD Cases Canvas (TEMPORARILY DISABLED) -->
+  <div class="original-3d-container" *ngIf="!usePreRecordedVideo">
     <canvas #canvas></canvas>
     <div #labelRenderer class="label-renderer"></div>
   </div>
@@ -28,13 +66,20 @@
     (updateBackgroundEffects)="updateBackgroundEffects()">
   </app-debug-menu>
   
-  <!-- Recording control button -->
-  <div class="recording-controls" *ngIf="isDebugMode && !isLoading">
+  <!-- Recording controls positioned directly below debug menu -->
+  <div class="recording-controls-below-debug" *ngIf="forceShowRecordingControls || (isDebugMode && !isLoading)">
     <button 
       class="record-btn" 
       (click)="startRecording()"
-      [disabled]="isRecordingMode">
+      [disabled]="isRecordingMode || usePreRecordedVideo">
       {{ isRecordingMode ? 'Recording... (60s)' : 'Start 60s Recording' }}
+    </button>
+    
+    <button 
+      class="toggle-3d-btn" 
+      (click)="toggle3DMode()"
+      [disabled]="isRecordingMode">
+      {{ usePreRecordedVideo ? 'Enable 3D Rendering' : 'Use Pre-recorded Video' }}
     </button>
   </div>
 </div>

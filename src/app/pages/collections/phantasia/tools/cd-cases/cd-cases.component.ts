@@ -165,6 +165,14 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private wheelDebounceTimer: any = null;
   private readonly WHEEL_DEBOUNCE_DELAY = 150; // ms
 
+  // Video background replacement system
+  public usePreRecordedVideo = true; // Set to false to re-enable 3D
+  @ViewChild('backgroundVideo') backgroundVideoRef?: ElementRef<HTMLVideoElement>;
+  public videoPlaybackFailed = false;
+  public autoplayAttempted = false;
+  private videoReadyForPlay = false;
+  public forceShowRecordingControls = true;
+
 
   constructor(
     private cdCasesService: CDCasesService,
@@ -244,6 +252,23 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
    * 【✓】
    */
   ngAfterViewInit(): void {
+    if (this.isDebugMode) {
+      console.log('[CDCases] AfterViewInit - Checking rendering mode');
+      console.log('  - usePreRecordedVideo:', this.usePreRecordedVideo);
+      console.log('  - forceShowRecordingControls:', this.forceShowRecordingControls);
+    }
+    
+    if (this.usePreRecordedVideo) {
+      if (this.isDebugMode) {
+        console.log('[CDCases] Using pre-recorded video background - skipping 3D setup');
+      }
+      // Set loading to false immediately for video mode
+      setTimeout(() => {
+        this.setLoadingState(false);
+      }, 100);
+      return;
+    }
+    
     if (this.isDebugMode) {
       console.log('[CDCases] AfterViewInit - Initializing 3D CD case scene');
     }
@@ -1417,6 +1442,169 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 60000);
   }
 
+  /**
+   * Toggle between video background and 3D rendering modes
+   */
+  public toggle3DMode(): void {
+    this.usePreRecordedVideo = !this.usePreRecordedVideo;
+    console.log('[CDCases] Rendering mode:', this.usePreRecordedVideo ? 'Pre-recorded Video' : 'Live 3D');
+    
+    if (this.usePreRecordedVideo) {
+      // Switching to video mode - clean up 3D resources if they exist
+      if (this.animationId !== null) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+    } else {
+      // Switching to 3D mode - reinitialize if needed
+      this.ngAfterViewInit();
+    }
+    
+    this.cdr.markForCheck();
+  }
 
+  /**
+   * Video event handlers for comprehensive autoplay bypass
+   */
+  public onVideoCanPlay(): void {
+    console.log('[CDCases] Video can play - attempting autoplay');
+    
+    if (this.backgroundVideoRef?.nativeElement && this.usePreRecordedVideo) {
+      const video = this.backgroundVideoRef.nativeElement;
+      
+      video.play().then(() => {
+        console.log('[CDCases] Video autoplay successful');
+        this.setLoadingState(false);
+      }).catch(error => {
+        console.warn('[CDCases] Video autoplay failed:', error);
+        this.setLoadingState(false);
+      });
+    }
+  }
+
+  public onVideoLoadStart(): void {
+    console.log('[CDCases] Video load started');
+  }
+
+  public onVideoLoadedData(): void {
+    console.log('[CDCases] Video data loaded');
+  }
+
+  public onVideoMetadataLoaded(): void {
+    console.log('[CDCases] Video metadata loaded - attempting advanced autoplay');
+    this.videoReadyForPlay = true;
+    this.attemptAdvancedAutoplay();
+  }
+
+  public onVideoPlaying(): void {
+    console.log('[CDCases] Video is now playing successfully');
+    this.videoPlaybackFailed = false;
+    this.autoplayAttempted = true;
+    
+    if (this.usePreRecordedVideo && this.backgroundVideoRef?.nativeElement && this.autoplayAttempted) {
+      setTimeout(() => this.attemptAdvancedAutoplay(), 100);
+    }
+  }
+
+  public onVideoPaused(): void {
+    console.log('[CDCases] Video paused');
+  }
+
+  private async attemptAdvancedAutoplay(): Promise<void> {
+    if (!this.backgroundVideoRef?.nativeElement || !this.usePreRecordedVideo || this.autoplayAttempted) {
+      return;
+    }
+
+    const video = this.backgroundVideoRef.nativeElement;
+    this.autoplayAttempted = true;
+
+    // Aggressive autoplay bypass strategies
+    try {
+      console.log('[CDCases] Attempting advanced video autoplay bypass...');
+      
+      // Strategy 1: Force all muted attributes
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+      
+      // Strategy 2: Set all mobile-friendly attributes
+      video.setAttribute('muted', 'true');
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('x5-playsinline', 'true');
+      video.setAttribute('x5-video-player-type', 'h5');
+      video.setAttribute('x5-video-player-fullscreen', 'false');
+      
+      // Strategy 3: Try immediate play
+      await video.play();
+      console.log('[CDCases] Video autoplay successful on first attempt');
+      
+    } catch (error1) {
+      console.log('[CDCases] First autoplay attempt failed, trying fallback strategies...');
+      
+      try {
+        // Strategy 4: Reset and retry
+        video.load();
+        video.currentTime = 0;
+        await new Promise(resolve => setTimeout(resolve, 50));
+        await video.play();
+        console.log('[CDCases] Video autoplay successful after reset');
+        
+      } catch (error2) {
+        console.log('[CDCases] Reset strategy failed, trying interaction simulation...');
+        
+        try {
+          // Strategy 5: Simulate user interaction timing
+          await new Promise(resolve => {
+            const playHandler = () => {
+              video.removeEventListener('loadedmetadata', playHandler);
+              resolve(video.play());
+            };
+            video.addEventListener('loadedmetadata', playHandler);
+            video.load();
+          });
+          console.log('[CDCases] Video autoplay successful with interaction simulation');
+          
+        } catch (error3) {
+          console.error('[CDCases] All autoplay strategies exhausted:', error3);
+          this.handleAutoplayFailure();
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle autoplay failure with click-to-play fallback
+   */
+  private handleAutoplayFailure(): void {
+    console.log('[CDCases] All autoplay attempts failed - showing user interaction fallback');
+    this.videoPlaybackFailed = true;
+    
+    // Set loading to false so interface is still usable
+    this.setLoadingState(false);
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Force video play when user clicks fallback overlay
+   */
+  public forceVideoPlay(): void {
+    console.log('[CDCases] User clicked to play video');
+    
+    if (this.backgroundVideoRef?.nativeElement && this.usePreRecordedVideo) {
+      const video = this.backgroundVideoRef.nativeElement;
+      this.videoReadyForPlay = true;
+      
+      video.play().then(() => {
+        console.log('[CDCases] Manual video play successful');
+        this.videoPlaybackFailed = false;
+        this.cdr.markForCheck();
+      }).catch(error => {
+        console.error('[CDCases] Manual video play failed:', error);
+        this.videoPlaybackFailed = false;
+        this.cdr.markForCheck();
+      });
+    }
+  }
 
 } 

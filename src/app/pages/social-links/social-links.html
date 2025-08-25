@@ -1,0 +1,164 @@
+<!-- Social Links Page -->
+<div class="social-links-page">
+  
+  <!-- Site Header -->
+  <app-site-header></app-site-header>
+  
+  <!-- Animated Triangle Background -->
+  <div class="triangle-container">
+    <!-- First wave of triangles -->
+    <div class="triangle triangle-1"></div>
+    <div class="triangle triangle-2"></div>
+    <div class="triangle triangle-3"></div>
+    <div class="triangle triangle-4"></div>
+    <div class="triangle triangle-5"></div>
+    <div class="triangle triangle-6"></div>
+    <div class="triangle triangle-7"></div>
+    <div class="triangle triangle-8"></div>
+    
+    <!-- Second wave for waterfall effect -->
+    <div class="triangle triangle-9"></div>
+    <div class="triangle triangle-10"></div>
+    <div class="triangle triangle-11"></div>
+    <div class="triangle triangle-12"></div>
+    <div class="triangle triangle-13"></div>
+    <div class="triangle triangle-14"></div>
+    <div class="triangle triangle-15"></div>
+    <div class="triangle triangle-16"></div>
+    
+    <!-- Third wave for continuous flow -->
+    <div class="triangle triangle-17"></div>
+    <div class="triangle triangle-18"></div>
+    <div class="triangle triangle-19"></div>
+    <div class="triangle triangle-20"></div>
+    
+    <!-- Fourth wave for more population -->
+    <div class="triangle triangle-21"></div>
+    <div class="triangle triangle-22"></div>
+    <div class="triangle triangle-23"></div>
+    <div class="triangle triangle-24"></div>
+    <div class="triangle triangle-25"></div>
+    <div class="triangle triangle-26"></div>
+    <div class="triangle triangle-27"></div>
+    <div class="triangle triangle-28"></div>
+    
+    <!-- Fifth wave for dense waterfall -->
+    <div class="triangle triangle-29"></div>
+    <div class="triangle triangle-30"></div>
+    <div class="triangle triangle-31"></div>
+    <div class="triangle triangle-32"></div>
+    <div class="triangle triangle-33"></div>
+    <div class="triangle triangle-34"></div>
+    <div class="triangle triangle-35"></div>
+    <div class="triangle triangle-36"></div>
+    
+    <!-- Sixth wave for extra density -->
+    <div class="triangle triangle-37"></div>
+    <div class="triangle triangle-38"></div>
+    <div class="triangle triangle-39"></div>
+    <div class="triangle triangle-40"></div>
+    <div class="triangle triangle-41"></div>
+    <div class="triangle triangle-42"></div>
+    <div class="triangle triangle-43"></div>
+    <div class="triangle triangle-44"></div>
+    
+    <!-- Seventh wave for maximum density -->
+    <div class="triangle triangle-45"></div>
+    <div class="triangle triangle-46"></div>
+    <div class="triangle triangle-47"></div>
+    <div class="triangle triangle-48"></div>
+    <div class="triangle triangle-49"></div>
+    <div class="triangle triangle-50"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="social-main">
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="title">ARTIST CIRCLES</h1>
+        <p class="subtitle">Connect with the creators behind Prismatic Collections</p>
+        <p class="description">
+          Explore our artists' social media platforms, follow their journeys, 
+          and stay updated with their latest musical creations and collaborations.
+        </p>
+      </div>
+    </section>
+
+    <!-- Artists Section -->
+    <section class="artists">
+      <h2 class="section-title">Featured Artists</h2>
+      
+      <div class="artists-grid">
+        <div *ngFor="let artist of artists; trackBy: trackByArtistId" 
+             class="artist-card"
+             [class.main-artist]="artist.id === 'deltaether'">
+          
+          <!-- Artist Avatar -->
+          <div class="artist-avatar">
+            <div class="avatar-container">
+              <img [src]="artist.avatar" 
+                   [alt]="artist.name + ' avatar'" 
+                   class="avatar-image"
+                   (error)="$event.target.src='assets/images/default-avatar.jpg'">
+            </div>
+            <div class="avatar-glow"></div>
+          </div>
+          
+          <!-- Artist Info -->
+          <div class="artist-info">
+            <h3 class="artist-name">{{ artist.name }}</h3>
+            <p class="artist-role">{{ artist.role }}</p>
+            <p class="artist-description">{{ artist.description }}</p>
+          </div>
+          
+          <!-- Social Links -->
+          <div class="social-links">
+            <h4 class="links-title">Connect</h4>
+            <div class="social-buttons">
+              <button *ngFor="let link of artist.socialLinks; trackBy: trackByPlatform"
+                      class="social-button"
+                      [style.--social-color]="link.color"
+                      [class.coming-soon]="link.url === '#'"
+                      (click)="openSocialLink(link.url, link.platform)">
+                <span class="social-icon">{{ link.icon }}</span>
+                <span class="social-platform">{{ link.platform }}</span>
+                <span class="social-arrow" *ngIf="link.url !== '#'">→</span>
+                <span class="coming-soon-text" *ngIf="link.url === '#'">Soon</span>
+              </button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="community">
+      <div class="community-content">
+        <h2 class="section-title">Join Our Community</h2>
+        <p class="community-text">
+          Be part of the Prismatic Collections community! Follow our artists, 
+          share your thoughts, and discover new music together.
+        </p>
+        <div class="community-stats">
+          <div class="stat">
+            <span class="stat-number">3+</span>
+            <span class="stat-label">Active Artists</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">10+</span>
+            <span class="stat-label">Social Platforms</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Musical Possibilities</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </main>
+  
+</div>

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
-import { LoginComponent } from './components/login/login.component';
+// import { LoginComponent } from './components/login/login.component'; // Temporarily disabled
 
 /**
  * Root application component with authentication gate
@@ -12,7 +12,7 @@ import { LoginComponent } from './components/login/login.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, LoginComponent],
+  imports: [RouterOutlet, CommonModule], // LoginComponent temporarily removed
   template: `
     <!-- Temporarily disabled authentication for development testing -->
     <!-- @if (authService.isAuthenticated()) {

@@ -1,0 +1,289 @@
+<!-- News Page -->
+<div class="news-page">
+  
+  <!-- Site Header -->
+  <app-site-header></app-site-header>
+  
+  <!-- Animated Triangle Background -->
+  <div class="triangle-container">
+    <!-- First wave of triangles -->
+    <div class="triangle triangle-1"></div>
+    <div class="triangle triangle-2"></div>
+    <div class="triangle triangle-3"></div>
+    <div class="triangle triangle-4"></div>
+    <div class="triangle triangle-5"></div>
+    <div class="triangle triangle-6"></div>
+    <div class="triangle triangle-7"></div>
+    <div class="triangle triangle-8"></div>
+    
+    <!-- Second wave for waterfall effect -->
+    <div class="triangle triangle-9"></div>
+    <div class="triangle triangle-10"></div>
+    <div class="triangle triangle-11"></div>
+    <div class="triangle triangle-12"></div>
+    <div class="triangle triangle-13"></div>
+    <div class="triangle triangle-14"></div>
+    <div class="triangle triangle-15"></div>
+    <div class="triangle triangle-16"></div>
+    
+    <!-- Third wave for continuous flow -->
+    <div class="triangle triangle-17"></div>
+    <div class="triangle triangle-18"></div>
+    <div class="triangle triangle-19"></div>
+    <div class="triangle triangle-20"></div>
+    
+    <!-- Fourth wave for more population -->
+    <div class="triangle triangle-21"></div>
+    <div class="triangle triangle-22"></div>
+    <div class="triangle triangle-23"></div>
+    <div class="triangle triangle-24"></div>
+    <div class="triangle triangle-25"></div>
+    <div class="triangle triangle-26"></div>
+    <div class="triangle triangle-27"></div>
+    <div class="triangle triangle-28"></div>
+    
+    <!-- Fifth wave for dense waterfall -->
+    <div class="triangle triangle-29"></div>
+    <div class="triangle triangle-30"></div>
+    <div class="triangle triangle-31"></div>
+    <div class="triangle triangle-32"></div>
+    <div class="triangle triangle-33"></div>
+    <div class="triangle triangle-34"></div>
+    <div class="triangle triangle-35"></div>
+    <div class="triangle triangle-36"></div>
+    
+    <!-- Sixth wave for extra density -->
+    <div class="triangle triangle-37"></div>
+    <div class="triangle triangle-38"></div>
+    <div class="triangle triangle-39"></div>
+    <div class="triangle triangle-40"></div>
+    <div class="triangle triangle-41"></div>
+    <div class="triangle triangle-42"></div>
+    <div class="triangle triangle-43"></div>
+    <div class="triangle triangle-44"></div>
+    
+    <!-- Seventh wave for maximum density -->
+    <div class="triangle triangle-45"></div>
+    <div class="triangle triangle-46"></div>
+    <div class="triangle triangle-47"></div>
+    <div class="triangle triangle-48"></div>
+    <div class="triangle triangle-49"></div>
+    <div class="triangle triangle-50"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="news-main">
+    
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="title">PROJECT UPDATES</h1>
+        <p class="subtitle">Latest News and Announcements</p>
+        <p class="description">
+          Stay updated with the latest developments, releases, and community highlights 
+          from Prismatic Collections. Discover new features, technical improvements, and exciting announcements.
+        </p>
+      </div>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <section class="filters">
+      <div class="filter-container">
+        
+        <!-- Search Bar -->
+        <div class="search-section">
+          <div class="search-input-container">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search news articles..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            >
+            <div class="search-icon">🔍</div>
+          </div>
+        </div>
+        
+        <!-- Category Filters -->
+        <div class="category-filters">
+          <button 
+            class="filter-button"
+            [class.active]="selectedCategory === ''"
+            (click)="onCategoryChange('')">
+            <span class="filter-icon">📰</span>
+            <span class="filter-label">All News</span>
+          </button>
+          
+          <button 
+            *ngFor="let category of categories" 
+            class="filter-button"
+            [class.active]="selectedCategory === category.value"
+            (click)="onCategoryChange(category.value)">
+            <span class="filter-icon">{{ category.icon }}</span>
+            <span class="filter-label">{{ category.label }}</span>
+          </button>
+        </div>
+        
+        <!-- Clear Filters -->
+        <div class="filter-actions" *ngIf="selectedCategory || searchTerm">
+          <button class="clear-filters" (click)="clearFilters()">
+            <span class="clear-icon">✕</span>
+            Clear Filters
+          </button>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- Featured Articles Section -->
+    <section class="featured-news" *ngIf="featuredArticles().length > 0">
+      <h2 class="section-title">Featured Updates</h2>
+      
+      <div class="featured-grid">
+        <article *ngFor="let article of featuredArticles(); trackBy: trackByArticleId" 
+                 class="featured-article"
+                 (click)="navigateToArticle(article.id)">
+          
+          <!-- Featured Image -->
+          <div class="article-image" *ngIf="article.featuredImage">
+            <img [src]="article.featuredImage" 
+                 [alt]="article.title" 
+                 (error)="$event.target.style.display='none'">
+            <div class="image-overlay"></div>
+          </div>
+          
+          <!-- Article Content -->
+          <div class="article-content">
+            
+            <!-- Article Meta -->
+            <div class="article-meta">
+              <span class="category-badge">
+                <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
+                {{ getCategoryLabel(article.category) }}
+              </span>
+              <span class="publish-date">{{ formatDate(article.publishDate) }}</span>
+              <span class="pinned-indicator" *ngIf="article.isPinned">📌 Pinned</span>
+            </div>
+            
+            <!-- Article Title and Subtitle -->
+            <h3 class="article-title">{{ article.title }}</h3>
+            <p class="article-subtitle">{{ article.subtitle }}</p>
+            <p class="article-excerpt">{{ article.excerpt }}</p>
+            
+            <!-- Author Info -->
+            <div class="author-info">
+              <div class="author-avatar" *ngIf="article.author.avatar">
+                <img [src]="article.author.avatar" [alt]="article.author.name">
+              </div>
+              <div class="author-details">
+                <span class="author-name">{{ article.author.name }}</span>
+                <span class="author-role">{{ article.author.role }}</span>
+              </div>
+            </div>
+            
+            <!-- Tags -->
+            <div class="article-tags">
+              <span *ngFor="let tag of article.tags" class="tag">#{{ tag }}</span>
+            </div>
+            
+            <!-- Read More -->
+            <div class="read-more">
+              <span class="read-more-text">Read Full Article</span>
+              <span class="read-more-arrow">→</span>
+            </div>
+            
+          </div>
+          
+        </article>
+      </div>
+    </section>
+
+    <!-- Regular News Articles -->
+    <section class="news-articles">
+      <h2 class="section-title" *ngIf="featuredArticles().length > 0">Recent Updates</h2>
+      <h2 class="section-title" *ngIf="featuredArticles().length === 0">All Updates</h2>
+      
+      <!-- No Results Message -->
+      <div class="no-results" *ngIf="regularArticles().length === 0 && featuredArticles().length === 0">
+        <div class="no-results-icon">🔍</div>
+        <h3 class="no-results-title">No articles found</h3>
+        <p class="no-results-text">
+          <span *ngIf="searchTerm || selectedCategory">No articles match your current filters.</span>
+          <span *ngIf="!searchTerm && !selectedCategory">No news articles are currently available.</span>
+        </p>
+        <button class="clear-filters" *ngIf="searchTerm || selectedCategory" (click)="clearFilters()">
+          Clear filters and show all articles
+        </button>
+      </div>
+      
+      <!-- Articles Grid -->
+      <div class="articles-grid" *ngIf="regularArticles().length > 0">
+        <article *ngFor="let article of regularArticles(); trackBy: trackByArticleId" 
+                 class="news-article"
+                 (click)="navigateToArticle(article.id)">
+          
+          <!-- Article Meta -->
+          <div class="article-meta">
+            <span class="category-badge small">
+              <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
+              {{ getCategoryLabel(article.category) }}
+            </span>
+            <span class="publish-date">{{ formatDate(article.publishDate) }}</span>
+          </div>
+          
+          <!-- Article Content -->
+          <div class="article-content">
+            <h3 class="article-title">{{ article.title }}</h3>
+            <p class="article-subtitle" *ngIf="article.subtitle">{{ article.subtitle }}</p>
+            <p class="article-excerpt">{{ article.excerpt }}</p>
+            
+            <!-- Author Info -->
+            <div class="author-info compact">
+              <span class="author-name">{{ article.author.name }}</span>
+              <span class="author-separator">•</span>
+              <span class="author-role">{{ article.author.role }}</span>
+            </div>
+            
+            <!-- Tags -->
+            <div class="article-tags">
+              <span *ngFor="let tag of article.tags.slice(0, 3)" class="tag small">#{{ tag }}</span>
+              <span *ngIf="article.tags.length > 3" class="tag-more">+{{ article.tags.length - 3 }} more</span>
+            </div>
+          </div>
+          
+          <!-- Read More Indicator -->
+          <div class="read-indicator">
+            <span class="read-text">Read More</span>
+            <span class="read-arrow">→</span>
+          </div>
+          
+        </article>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="newsletter-cta">
+      <div class="cta-content">
+        <h2 class="cta-title">Stay Updated</h2>
+        <p class="cta-text">
+          Never miss an update! Follow our social channels or bookmark this page 
+          to stay informed about the latest developments in Prismatic Collections.
+        </p>
+        <div class="cta-buttons">
+          <button class="button primary" (click)="router.navigate(['/socials'])">
+            <span class="button-icon">🔔</span>
+            Follow Us
+            <span class="button-description">Join our community channels</span>
+          </button>
+          <button class="button secondary" (click)="router.navigate(['/collections'])">
+            <span class="button-icon">🎨</span>
+            Explore Collections
+            <span class="button-description">Discover our interactive experiences</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    
+  </main>
+  
+</div>

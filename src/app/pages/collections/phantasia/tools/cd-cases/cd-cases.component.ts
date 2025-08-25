@@ -166,7 +166,7 @@ export class CDCasesComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly WHEEL_DEBOUNCE_DELAY = 150; // ms
 
   // Video background replacement system
-  public usePreRecordedVideo = false; // Set to true when you have actual video files
+  public usePreRecordedVideo = true; // Now using optimized 11MB video file
   @ViewChild('backgroundVideo') backgroundVideoRef?: ElementRef<HTMLVideoElement>;
   public videoPlaybackFailed = false;
   public autoplayAttempted = false;

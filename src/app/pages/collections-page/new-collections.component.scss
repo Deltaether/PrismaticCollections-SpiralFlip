@@ -81,11 +81,13 @@
   overflow: hidden;
 }
 
-/* 【✓】 Individual triangle shapes that fill from base to peak */
+/* 【✓】 Individual triangle shapes - Performance Optimized */
 .triangle {
   position: absolute;
   width: 60px;
   height: 50px;
+  /* Enable hardware acceleration */
+  will-change: transform;
   
   // Base triangle background (darker grey unfilled area)
   &::before {
@@ -98,9 +100,10 @@
     background: rgba(160, 160, 160, 0.9); // Darker grey unfilled
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     z-index: 1;
+    will-change: clip-path;
   }
   
-  // Filled portion (starts violet, becomes orange)
+  // Filled portion (starts violet, becomes orange) - REMOVE EXPENSIVE FILTER
   &::after {
     content: '';
     position: absolute;
@@ -111,7 +114,8 @@
     background: #8b5cf6; // Start violet
     clip-path: polygon(50% 100%, 0% 100%, 100% 100%); // Start with 0% fill (just base line)
     z-index: 2;
-    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.3));
+    /* Remove expensive drop-shadow filter for better performance */
+    will-change: clip-path, background;
   }
 }
 
@@ -566,41 +570,38 @@
   }
 }
 
-/* 【✓】 Triangle Movement - Waterfall movement from bottom to top */
+/* 【✓】 Triangle Movement - Optimized for Performance */
 @keyframes triangleMove {
   0% { 
-    transform: translateY(100vh);
+    transform: translate3d(0, 100vh, 0);
   }
   100% { 
-    transform: translateY(-100vh);
+    transform: translate3d(0, -100vh, 0);
   }
 }
 
-/* 【✓】 Exact Same Animation as Home Page - Just Copy/Paste */
+/* 【✓】 Triangle Fill Animation - Performance Optimized */
 @keyframes triangleFill {
   0% { 
     // Start with 0% fill (just base line) and violet color
     clip-path: polygon(50% 100%, 0% 100%, 100% 100%);
     background: #8b5cf6; // Pure violet
-    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.3));
+    /* Remove expensive filter operations */
   }
   37% { 
     // Color change happens below "Explore Prisms" text
     clip-path: polygon(50% 63%, 0% 100%, 100% 100%);
     background: #ff7f50; // Change to Prismatic Collections orange
-    filter: drop-shadow(0 0 7px rgba(255, 127, 80, 0.4));
   }
   50% { 
     // Half filled with orange
     clip-path: polygon(50% 50%, 0% 100%, 100% 100%);
     background: #ff7f50; // Prismatic Collections orange
-    filter: drop-shadow(0 0 8px rgba(255, 127, 80, 0.5));
   }
   100% { 
     // Fully filled triangle with pure Prismatic orange
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     background: #ff7f50; // Pure Prismatic Collections orange
-    filter: drop-shadow(0 0 12px rgba(255, 127, 80, 0.7));
   }
 }
 
@@ -630,29 +631,38 @@
   padding: 1rem 0;
 }
 
-/* Album Card */
+/* Album Card - Performance Optimized */
 .album-card {
   position: relative;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Optimize transitions - only animate specific properties */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  /* Remove expensive backdrop-filter for now - use solid background instead */
+  background: rgba(20, 24, 40, 0.85);
+  
+  /* Enable hardware acceleration */
+  will-change: transform, box-shadow;
+  transform: translateZ(0); /* Force GPU layer */
   
   &:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.08);
+    /* Use translate3d for better performance */
+    transform: translate3d(0, -8px, 0);
     border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    /* Simplified box-shadow - less expensive */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
     
     .card-overlay {
       opacity: 1;
     }
     
     .play-button {
-      transform: scale(1.1);
+      transform: scale3d(1.05, 1.05, 1); /* Reduce scale for smoother animation */
     }
   }
   
@@ -676,7 +686,7 @@
   }
 }
 
-/* Card Image */
+/* Card Image - Performance Optimized */
 .card-image {
   position: relative;
   width: 100%;
@@ -687,15 +697,19 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    /* Faster transition with hardware acceleration */
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU layer */
   }
   
   &:hover img {
-    transform: scale(1.1);
+    /* Use scale3d for hardware acceleration and reduce scale */
+    transform: scale3d(1.05, 1.05, 1);
   }
 }
 
-/* Card Overlay */
+/* Card Overlay - Performance Optimized */
 .card-overlay {
   position: absolute;
   top: 0;
@@ -707,10 +721,12 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  /* Faster transition */
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
 }
 
-/* Play Button */
+/* Play Button - Performance Optimized */
 .play-button {
   width: 60px;
   height: 60px;
@@ -720,7 +736,10 @@
   align-items: center;
   justify-content: center;
   color: #000;
-  transition: transform 0.3s ease;
+  /* Faster transition with hardware acceleration */
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU layer */
   
   svg {
     margin-left: 2px; // Optical alignment for play icon
@@ -774,7 +793,9 @@
   border-radius: 15px;
   font-size: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  /* Optimized transitions - specific properties only */
+  transition: background-color 0.15s ease,
+              border-color 0.15s ease;
   
   &:hover {
     background: rgba(255, 255, 255, 0.2);

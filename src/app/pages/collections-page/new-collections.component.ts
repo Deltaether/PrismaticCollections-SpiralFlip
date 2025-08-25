@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
@@ -37,7 +37,9 @@ interface Triangle {
   standalone: true,
   imports: [CommonModule, SiteHeaderComponent],
   templateUrl: './new-collections.component.html',
-  styleUrls: ['./new-collections.component.scss']
+  styleUrls: ['./new-collections.component.scss'],
+  // Enable OnPush change detection for better performance
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewCollectionsComponent implements OnInit {
   
@@ -129,5 +131,10 @@ export class NewCollectionsComponent implements OnInit {
     if (album) {
       this.router.navigate([album.route]);
     }
+  }
+
+  /* TrackBy function for better ngFor performance */
+  trackByAlbumId(index: number, album: Album): string {
+    return album.id;
   }
 }

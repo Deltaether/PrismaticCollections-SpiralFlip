@@ -4,7 +4,7 @@
   <!-- Site Header -->
   <app-site-header></app-site-header>
   
-  <!-- Exact Same Triangle Structure as Home Page -->
+  <!-- Performance Optimized Triangle Structure - Reduced Count -->
   <div class="triangle-container">
     <div class="triangle triangle-1"></div>
     <div class="triangle triangle-2"></div>
@@ -18,19 +18,7 @@
     <div class="triangle triangle-10"></div>
     <div class="triangle triangle-11"></div>
     <div class="triangle triangle-12"></div>
-    <div class="triangle triangle-13"></div>
-    <div class="triangle triangle-14"></div>
-    <div class="triangle triangle-15"></div>
-    <div class="triangle triangle-16"></div>
-    <div class="triangle triangle-17"></div>
-    <div class="triangle triangle-18"></div>
-    <div class="triangle triangle-19"></div>
-    <div class="triangle triangle-20"></div>
-    <div class="triangle triangle-21"></div>
-    <div class="triangle triangle-22"></div>
-    <div class="triangle triangle-23"></div>
-    <div class="triangle triangle-24"></div>
-    <div class="triangle triangle-25"></div>
+    <!-- Reduced from 25 to 12 triangles for better performance -->
   </div>
 
   <!-- Main Content -->
@@ -48,12 +36,12 @@
       <!-- Albums Grid -->
       <div class="albums-grid">
         <div class="album-card" 
-             *ngFor="let album of albums" 
+             *ngFor="let album of albums; trackBy: trackByAlbumId" 
              (click)="navigateToAlbum(album.id)"
              [class.featured]="album.featured">
           
           <div class="card-image">
-            <img [src]="album.coverImage" [alt]="album.title" />
+            <img [src]="album.coverImage" [alt]="album.title" loading="lazy" />
             <div class="card-overlay">
               <div class="play-button">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

@@ -1,4 +1,4 @@
-@use '../themes/variables' as vars;
+@use '../themes/simple-theme' as vars;
 
 // 【✓】 Button Base
 button, .button {
@@ -7,7 +7,7 @@ button, .button {
   outline: none;
   padding: vars.$spacing-sm vars.$spacing-md;
   border-radius: vars.$border-radius-sm;
-  transition: all vars.$transition-normal;
+  transition: all vars.$transition-standard;
   font-size: vars.$font-size-md;
   
   &:hover {

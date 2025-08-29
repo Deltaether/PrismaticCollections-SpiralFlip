@@ -1,0 +1,566 @@
+/**
+ * Angular Material-inspired Theme System for Prismatic Collections
+ * Following Angular 20 Material Design 3 principles
+ * 
+ * This file establishes a comprehensive theming system with:
+ * - Color palettes with tonal variations
+ * - CSS custom properties for runtime theming
+ * - SCSS mixins for consistent usage
+ * - Dark/Light theme support
+ */
+
+@use 'sass:map';
+@use 'sass:color';
+@use 'sass:math';
+@use 'sass:meta';
+@use 'sass:string';
+
+// ============================================================================
+// Core Theme Configuration
+// ============================================================================
+
+// Generate tonal palette from base color
+@function generate-palette($base-color, $name: 'custom') {
+  @return (
+    50: color.scale($base-color, $lightness: 95%),
+    100: color.scale($base-color, $lightness: 85%),
+    200: color.scale($base-color, $lightness: 70%),
+    300: color.scale($base-color, $lightness: 50%),
+    400: color.scale($base-color, $lightness: 25%),
+    500: $base-color,
+    600: color.scale($base-color, $lightness: -10%),
+    700: color.scale($base-color, $lightness: -25%),
+    800: color.scale($base-color, $lightness: -40%),
+    900: color.scale($base-color, $lightness: -60%),
+    A100: color.adjust($base-color, $saturation: 20%, $lightness: 15%),
+    A200: color.adjust($base-color, $saturation: 30%, $lightness: 5%),
+    A400: color.adjust($base-color, $saturation: 40%),
+    A700: color.adjust($base-color, $saturation: 50%, $lightness: -10%),
+    contrast: (
+      50: rgba(0, 0, 0, 0.87),
+      100: rgba(0, 0, 0, 0.87),
+      200: rgba(0, 0, 0, 0.87),
+      300: rgba(0, 0, 0, 0.87),
+      400: rgba(0, 0, 0, 0.87),
+      500: white,
+      600: white,
+      700: white,
+      800: white,
+      900: white,
+      A100: rgba(0, 0, 0, 0.87),
+      A200: white,
+      A400: white,
+      A700: white,
+    )
+  );
+}
+
+// ============================================================================
+// Prismatic Collections Color Palettes
+// ============================================================================
+
+// Primary Palette - Coral/Orange (Site's signature color)
+$prismatic-coral-palette: (
+  50: #fef7f5,
+  100: #feebe6,
+  200: #fdd2c2,
+  300: #fbb499,
+  400: #f8906f,
+  500: #ff6b6b,  // Primary base - signature coral
+  600: #ff5252,  // Darker coral
+  700: #e84545,
+  800: #d13838,
+  900: #b92b2b,
+  A100: #ffb3b3,
+  A200: #ff8080,
+  A400: #ff4d4d,
+  A700: #ff1a1a,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: rgba(0, 0, 0, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: rgba(0, 0, 0, 0.87),
+    A400: white,
+    A700: white,
+  )
+);
+
+// Accent Palette - Blue/Teal (Complementary colors)
+$prismatic-accent-palette: (
+  50: #e8f4fd,
+  100: #c5e4fb,
+  200: #9ed2f8,
+  300: #77c0f5,
+  400: #5ab3f3,
+  500: #4a9eff,  // Base blue
+  600: #3d8ce8,
+  700: #2f7ad1,
+  800: #2268ba,
+  900: #0d4d96,
+  A100: #82b1ff,
+  A200: #448aff,
+  A400: #2979ff,
+  A700: #2962ff,
+  teal: (
+    light: #20b2aa,
+    main: #008080,
+    dark: #005757,
+    cyan: #00ced1,
+  ),
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: rgba(0, 0, 0, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+// Neutral Palette - Grays for backgrounds and surfaces
+$prismatic-neutral-palette: (
+  50: #fafafa,
+  100: #f5f5f5,
+  200: #eeeeee,
+  300: #e0e0e0,
+  400: #bdbdbd,
+  500: #9e9e9e,
+  600: #757575,
+  700: #616161,
+  800: #424242,
+  900: #212121,
+  // Dark theme specific
+  950: #121212,
+  975: #0a0a0f,
+  1000: #000000,
+);
+
+// Success/Warning/Error Palettes (Semantic colors)
+$prismatic-semantic-colors: (
+  success: (
+    light: #81c784,
+    main: #4caf50,
+    dark: #388e3c,
+    contrast: white,
+  ),
+  warning: (
+    light: #ffb74d,
+    main: #ff9800,
+    dark: #f57c00,
+    contrast: rgba(0, 0, 0, 0.87),
+  ),
+  error: (
+    light: #e57373,
+    main: #f44336,
+    dark: #d32f2f,
+    contrast: white,
+  ),
+  info: (
+    light: #64b5f6,
+    main: #2196f3,
+    dark: #1976d2,
+    contrast: white,
+  ),
+);
+
+// ============================================================================
+// Theme Definitions
+// ============================================================================
+
+// Light Theme Configuration
+$prismatic-light-theme: (
+  primary: $prismatic-coral-palette,
+  accent: $prismatic-accent-palette,
+  warn: map.get($prismatic-semantic-colors, error),
+  is-dark: false,
+  foreground: (
+    base: black,
+    divider: rgba(0, 0, 0, 0.12),
+    dividers: rgba(0, 0, 0, 0.12),
+    disabled: rgba(0, 0, 0, 0.38),
+    disabled-button: rgba(0, 0, 0, 0.26),
+    disabled-text: rgba(0, 0, 0, 0.38),
+    elevation: black,
+    hint-text: rgba(0, 0, 0, 0.38),
+    secondary-text: rgba(0, 0, 0, 0.54),
+    icon: rgba(0, 0, 0, 0.54),
+    icons: rgba(0, 0, 0, 0.54),
+    text: rgba(0, 0, 0, 0.87),
+    slider-min: rgba(0, 0, 0, 0.87),
+    slider-off: rgba(0, 0, 0, 0.26),
+    slider-off-active: rgba(0, 0, 0, 0.38),
+  ),
+  background: (
+    status-bar: map.get($prismatic-neutral-palette, 300),
+    app-bar: map.get($prismatic-neutral-palette, 100),
+    background: map.get($prismatic-neutral-palette, 50),
+    hover: rgba(0, 0, 0, 0.04),
+    card: white,
+    dialog: white,
+    disabled-button: rgba(0, 0, 0, 0.12),
+    raised-button: white,
+    focused-button: rgba(0, 0, 0, 0.12),
+    selected-button: map.get($prismatic-neutral-palette, 300),
+    selected-disabled-button: map.get($prismatic-neutral-palette, 400),
+    disabled-button-toggle: map.get($prismatic-neutral-palette, 200),
+    unselected-chip: map.get($prismatic-neutral-palette, 300),
+    disabled-list-option: map.get($prismatic-neutral-palette, 200),
+    tooltip: map.get($prismatic-neutral-palette, 700),
+  ),
+);
+
+// Dark Theme Configuration
+$prismatic-dark-theme: (
+  primary: $prismatic-coral-palette,
+  accent: $prismatic-accent-palette,
+  warn: map.get($prismatic-semantic-colors, error),
+  is-dark: true,
+  foreground: (
+    base: white,
+    divider: rgba(255, 255, 255, 0.12),
+    dividers: rgba(255, 255, 255, 0.12),
+    disabled: rgba(255, 255, 255, 0.3),
+    disabled-button: rgba(255, 255, 255, 0.3),
+    disabled-text: rgba(255, 255, 255, 0.3),
+    elevation: black,
+    hint-text: rgba(255, 255, 255, 0.3),
+    secondary-text: rgba(255, 255, 255, 0.7),
+    icon: white,
+    icons: white,
+    text: white,
+    slider-min: white,
+    slider-off: rgba(255, 255, 255, 0.3),
+    slider-off-active: rgba(255, 255, 255, 0.3),
+  ),
+  background: (
+    status-bar: black,
+    app-bar: map.get($prismatic-neutral-palette, 900),
+    background: #0a0a0f,  // Deep space black (from home component)
+    hover: rgba(255, 255, 255, 0.04),
+    card: rgba(30, 44, 54, 0.45),  // Glassmorphic card
+    dialog: map.get($prismatic-neutral-palette, 800),
+    disabled-button: rgba(255, 255, 255, 0.12),
+    raised-button: map.get($prismatic-neutral-palette, 800),
+    focused-button: rgba(255, 255, 255, 0.12),
+    selected-button: map.get($prismatic-neutral-palette, 900),
+    selected-disabled-button: map.get($prismatic-neutral-palette, 800),
+    disabled-button-toggle: black,
+    unselected-chip: map.get($prismatic-neutral-palette, 700),
+    disabled-list-option: rgba(255, 255, 255, 0.12),
+    tooltip: map.get($prismatic-neutral-palette, 700),
+  ),
+);
+
+// ============================================================================
+// CSS Custom Properties Generation
+// ============================================================================
+
+@mixin generate-css-variables($theme, $prefix: '') {
+  // Primary colors
+  @each $weight, $color in map.get($theme, primary) {
+    @if meta.type-of($color) == 'color' {
+      --#{$prefix}primary-#{$weight}: #{$color};
+    }
+  }
+  
+  // Accent colors
+  @each $weight, $color in map.get($theme, accent) {
+    @if meta.type-of($color) == 'color' {
+      --#{$prefix}accent-#{$weight}: #{$color};
+    } @else if meta.type-of($color) == 'map' {
+      @each $subweight, $subcolor in $color {
+        // Convert color names to strings safely
+        $weight-str: if(meta.type-of($weight) == 'color', '' + $weight, $weight);
+        $subweight-str: if(meta.type-of($subweight) == 'color', '' + $subweight, $subweight);
+        --#{$prefix}accent-#{$weight-str}-#{$subweight-str}: #{$subcolor};
+      }
+    }
+  }
+  
+  // Semantic colors
+  @each $semantic, $colors in $prismatic-semantic-colors {
+    @each $variant, $color in $colors {
+      @if meta.type-of($color) == 'color' {
+        --#{$prefix}#{$semantic}-#{$variant}: #{$color};
+      }
+    }
+  }
+  
+  // Foreground colors
+  @each $key, $color in map.get($theme, foreground) {
+    --#{$prefix}foreground-#{$key}: #{$color};
+  }
+  
+  // Background colors
+  @each $key, $color in map.get($theme, background) {
+    --#{$prefix}background-#{$key}: #{$color};
+  }
+  
+  // Additional custom properties
+  --#{$prefix}border-radius-sm: 4px;
+  --#{$prefix}border-radius-md: 8px;
+  --#{$prefix}border-radius-lg: 16px;
+  --#{$prefix}border-radius-xl: 24px;
+  
+  --#{$prefix}spacing-xs: 4px;
+  --#{$prefix}spacing-sm: 8px;
+  --#{$prefix}spacing-md: 16px;
+  --#{$prefix}spacing-lg: 24px;
+  --#{$prefix}spacing-xl: 32px;
+  --#{$prefix}spacing-xxl: 48px;
+  
+  --#{$prefix}transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --#{$prefix}transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --#{$prefix}transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --#{$prefix}elevation-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --#{$prefix}elevation-2: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --#{$prefix}elevation-3: 0 8px 16px rgba(0, 0, 0, 0.14);
+  --#{$prefix}elevation-4: 0 12px 24px rgba(0, 0, 0, 0.16);
+  --#{$prefix}elevation-5: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+// ============================================================================
+// Theme Application
+// ============================================================================
+
+// Default theme (dark)
+:root {
+  @include generate-css-variables($prismatic-dark-theme, 'theme-');
+  
+  // Signature gradients
+  --gradient-primary: linear-gradient(135deg, #ff6b6b, #ff5252);
+  --gradient-accent: linear-gradient(135deg, #4a9eff, #20b2aa);
+  --gradient-dark: linear-gradient(180deg, #0a0a0f 0%, #0f1419 25%, #141922 50%, #0d1117 75%, #080810 100%);
+  
+  // Glassmorphism effects
+  --glass-blur: blur(10px);
+  --glass-background: rgba(255, 255, 255, 0.05);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+// Light theme class
+.theme-light {
+  @include generate-css-variables($prismatic-light-theme, 'theme-');
+  
+  // Override glassmorphism for light theme
+  --glass-background: rgba(255, 255, 255, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+// ============================================================================
+// Utility Mixins
+// ============================================================================
+
+// Apply primary color with proper contrast
+@mixin apply-primary($property: background-color, $weight: 500) {
+  #{$property}: var(--theme-primary-#{$weight});
+  
+  @if $property == background-color or $property == background {
+    color: var(--theme-primary-contrast-#{$weight});
+  }
+}
+
+// Apply accent color with proper contrast
+@mixin apply-accent($property: background-color, $weight: 500) {
+  #{$property}: var(--theme-accent-#{$weight});
+  
+  @if $property == background-color or $property == background {
+    color: var(--theme-accent-contrast-#{$weight});
+  }
+}
+
+// Glassmorphism effect
+@mixin glassmorphism($blur: 10px, $opacity: 0.05) {
+  background: var(--glass-background);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+// Card elevation
+@mixin elevation($level: 2) {
+  box-shadow: var(--theme-elevation-#{$level});
+}
+
+// Theme-aware text color
+@mixin theme-text($type: primary) {
+  @if $type == primary {
+    color: var(--theme-foreground-text);
+  } @else if $type == secondary {
+    color: var(--theme-foreground-secondary-text);
+  } @else if $type == disabled {
+    color: var(--theme-foreground-disabled-text);
+  } @else if $type == hint {
+    color: var(--theme-foreground-hint-text);
+  }
+}
+
+// Theme-aware background
+@mixin theme-background($type: background) {
+  background-color: var(--theme-background-#{$type});
+}
+
+// Responsive spacing
+@mixin spacing($sides: all, $size: md) {
+  $value: var(--theme-spacing-#{$size});
+  
+  @if $sides == all {
+    padding: $value;
+  } @else if $sides == vertical {
+    padding-top: $value;
+    padding-bottom: $value;
+  } @else if $sides == horizontal {
+    padding-left: $value;
+    padding-right: $value;
+  } @else if $sides == top {
+    padding-top: $value;
+  } @else if $sides == bottom {
+    padding-bottom: $value;
+  } @else if $sides == left {
+    padding-left: $value;
+  } @else if $sides == right {
+    padding-right: $value;
+  }
+}
+
+// ============================================================================
+// Component Theming Mixins
+// ============================================================================
+
+// Button theming
+@mixin theme-button($variant: filled, $color: primary) {
+  @if $variant == filled {
+    @include apply-primary(background-color);
+    border: none;
+    @include elevation(2);
+    
+    &:hover {
+      @include elevation(3);
+      filter: brightness(1.1);
+    }
+    
+    &:active {
+      @include elevation(1);
+    }
+    
+    &:disabled {
+      background-color: var(--theme-background-disabled-button);
+      color: var(--theme-foreground-disabled-text);
+      @include elevation(0);
+    }
+  } @else if $variant == outlined {
+    background-color: transparent;
+    border: 2px solid var(--theme-primary-500);
+    color: var(--theme-primary-500);
+    
+    &:hover {
+      background-color: var(--theme-primary-50);
+    }
+    
+    &:disabled {
+      border-color: var(--theme-foreground-disabled);
+      color: var(--theme-foreground-disabled-text);
+    }
+  } @else if $variant == text {
+    background-color: transparent;
+    border: none;
+    color: var(--theme-primary-500);
+    
+    &:hover {
+      background-color: var(--theme-background-hover);
+    }
+    
+    &:disabled {
+      color: var(--theme-foreground-disabled-text);
+    }
+  }
+  
+  // Common button properties
+  padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+  border-radius: var(--theme-border-radius-md);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--theme-transition-standard);
+  cursor: pointer;
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// Card theming
+@mixin theme-card($elevated: true, $glassmorphic: false) {
+  @if $glassmorphic {
+    @include glassmorphism();
+  } @else {
+    @include theme-background(card);
+    
+    @if $elevated {
+      @include elevation(2);
+    }
+  }
+  
+  border-radius: var(--theme-border-radius-lg);
+  @include spacing(all, lg);
+}
+
+// Input theming
+@mixin theme-input() {
+  background-color: var(--theme-background-background);
+  border: 1px solid var(--theme-foreground-divider);
+  border-radius: var(--theme-border-radius-md);
+  color: var(--theme-foreground-text);
+  padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+  transition: var(--theme-transition-fast);
+  
+  &:hover {
+    border-color: var(--theme-primary-300);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--theme-primary-500);
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+  }
+  
+  &:disabled {
+    background-color: var(--theme-background-disabled-button);
+    color: var(--theme-foreground-disabled-text);
+    cursor: not-allowed;
+  }
+  
+  &::placeholder {
+    color: var(--theme-foreground-hint-text);
+  }
+}
+
+// Export variables for use in TypeScript
+:export {
+  primaryColor: #ff6b6b;
+  accentColor: #4a9eff;
+  successColor: #4caf50;
+  warningColor: #ff9800;
+  errorColor: #f44336;
+  infoColor: #2196f3;
+}

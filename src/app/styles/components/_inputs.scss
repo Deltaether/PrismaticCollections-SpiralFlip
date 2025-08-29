@@ -1,4 +1,4 @@
-@use '../themes/variables' as vars;
+@use '../themes/simple-theme' as vars;
 
 // 【✓】 Form Inputs
 input, textarea, select {
@@ -7,7 +7,7 @@ input, textarea, select {
   border: 1px solid #ddd;
   border-radius: vars.$border-radius-sm;
   font-size: vars.$font-size-md;
-  transition: border-color vars.$transition-normal, box-shadow vars.$transition-normal;
+  transition: border-color vars.$transition-standard, box-shadow vars.$transition-standard;
   
   &:focus {
     outline: none;

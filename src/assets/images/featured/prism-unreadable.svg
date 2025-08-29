@@ -83,13 +83,13 @@
   <!-- Main 3D prism with glassmorphism -->
   <g transform="translate(200,130)">
     
-    <!-- Back face - darker -->
-    <polygon points="-45,40 45,40 45,-50 -45,-50" 
+    <!-- Back face - darker triangular -->
+    <polygon points="-45,40 45,40 0,-50" 
              fill="url(#darkGradient)" 
              opacity="0.6"/>
     
     <!-- Left face with glass effect -->
-    <polygon points="-70,60 -45,40 -45,-50 -70,-30" 
+    <polygon points="-70,60 -45,40 0,-50 -25,-60" 
              fill="url(#glassEffect)" 
              stroke="url(#chromeGradient)" 
              stroke-width="1" 
@@ -97,23 +97,15 @@
              filter="url(#glassBlur)"/>
     
     <!-- Right face with orange gradient -->
-    <polygon points="45,40 70,60 70,-30 45,-50" 
+    <polygon points="45,40 70,60 25,-60 0,-50" 
              fill="url(#prismOrange)" 
              stroke="#ff5252" 
              stroke-width="1" 
              opacity="0.85"
              filter="url(#modernShadow)"/>
     
-    <!-- Top face with chrome effect -->
-    <polygon points="-70,-30 -45,-50 45,-50 70,-30" 
-             fill="url(#chromeGradient)" 
-             stroke="#c0c0c0" 
-             stroke-width="0.5" 
-             opacity="0.9"
-             filter="url(#chromeShine)"/>
-    
-    <!-- Front face - main glass panel -->
-    <polygon points="-70,60 70,60 70,-30 -70,-30" 
+    <!-- Front face - main glass triangular panel -->
+    <polygon points="-70,60 70,60 0,-80" 
              fill="url(#glassEffect)" 
              stroke="url(#prismOrange)" 
              stroke-width="2" 

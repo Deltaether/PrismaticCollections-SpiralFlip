@@ -1,0 +1,441 @@
+/**
+ * Simplified Theme System for Prismatic Collections
+ * 
+ * A streamlined approach that provides:
+ * - Core color variables
+ * - CSS custom properties
+ * - Essential mixins
+ * - No complex palette generation to avoid build issues
+ */
+
+@use 'sass:color';
+
+// ============================================================================
+// Core Theme Colors (Simplified)
+// ============================================================================
+
+// Primary Colors (Coral/Orange - Site signature)
+$primary-color: #ff6b6b;
+$primary-light: #ff8080;
+$primary-dark: #ff5252;
+$primary-gradient: linear-gradient(135deg, #ff6b6b, #ff5252);
+
+// Secondary Colors (Blue/Teal)
+$secondary-color: #4a9eff;
+$secondary-light: #77c0f5;
+$secondary-dark: #2268ba;
+
+// Accent Colors
+$accent-teal: #20b2aa;
+$accent-teal-dark: #008080;
+$accent-cyan: #00ced1;
+
+// Legacy teal aliases for backward compatibility
+$teal-primary: $accent-teal-dark;
+$teal-secondary: $accent-teal;
+$teal-light: $accent-teal;
+$teal-dark: $accent-teal-dark;
+
+// Gold colors for legacy compatibility
+$gold-accent: #FFD700;
+$gold-light: #FFECB3;
+$gold-dark: #FFC107;
+
+// Semantic Colors
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$error-color: #ef4444;
+$info-color: #3b82f6;
+
+// Dark Theme Background Colors
+$dark-bg-primary: #0a0a0f;
+$dark-bg-secondary: #0f1419;
+$dark-bg-tertiary: #141922;
+$dark-bg-card: rgba(30, 44, 54, 0.45);
+
+// Light Theme Background Colors
+$light-bg-primary: #ffffff;
+$light-bg-secondary: #f8f9fa;
+$light-bg-card: #ffffff;
+
+// Legacy background aliases
+$background-light: $light-bg-primary;
+$background-dark: $dark-bg-primary;
+$background-muted: $light-bg-secondary;
+$light-color: $light-bg-secondary;
+
+// Text Colors
+$text-light: #ffffff;
+$text-light-secondary: rgba(255, 255, 255, 0.8);
+$text-light-muted: rgba(255, 255, 255, 0.6);
+$text-dark: #333333;
+$text-dark-secondary: rgba(0, 0, 0, 0.7);
+$text-dark-muted: rgba(0, 0, 0, 0.6);
+
+// ============================================================================
+// Spacing System
+// ============================================================================
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+$spacing-xxxl: 64px;
+
+// ============================================================================
+// Typography
+// ============================================================================
+
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-md: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-xxl: 1.5rem;
+$font-size-xxxl: 2rem;
+$font-size-display: 3rem;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ============================================================================
+// Layout & Design System
+// ============================================================================
+
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
+$border-radius-xl: 24px;
+$border-radius-pill: 9999px;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+$elevation-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+$elevation-2: 0 4px 8px rgba(0, 0, 0, 0.12);
+$elevation-3: 0 8px 16px rgba(0, 0, 0, 0.14);
+$elevation-4: 0 12px 24px rgba(0, 0, 0, 0.16);
+
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// Glassmorphism
+$glass-blur: blur(10px);
+$glass-blur-strong: blur(20px);
+$glass-bg-dark: rgba(255, 255, 255, 0.05);
+$glass-border-dark: 1px solid rgba(255, 255, 255, 0.1);
+$glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+// Header
+$header-height: 89px;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// ============================================================================
+// CSS Custom Properties
+// ============================================================================
+
+:root {
+  // Colors
+  --primary-color: #{$primary-color};
+  --primary-light: #{$primary-light};
+  --primary-dark: #{$primary-dark};
+  --primary-gradient: #{$primary-gradient};
+  
+  --secondary-color: #{$secondary-color};
+  --accent-teal: #{$accent-teal};
+  --accent-cyan: #{$accent-cyan};
+  
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --error-color: #{$error-color};
+  --info-color: #{$info-color};
+  
+  // Backgrounds (Dark theme default)
+  --bg-primary: #{$dark-bg-primary};
+  --bg-secondary: #{$dark-bg-secondary};
+  --bg-card: #{$dark-bg-card};
+  
+  // Text
+  --text-primary: #{$text-light};
+  --text-secondary: #{$text-light-secondary};
+  --text-muted: #{$text-light-muted};
+  
+  // Spacing
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+  --spacing-xxl: #{$spacing-xxl};
+  
+  // Layout
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+  --border-radius-xl: #{$border-radius-xl};
+  
+  --transition-fast: #{$transition-fast};
+  --transition-standard: #{$transition-standard};
+  --transition-slow: #{$transition-slow};
+  
+  --elevation-1: #{$elevation-1};
+  --elevation-2: #{$elevation-2};
+  --elevation-3: #{$elevation-3};
+  --elevation-4: #{$elevation-4};
+  
+  // Glassmorphism
+  --glass-blur: #{$glass-blur};
+  --glass-bg: #{$glass-bg-dark};
+  --glass-border: #{$glass-border-dark};
+  --glass-shadow: #{$glass-shadow};
+}
+
+// Light theme override
+.theme-light {
+  --bg-primary: #{$light-bg-primary};
+  --bg-secondary: #{$light-bg-secondary};
+  --bg-card: #{$light-bg-card};
+  --text-primary: #{$text-dark};
+  --text-secondary: #{$text-dark-secondary};
+  --text-muted: #{$text-dark-muted};
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+// ============================================================================
+// Core Mixins
+// ============================================================================
+
+// Full screen container
+@mixin full-screen-container() {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Flex centering
+@mixin flex-center($direction: row) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: $direction;
+}
+
+// Glassmorphism
+@mixin glassmorphism($blur: 10px, $opacity: 0.05) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: $glass-shadow;
+}
+
+// Dark glassmorphism
+@mixin dark-glassmorphism() {
+  background: $dark-bg-card;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+// Button primary
+@mixin button-primary() {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  background: $primary-gradient;
+  color: white;
+  border: none;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-medium;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: $transition-standard;
+  box-shadow: $elevation-2;
+  min-height: 44px;
+  
+  &:hover:not(:disabled) {
+    box-shadow: $elevation-3;
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: $elevation-1;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+}
+
+// Button secondary
+@mixin button-secondary() {
+  @include button-primary();
+  background: transparent;
+  color: $primary-color;
+  border: 2px solid $primary-color;
+  box-shadow: none;
+  
+  &:hover:not(:disabled) {
+    background: rgba(255, 107, 107, 0.1);
+    box-shadow: none;
+  }
+  
+  &:active {
+    background: rgba(255, 107, 107, 0.2);
+  }
+}
+
+// Card styling
+@mixin card($glassmorphic: true) {
+  @if $glassmorphic {
+    @include dark-glassmorphism();
+  } @else {
+    background: $light-bg-card;
+    box-shadow: $elevation-2;
+  }
+  
+  padding: $spacing-lg;
+  border-radius: $border-radius-lg;
+  transition: $transition-standard;
+}
+
+// Interactive card
+@mixin interactive-card() {
+  cursor: pointer;
+  transition: $transition-standard;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $elevation-4;
+  }
+  
+  &:active {
+    transform: translateY(-2px);
+  }
+}
+
+// Responsive grid
+@mixin responsive-grid($min-width: 280px, $gap: $spacing-lg) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// Text truncation
+@mixin truncate-text($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// Spacing utility
+@mixin spacing($sides: all, $size: md) {
+  $value: var(--spacing-#{$size});
+  
+  @if $sides == all {
+    padding: $value;
+  } @else if $sides == vertical {
+    padding-top: $value;
+    padding-bottom: $value;
+  } @else if $sides == horizontal {
+    padding-left: $value;
+    padding-right: $value;
+  }
+}
+
+// Responsive breakpoints
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: #{$breakpoint-sm}) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (min-width: #{$breakpoint-md}) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (min-width: #{$breakpoint-lg}) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (min-width: #{$breakpoint-xl}) {
+      @content;
+    }
+  }
+}
+
+// Dark gradient background (from home page)
+@mixin dark-gradient-background() {
+  background: 
+    // Diagonal strip pattern
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 28px,
+      rgba(74, 158, 255, 0.025) 29px,
+      rgba(74, 158, 255, 0.025) 30px,
+      transparent 31px,
+      transparent 59px,
+      rgba(32, 178, 170, 0.02) 60px,
+      rgba(32, 178, 170, 0.02) 61px,
+      transparent 62px,
+      transparent 89px,
+      rgba(0, 206, 209, 0.015) 90px,
+      rgba(0, 206, 209, 0.015) 91px,
+      transparent 92px,
+      transparent 120px
+    ),
+    // Orange/coral glow
+    radial-gradient(ellipse at 30% 0%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, rgba(255, 127, 80, 0.06) 0%, transparent 45%),
+    // Metallic highlights
+    radial-gradient(circle at 20% 50%, rgba(192, 192, 192, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 80% 30%, rgba(169, 169, 169, 0.02) 0%, transparent 35%),
+    // Base gradient
+    linear-gradient(180deg, 
+      #{$dark-bg-primary} 0%,
+      #{$dark-bg-secondary} 25%,
+      #{$dark-bg-tertiary} 50%,
+      #0d1117 75%,
+      #080810 100%
+    );
+}

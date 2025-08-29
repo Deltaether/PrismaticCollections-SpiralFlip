@@ -1,5 +1,10 @@
-/* Main styles file */
+/* Main styles file with simplified theming system */
 @use './sass-options.scss';
+
+// Import simplified theme system
+@use './app/styles/themes/simple-theme' as theme;
+
+// Import existing styles
 @use './app/styles/main.scss';
 @use './app/shared/styles/scroll-animations.scss' as scroll;
 @use './app/shared/styles/header-styles.scss' as header;

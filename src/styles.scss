@@ -92,8 +92,29 @@ body.home-page-active {
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background: #fff;
+  color: #ffffff;
+  /* Enhanced global background with subtle blue-teal diagonal strips */
+  background: 
+    /* Subtle blue-teal diagonal strip pattern - barely visible relief effect */
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 28px,
+      rgba(74, 158, 255, 0.022) 29px,   /* Blue strip - extremely subtle */
+      rgba(74, 158, 255, 0.022) 30px,
+      transparent 31px,
+      transparent 59px,
+      rgba(32, 178, 170, 0.018) 60px,   /* Teal strip - even more subtle */
+      rgba(32, 178, 170, 0.018) 61px,
+      transparent 62px,
+      transparent 89px,
+      rgba(0, 206, 209, 0.012) 90px,    /* Semi-cyan strip - barely there */
+      rgba(0, 206, 209, 0.012) 91px,
+      transparent 92px,
+      transparent 120px
+    ),
+    /* Base dark color */
+    #0a0a0f;
   min-height: 100%;
 }
 

@@ -28,18 +28,82 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Home Page Container - Exact Same Structure as Collections Page */
+/* Home Page Container - Modern 2024/2025 Design */
 .home-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0b0f 0%, #161821 100%);
+  /* Sophisticated dark gradient with subtle diagonal relief pattern - 2025 trend */
+  background: 
+    /* Subtle blue-teal diagonal strip pattern - barely visible relief effect */
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 28px,
+      rgba(74, 158, 255, 0.025) 29px,   /* Blue strip - extremely subtle */
+      rgba(74, 158, 255, 0.025) 30px,
+      transparent 31px,
+      transparent 59px,
+      rgba(32, 178, 170, 0.02) 60px,    /* Teal strip - even more subtle */
+      rgba(32, 178, 170, 0.02) 61px,
+      transparent 62px,
+      transparent 89px,
+      rgba(0, 206, 209, 0.015) 90px,    /* Semi-cyan strip - barely there */
+      rgba(0, 206, 209, 0.015) 91px,
+      transparent 92px,
+      transparent 120px
+    ),
+    /* Subtle orange/coral glow to complement site accents */
+    radial-gradient(ellipse at 30% 0%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, rgba(255, 127, 80, 0.06) 0%, transparent 45%),
+    /* Metallic silver/chrome highlights for modern tech feel */
+    radial-gradient(circle at 20% 50%, rgba(192, 192, 192, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 80% 30%, rgba(169, 169, 169, 0.02) 0%, transparent 35%),
+    /* Deep space gradient base - sophisticated dark theme */
+    linear-gradient(180deg, 
+      #0a0a0f 0%,      /* Deep space black */
+      #0f1419 25%,     /* Midnight blue-black */
+      #141922 50%,     /* Charcoal with blue undertones */
+      #0d1117 75%,     /* GitHub dark theme inspired */
+      #080810 100%     /* Rich black finish */
+    );
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
-  margin-top: 89px; /* Add 89px margin-top as requested */
+  margin-top: 89px;
   
-  /* Prevent unwanted height stretching */
-  height: auto; /* Let content determine height naturally */
+  /* Modern glass effect backdrop */
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(120px);
+    -webkit-backdrop-filter: blur(120px);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  /* Subtle animated noise texture */
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 100px 100px, 80px 80px, 120px 120px;
+    animation: subtleFloat 20s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+  }
 
+  /* Let content determine height naturally */
+  height: auto;
 }
 
 /* Main Content Container - Exact Same as Collections Page */
@@ -409,6 +473,22 @@ $transition: all 0.3s ease;
   }
 }
 
+/* Modern subtle background animation */
+@keyframes subtleFloat {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+  33% {
+    background-position: 30px 20px, 20px 40px, 40px 10px;
+  }
+  66% {
+    background-position: 20px 40px, 40px 20px, 10px 30px;
+  }
+  100% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+}
+
 /* About Section */
 .about {
   padding: 4rem 2rem;
@@ -473,93 +553,105 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Call to Action */
-.cta {
-  padding: 4rem 2rem;
-  background: linear-gradient(135deg, rgba(26, 40, 50, 0.4) 0%, rgba(30, 44, 54, 0.45) 50%, rgba(22, 36, 46, 0.4) 100%);
-  backdrop-filter: blur(5px);
-  text-align: center;
-  border-radius: $border-radius;
-  margin: 3rem 0;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
-  
-  .cta-title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+
+/* Modern Responsive Design - Mobile First Approach */
+
+/* Base Mobile Design (320px+) */
+.home-page {
+  /* Reduce gradient complexity and diagonal strips on smaller screens for performance */
+  @media (max-width: 480px) {
+    background: 
+      /* Simplified diagonal strip pattern - wider spacing, fewer strips */
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 58px,
+        rgba(74, 158, 255, 0.015) 59px,   /* Single blue strip - more subtle */
+        rgba(74, 158, 255, 0.015) 60px,
+        transparent 61px,
+        transparent 179px,
+        rgba(32, 178, 170, 0.01) 180px,   /* Single teal strip - barely visible */
+        rgba(32, 178, 170, 0.01) 181px,
+        transparent 182px,
+        transparent 240px
+      ),
+      radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.06) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
   }
   
-  .cta-text {
-    font-size: 1.1rem;
-    max-width: 700px;
-    margin: 0 auto 2rem;
-    color: rgba(255, 255, 255, 0.8);
+  /* Remove diagonal strips entirely on very small screens for optimal performance */
+  @media (max-width: 320px) {
+    background: 
+      radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.06) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
   }
-  
-  .cta-buttons {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    flex-wrap: wrap;
+}
+
+.home-main {
+  @media (max-width: 480px) {
+    padding: 0 1rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .hero {
+    height: 50vh;
+    min-height: 350px;
+    padding: 2rem 1.5rem;
     margin-bottom: 2rem;
     
-    .button {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1.5rem;
-      border-radius: $border-radius;
-      width: 250px;
-      transition: $transition;
-      font-weight: 600;
-      cursor: pointer;
-      
-      .button-icon {
+    .hero-content {
+      .title {
         font-size: 2rem;
-        margin-bottom: 1rem;
+        line-height: 1.1;
       }
       
-      .button-description {
-        font-size: 0.9rem;
-        font-weight: normal;
-        margin-top: 0.5rem;
-        opacity: 0.7;
+      .subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
       }
       
-      &.primary {
-        background: $gradient-primary;
-        color: $light-text;
+      .hero-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
         
-        &:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(255, 127, 80, 0.3);
-        }
-      }
-      
-      &.secondary {
-        background-color: rgba(74, 144, 226, 0.1);
-        color: $light-text;
-        border: 2px solid $secondary-color;
-        
-        &:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+        .button {
+          padding: 0.6rem 1.2rem;
+          font-size: 0.9rem;
         }
       }
     }
   }
   
-  .cta-note {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.5);
+  .features, .about, .news {
+    padding: 2rem 1rem;
+    
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .featured-grid {
+    gap: 1.5rem;
+    
+    .feature-card {
+      width: 100% !important;
+      
+      .card-content {
+        padding: 1.2rem;
+      }
+    }
   }
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
+/* Large Mobile / Small Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
   .hero {
-    height: 60vh;
+    height: 55vh;
     min-height: 400px;
     
     .hero-content {
@@ -576,18 +668,88 @@ $transition: all 0.3s ease;
   .features {
     .section-title, 
     .about-content .section-title, 
-    .news .section-title, 
-    .cta .cta-title {
+    .news .section-title {
       font-size: 2rem;
+    }
+    
+    .featured-grid {
+      gap: 1.5rem;
+    }
+  }
+}
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero {
+    .hero-content {
+      .title {
+        font-size: 3rem;
+      }
+      
+      .subtitle {
+        font-size: 1.3rem;
+      }
     }
   }
   
-  .cta-buttons {
-    gap: 1rem;
-    
-    .button {
-      width: 200px;
-      padding: 1.2rem;
+  .home-main {
+    padding: 0 1.5rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Large Desktop (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .home-main {
+    max-width: 1200px;
+  }
+}
+
+/* Ultra-wide Desktop (1441px+) */
+@media (min-width: 1441px) {
+  .home-main {
+    max-width: 1400px;
+  }
+  
+  .hero {
+    .hero-content {
+      .title {
+        font-size: 4rem;
+      }
+      
+      .subtitle {
+        font-size: 1.6rem;
+      }
     }
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .feature-card,
+  .button {
+    /* Increase touch targets for mobile */
+    min-height: 44px;
+    
+    &:hover {
+      /* Disable hover effects on touch devices */
+      transform: none;
+      box-shadow: inherit;
+    }
+    
+    &:active {
+      /* Add active states for touch feedback */
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+  }
+}
+
+/* High DPI / Retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .home-page::after {
+    /* Reduce texture complexity on high DPI to prevent performance issues */
+    background-size: 50px 50px, 40px 40px, 60px 60px;
   }
 }

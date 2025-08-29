@@ -2,14 +2,12 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { CDCasesComponent } from '../../tools/cd-cases/cd-cases.component';
-import { SiteVersionSelectorComponent } from '../../../../../components/site-version-selector/site-version-selector.component';
 import { DisclaimerComponent } from '../../../../../components/disclaimer/disclaimer.component';
 import { SceneLoaderComponent } from '../../tools/cd-cases/scene-loader/scene-loader.component';
-import { MobileViewComponent } from '../../mobile/mobile-view.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 
 /**
- * Phantasia component that shows the 3D experience and version selector
+ * Phantasia component that shows the 3D experience
  * This is the entry point for Project Phantasia 3D experience
  * 【✓】
  */
@@ -19,10 +17,8 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
   imports: [
     CommonModule,
     CDCasesComponent,
-    SiteVersionSelectorComponent,
     DisclaimerComponent,
     SceneLoaderComponent,
-    MobileViewComponent,
     SiteHeaderComponent
   ],
   templateUrl: './phantasia.component.html',
@@ -38,13 +34,10 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   private readonly MINIMUM_LOADING_TIME = 3000; // 3 seconds minimum for aesthetic
 
   // Storage keys
-  private readonly SELECTOR_STORAGE_KEY = 'prismatic_collections_site_version_preference';
   private readonly DISCLAIMER_STORAGE_KEY = 'prismatic_collections_disclaimer_acknowledged';
   
   // UI state flags
-  showVersionSelector = false;
   showDisclaimer = false;
-  isMobileView = false;
 
   // Debug flag
   private readonly isDebugMode = true;
@@ -80,8 +73,8 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
         console.log(`[PhantasiaComponent] Disclaimer already acknowledged`);
       }
       
-      // Check for version preference
-      this.checkVersionPreference();
+      // Disclaimer already acknowledged, proceed directly to 3D experience
+      // No version selector needed, always show desktop 3D experience
     } else {
       // Show disclaimer first
       this.showDisclaimer = true;
@@ -112,46 +105,6 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     return this.router.url.includes('/phantasia/');
   }
 
-  /**
-   * Checks if user has a saved version preference
-   * 【✓】
-   */
-  private checkVersionPreference(): void {
-    const savedPreference = localStorage.getItem(this.SELECTOR_STORAGE_KEY);
-    
-    if (savedPreference) {
-      // If preference exists, don't show selector
-      this.showVersionSelector = false;
-      
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Found saved preference: ${savedPreference}`);
-      }
-      
-      this.isMobileView = savedPreference === 'mobile';
-      
-      // For mobile view, ensure minimum loading time for aesthetic
-      if (this.isMobileView) {
-        const loadingDuration = Date.now() - this.loadingStartTime;
-        const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
-        
-        setTimeout(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        }, remainingTime);
-      }
-      // For desktop, wait for CD Cases to load
-      
-    } else {
-      // Show version selector after disclaimer
-      this.showVersionSelector = true;
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] No saved preference, showing version selector`);
-      }
-    }
-    
-    // Update the UI
-    this.cdr.markForCheck();
-  }
 
   /**
    * Handles user acknowledgment of the disclaimer
@@ -165,41 +118,12 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     // Save acknowledgment in local storage
     localStorage.setItem(this.DISCLAIMER_STORAGE_KEY, 'true');
     
-    // Hide disclaimer and check version preference
+    // Hide disclaimer and proceed directly to 3D experience
     this.showDisclaimer = false;
-    this.checkVersionPreference();
+    // No version selector needed, proceed directly to desktop 3D experience
     this.cdr.markForCheck();
   }
 
-  /**
-   * Handle version selection
-   * 【✓】
-   */
-  onVersionSelected(version: string): void {
-    if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] User selected version: ${version}`);
-    }
-    
-    // Save the user's preference
-    localStorage.setItem(this.SELECTOR_STORAGE_KEY, version);
-    
-    this.showVersionSelector = false;
-    this.isMobileView = version === 'mobile';
-    
-    // For mobile view, ensure minimum loading time for aesthetic
-    if (this.isMobileView) {
-      const loadingDuration = Date.now() - this.loadingStartTime;
-      const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
-      
-      setTimeout(() => {
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      }, remainingTime);
-    }
-    // For desktop, wait for CD Cases to load
-    
-    this.cdr.markForCheck();
-  }
 
   /**
    * Handle CD Cases loading change
@@ -207,11 +131,11 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
    */
   onCDCasesLoadingChange(isLoading: boolean): void {
     if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] CD Cases loading state received: ${isLoading}, current isLoading: ${this.isLoading}, isMobileView: ${this.isMobileView}`);
+      console.log(`[PhantasiaComponent] CD Cases loading state received: ${isLoading}, current isLoading: ${this.isLoading}`);
     }
     
     // Update loading state only if CD Cases are done loading
-    if (!isLoading && !this.isMobileView) {
+    if (!isLoading) {
       // Calculate how long loading has been shown
       const loadingDuration = Date.now() - this.loadingStartTime;
       const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
@@ -237,7 +161,7 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     } else if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}, isMobileView: ${this.isMobileView}`);
+      console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}`);
     }
     this.cdr.markForCheck();
   }

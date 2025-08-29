@@ -11,14 +11,8 @@
     (acknowledged)="onDisclaimerAcknowledged()"
   ></app-disclaimer>
   
-  <!-- Site Version Selector - appears after disclaimer -->
-  <app-site-version-selector
-    *ngIf="!showDisclaimer && showVersionSelector"
-    (versionSelected)="onVersionSelected($event)"
-  ></app-site-version-selector>
-  
-  <!-- Desktop Experience with CD Cases -->
-  <ng-container *ngIf="!showDisclaimer && !showVersionSelector && !isMobileView">
+  <!-- Desktop Experience with CD Cases - Always shown after disclaimer -->
+  <ng-container *ngIf="!showDisclaimer">
     <!-- CD Cases - Always rendered but visually hidden during loading -->
     <div class="cd-cases-container">
       <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
@@ -60,7 +54,4 @@
       </div>
     </div>
   </ng-container>
-  
-  <!-- Mobile Experience -->
-  <app-mobile-view *ngIf="!isLoading && !showDisclaimer && !showVersionSelector && isMobileView"></app-mobile-view>
 </div>

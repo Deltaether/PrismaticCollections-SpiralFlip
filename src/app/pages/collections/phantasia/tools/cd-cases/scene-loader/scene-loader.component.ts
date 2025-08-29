@@ -63,7 +63,7 @@ interface RunePosition {
       </div>
       <div class="content">
         <div class="logo-container">
-          <img src="/assets/graphic/prismcoll_logox_black_upright.svg" alt="Prismatic Collections" class="logo">
+          <img src="/assets/images/prismcoll_logox_black_upright.svg" alt="Prismatic Collections" class="logo">
         </div>
         <div class="loading-text">Now Loading</div>
       </div>

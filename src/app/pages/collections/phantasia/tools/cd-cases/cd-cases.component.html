@@ -51,21 +51,6 @@
     <div class="loading-text">Loading 3D CD Cases...</div>
   </div>
   
-  <!-- Debug menu with OnPush change detection -->
-  <app-debug-menu
-    *ngIf="isDebugMode && !isRecordingMode"
-    [sceneSettings]="sceneSettings"
-    [caseSettings]="caseSettings"
-    [cdCases]="cdCases"
-    (updateCamera)="updateCamera()"
-    (updateLighting)="updateLighting()"
-    (updateRenderer)="updateRenderer()"
-    (updateOrbitControls)="updateOrbitControls()"
-    (updateGround)="updateGround()"
-    (updateCaseTransform)="updateCaseTransform($event)"
-    (resetToDefault)="resetToDefault()"
-    (updateBackgroundEffects)="updateBackgroundEffects()">
-  </app-debug-menu>
   
   <!-- Recording controls positioned directly below debug menu -->
   <div class="recording-controls-below-debug" *ngIf="forceShowRecordingControls || (isDebugMode && !isLoading)">
@@ -82,24 +67,5 @@
       [disabled]="isRecordingMode">
       {{ usePreRecordedVideo ? 'Enable 3D Rendering' : 'Use Pre-recorded Video' }}
     </button>
-  </div>
-</div>
-
-<!-- Case status indicators with title and artist information -->
-<div class="case-indicators" 
-     *ngIf="!isRecordingMode"
-     [style.opacity]="isLoading ? '0' : '1'" 
-     aria-live="polite">
-  <h2 class="visually-hidden">CD Case Status</h2>
-  <div *ngFor="let cdCase of cdCases; let i = index; trackBy: trackByCaseId" 
-       class="case-indicator"
-       [class.open]="cdCase.isOpen"
-       [class.active]="cdCase.isActive"
-       (click)="handleTrackSelection(i)"
-       role="button"
-       tabindex="0"
-       [attr.aria-label]="'Select ' + cdCase.title + ' by ' + cdCase.artist">
-    <strong>{{cdCase.title}}</strong> by {{cdCase.artist}}
-    <span class="status">({{ cdCase.isOpen ? 'Open' : 'Closed' }})</span>
   </div>
 </div> 

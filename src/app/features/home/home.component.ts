@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       id: 'unknown-prism',
       title: '???',
       description: 'PRISM UNREADABLE - This prism appears to be corrupted ./restoration in progress...',
-      image: 'assets/images/featured/cd-unreadable.svg',
+      image: 'assets/images/featured/prism-unreadable.svg',
       route: '/phantasia/phantasia',
       isMain: false
     }

@@ -34,7 +34,7 @@ The header provides three main navigation options:
 ## Style Notes
 
 - Orange background color: `#E37C55`
-- SVG logo path: `/assets/graphic/prismcoll_logox.svg`
+- SVG logo path: `/assets/images/prismcoll_logox.svg`
 - Active states use white opacity overlays for highlighting
 
 ## Active Development

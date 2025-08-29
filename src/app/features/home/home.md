@@ -9,7 +9,7 @@ The Home component serves as the landing page for the Prismatic Collections appl
 - `src/app/pages/home/home.component.scss` - Styling with animated background
 - `src/app/shared/components/site-header/site-header.component.ts` - Navigation header
 - `src/app/pages/collections-page/collection-header-global.scss` - Header global styles
-- `src/assets/images/featured/cd-unreadable.svg` - PS1-style unrecognized disc image
+- `src/assets/images/featured/prism-unreadable.svg` - PS1-style unrecognized disc image
 
 ## Visual Features
 
@@ -77,7 +77,7 @@ The application now properly bootstraps from `AppComponent` instead of `Phantasi
 - **Performance**: CSS-only animations with clip-path, background and transform for hardware acceleration
 - **Featured Projects**: Streamlined to 2 cards - Project Phantasia CD Album (main) and mysterious "???" CD Unreadable card
 - **PlayStation 1 Aesthetic**: CD Unreadable card features authentic PS1-style SVG disc image with:
-  - Custom `cd-unreadable.svg` with realistic disc gradient, scratches, and PS1 error symbols
+  - Custom `prism-unreadable.svg` with realistic disc gradient, scratches, and PS1 error symbols
   - PS1-style scanlines overlay and subtle static noise animation
   - Monospace font (Courier New) for authentic retro feel
   - Updated description: "CD UNREADABLE - This disc appears to be corrupted ./restoration in progress..."

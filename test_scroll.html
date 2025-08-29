@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scroll Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .instructions {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prismatic Collections Scroll Test</h1>
+    
+    <div class="instructions">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Look for a <strong>vertical scrollbar</strong> on the right side of the iframe below</li>
+            <li>Try scrolling within the iframe using your mouse wheel or scrollbar</li>
+            <li>The scrollbar should be visible and functional</li>
+            <li>You should be able to see content below the initial "Prismatic Collections" hero section</li>
+        </ol>
+    </div>
+    
+    <div id="test-results"></div>
+    
+    <h2>Live Application (Dev Server):</h2>
+    <iframe src="http://localhost:4301" id="app-frame"></iframe>
+    
+    <script>
+        // Simple test to check if the iframe loaded
+        document.getElementById('app-frame').onload = function() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="success">✓ Application loaded successfully from development server</div>';
+        };
+        
+        document.getElementById('app-frame').onerror = function() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="error">✗ Failed to load application - make sure dev server is running on port 4301</div>';
+        };
+        
+        // Add a note about what to look for
+        setTimeout(() => {
+            const results = document.getElementById('test-results');
+            results.innerHTML += '<div class="test-result" style="background: #fff3cd; color: #856404; border: 1px solid #ffeaa7;"><strong>Manual Test Required:</strong> Check if you can see and use the vertical scrollbar on the right side of the iframe above. The scrollbar should allow you to scroll down to see more content including "Featured Projects" section.</div>';
+        }, 2000);
+    </script>
+</body>
+</html>

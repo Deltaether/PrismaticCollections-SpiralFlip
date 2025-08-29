@@ -12,7 +12,7 @@ This folder contains the components and styles for the Collections page of Proje
 
 ### Assets
 - `assets/logo/phantasia-logo-light.png` - Light version of the Phantasia logo for the header
-- `assets/graphic/phantasia_1_cover_final.png` - Cover image for Project Phantasia collection
+- `assets/images/phantasia_1_cover_final.png` - Cover image for Project Phantasia collection
 - `assets/collections/ethereal-soundscapes.jpg` - Cover image for Ethereal Soundscapes collection
 - `assets/collections/digital-artifacts.jpg` - Cover image for Digital Artifacts collection
 

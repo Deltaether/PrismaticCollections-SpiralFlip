@@ -29,7 +29,7 @@ $overlay-color: rgba(0, 0, 0, 0.85);
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: $overlay-color url('/assets/graphic/jewel-case-_640.png') center/cover no-repeat;
+  background: $overlay-color url('/assets/images/jewel-case-_640.png') center/cover no-repeat;
   background-blend-mode: darken;
   @include flex-center;
   padding: 20px;

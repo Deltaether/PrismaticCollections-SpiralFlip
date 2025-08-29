@@ -1,0 +1,132 @@
+/* Enhanced Color System for Prismatic Collections */
+/* Extends existing brand colors with semantic color categories */
+
+@use 'sass:map';
+@use 'sass:string';
+
+/* Primary Brand Colors (Existing) */
+$primary-color: #ff7f50;
+$secondary-color: #4a90e2;
+$gradient-primary: linear-gradient(135deg, #ff7f50, #ff5252);
+
+/* Extended Color Palette */
+$coral-50: #fef7f5;
+$coral-100: #feebe6;
+$coral-200: #fdd2c2;
+$coral-300: #fbb499;
+$coral-400: #f8906f;
+$coral-500: #ff7f50; // Primary
+$coral-600: #e86f40;
+$coral-700: #c55a30;
+$coral-800: #a24620;
+$coral-900: #83361a;
+
+/* Semantic Color Categories for News */
+$news-categories: (
+  'project-updates': (
+    'color': #6366f1,
+    'gradient': linear-gradient(135deg, #6366f1, #8b5cf6),
+    'light': rgba(99, 102, 241, 0.1),
+    'icon': '🚀'
+  ),
+  'releases': (
+    'color': #10b981,
+    'gradient': linear-gradient(135deg, #10b981, #059669),
+    'light': rgba(16, 185, 129, 0.1),
+    'icon': '🎵'
+  ),
+  'announcements': (
+    'color': #f59e0b,
+    'gradient': linear-gradient(135deg, #f59e0b, #d97706),
+    'light': rgba(245, 158, 11, 0.1),
+    'icon': '📢'
+  ),
+  'technical-updates': (
+    'color': #8b5cf6,
+    'gradient': linear-gradient(135deg, #8b5cf6, #7c3aed),
+    'light': rgba(139, 92, 246, 0.1),
+    'icon': '⚙️'
+  ),
+  'community': (
+    'color': #ec4899,
+    'gradient': linear-gradient(135deg, #ec4899, #db2777),
+    'light': rgba(236, 72, 153, 0.1),
+    'icon': '👥'
+  )
+);
+
+/* Social Platform Colors */
+$social-platforms: (
+  'Spotify': #1DB954,
+  'SoundCloud': #FF5500,
+  'YouTube': #FF0000,
+  'GitHub': #333333,
+  'Discord': #5865F2,
+  'Bandcamp': #629AA0,
+  'Instagram': #E4405F,
+  'Twitter': #1DA1F2
+);
+
+/* Status Colors */
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$error-color: #ef4444;
+$info-color: #3b82f6;
+
+$success-light: rgba(16, 185, 129, 0.1);
+$warning-light: rgba(245, 158, 11, 0.1);
+$error-light: rgba(239, 68, 68, 0.1);
+$info-light: rgba(59, 130, 246, 0.1);
+
+/* Neutral Grays */
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+/* Dark Mode Colors */
+$dark-bg-primary: #0a0b0f;
+$dark-bg-secondary: #161821;
+$dark-bg-card: rgba(30, 44, 54, 0.45);
+$dark-text-primary: #ffffff;
+$dark-text-secondary: rgba(255, 255, 255, 0.8);
+$dark-text-muted: rgba(255, 255, 255, 0.6);
+
+/* Utility Functions */
+@function get-category-color($category, $property: 'color') {
+  @return map-get(map-get($news-categories, $category), $property);
+}
+
+@function get-social-color($platform) {
+  @return map-get($social-platforms, $platform);
+}
+
+/* CSS Custom Properties for Dynamic Theming */
+:root {
+  --primary-color: #{$primary-color};
+  --gradient-primary: #{$gradient-primary};
+  
+  // Category colors
+  @each $category, $colors in $news-categories {
+    --category-#{$category}-color: #{map.get($colors, 'color')};
+    --category-#{$category}-gradient: #{map.get($colors, 'gradient')};
+    --category-#{$category}-light: #{map.get($colors, 'light')};
+  }
+  
+  // Social platform colors
+  @each $platform, $color in $social-platforms {
+    --social-#{string.to-lower-case($platform)}-color: #{$color};
+  }
+  
+  // Status colors
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --error-color: #{$error-color};
+  --info-color: #{$info-color};
+}

@@ -145,4 +145,31 @@ export class SocialLinksComponent implements OnInit {
   trackByPlatform(index: number, link: SocialLink): string {
     return link.platform;
   }
+
+  /**
+   * Enhanced interaction methods
+   */
+  onSocialHover(platform: string): void {
+    console.log('Social platform hovered:', platform);
+    // Could trigger analytics or preview loading
+  }
+
+  /**
+   * Get platform-specific styling or behavior
+   */
+  getPlatformAttributes(platform: string): { [key: string]: string } {
+    const platformLower = platform.toLowerCase();
+    return {
+      'data-platform': platformLower,
+      'aria-label': `Visit ${platform}`,
+      'title': `Connect on ${platform}`
+    };
+  }
+
+  /**
+   * Check if platform link is available
+   */
+  isPlatformAvailable(url: string): boolean {
+    return url !== '#';
+  }
 }

@@ -1,5 +1,8 @@
-/* Import unified triangle animations */
+/* Import unified triangle animations and enhanced design systems */
 @use '../../shared/styles/triangle-animations.scss';
+@use '../../shared/styles/typography-system.scss' as typo;
+@use '../../shared/styles/enhanced-color-system.scss' as colors;
+@use '../../shared/styles/accessibility-enhancements.scss' as a11y;
 
 /* Variables - Match existing design system */
 $primary-color: #ff7f50;
@@ -13,6 +16,8 @@ $card-radius: 20px;
 $box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 $card-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 $transition: all 0.3s ease;
+$transition-fast: all 0.15s ease;
+$transition-slow: all 0.5s ease;
 
 /* Clean header visibility */
 :host {
@@ -56,32 +61,71 @@ $transition: all 0.3s ease;
   margin-bottom: 4rem;
   
   .hero-content {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     
+    /* Glassmorphism Background Enhancement */
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.12) 0%, 
+      rgba(255, 255, 255, 0.08) 50%, 
+      rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 3rem 2.5rem;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    
+    /* Additional glow effect */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        circle at center,
+        rgba(255, 127, 80, 0.1) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+    }
+    
+    
     .title {
-      font-size: 3.5rem;
-      font-weight: 800;
+      @extend .typography-display-large;
       margin-bottom: 1rem;
       background: linear-gradient(to right, #ff7f50, #ff5252);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-fill-color: transparent;
+      animation: titlePulse 3s ease-in-out infinite alternate;
+      position: relative;
+      z-index: 2;
     }
     
     .subtitle {
-      font-size: 1.5rem;
+      @extend .typography-heading-2;
       margin-bottom: 1.5rem;
       color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      position: relative;
+      z-index: 2;
     }
     
     .description {
-      font-size: 1.1rem;
-      line-height: 1.6;
+      @extend .typography-body-large;
       color: rgba(255, 255, 255, 0.7);
       max-width: 600px;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
   }
 }
@@ -376,14 +420,18 @@ $transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: $gradient-primary;
     color: white;
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    @extend .typography-label-small;
+    background: var(--category-project-updates-gradient, $gradient-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
     
     &.small {
       padding: 0.2rem 0.6rem;
@@ -413,25 +461,29 @@ $transition: all 0.3s ease;
 
 /* Article Content */
 .article-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  @extend .typography-heading-3;
   color: $light-text;
   margin-bottom: 0.5rem;
-  line-height: 1.3;
+  transition: color 0.2s ease;
+  
+  .featured-article:hover &,
+  .news-article:hover & {
+    color: $primary-color;
+  }
 }
 
 .article-subtitle {
-  font-size: 1.1rem;
+  @extend .typography-body-large;
   color: $primary-color;
   margin-bottom: 1rem;
-  font-weight: 600;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .article-excerpt {
+  @extend .typography-body-medium;
   color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
   margin-bottom: 1.5rem;
-  font-size: 0.95rem;
 }
 
 /* Author Information */
@@ -561,8 +613,10 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Newsletter CTA Section */
+/* Enhanced Newsletter CTA Section */
 .newsletter-cta {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(135deg, rgba(26, 40, 50, 0.4) 0%, rgba(30, 44, 54, 0.45) 50%, rgba(22, 36, 46, 0.4) 100%);
   backdrop-filter: blur(5px);
   margin: 4rem 0;
@@ -571,6 +625,27 @@ $transition: all 0.3s ease;
   margin-right: calc(-50vw + 50%);
   border-radius: $border-radius;
   padding: 4rem 2rem;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 127, 80, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
   
   .cta-content {
     max-width: 800px;
@@ -650,12 +725,123 @@ $transition: all 0.3s ease;
   }
 }
 
+/* Enhanced Animations */
+@keyframes titlePulse {
+  0% {
+    filter: brightness(1) saturate(1);
+  }
+  100% {
+    filter: brightness(1.1) saturate(1.2);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes cardFloatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Enhanced Interactive States */
+.featured-article,
+.news-article {
+  animation: cardFloatIn 0.6s ease-out;
+  animation-fill-mode: both;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
+    opacity: 0;
+  }
+  
+  &:hover::after {
+    left: 100%;
+    opacity: 1;
+  }
+  
+  // Staggered animation delays for visual appeal
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+.filter-button {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+  
+  &:hover::before {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.search-input {
+  &:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.2);
+  }
+}
+
+/* Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero {
     padding: 2rem 0;
     
     .hero-content {
+      padding: 2rem 1.5rem;
+      border-radius: 20px;
+      
       .title {
         font-size: 2.5rem;
       }
@@ -750,6 +936,9 @@ $transition: all 0.3s ease;
   
   .hero {
     .hero-content {
+      padding: 1.5rem 1rem;
+      border-radius: 16px;
+      
       .title {
         font-size: 2rem;
       }

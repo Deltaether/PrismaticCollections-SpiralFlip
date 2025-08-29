@@ -121,7 +121,10 @@
                       class="social-button"
                       [style.--social-color]="link.color"
                       [class.coming-soon]="link.url === '#'"
-                      (click)="openSocialLink(link.url, link.platform)">
+                      [attr.data-platform]="link.platform.toLowerCase()"
+                      [title]="link.url === '#' ? link.platform + ' - Coming Soon' : 'Visit ' + link.platform"
+                      (click)="openSocialLink(link.url, link.platform)"
+                      (mouseenter)="onSocialHover(link.platform)">
                 <span class="social-icon">{{ link.icon }}</span>
                 <span class="social-platform">{{ link.platform }}</span>
                 <span class="social-arrow" *ngIf="link.url !== '#'">→</span>

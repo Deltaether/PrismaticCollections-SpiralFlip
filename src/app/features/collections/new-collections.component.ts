@@ -42,7 +42,7 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
     {
       id: 'phantasia',
       title: 'Project Phantasia',
-      image: 'assets/graphic/phantasia_1_cover_final.png',
+      image: 'assets/images/phantasia_1_cover_final.png',
       tracks: 12,
       year: 2023,
       description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies that transcend conventional electronic music genres.',

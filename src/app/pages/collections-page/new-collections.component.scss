@@ -313,53 +313,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Debug Menu */
-.debug-menu {
-  position: fixed;
-  top: 120px;
-  right: 20px;
-  width: 300px;
-  background: rgba(0, 0, 0, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 1rem;
-  color: #ffffff;
-  font-size: 0.85rem;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  max-height: 80vh;
-  overflow-y: auto;
-  
-  h3 {
-    margin: 0 0 1rem 0;
-    color: #ff6b35;
-    font-size: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 0.5rem;
-  }
-  
-  .debug-section {
-    margin-bottom: 1rem;
-    
-    h4 {
-      margin: 0 0 0.5rem 0;
-      color: #8b5cf6;
-      font-size: 0.9rem;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-      color: #b8bcc8;
-      
-      input[type="range"] {
-        width: 100%;
-        margin-left: 0.5rem;
-        accent-color: #ff6b35;
-      }
-    }
-  }
-}
 
 /* Quest Scroll Info Overlay */
 .scroll-info-overlay {

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 300" preserveAspectRatio="none">
+  <!-- Definitions for gradients and filters -->
+  <defs>
+    <!-- Cyberpunk glowing gradients -->
+    <linearGradient id="prismGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1">
+        <animate attributeName="stop-color" values="#00ffff;#ff00ff;#00ff00;#00ffff" dur="8s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="50%" style="stop-color:#ff00ff;stop-opacity:1">
+        <animate attributeName="stop-color" values="#ff00ff;#00ff00;#00ffff;#ff00ff" dur="8s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" style="stop-color:#00ff00;stop-opacity:1">
+        <animate attributeName="stop-color" values="#00ff00;#00ffff;#ff00ff;#00ff00" dur="8s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+    
+    <linearGradient id="prismGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00ffff;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <radialGradient id="glowGradient">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00ffff;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Glitch effect filter -->
+    <filter id="glitch">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="1" result="noise">
+        <animate attributeName="baseFrequency" values="0.01;0.02;0.01" dur="0.3s" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    
+    <!-- Glow filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Circuit pattern -->
+    <pattern id="circuitPattern" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <rect width="50" height="50" fill="none"/>
+      <path d="M10,10 L40,10 M25,10 L25,40 M10,25 L40,25" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="10" cy="10" r="2" fill="#00ffff" opacity="0.5"/>
+      <circle cx="40" cy="10" r="2" fill="#ff00ff" opacity="0.5"/>
+      <circle cx="25" cy="25" r="2" fill="#00ff00" opacity="0.5"/>
+      <circle cx="10" cy="40" r="2" fill="#00ffff" opacity="0.5"/>
+      <circle cx="40" cy="40" r="2" fill="#ff00ff" opacity="0.5"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background with circuit pattern - adaptive to rectangular container -->
+  <rect width="400" height="300" fill="#0a0a0a"/>
+  <rect width="400" height="300" fill="url(#circuitPattern)" opacity="0.2">
+    <animateTransform attributeName="transform" type="translate" values="0,0; 50,37.5; 0,0" dur="20s" repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- Main content group - properly centered and scaled for rectangular layout -->
+  <g transform="translate(200,150) scale(0.9,0.85) translate(-200,-150)">
+    
+    <!-- Outer glow ring - properly sized for container -->
+    <ellipse cx="200" cy="150" rx="140" ry="100" fill="none" stroke="url(#prismGradient1)" stroke-width="1" opacity="0.5" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0 200 150" to="360 200 150" dur="30s" repeatCount="indefinite"/>
+    </ellipse>
+    
+    <!-- Main Prism Structure - properly centered -->
+    <g id="mainPrism" transform="translate(200,150)">
+      <!-- Bottom face -->
+      <polygon points="-80,40 0,80 80,40 0,0" fill="url(#prismGradient2)" opacity="0.8" stroke="#00ffff" stroke-width="2"/>
+      
+      <!-- Left face -->
+      <polygon points="-80,40 -80,-60 0,-100 0,0" fill="url(#prismGradient1)" opacity="0.7" stroke="#ff00ff" stroke-width="2">
+        <animateTransform attributeName="transform" type="skewY" values="0;2;0;-2;0" dur="4s" repeatCount="indefinite"/>
+      </polygon>
+      
+      <!-- Right face -->
+      <polygon points="0,0 0,-100 80,-60 80,40" fill="url(#prismGradient2)" opacity="0.7" stroke="#00ff00" stroke-width="2">
+        <animateTransform attributeName="transform" type="skewY" values="0;-2;0;2;0" dur="4s" repeatCount="indefinite"/>
+      </polygon>
+      
+      <!-- Top face - main prism surface -->
+      <polygon points="-80,-60 0,-100 80,-60 0,-20" fill="none" stroke="url(#prismGradient1)" stroke-width="3" filter="url(#glow)"/>
+      
+      <!-- Inner core - glowing center -->
+      <g id="core" filter="url(#glow)">
+        <polygon points="-40,20 0,40 40,20 0,0" fill="url(#glowGradient)" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+        </polygon>
+        <polygon points="-40,20 -40,-30 0,-50 0,0" fill="#00ffff" opacity="0.4"/>
+        <polygon points="0,0 0,-50 40,-30 40,20" fill="#ff00ff" opacity="0.4"/>
+      </g>
+      
+      <!-- Data streams -->
+      <g id="dataStreams">
+        <path d="M-80,-60 L0,-20 L80,-60" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0">
+          <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="0,100;100,0" dur="1.5s" repeatCount="indefinite"/>
+        </path>
+        <path d="M0,-100 L0,80" stroke="#ff00ff" stroke-width="0.8" fill="none" opacity="0">
+          <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="0,180;180,0" dur="2s" repeatCount="indefinite"/>
+        </path>
+      </g>
+    </g>
+    
+    <!-- Floating particles - positioned for rectangular layout -->
+    <g id="particles">
+      <circle cx="80" cy="80" r="2" fill="#00ffff">
+        <animate attributeName="cy" values="80;220;80" dur="5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="320" cy="220" r="2" fill="#ff00ff">
+        <animate attributeName="cy" values="220;80;220" dur="6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="150" cy="180" r="1.5" fill="#00ff00">
+        <animate attributeName="cx" values="150;250;150" dur="7s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="7s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Glitch text overlay -->
+    <g id="glitchText" filter="url(#glitch)" opacity="0.7">
+      <text x="200" y="250" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#00ffff" stroke="#00ffff" stroke-width="0.8">
+        PRISM://UNREADABLE
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite"/>
+      </text>
+    </g>
+    
+    <!-- Scanning line effect -->
+    <rect x="0" y="0" width="400" height="3" fill="url(#prismGradient1)" opacity="0.5">
+      <animateTransform attributeName="transform" type="translate" values="0,0; 0,300; 0,0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    
+    <!-- Corner markers for cyber feel - positioned closer to edges for professional look -->
+    <g id="corners" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.6">
+      <path d="M8,8 L8,42 M8,8 L42,8"/>
+      <path d="M358,8 L392,8 M392,8 L392,42"/>
+      <path d="M8,292 L8,258 M8,292 L42,292"/>
+      <path d="M392,292 L358,292 M392,292 L392,258"/>
+    </g>
+    
+    <!-- Central glow pulse - positioned for rectangular layout -->
+    <ellipse cx="200" cy="150" rx="35" ry="25" fill="none" stroke="url(#glowGradient)" stroke-width="0.8" opacity="0">
+      <animate attributeName="rx" values="35;90;35" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="25;65;25" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite"/>
+    </ellipse>
+    
+  </g>
+</svg>

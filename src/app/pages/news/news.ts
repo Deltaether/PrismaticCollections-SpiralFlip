@@ -92,13 +92,55 @@ export class News implements OnInit {
     this.filteredArticles().filter(article => !article.isPinned)
   );
   
-  // Categories for filter
-  readonly categories: { value: NewsCategory; label: string; icon: string }[] = [
-    { value: 'project-updates', label: 'Project Updates', icon: '🚀' },
-    { value: 'releases', label: 'Releases', icon: '🎵' },
-    { value: 'announcements', label: 'Announcements', icon: '📢' },
-    { value: 'technical-updates', label: 'Technical', icon: '⚙️' },
-    { value: 'community', label: 'Community', icon: '👥' }
+  // Enhanced Categories with colors and gradients
+  readonly categories: { 
+    value: NewsCategory; 
+    label: string; 
+    icon: string;
+    color: string;
+    gradient: string;
+    lightBg: string;
+  }[] = [
+    { 
+      value: 'project-updates', 
+      label: 'Project Updates', 
+      icon: '🚀',
+      color: '#6366f1',
+      gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+      lightBg: 'rgba(99, 102, 241, 0.1)'
+    },
+    { 
+      value: 'releases', 
+      label: 'Releases', 
+      icon: '🎵',
+      color: '#10b981',
+      gradient: 'linear-gradient(135deg, #10b981, #059669)',
+      lightBg: 'rgba(16, 185, 129, 0.1)'
+    },
+    { 
+      value: 'announcements', 
+      label: 'Announcements', 
+      icon: '📢',
+      color: '#f59e0b',
+      gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+      lightBg: 'rgba(245, 158, 11, 0.1)'
+    },
+    { 
+      value: 'technical-updates', 
+      label: 'Technical', 
+      icon: '⚙️',
+      color: '#8b5cf6',
+      gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+      lightBg: 'rgba(139, 92, 246, 0.1)'
+    },
+    { 
+      value: 'community', 
+      label: 'Community', 
+      icon: '👥',
+      color: '#ec4899',
+      gradient: 'linear-gradient(135deg, #ec4899, #db2777)',
+      lightBg: 'rgba(236, 72, 153, 0.1)'
+    }
   ];
   
   // Filter properties
@@ -247,6 +289,21 @@ export class News implements OnInit {
     const categoryInfo = this.categories.find(c => c.value === category);
     return categoryInfo?.label || category;
   }
+
+  getCategoryColor(category: NewsCategory): string {
+    const categoryInfo = this.categories.find(c => c.value === category);
+    return categoryInfo?.color || '#ff7f50';
+  }
+
+  getCategoryGradient(category: NewsCategory): string {
+    const categoryInfo = this.categories.find(c => c.value === category);
+    return categoryInfo?.gradient || 'linear-gradient(135deg, #ff7f50, #ff5252)';
+  }
+
+  getCategoryLightBg(category: NewsCategory): string {
+    const categoryInfo = this.categories.find(c => c.value === category);
+    return categoryInfo?.lightBg || 'rgba(255, 127, 80, 0.1)';
+  }
   
   navigateToArticle(articleId: string): void {
     // In a real app, this would navigate to a detailed article view
@@ -255,6 +312,17 @@ export class News implements OnInit {
   
   openExternalLink(url: string): void {
     window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  // Enhanced interaction methods
+  onArticleHover(articleId: string): void {
+    // Add hover analytics or preview loading
+    console.log('Article hovered:', articleId);
+  }
+
+  onCategoryHover(category: string): void {
+    // Optional: Show category preview or statistics
+    console.log('Category hovered:', category);
   }
   
   trackByArticleId(index: number, article: NewsArticle): string {

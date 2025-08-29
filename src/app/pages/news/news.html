@@ -142,7 +142,8 @@
       <div class="featured-grid">
         <article *ngFor="let article of featuredArticles(); trackBy: trackByArticleId" 
                  class="featured-article"
-                 (click)="navigateToArticle(article.id)">
+                 (click)="navigateToArticle(article.id)"
+                 (mouseenter)="onArticleHover(article.id)">
           
           <!-- Featured Image -->
           <div class="article-image" *ngIf="article.featuredImage">
@@ -157,7 +158,8 @@
             
             <!-- Article Meta -->
             <div class="article-meta">
-              <span class="category-badge">
+              <span class="category-badge"
+                    [style.background]="getCategoryGradient(article.category)">
                 <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
                 {{ getCategoryLabel(article.category) }}
               </span>
@@ -220,11 +222,13 @@
       <div class="articles-grid" *ngIf="regularArticles().length > 0">
         <article *ngFor="let article of regularArticles(); trackBy: trackByArticleId" 
                  class="news-article"
-                 (click)="navigateToArticle(article.id)">
+                 (click)="navigateToArticle(article.id)"
+                 (mouseenter)="onArticleHover(article.id)">
           
           <!-- Article Meta -->
           <div class="article-meta">
-            <span class="category-badge small">
+            <span class="category-badge small"
+                  [style.background]="getCategoryGradient(article.category)">
               <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
               {{ getCategoryLabel(article.category) }}
             </span>

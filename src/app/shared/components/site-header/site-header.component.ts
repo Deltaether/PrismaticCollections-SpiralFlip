@@ -18,7 +18,7 @@ import { Router, RouterModule } from '@angular/router';
         <!-- Site Logo/Title -->
         <div class="logo-container">
           <a class="logo-link" [routerLink]="['/']">
-            <img src="/assets/graphic/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
+            <img src="/assets/images/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
           </a>
         </div>
 

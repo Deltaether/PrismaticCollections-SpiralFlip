@@ -75,9 +75,9 @@ export class CDCaseLoadingService {
 
       // Load environment map
       const envMapPromise = new Promise<void>((resolve, reject) => {
-        console.log('[CDCaseLoadingService] Loading environment map: assets/graphic/composite.png');
+        console.log('[CDCaseLoadingService] Loading environment map: assets/images/composite.png');
         new THREE.TextureLoader().load(
-          'assets/graphic/composite.png', 
+          'assets/images/composite.png', 
           (texture) => {
             console.log('[CDCaseLoadingService] Environment map loaded successfully');
             this.materialsService.setupEnvironmentMap(scene, renderer, texture);

@@ -47,7 +47,7 @@ import { SiteHeaderComponent } from '../../shared/components/site-header/site-he
 
 ### Asset Dependencies
 ```
-assets/graphic/phantasia_1_cover_final.png
+assets/images/phantasia_1_cover_final.png
 assets/collections/ethereal-soundscapes.jpg
 assets/collections/digital-artifacts.jpg
 ```

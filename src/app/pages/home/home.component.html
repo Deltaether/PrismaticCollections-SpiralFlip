@@ -96,13 +96,14 @@
       
       <div class="featured-grid">
         <div *ngFor="let section of featuredSections" 
-            class="feature-card" 
+            [class]="section.id === 'unknown-prism' ? 'prism-card' : 'feature-card'" 
             [class.main-feature]="section.isMain"
-            [class.cd-unreadable]="section.id === 'unknown-cd'"
+            [class.cd-unreadable]="section.id === 'unknown-prism'"
             (click)="navigateTo(section.route)">
           <div class="card-image" 
                [style.backgroundImage]="'url(' + section.image + ')'">
-            <div class="card-overlay" *ngIf="section.id !== 'unknown-cd'"></div>
+            <div class="card-overlay" *ngIf="section.id !== 'unknown-prism'"></div>
+            <div class="prism-card-overlay" *ngIf="section.id === 'unknown-prism'"></div>
           </div>
           <div class="card-content">
             <h3 class="card-title">{{ section.title }}</h3>

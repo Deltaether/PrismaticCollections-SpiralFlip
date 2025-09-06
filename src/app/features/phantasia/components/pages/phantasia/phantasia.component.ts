@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CDCasesComponent } from '../../../../pages/collections/phantasia/tools/cd-cases/cd-cases.component';
 import { SiteVersionSelectorComponent } from '../../../../../components/site-version-selector/site-version-selector.component';
-import { DisclaimerComponent } from '../../../../../components/disclaimer/disclaimer.component';
 import { SceneLoaderComponent } from '../../../../pages/collections/phantasia/tools/cd-cases/scene-loader/scene-loader.component';
 import { MobileViewComponent } from '../../mobile/mobile-view.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
@@ -20,7 +19,6 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
     CommonModule,
     CDCasesComponent,
     SiteVersionSelectorComponent,
-    DisclaimerComponent,
     SceneLoaderComponent,
     MobileViewComponent,
     SiteHeaderComponent
@@ -35,11 +33,9 @@ export class PhantasiaComponent implements OnInit {
 
   // Storage keys
   private readonly SELECTOR_STORAGE_KEY = 'prismatic_collections_site_version_preference';
-  private readonly DISCLAIMER_STORAGE_KEY = 'prismatic_collections_disclaimer_acknowledged';
   
   // UI state flags
   showVersionSelector = false;
-  showDisclaimer = false;
   isMobileView = false;
 
   // Debug flag
@@ -55,25 +51,8 @@ export class PhantasiaComponent implements OnInit {
       console.log(`[PhantasiaComponent] Current URL: ${this.router.url}`);
     }
 
-    // Check if user has already acknowledged the disclaimer
-    const disclaimerAcknowledged = localStorage.getItem(this.DISCLAIMER_STORAGE_KEY);
-    
-    if (disclaimerAcknowledged) {
-      this.showDisclaimer = false;
-      
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Disclaimer already acknowledged`);
-      }
-      
-      // Check for version preference
-      this.checkVersionPreference();
-    } else {
-      // Show disclaimer first
-      this.showDisclaimer = true;
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Showing disclaimer`);
-      }
-    }
+    // Check for version preference directly
+    this.checkVersionPreference();
     
     // Add a fallback timeout to ensure loading doesn't get stuck forever
     setTimeout(() => {
@@ -124,7 +103,7 @@ export class PhantasiaComponent implements OnInit {
       }, 1000); // 1 second timeout
       
     } else {
-      // Show version selector after disclaimer
+      // Show version selector
       this.showVersionSelector = true;
       if (this.isDebugMode) {
         console.log(`[PhantasiaComponent] No saved preference, showing version selector`);
@@ -132,24 +111,6 @@ export class PhantasiaComponent implements OnInit {
     }
     
     // Update the UI
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Handles user acknowledgment of the disclaimer
-   * 【✓】
-   */
-  onDisclaimerAcknowledged(): void {
-    if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Disclaimer acknowledged`);
-    }
-    
-    // Save acknowledgment in local storage
-    localStorage.setItem(this.DISCLAIMER_STORAGE_KEY, 'true');
-    
-    // Hide disclaimer and check version preference
-    this.showDisclaimer = false;
-    this.checkVersionPreference();
     this.cdr.markForCheck();
   }
 

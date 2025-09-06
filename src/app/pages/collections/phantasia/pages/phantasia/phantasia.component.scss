@@ -69,97 +69,249 @@ p {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: 2;
+  z-index: 1;
   opacity: 1;
   transition: opacity 0.8s ease-in-out;
 }
 
-// Introduction content styling
+// Material Design intro content styling
 .intro-content {
   position: relative;
-  z-index: 3;
+  z-index: 10;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  opacity: 0.9;
-  transition: opacity 0.8s ease-in-out;
-  
-  // Positioned in a way that doesn't interfere with CD cases
-  margin-top: 30vh;
-  pointer-events: none; // Allow interaction with CD cases behind
-}
-
-.hero-section {
-  text-align: center;
-  margin-bottom: 40px;
-  
-  h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-    letter-spacing: 2px;
-  }
-  
-  .subtitle {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: #b3b3ff;
-    letter-spacing: 1px;
-  }
-}
-
-.description {
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
-  padding: 20px;
-  
-  .highlight {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #d9d9ff;
-    margin-bottom: 15px;
-    border-left: 3px solid #6464ff;
-    padding-left: 15px;
-  }
-  
-  p {
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-}
-
-.features {
+  padding: 24px;
   display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
-  
-  .feature {
-    flex: 1;
-    background-color: rgba(40, 40, 80, 0.6);
-    padding: 15px;
-    border-radius: 8px;
-    margin: 0 10px;
+  flex-direction: column;
+  gap: 24px;
+  opacity: 0.95;
+  transition: opacity 0.8s ease-in-out;
+  pointer-events: auto;
+
+  // Hero card styling
+  .hero-card {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 107, 107, 0.3);
     text-align: center;
     
-    h3 {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-      color: #a9a9ff;
+    mat-card-header {
+      justify-content: center;
+      
+      mat-card-title h1 {
+        color: #ffffff;
+        text-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+        margin: 0;
+      }
+      
+      mat-card-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.25rem;
+        margin-top: 8px;
+      }
+    }
+  }
+
+  // Description card styling
+  .description-card {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    
+    .highlight-chip {
+      margin-bottom: 16px;
+      
+      mat-chip-option {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        color: white;
+        
+        mat-icon {
+          color: white;
+        }
+      }
+    }
+    
+    .highlight-text {
+      color: #ffffff;
+      font-weight: 500;
+      border-left: 3px solid #ff6b6b;
+      padding-left: 16px;
+      margin: 16px 0;
     }
     
     p {
-      font-size: 0.9rem;
-      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+  }
+
+  // Features grid
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+    margin: 20px 0;
+    
+    .feature-card {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      min-height: 160px;
+      padding: 16px;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(255, 107, 107, 0.25);
+        background: rgba(0, 0, 0, 0.85);
+      }
+      
+      mat-card-header {
+        padding: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        
+        mat-card-title {
+          color: #ffffff;
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin: 0;
+          line-height: 1.3;
+          flex: 1;
+          min-width: 0; // Allow text to shrink
+        }
+        
+        [mat-card-avatar] {
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 56px;
+          height: 56px;
+          flex-shrink: 0;
+          order: -1; // Move avatar to the left
+          
+          mat-icon {
+            color: white;
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+          }
+        }
+      }
+      
+      mat-card-content {
+        padding: 0;
+        margin-top: 8px;
+        
+        p {
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          line-height: 1.5;
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Action buttons
+  .action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+    
+    .explore-btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+      color: white;
+      font-weight: 500;
+      
+      mat-icon {
+        margin-right: 8px;
+      }
     }
     
-    &:first-child {
-      margin-left: 0;
+    .info-btn {
+      border-color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.9);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 16px;
+    gap: 16px;
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      
+      .feature-card {
+        min-height: 140px;
+        padding: 12px;
+        
+        mat-card-header {
+          gap: 12px;
+          
+          mat-card-title {
+            font-size: 1.1rem;
+          }
+          
+          [mat-card-avatar] {
+            width: 48px;
+            height: 48px;
+            
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+            }
+          }
+        }
+        
+        mat-card-content p {
+          font-size: 0.9rem;
+        }
+      }
     }
     
-    &:last-child {
-      margin-right: 0;
+    .action-buttons {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .features-grid {
+      .feature-card {
+        mat-card-header {
+          [mat-card-avatar] {
+            width: 44px;
+            height: 44px;
+            
+            mat-icon {
+              font-size: 22px;
+              width: 22px;
+              height: 22px;
+            }
+          }
+        }
+      }
     }
   }
 }

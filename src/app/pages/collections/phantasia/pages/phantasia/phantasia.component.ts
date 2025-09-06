@@ -1,8 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 import { CDCasesComponent } from '../../tools/cd-cases/cd-cases.component';
-import { DisclaimerComponent } from '../../../../../components/disclaimer/disclaimer.component';
 import { SceneLoaderComponent } from '../../tools/cd-cases/scene-loader/scene-loader.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 
@@ -16,8 +19,11 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
   standalone: true,
   imports: [
     CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
     CDCasesComponent,
-    DisclaimerComponent,
     SceneLoaderComponent,
     SiteHeaderComponent
   ],
@@ -33,17 +39,34 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   private loadingStartTime = Date.now();
   private readonly MINIMUM_LOADING_TIME = 3000; // 3 seconds minimum for aesthetic
 
-  // Storage keys
-  private readonly DISCLAIMER_STORAGE_KEY = 'prismatic_collections_disclaimer_acknowledged';
-  
-  // UI state flags
-  showDisclaimer = false;
 
   // Debug flag
   private readonly isDebugMode = true;
   
   // Development mode - bypass all loading screens for testing recording controls
   private readonly isDevelopmentMode = true;
+
+  // Features data for Material cards
+  features = [
+    {
+      title: '2 Discs',
+      description: '20 original tracks spread across two themed discs',
+      icon: 'album',
+      color: 'linear-gradient(135deg, #ff6b6b, #ff8e8e)'
+    },
+    {
+      title: '160+ BPM',
+      description: 'High-energy compositions that will move your soul',
+      icon: 'graphic_eq',
+      color: 'linear-gradient(135deg, #4facfe, #00f2fe)'
+    },
+    {
+      title: 'Digital Art',
+      description: 'Stunning visual accompaniment for each track',
+      icon: 'palette',
+      color: 'linear-gradient(135deg, #667eea, #764ba2)'
+    }
+  ];
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -63,25 +86,6 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
       console.log(`[PhantasiaComponent] Added phantasia-3d-page class to body`);
     }
 
-    // Check if user has already acknowledged the disclaimer
-    const disclaimerAcknowledged = localStorage.getItem(this.DISCLAIMER_STORAGE_KEY);
-    
-    if (disclaimerAcknowledged) {
-      this.showDisclaimer = false;
-      
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Disclaimer already acknowledged`);
-      }
-      
-      // Disclaimer already acknowledged, proceed directly to 3D experience
-      // No version selector needed, always show desktop 3D experience
-    } else {
-      // Show disclaimer first
-      this.showDisclaimer = true;
-      if (this.isDebugMode) {
-        console.log(`[PhantasiaComponent] Showing disclaimer`);
-      }
-    }
     
     // Add a reasonable fallback timeout to prevent infinite loading
     setTimeout(() => {
@@ -105,24 +109,6 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     return this.router.url.includes('/phantasia/');
   }
 
-
-  /**
-   * Handles user acknowledgment of the disclaimer
-   * 【✓】
-   */
-  onDisclaimerAcknowledged(): void {
-    if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Disclaimer acknowledged`);
-    }
-    
-    // Save acknowledgment in local storage
-    localStorage.setItem(this.DISCLAIMER_STORAGE_KEY, 'true');
-    
-    // Hide disclaimer and proceed directly to 3D experience
-    this.showDisclaimer = false;
-    // No version selector needed, proceed directly to desktop 3D experience
-    this.cdr.markForCheck();
-  }
 
 
   /**

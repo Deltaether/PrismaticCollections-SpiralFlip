@@ -5,20 +5,14 @@
   <!-- Loading Screen -->
   <app-scene-loader *ngIf="isLoading"></app-scene-loader>
   
-  <!-- Disclaimer Screen - appears before anything else -->
-  <app-disclaimer
-    *ngIf="showDisclaimer"
-    (acknowledged)="onDisclaimerAcknowledged()"
-  ></app-disclaimer>
-  
-  <!-- Site Version Selector - appears after disclaimer -->
+  <!-- Site Version Selector -->
   <app-site-version-selector
-    *ngIf="!showDisclaimer && showVersionSelector"
+    *ngIf="showVersionSelector"
     (versionSelected)="onVersionSelected($event)"
   ></app-site-version-selector>
   
   <!-- Desktop Experience with CD Cases -->
-  <ng-container *ngIf="!isLoading && !showDisclaimer && !showVersionSelector && !isMobileView">
+  <ng-container *ngIf="!isLoading && !showVersionSelector && !isMobileView">
     <!-- CD Cases -->
     <div class="cd-cases-container">
       <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
@@ -62,5 +56,5 @@
   </ng-container>
   
   <!-- Mobile Experience -->
-  <app-mobile-view *ngIf="!isLoading && !showDisclaimer && !showVersionSelector && isMobileView"></app-mobile-view>
+  <app-mobile-view *ngIf="!isLoading && !showVersionSelector && isMobileView"></app-mobile-view>
 </div>

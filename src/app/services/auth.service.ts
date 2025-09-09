@@ -5,8 +5,8 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly CORRECT_USERNAME = 'phantasia_dev';
-  private readonly CORRECT_PASSWORD = 'i1Si1SbOEkgK';
+  private readonly CORRECT_USERNAME = 'SpiralFlipFlop';
+  private readonly CORRECT_PASSWORD = 'Kx9#mP2$vB8@zN5&yQ7*';
   private readonly AUTH_KEY = 'phantasia_authenticated';
   
   // Signal to track authentication status

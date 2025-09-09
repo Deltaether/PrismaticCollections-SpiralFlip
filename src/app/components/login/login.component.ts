@@ -10,6 +10,25 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="login-container">
       <div class="login-card">
+        <div class="login-header">
+          <h1>Prismatic Collections</h1>
+          <p>Client Access Portal</p>
+        </div>
+        
+        <div class="credentials-info">
+          <div class="credentials-box">
+            <h3>Login Credentials:</h3>
+            <div class="credential-item">
+              <label>Username:</label>
+              <span>{{ authInfo.username }}</span>
+            </div>
+            <div class="credential-item">
+              <label>Password:</label>
+              <span>{{ authInfo.password }}</span>
+            </div>
+          </div>
+        </div>
+        
         <form (ngSubmit)="onLogin()" class="login-form">
           <div class="form-group">
             <input 
@@ -68,8 +87,70 @@ import { AuthService } from '../../services/auth.service';
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       padding: 32px;
-      max-width: 320px;
+      max-width: 400px;
       width: 100%;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .login-header h1 {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .login-header p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .credentials-info {
+      margin-bottom: 24px;
+    }
+    
+    .credentials-box {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    
+    .credentials-box h3 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .credential-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-family: monospace;
+    }
+    
+    .credential-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .credential-item label {
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .credential-item span {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #333;
+      border: 1px solid rgba(0,0,0,0.1);
     }
     
     .form-group {
@@ -138,6 +219,7 @@ export class LoginComponent {
   password = '';
   errorMessage = signal<string>('');
   isLoading = signal<boolean>(false);
+  authInfo = this.authService.getAuthInfo();
   
   constructor(private authService: AuthService) {}
   

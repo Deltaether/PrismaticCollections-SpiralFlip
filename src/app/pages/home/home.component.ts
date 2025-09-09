@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Flag for debug logging
   private readonly isDebugMode = false;
   
+  
   // Featured content sections
   readonly featuredSections = [
     {
@@ -81,6 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   navigateTo(route: string): void {
     this.router.navigate([route]);
   }
+
 
   /**
    * Clean up on component destruction

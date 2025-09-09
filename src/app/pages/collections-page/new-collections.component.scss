@@ -1,5 +1,6 @@
-/* Import unified triangle animations */
+/* Import unified triangle animations and winter background system */
 @use '../../shared/styles/triangle-animations.scss';
+@use '../../shared/styles/unified-background.scss' as winter;
 
 /* 
  * Z-INDEX HIERARCHY DOCUMENTATION
@@ -18,25 +19,73 @@
 
 .collections-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0b0f 0%, #161821 100%);
-  color: #ffffff;
-  position: relative;
-  overflow-x: hidden;
-  /*margin-top: 89px; /* Add 89px margin-top same as home page */
+  width: 100%;
+  margin-top: 89px;
+  
+  /* Dark gradient background - similar to home */
+  background: 
+    linear-gradient(180deg,
+      #1a1a1f 0%,
+      #1f2429 25%,
+      #242932 50%,
+      #1d2127 75%,
+      #181820 100%
+    );
+  
+  /* Diagonal Lines Layer - Separate animatable pseudo-element */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(74, 158, 255, 0.035) 4px,
+        rgba(74, 158, 255, 0.035) 7px
+      ),
+      repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(255, 127, 80, 0.03) 3px,
+        rgba(255, 127, 80, 0.03) 6px
+      );
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  /* Animation C - Fast diagonal sweep */
+  &.anim-c::before {
+    animation: diagonalSweepC 4s linear infinite;
+  }
+  
+  /* Apply winter text colors */
+  @include winter.winter-text-colors;
   
   /* Prevent unwanted height stretching */
   height: auto; /* Let content determine height naturally */
 }
 
-/* Main Content Container - Enhanced Z-Index */
+/* Animation keyframes */
+@keyframes diagonalSweepC {
+  0% {
+    background-position: 0px 0px, 0px 0px;
+  }
+  100% {
+    background-position: 84px 84px, 76px 76px;
+  }
+}
+
+/* Main Content Container - Winter Theme */
 .collections-main {
-  position: relative;
+  @include winter.winter-content-container;
   z-index: 10; /* Increase z-index to ensure content is above triangles */
-  padding: 0 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
   padding-top: 6rem; /* Add proper margin below navbar */
-  padding-bottom: 4rem; /* Add margin from bottom */
 }
 
 /* Albums Container */
@@ -54,14 +103,11 @@
   padding: 1rem 0;
 }
 
-/* Album Card - Glassmorphism with Proper Z-Index */
+/* Album Card - Winter Theme */
 .album-card {
   position: relative;
   z-index: 20; /* Ensure cards are above all background elements */
-  background: rgba(255, 255, 255, 0.08); /* Slightly more transparent for glassmorphism */
-  backdrop-filter: blur(12px); /* Restore glassmorphism effect */
-  -webkit-backdrop-filter: blur(12px); /* Safari support */
-  border-radius: 20px;
+  @include winter.winter-card-style;
   overflow: hidden;
   cursor: pointer;
   /* Optimize transitions - only animate specific properties */

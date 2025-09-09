@@ -1,8 +1,9 @@
-/* Import unified triangle animations and enhanced design systems */
+/* Import unified triangle animations, enhanced design systems, and winter background */
 @use '../../shared/styles/triangle-animations.scss';
 @use '../../shared/styles/typography-system.scss' as typo;
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
+@use '../../shared/styles/unified-background.scss' as winter;
 
 /* Variables */
 $primary-color: #ff7f50;
@@ -27,26 +28,20 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Social Links Page Container */
+/* Social Links Page Container - Winter Theme */
 .social-links-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a0b0f 0%, #161821 100%);
-  color: #ffffff;
-  position: relative;
-  overflow-x: hidden;
+  @include winter.unified-winter-background;
   margin-top: 89px;
+  
+  /* Apply winter text colors */
+  @include winter.winter-text-colors;
+  
   height: auto;
 }
 
-/* Main Content Container */
+/* Main Content Container - Winter Theme */
 .social-main {
-  position: relative;
-  z-index: 2;
-  padding: 0 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  @include winter.winter-content-container;
 }
 
 /* Hero Section */

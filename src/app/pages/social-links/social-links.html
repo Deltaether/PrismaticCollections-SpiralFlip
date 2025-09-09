@@ -101,7 +101,8 @@
               <img [src]="artist.avatar" 
                    [alt]="artist.name + ' avatar'" 
                    class="avatar-image"
-                   (error)="$event.target.src='assets/images/default-avatar.jpg'">
+                   (error)="onAvatarError($event, artist.name)"
+                   loading="lazy">
             </div>
             <div class="avatar-glow"></div>
           </div>

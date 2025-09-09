@@ -39,7 +39,7 @@ export class SocialLinksComponent implements OnInit {
       name: 'Deltaether',
       role: 'Lead Producer & Visual Artist',
       description: 'Creating immersive musical experiences and interactive visual environments.',
-      avatar: 'assets/images/artists/deltaether-avatar.jpg',
+      avatar: 'assets/images/artists/deltaether-avatar.svg',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -78,7 +78,7 @@ export class SocialLinksComponent implements OnInit {
       name: 'Phantasia Collective',
       role: 'Musical Collaboration',
       description: 'A collective of artists working together on the Phantasia project.',
-      avatar: 'assets/images/artists/phantasia-collective.jpg',
+      avatar: 'assets/images/artists/phantasia-collective.svg',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -105,7 +105,7 @@ export class SocialLinksComponent implements OnInit {
       name: 'Featured Artists',
       role: 'Collaborations & Remixes',
       description: 'Various artists who have contributed to Prismatic Collections projects.',
-      avatar: 'assets/images/artists/featured-artists.jpg',
+      avatar: 'assets/images/artists/featured-artists.svg',
       socialLinks: [
         {
           platform: 'Various Platforms',
@@ -171,5 +171,26 @@ export class SocialLinksComponent implements OnInit {
    */
   isPlatformAvailable(url: string): boolean {
     return url !== '#';
+  }
+
+  /**
+   * Handle avatar image loading errors with proper fallback
+   */
+  onAvatarError(event: any, artistName: string): void {
+    console.warn(`Avatar image failed to load for ${artistName}, using default fallback`);
+    event.target.src = 'assets/images/default-avatar.svg';
+    event.target.onerror = null; // Prevent infinite loop if default also fails
+  }
+
+  /**
+   * Handle default avatar error as final fallback
+   */
+  onDefaultAvatarError(event: any): void {
+    console.error('Default avatar also failed to load, using CSS fallback');
+    event.target.style.display = 'none';
+    const parent = event.target.parentElement;
+    if (parent) {
+      parent.classList.add('avatar-fallback');
+    }
   }
 }

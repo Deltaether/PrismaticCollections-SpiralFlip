@@ -290,8 +290,8 @@ $transition: all 0.3s ease;
 /* Hero Section */
 .hero {
   position: relative;
-  height: 60vh;
-  min-height: 500px;
+  height: 25vh;
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1188,8 +1188,8 @@ $transition: all 0.3s ease;
 /* Small Mobile (320px - 480px) */
 @media (max-width: 480px) {
   .hero {
-    height: 50vh;
-    min-height: 350px;
+    height: 25vh;
+    min-height: 220px;
     padding: 2rem 1.5rem;
     margin-bottom: 2rem;
     
@@ -1241,8 +1241,8 @@ $transition: all 0.3s ease;
 /* Large Mobile / Small Tablet (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   .hero {
-    height: 55vh;
-    min-height: 400px;
+    height: 25vh;
+    min-height: 220px;
     
     .hero-content {
       .title {

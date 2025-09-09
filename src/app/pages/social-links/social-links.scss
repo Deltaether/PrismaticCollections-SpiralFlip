@@ -28,13 +28,18 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Social Links Page Container */
+/* Social Links Page Container - PERFORMANCE OPTIMIZED */
 .social-links-page {
   min-height: 100vh;
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
-  margin-top: 89px;
+  padding-top: 89px;
+  
+  /* Performance optimizations to prevent glitching */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
   
   /* Static Background: Only radial gradients and base gradient - NEVER animated */
   background: 
@@ -48,7 +53,7 @@ $transition: all 0.3s ease;
       #181820 100%
     );
   
-  /* Diagonal Lines Layer - Separate animatable pseudo-element */
+  /* Diagonal Lines Layer - Separate animatable pseudo-element - GPU ACCELERATED */
   &::before {
     content: '';
     position: absolute;
@@ -85,14 +90,20 @@ $transition: all 0.3s ease;
       );
     pointer-events: none;
     z-index: 1;
+    
+    /* GPU acceleration to prevent glitching */
+    transform: translateZ(0);
+    will-change: background-position, opacity, filter;
+    backface-visibility: hidden;
   }
   
   /* Diagonal Line Animation Variations - A to T (20 animations) */
   /* All animations target ONLY the ::before pseudo-element (diagonal lines layer) */
   
-  /* A - Smooth diagonal slide right-down */
+  /* A - Smooth diagonal slide right-down - STABLE PERFORMANCE */
   &.anim-a::before {
-    animation: diagonalSlideA 8s linear infinite;
+    animation: diagonalSlideA 12s linear infinite;
+    will-change: background-position;
   }
   
   /* B - Pulsing diagonal opacity */
@@ -215,12 +226,18 @@ $transition: all 0.3s ease;
   height: auto;
 }
 
-/* Main Content Container - Winter Theme */
+/* Main Content Container - Same as collections page */
 .social-main {
-  @include winter.winter-content-container;
+  position: relative;
+  z-index: 2;
+  padding: 0 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
-/* Hero Section - Enhanced glassmorphism styling */
+/* Hero Section - Exact copy from collections page */
 .hero {
   position: relative;
   height: 25vh;
@@ -234,19 +251,18 @@ $transition: all 0.3s ease;
   margin-left: auto;
   margin-right: auto;
   
-  /* Enhanced glassmorphism effect for hero background */
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.12) 0%, 
-    rgba(255, 255, 255, 0.08) 50%, 
-    rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* Slightly transparent card styling for illuminated dark theme */
+  background: linear-gradient(
+      135deg,
+      rgba(167, 90, 201, 0.02) 0%,
+      rgba(143, 182, 136, 0.22) 50%,
+      rgba(187, 108, 164, 0.08) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  padding: 2.5rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 3rem 2.5rem;
   
   /* Additional glow effect */
   &::before {
@@ -271,32 +287,28 @@ $transition: all 0.3s ease;
     position: relative;
     
     .title {
-      @extend .typography-display-large;
+      font-size: 3.5rem;
+      font-weight: 800;
       margin-bottom: 1rem;
       background: linear-gradient(to right, #ff7f50, #ff5252);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-fill-color: transparent;
-      animation: titleGlow 4s ease-in-out infinite alternate;
       position: relative;
-      z-index: 2;
+      z-index: 1;
     }
     
     .subtitle {
-      @extend .typography-heading-2;
-      margin-bottom: 1.5rem;
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 500;
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.9);
       position: relative;
-      z-index: 2;
+      z-index: 1;
     }
     
     .description {
-      @extend .typography-body-large;
-      color: rgba(255, 255, 255, 0.7);
-      max-width: 600px;
-      margin: 0 auto;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
       position: relative;
       z-index: 2;
     }
@@ -436,6 +448,30 @@ $transition: all 0.3s ease;
     opacity: 0;
     transition: all 0.5s ease;
     z-index: 1;
+  }
+  
+  /* CSS Fallback for missing avatars */
+  .avatar-fallback {
+    position: relative;
+    
+    &::before {
+      content: '👤';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.7);
+      background: linear-gradient(135deg, $primary-color, rgba(255, 127, 80, 0.7));
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid $primary-color;
+      box-shadow: 0 4px 20px rgba(255, 127, 80, 0.3);
+    }
   }
 }
 
@@ -833,13 +869,15 @@ $transition: all 0.3s ease;
   }
 }
 
-/* O - Diagonal zoom pulse (background-size) */
+/* O - Diagonal zoom pulse (background-size) - PERFORMANCE OPTIMIZED */
 @keyframes diagonalZoomPulseO {
   0%, 100% {
-    background-size: 42px 42px, 38px 38px;
+    transform: scale(1);
+    opacity: 1;
   }
   50% {
-    background-size: 60px 60px, 55px 55px;
+    transform: scale(1.02);
+    opacity: 0.9;
   }
 }
 
@@ -914,23 +952,23 @@ $transition: all 0.3s ease;
   }
 }
 
-/* T - Diagonal morphing pattern (size + position) */
+/* T - Diagonal morphing pattern - SIMPLIFIED FOR PERFORMANCE */
 @keyframes diagonalMorphingPatternT {
   0%, 100% {
-    background-size: 42px 42px, 38px 38px;
     background-position: 0px 0px, 0px 0px;
+    filter: brightness(1);
   }
   25% {
-    background-size: 55px 55px, 50px 50px;
     background-position: 20px 10px, 18px 8px;
+    filter: brightness(1.1);
   }
   50% {
-    background-size: 35px 35px, 32px 32px;
     background-position: 40px 20px, 35px 18px;
+    filter: brightness(0.9);
   }
   75% {
-    background-size: 65px 65px, 60px 60px;
     background-position: 20px 30px, 18px 25px;
+    filter: brightness(1.05);
   }
 }
 
@@ -1118,6 +1156,48 @@ $transition: all 0.3s ease;
       border-color: #5865F2;
       box-shadow: 0 0 20px rgba(88, 101, 242, 0.3);
     }
+  }
+}
+
+/* Accessibility - Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .social-links-page {
+    &::before,
+    &::after {
+      animation: none !important;
+    }
+    
+    &.anim-a::before,
+    &.anim-b::before,
+    &.anim-c::before,
+    &.anim-d::before,
+    &.anim-e::before,
+    &.anim-f::before,
+    &.anim-g::before,
+    &.anim-h::before,
+    &.anim-i::before,
+    &.anim-j::before,
+    &.anim-k::before,
+    &.anim-l::before,
+    &.anim-m::before,
+    &.anim-n::before,
+    &.anim-o::before,
+    &.anim-p::before,
+    &.anim-q::before,
+    &.anim-r::before,
+    &.anim-s::before,
+    &.anim-t::before {
+      animation: none !important;
+    }
+  }
+  
+  .hero .hero-content .title {
+    animation: none !important;
+  }
+  
+  .artist-card,
+  .social-button {
+    animation: none !important;
   }
 }
 

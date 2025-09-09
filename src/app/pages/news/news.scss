@@ -564,7 +564,7 @@ $transition-slow: all 0.5s ease;
   padding-bottom: 4rem;
 }
 
-/* Hero Section - Enhanced glassmorphism styling */
+/* Hero Section - Exact copy from collections page */
 .hero {
   position: relative;
   height: 25vh;
@@ -578,19 +578,14 @@ $transition-slow: all 0.5s ease;
   margin-left: auto;
   margin-right: auto;
   
-  /* Enhanced glassmorphism effect for news page */
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.12) 0%, 
-    rgba(255, 255, 255, 0.08) 50%, 
-    rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* Slightly transparent card styling for illuminated dark theme */
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.0) 0%, rgba(45, 124, 215, 0.22) 50%, rgba(255, 136, 95, 0.18) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  padding: 2.5rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 3rem 2.5rem;
   
   /* Additional glow effect */
   &::before {

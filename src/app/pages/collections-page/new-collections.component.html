@@ -24,11 +24,21 @@
   <!-- Main Content -->
   <main class="collections-main">
     
-    <!-- Page Header -->
-    <header class="page-header">
-      <h1>Music Collections</h1>
-      <p>Explore our curated collections of music, each with its own unique theme and atmosphere.</p>
-    </header>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="title">MUSIC COLLECTIONS</h1>
+        <p class="subtitle">Explore Our Curated Musical Experiences</p>
+        <div class="hero-buttons">
+          <button class="button primary" (click)="navigateToAlbum('phantasia-album')">
+            Explore Collections
+          </button>
+        </div>
+      </div>
+      <div class="hero-background">
+        <div class="overlay"></div>
+      </div>
+    </section>
 
     <!-- Album Cards Container -->
     <div class="albums-container">

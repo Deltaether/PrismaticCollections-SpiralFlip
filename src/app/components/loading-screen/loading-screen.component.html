@@ -1,19 +1,41 @@
-<div class="loading-screen">
-  <div class="loading-content">
+<div class="loader-container" [class.visible]="true">
+  <div class="magical-circle outer"></div>
+  <div class="magical-circle"></div>
+  <div class="rune-effects"></div>
+  <div class="decorative-elements">
+    <div class="corner-line top-left"></div>
+    <div class="corner-line top-right"></div>
+    <div class="corner-line bottom-left"></div>
+    <div class="corner-line bottom-right"></div>
+    <div class="mid-line left"></div>
+    <div class="mid-line right"></div>
+    <div class="mid-line top"></div>
+    <div class="mid-line bottom"></div>
+  </div>
+  <div class="light-beams">
+    <div class="beam beam-1"></div>
+    <div class="beam beam-2"></div>
+    <div class="beam beam-3"></div>
+    <div class="beam beam-4"></div>
+  </div>
+  <div class="rune-circle">
+    <div class="rune" *ngFor="let rune of runes" 
+         [class.clockwise]="rune.clockwise"
+         [class.counter-clockwise]="!rune.clockwise"
+         [style.left]="rune.x + 'vw'"
+         [style.top]="rune.y + 'vh'"
+         [style.--move-x]="rune.moveX + 'px'"
+         [style.--move-y]="rune.moveY + 'px'"
+         [style.--scale]="rune.scale"
+         [style.--base-opacity]="rune.opacity"
+         [style.--rotation-offset]="rune.rotationOffset"
+         [style.--delay]="rune.delay">
+    </div>
+  </div>
+  <div class="content">
     <div class="logo-container">
-      <img src="/assets/images/prismcoll_logox.svg" alt="Prismatic Collections" class="logo">
-      <div class="tagline">Project Phantasia</div>
+      <img src="/assets/images/prismcoll_logox_black_upright.svg" alt="Prismatic Collections" class="logo">
     </div>
-    
-    <div class="loader-container">
-      <div class="progress-bar-container">
-        <div class="progress-bar" [style.width]="progressText"></div>
-      </div>
-      <div class="progress-text">{{ progressText }}</div>
-    </div>
-    
-    <div class="loading-message">
-      {{ loadingMessages[currentMessageIndex] }}
-    </div>
+    <div class="loading-text">NOW LOADING</div>
   </div>
 </div> 

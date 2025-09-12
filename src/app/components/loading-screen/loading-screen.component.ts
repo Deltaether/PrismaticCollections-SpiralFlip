@@ -1,9 +1,26 @@
-import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 /**
- * Displays a professional loading screen with progress indicator
- * Shows while the application assets are loading
+ * Defines position and animation properties for rune elements
+ * Controls appearance and movement of magical rune symbols
+ */
+interface RunePosition {
+  x: number;
+  y: number;
+  scale: number;
+  delay: number;
+  opacity: number;
+  moveX: number;
+  moveY: number;
+  rotationOffset: number;
+  clockwise: boolean;
+}
+
+/**
+ * Creates an animated loading screen with magical effects
+ * Displays during application loading and initialization
+ * Provides visual feedback and sets atmosphere for the application
  * 【✓】
  */
 @Component({
@@ -14,7 +31,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./loading-screen.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoadingScreenComponent {
+export class LoadingScreenComponent implements OnInit {
   @Input() set progress(value: number) {
     this._progress = value;
     this.progressText = `${Math.floor(value)}%`;
@@ -27,27 +44,36 @@ export class LoadingScreenComponent {
   
   private _progress = 0;
   progressText = '0%';
-  loadingMessages = [
-    'Initializing 3D environment...',
-    'Preparing audio assets...',
-    'Loading graphical elements...',
-    'Configuring interactive components...',
-    'Optimizing experience...'
-  ];
-  currentMessageIndex = 0;
+  runes: RunePosition[] = [];
   
-  constructor(private cdr: ChangeDetectorRef) {
-    this.startMessageCycle();
-  }
+  constructor(private cdr: ChangeDetectorRef) {}
   
   /**
-   * Cycles through loading messages to create dynamic experience
+   * Initializes the loading screen and generates rune positions
+   * Creates randomized magical elements with varied animations
    * 【✓】
    */
-  private startMessageCycle(): void {
-    setInterval(() => {
-      this.currentMessageIndex = (this.currentMessageIndex + 1) % this.loadingMessages.length;
-      this.cdr.markForCheck();
-    }, 3000);
+  ngOnInit() {
+    this.generateRunePositions();
+  }
+
+  /**
+   * Creates random positions and properties for rune elements
+   * Generates visually interesting magical symbols with varied behavior
+   * 【✓】
+   */
+  private generateRunePositions() {
+    const numRunes = 48;
+    this.runes = Array.from({ length: numRunes }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      scale: 0.6 + Math.random() * 1.4,
+      delay: Math.random() * 8,
+      opacity: 0.3 + Math.random() * 0.5,
+      moveX: 15 + Math.random() * 20,
+      moveY: 15 + Math.random() * 20,
+      rotationOffset: Math.random() * 360,
+      clockwise: Math.random() < 0.5
+    }));
   }
 } 

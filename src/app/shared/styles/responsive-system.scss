@@ -1,0 +1,671 @@
+@use 'sass:map';
+
+/**
+ * Comprehensive Responsive Design System for Phantasia Collections
+ * 
+ * This system provides:
+ * - Professional breakpoint system with consistent naming
+ * - Typography scales that adapt to screen size
+ * - Spacing scales for optimal layouts
+ * - Touch-friendly interaction patterns
+ * - High DPI display optimizations
+ * - Accessibility considerations
+ * 
+ * Usage:
+ * @use './shared/styles/responsive-system' as responsive;
+ * 
+ * .my-component {
+ *   @include responsive.mobile {
+ *     // Mobile styles
+ *   }
+ *   
+ *   @include responsive.tablet-up {
+ *     // Tablet and above styles
+ *   }
+ * }
+ * 【✓】
+ */
+
+// =============================================================================
+// BREAKPOINT DEFINITIONS
+// =============================================================================
+
+$breakpoints: (
+  xs: 319px,      // Extra small mobile
+  sm: 767px,      // Mobile
+  md: 1023px,     // Tablet
+  lg: 1439px,     // Desktop
+  xl: 2559px,     // Large Desktop
+  xxl: 2560px     // Ultra-wide
+) !default;
+
+// =============================================================================
+// RESPONSIVE MIXINS
+// =============================================================================
+
+/**
+ * Mobile devices (320px - 767px)
+ */
+@mixin mobile {
+  @media (min-width: 320px) and (max-width: map.get($breakpoints, sm)) {
+    @content;
+  }
+}
+
+/**
+ * Small mobile devices (up to 319px)
+ */
+@mixin mobile-xs {
+  @media (max-width: map.get($breakpoints, xs)) {
+    @content;
+  }
+}
+
+/**
+ * Tablet devices (768px - 1023px)
+ */
+@mixin tablet {
+  @media (min-width: #{map.get($breakpoints, sm) + 1px}) and (max-width: map.get($breakpoints, md)) {
+    @content;
+  }
+}
+
+/**
+ * Desktop devices (1024px - 1439px)
+ */
+@mixin desktop {
+  @media (min-width: #{map.get($breakpoints, md) + 1px}) and (max-width: map.get($breakpoints, lg)) {
+    @content;
+  }
+}
+
+/**
+ * Large desktop devices (1440px - 2559px)
+ */
+@mixin desktop-large {
+  @media (min-width: #{map.get($breakpoints, lg) + 1px}) and (max-width: map.get($breakpoints, xl)) {
+    @content;
+  }
+}
+
+/**
+ * Ultra-wide devices (2560px+)
+ */
+@mixin ultra-wide {
+  @media (min-width: map.get($breakpoints, xxl)) {
+    @content;
+  }
+}
+
+// =============================================================================
+// MOBILE-UP MIXINS (Progressive Enhancement)
+// =============================================================================
+
+/**
+ * Tablet and up (768px+)
+ */
+@mixin tablet-up {
+  @media (min-width: #{map.get($breakpoints, sm) + 1px}) {
+    @content;
+  }
+}
+
+/**
+ * Desktop and up (1024px+)
+ */
+@mixin desktop-up {
+  @media (min-width: #{map.get($breakpoints, md) + 1px}) {
+    @content;
+  }
+}
+
+/**
+ * Large desktop and up (1440px+)
+ */
+@mixin desktop-large-up {
+  @media (min-width: #{map.get($breakpoints, lg) + 1px}) {
+    @content;
+  }
+}
+
+// =============================================================================
+// MOBILE-DOWN MIXINS (Graceful Degradation)
+// =============================================================================
+
+/**
+ * Mobile and below (up to 767px)
+ */
+@mixin mobile-down {
+  @media (max-width: map.get($breakpoints, sm)) {
+    @content;
+  }
+}
+
+/**
+ * Tablet and below (up to 1023px)
+ */
+@mixin tablet-down {
+  @media (max-width: map.get($breakpoints, md)) {
+    @content;
+  }
+}
+
+/**
+ * Desktop and below (up to 1439px)
+ */
+@mixin desktop-down {
+  @media (max-width: map.get($breakpoints, lg)) {
+    @content;
+  }
+}
+
+// =============================================================================
+// ORIENTATION MIXINS
+// =============================================================================
+
+/**
+ * Portrait orientation
+ */
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+/**
+ * Landscape orientation
+ */
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+/**
+ * Mobile portrait
+ */
+@mixin mobile-portrait {
+  @media (max-width: map.get($breakpoints, sm)) and (orientation: portrait) {
+    @content;
+  }
+}
+
+/**
+ * Mobile landscape
+ */
+@mixin mobile-landscape {
+  @media (max-width: map.get($breakpoints, md)) and (orientation: landscape) {
+    @content;
+  }
+}
+
+// =============================================================================
+// DEVICE CAPABILITY MIXINS
+// =============================================================================
+
+/**
+ * Touch devices (no hover capability)
+ */
+@mixin touch-device {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+/**
+ * Hover-capable devices
+ */
+@mixin hover-capable {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+/**
+ * High DPI displays (Retina)
+ */
+@mixin retina {
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    @content;
+  }
+}
+
+/**
+ * Short height screens (useful for mobile landscape)
+ */
+@mixin short-height {
+  @media (max-height: 600px) {
+    @content;
+  }
+}
+
+/**
+ * Tall screens (useful for desktop)
+ */
+@mixin tall-height {
+  @media (min-height: 900px) {
+    @content;
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY MIXINS
+// =============================================================================
+
+/**
+ * Reduced motion preference
+ */
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+/**
+ * Dark mode preference
+ */
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+/**
+ * Light mode preference
+ */
+@mixin light-mode {
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
+}
+
+// =============================================================================
+// TYPOGRAPHY SCALES
+// =============================================================================
+
+$typography-scales: (
+  mobile: 0.85,
+  tablet: 0.95,
+  desktop: 1.0,
+  desktop-large: 1.05,
+  ultra-wide: 1.1
+) !default;
+
+/**
+ * Generate responsive typography
+ * 
+ * @param {number} $base-size - Base font size in rem
+ * @param {number} $mobile-scale - Scale factor for mobile (optional)
+ * @param {number} $tablet-scale - Scale factor for tablet (optional)
+ */
+@mixin responsive-font-size($base-size, $mobile-scale: null, $tablet-scale: null) {
+  $mobile-scale: if($mobile-scale, $mobile-scale, map.get($typography-scales, mobile));
+  $tablet-scale: if($tablet-scale, $tablet-scale, map.get($typography-scales, tablet));
+  
+  // Base size (desktop)
+  font-size: #{$base-size}rem;
+  
+  // Mobile scaling
+  @include mobile {
+    font-size: #{$base-size * $mobile-scale}rem;
+  }
+  
+  // Tablet scaling
+  @include tablet {
+    font-size: #{$base-size * $tablet-scale}rem;
+  }
+  
+  // Large desktop scaling
+  @include desktop-large-up {
+    font-size: #{$base-size * map.get($typography-scales, desktop-large)}rem;
+  }
+  
+  // Ultra-wide scaling
+  @include ultra-wide {
+    font-size: #{$base-size * map.get($typography-scales, ultra-wide)}rem;
+  }
+}
+
+// =============================================================================
+// SPACING SCALES
+// =============================================================================
+
+$spacing-scales: (
+  mobile: 0.75,
+  tablet: 0.9,
+  desktop: 1.0,
+  desktop-large: 1.1,
+  ultra-wide: 1.2
+) !default;
+
+/**
+ * Generate responsive spacing
+ * 
+ * @param {string} $property - CSS property (margin, padding, etc.)
+ * @param {number} $base-value - Base spacing value in rem
+ */
+@mixin responsive-spacing($property, $base-value) {
+  // Base spacing (desktop)
+  & {
+    #{$property}: #{$base-value}rem;
+  }
+  
+  // Mobile scaling
+  @include mobile {
+    #{$property}: #{$base-value * map.get($spacing-scales, mobile)}rem;
+  }
+  
+  // Tablet scaling
+  @include tablet {
+    #{$property}: #{$base-value * map.get($spacing-scales, tablet)}rem;
+  }
+  
+  // Large desktop scaling
+  @include desktop-large-up {
+    #{$property}: #{$base-value * map.get($spacing-scales, desktop-large)}rem;
+  }
+  
+  // Ultra-wide scaling
+  @include ultra-wide {
+    #{$property}: #{$base-value * map.get($spacing-scales, ultra-wide)}rem;
+  }
+}
+
+/**
+ * Responsive padding
+ */
+@mixin responsive-padding($value) {
+  @include responsive-spacing(padding, $value);
+}
+
+/**
+ * Responsive margin
+ */
+@mixin responsive-margin($value) {
+  @include responsive-spacing(margin, $value);
+}
+
+// =============================================================================
+// GRID SYSTEMS
+// =============================================================================
+
+/**
+ * Responsive grid columns
+ */
+@mixin responsive-grid-columns($mobile: 1, $tablet: 2, $desktop: 3, $desktop-large: 4, $ultra-wide: 5) {
+  display: grid;
+  gap: 1rem;
+  
+  // Mobile
+  grid-template-columns: repeat($mobile, 1fr);
+  
+  // Tablet
+  @include tablet-up {
+    grid-template-columns: repeat($tablet, 1fr);
+    gap: 1.25rem;
+  }
+  
+  // Desktop
+  @include desktop-up {
+    grid-template-columns: repeat($desktop, 1fr);
+    gap: 1.5rem;
+  }
+  
+  // Large Desktop
+  @include desktop-large-up {
+    grid-template-columns: repeat($desktop-large, 1fr);
+    gap: 1.75rem;
+  }
+  
+  // Ultra-wide
+  @include ultra-wide {
+    grid-template-columns: repeat($ultra-wide, 1fr);
+    gap: 2rem;
+  }
+}
+
+/**
+ * Responsive flexbox layout
+ */
+@mixin responsive-flex($mobile-direction: column, $desktop-direction: row) {
+  display: flex;
+  flex-direction: $mobile-direction;
+  gap: 1rem;
+  
+  @include tablet-up {
+    flex-direction: $desktop-direction;
+    gap: 1.5rem;
+  }
+}
+
+// =============================================================================
+// CONTAINER SYSTEMS
+// =============================================================================
+
+/**
+ * Responsive container with max-widths
+ */
+@mixin responsive-container($mobile-padding: 1rem, $desktop-padding: 2rem) {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 $mobile-padding;
+  
+  @include tablet-up {
+    padding: 0 $desktop-padding;
+  }
+  
+  @include tablet {
+    max-width: 768px;
+  }
+  
+  @include desktop {
+    max-width: 1024px;
+  }
+  
+  @include desktop-large {
+    max-width: 1200px;
+  }
+  
+  @include ultra-wide {
+    max-width: 1400px;
+  }
+}
+
+// =============================================================================
+// TOUCH-FRIENDLY INTERACTIONS
+// =============================================================================
+
+/**
+ * Touch-friendly button sizing
+ */
+@mixin touch-friendly {
+  min-height: 44px; // iOS/Android recommended minimum
+  min-width: 44px;
+  
+  @include touch-device {
+    padding: 0.75rem 1.5rem;
+    
+    // Remove hover effects on touch devices
+    &:hover {
+      transform: none;
+    }
+    
+    // Add active states for touch feedback
+    &:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+  }
+}
+
+/**
+ * Responsive touch targets
+ */
+@mixin responsive-touch-target($mobile-size: 44px, $desktop-size: 40px) {
+  @include mobile-down {
+    min-height: $mobile-size;
+    min-width: $mobile-size;
+  }
+  
+  @include tablet-up {
+    min-height: $desktop-size;
+    min-width: $desktop-size;
+  }
+}
+
+// =============================================================================
+// PERFORMANCE OPTIMIZATIONS
+// =============================================================================
+
+/**
+ * Reduce complexity on mobile for performance
+ */
+@mixin mobile-performance-optimizations {
+  @include mobile {
+    // Reduce shadows and effects
+    box-shadow: none !important;
+    text-shadow: none !important;
+    
+    // Simplify gradients
+    background: var(--fallback-bg, #1a1a1f) !important;
+    
+    // Disable animations on very small screens
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/**
+ * High DPI optimizations
+ */
+@mixin retina-optimizations {
+  @include retina {
+    // Use optimized images
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    
+    // Reduce texture complexity
+    &::before,
+    &::after {
+      background-size: 50% 50% !important;
+    }
+  }
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Convert px to rem based on base font size
+ */
+@function px-to-rem($px, $base: 16px) {
+  @return #{$px / $base}rem;
+}
+
+/**
+ * Fluid typography using clamp()
+ */
+@function fluid-size($min-size, $max-size, $min-width: 320px, $max-width: 1440px) {
+  $slope: ($max-size - $min-size) / ($max-width - $min-width);
+  $intercept: $min-size - $slope * $min-width;
+  
+  @return clamp(#{$min-size}px, #{$intercept}px + #{$slope * 100}vw, #{$max-size}px);
+}
+
+// =============================================================================
+// SAFE AREA SUPPORT (for devices with notches)
+// =============================================================================
+
+/**
+ * Safe area padding
+ */
+@mixin safe-area-padding($property: padding) {
+  #{$property}-top: env(safe-area-inset-top);
+  #{$property}-right: env(safe-area-inset-right);
+  #{$property}-bottom: env(safe-area-inset-bottom);
+  #{$property}-left: env(safe-area-inset-left);
+}
+
+/**
+ * Full viewport height accounting for safe areas
+ */
+@mixin full-viewport-height {
+  height: 100vh;
+  height: -webkit-fill-available;
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+// =============================================================================
+// COMPONENT-SPECIFIC RESPONSIVE PATTERNS
+// =============================================================================
+
+/**
+ * Responsive card layout
+ */
+@mixin responsive-card {
+  @include responsive-container;
+  @include responsive-padding(1.5);
+  border-radius: 8px;
+  
+  @include mobile {
+    border-radius: 4px;
+  }
+  
+  @include desktop-large-up {
+    border-radius: 12px;
+  }
+  
+  @include touch-device {
+    @include touch-friendly;
+  }
+}
+
+/**
+ * Responsive hero section
+ */
+@mixin responsive-hero {
+  padding: 4rem 0;
+  
+  @include mobile {
+    padding: 2rem 0;
+  }
+  
+  @include desktop-large-up {
+    padding: 6rem 0;
+  }
+  
+  h1 {
+    @include responsive-font-size(3.5, 2.0, 2.8);
+  }
+  
+  p {
+    @include responsive-font-size(1.25, 1.0, 1.1);
+  }
+}
+
+/**
+ * Responsive navigation
+ */
+@mixin responsive-nav {
+  @include mobile-down {
+    // Mobile hamburger menu styles
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+  }
+  
+  @include tablet-up {
+    // Desktop horizontal menu styles
+    flex-direction: row;
+    position: static;
+    width: auto;
+    height: auto;
+    background: transparent;
+  }
+}

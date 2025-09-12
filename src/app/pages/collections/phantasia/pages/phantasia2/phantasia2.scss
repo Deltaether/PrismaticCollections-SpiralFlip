@@ -335,16 +335,16 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
   
   .title-subtitle {
-    margin-top: 0.69vw; /* 1rem → responsive margin */
-    font-size: 0.9vw; /* 1.3rem → responsive font size */
+    margin-top: clamp(0.75rem, 0.69vw, 1.25rem); /* Smart responsive margin */
+    font-size: clamp(1.1rem, 0.9vw, 1.8rem); /* Smart responsive font size with readability bounds */
     font-weight: 300;
     color: rgba(255, 255, 255, 0.8);
     font-style: italic;
-    text-shadow: 0 0.14vw 0.56vw rgba(0, 0, 0, 0.6); /* 2px 8px → responsive */
-    letter-spacing: 0.035vw; /* 0.5px → responsive spacing */
+    text-shadow: 0 clamp(1px, 0.14vw, 3px) clamp(6px, 0.56vw, 14px) rgba(0, 0, 0, 0.6); /* Smart responsive shadow */
+    letter-spacing: clamp(0.3px, 0.035vw, 1px); /* Smart responsive letter spacing */
     
     @media (max-width: 768px) {
-      font-size: 1.21vw; /* 1.1rem → responsive tablet font */
+      font-size: clamp(0.95rem, 1.21vw, 1.4rem); /* Smart responsive tablet font with bounds */
     }
   }
 }
@@ -388,13 +388,13 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   
   .scroll-text {
     font-family: 'Inter', sans-serif;
-    font-size: 0.69vw; /* Convert 1rem to viewport units (1rem ≈ 0.69vw at 1440px) */
+    font-size: clamp(0.75rem, 0.69vw, 1.2rem); /* Smart responsive font size with min/max bounds */
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
     text-transform: uppercase;
-    letter-spacing: 0.07vw; /* Convert 1px to viewport units */
-    margin-bottom: 0.56vw; /* Convert 0.8rem to viewport units */
-    text-shadow: 0 0.14vw 0.56vw rgba(0, 0, 0, 0.6); /* Convert shadow to viewport units */
+    letter-spacing: clamp(0.5px, 0.07vw, 2px); /* Smart responsive letter spacing */
+    margin-bottom: clamp(0.5rem, 0.56vw, 1rem); /* Smart responsive margin */
+    text-shadow: 0 clamp(1px, 0.14vw, 3px) clamp(4px, 0.56vw, 12px) rgba(0, 0, 0, 0.6); /* Smart responsive shadow */
     transition: all 0.3s ease;
     text-align: center; /* Ensure text is centered */
     width: 100%; /* Full width for proper centering */
@@ -636,19 +636,19 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       
       .artists {
         font-family: 'Inter', sans-serif;
-        font-size: 1.39vw; /* 2rem → responsive font size */
+        font-size: clamp(1.5rem, 1.39vw, 2.5rem); /* Smart responsive font size with readability bounds */
         font-weight: 600;
-        margin: 0 0 0.35vw 0; /* 0.5rem → responsive margin */
+        margin: 0 0 clamp(0.25rem, 0.35vw, 0.75rem) 0; /* Smart responsive margin */
         color: $primary-white;
-        text-shadow: 0 0.14vw 0.56vw rgba(0, 0, 0, 0.7); /* 2px 8px → responsive */
+        text-shadow: 0 clamp(1px, 0.14vw, 3px) clamp(6px, 0.56vw, 12px) rgba(0, 0, 0, 0.7); /* Smart responsive shadow */
         
         @media (max-width: 768px) {
-          font-size: 2.08vw; /* 1.6rem → responsive tablet font */
+          font-size: clamp(1.2rem, 2.08vw, 2rem); /* Smart responsive tablet font with bounds */
         }
       }
       
       .collaboration-label {
-        font-size: 0.69vw; /* 1rem → responsive font size */
+        font-size: clamp(0.85rem, 0.69vw, 1.2rem); /* Smart responsive font size with readability bounds */
         font-weight: 400;
         color: rgba(255, 255, 255, 0.7);
         margin: 0;
@@ -680,7 +680,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
         align-items: center;
         gap: 1.11vw; /* 16px → responsive gap */
         color: rgba(255, 255, 255, 0.95);
-        font-size: 0.73vw; /* 1.05rem → responsive font size */
+        font-size: clamp(0.9rem, 0.73vw, 1.3rem); /* Smart responsive font size with readability bounds */
         font-weight: 400;
         text-shadow: 0 0.14vw 0.56vw rgba(0, 0, 0, 0.6); /* 2px 8px → responsive */
         padding: 0.56vw; /* 0.8rem → responsive padding */

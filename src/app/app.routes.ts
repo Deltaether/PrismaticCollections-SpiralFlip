@@ -68,6 +68,10 @@ export const routes: Routes = [
       {
         path: 'pv',
         loadComponent: () => import('./pages/collections/phantasia/pages/pv/pv.component').then(m => m.PvComponent)
+      },
+      {
+        path: 'phantasia2',
+        loadComponent: () => import('./pages/collections/phantasia/pages/phantasia2/phantasia2').then(m => m.Phantasia2Component)
       }
     ]
   },
@@ -124,38 +128,8 @@ export const routes: Routes = [
     ]
   },
   
-  // Mobile Layout routes with named outlets
-  {
-    path: 'mobile',
-    loadComponent: () => import('./pages/collections/phantasia/mobile/mobile-view.component').then(m => m.MobileViewComponent),
-    children: [
-      { 
-        path: '', 
-        loadComponent: () => import('./pages/collections/phantasia/mobile/pages/mobile-home/mobile-home.component').then(m => m.MobileHomeComponent),
-        outlet: 'front'
-      },
-      { 
-        path: 'music', 
-        loadComponent: () => import('./pages/collections/phantasia/mobile/pages/mobile-music/mobile-music.component').then(m => m.MobileMusicComponent),
-        outlet: 'right'
-      },
-      { 
-        path: 'about', 
-        loadComponent: () => import('./pages/collections/phantasia/mobile/pages/mobile-about/mobile-about.component').then(m => m.MobileAboutComponent),
-        outlet: 'back'
-      },
-      { 
-        path: 'contact', 
-        loadComponent: () => import('./pages/collections/phantasia/mobile/pages/mobile-contact/mobile-contact.component').then(m => m.MobileContactComponent),
-        outlet: 'left'
-      },
-      { 
-        path: 'credits', 
-        loadComponent: () => import('./pages/collections/phantasia/mobile/pages/mobile-credits/mobile-credits.component').then(m => m.MobileCreditsComponent),
-        outlet: 'top'
-      }
-    ]
-  },
+  // Mobile routes removed - Using responsive design instead
+  // All components now handle mobile layouts through responsive design
   
   // For backward compatibility, redirect old paths to new structured paths
   {

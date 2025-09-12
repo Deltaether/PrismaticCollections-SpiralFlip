@@ -40,27 +40,27 @@ export class NewCollectionsComponent implements OnInit {
   albums: Album[] = [
     {
       id: 'phantasia',
-      title: 'Project Phantasia',
+      title: 'Project Phantasia I',
       artist: 'Prismatic Collections',
       coverImage: 'assets/images/thumbnails/phantasia_1_cover_thumbnail.webp',
-      trackCount: 12,
-      year: 2023,
+      trackCount: 14,
+      year: 2024,
       description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies.',
-      tags: ['Ambient', 'Electronic', 'Experimental'],
+      tags: ['Ambient', 'Fantasy', 'Orchestral'],
       featured: true,
       route: '/phantasia'
     },
     {
-      id: 'ethereal',
-      title: 'Ethereal Soundscapes', 
-      artist: 'Various Artists',
-      coverImage: 'assets/images/composite.png',
-      trackCount: 8,
-      year: 2022,
-      description: 'Immerse yourself in ambient textures and atmospheric compositions.',
-      tags: ['Ambient', 'Atmospheric', 'Meditative'],
+      id: 'phantasia2',
+      title: 'Phantasia Project II', 
+      artist: 'Prismatic Collections',
+      coverImage: 'assets/images/project_phantasia2/album_cover.png',
+      trackCount: 14,
+      year: 2025,
+      description: 'The highly anticipated sequel featuring expanded orchestral arrangements and deeper ambient textures.',
+      tags: ['Ambient', 'Fantasy', 'Orchestral'],
       featured: false,
-      route: '/collections/ethereal'
+      route: '/phantasia/phantasia2'
     },
     {
       id: 'unknown-prism',

@@ -1,0 +1,173 @@
+<!-- Loading Screen -->
+<app-loading-screen 
+  *ngIf="isLoading" 
+  [progress]="loadingProgress">
+</app-loading-screen>
+
+<div class="phantasia-album-page" *ngIf="!isLoading">
+  <!-- Site Header - only shown when not inside the phantasia layout -->
+  <app-site-header *ngIf="!isInsidePhantasiaLayout"></app-site-header>
+
+  <!-- Video Background with Seamless Loop -->
+  <div class="video-background">
+    <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
+      <source src="assets/images/project_phantasia2/animated_background_web.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <!-- Video Title Section - Clean Structure for Perfect Centering -->
+  <section class="video-title-section">
+    <!-- Background Rectangle - Low opacity black background -->
+    <div class="title-background-rectangle"></div>
+    
+    <div class="title-container">
+      <video #titleVideo class="title-video" autoplay muted playsinline preload="auto" 
+             (loadedmetadata)="onTitleVideoLoaded()" 
+             (canplay)="onTitleVideoCanPlay()"
+             (ended)="onTitleVideoEnded()">
+        <source src="assets/images/project_phantasia2/ULTIMATE_alpha_with_flares.webm" type="video/webm">
+        <source src="assets/images/project_phantasia2/Phantasi2_Logo_Animated_web.mp4" type="video/mp4">
+        <!-- Fallback to static image if video fails -->
+        <img src="assets/images/project_phantasia2/Logo_fx.png" alt="Phantasia Project II" class="title-image-fallback">
+      </video>
+      <p class="title-subtitle">The highly anticipated sequel</p>
+    </div>
+    
+    <!-- Animated Scroll Indicator with Triangle Separator - moved to video title section bottom -->
+    <div class="scroll-indicator-container" 
+         *ngIf="showScrollIndicator()" 
+         [@scrollIndicator]="scrollIndicatorState"
+         (click)="scrollToContent()">
+      <div class="scroll-text">Scroll for More</div>
+      <div class="triangle-separator">
+        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
+          <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Album Presentation Content -->
+  <div class="album-presentation">
+
+    <!-- Enhanced CD Showcase - Always Visible -->
+    <section class="cd-showcase" #cdShowcase>
+
+      <!-- Modern Showcase Layout -->
+      <div class="showcase-container">
+        <div class="cd-jacket">
+          <div class="jacket-3d-container">
+            <div class="jacket-art">
+              <img src="assets/images/project_phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
+            </div>
+            <div class="jacket-spine"></div>
+          </div>
+          <div class="jacket-reflection"></div>
+        </div>
+        
+        <div class="album-info">
+          <div class="artist-info">
+            <h3 class="artists">SpiralFlip × Various Artists</h3>
+            <p class="collaboration-label">Evolved Masterpiece</p>
+          </div>
+          <div class="album-details">
+            <div class="detail-item">
+              <mat-icon>music_note</mat-icon>
+              <span>20 Epic Tracks</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>schedule</mat-icon>
+              <span>83 Minutes</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>style</mat-icon>
+              <span>Ambient Fantasy Orchestral</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Enhanced Music Player with Modern Positioning -->
+      <div class="player-container">
+        <div class="player-header">
+          <h4>Experience the Evolution</h4>
+        </div>
+        <app-music-player></app-music-player>
+      </div>
+    </section>
+
+    <!-- Artist Social Links - Always Visible -->
+    <section class="artist-section">
+      <h3>Meet the Artists</h3>
+      <div class="artists-grid">
+        <div class="artist-card">
+          <div class="artist-avatar">
+            <span>An</span>
+          </div>
+          <div class="artist-info">
+            <h4>An</h4>
+            <p>Professional Composer</p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <mat-icon>music_video</mat-icon>
+              </a>
+              <a href="#" class="social-link">
+                <mat-icon>language</mat-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="artist-card">
+          <div class="artist-avatar">
+            <span>Fery</span>
+          </div>
+          <div class="artist-info">
+            <h4>Feryquitous</h4>
+            <p>Audio Engineer</p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <mat-icon>music_video</mat-icon>
+              </a>
+              <a href="#" class="social-link">
+                <mat-icon>language</mat-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="phantasia-footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="assets/images/prismcoll_logox.svg" alt="Prismatic Collections" />
+        </div>
+        
+        <div class="footer-links">
+          <div class="link-group">
+            <h3>Explore</h3>
+            <ul>
+              <li><a routerLink="/collections">Collections</a></li>
+              <li><a routerLink="/phantasia/phantasia2">About</a></li>
+            </ul>
+          </div>
+          
+          <div class="link-group">
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © {{ currentYear }} Prismatic Collections. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

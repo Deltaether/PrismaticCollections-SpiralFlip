@@ -76,7 +76,7 @@ import { Router, RouterModule } from '@angular/router';
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 900;
+      z-index: 1000;
       background-color: rgba(17, 17, 17, 0.95);
       backdrop-filter: blur(15px);
       border-bottom: 1px solid rgba(0, 229, 255, 0.3);

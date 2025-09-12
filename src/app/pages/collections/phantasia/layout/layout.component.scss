@@ -107,11 +107,10 @@ $header-height: 90px; // Height of the site-header
 // Main content area - updated with top padding for fixed header
 .phantasia-content {
   flex: 1;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
-  max-width: $content-max-width;
-  padding: 2rem;
-  padding-top: calc(2rem + $header-height); // Add padding for the fixed header
+  padding: 0;
+  padding-top: 0; // Remove padding as phantasia page handles its own spacing
 }
 
 // Footer styles

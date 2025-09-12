@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
+import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
 
 /**
  * Main homepage component for Prismatic Collections
@@ -13,7 +14,7 @@ import { SiteHeaderComponent } from '../../shared/components/site-header/site-he
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, SiteHeaderComponent],
+  imports: [CommonModule, RouterModule, SiteHeaderComponent, TrianglesAnimationComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

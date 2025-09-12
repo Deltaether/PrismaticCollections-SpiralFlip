@@ -1,5 +1,5 @@
 /* Import unified triangle animations and winter background system */
-@use '../../shared/styles/triangle-animations.scss';
+/* Triangle animations now handled by TypeScript component */
 @use '../../shared/styles/unified-background.scss' as winter;
 
 /* 
@@ -571,6 +571,7 @@
   -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 3rem 2.5rem;
   
@@ -584,7 +585,7 @@
     bottom: 0;
     background: radial-gradient(
       circle at center,
-      rgba(255, 127, 80, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 0%,
       transparent 60%
     );
     pointer-events: none;
@@ -621,10 +622,7 @@
       font-size: 3.5rem;
       font-weight: 800;
       margin-bottom: 1rem;
-      background: linear-gradient(to right, #ff7f50, #ff5252);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
       position: relative;
       z-index: 1;
     }
@@ -692,11 +690,14 @@
   padding: 1rem 0;
 }
 
-/* Album Card - Winter Theme */
+/* Album Card - Black Glassy Theme */
 .album-card {
   position: relative;
   z-index: 20; /* Ensure cards are above all background elements */
-  @include winter.winter-card-style;
+  background: rgba(0, 0, 0, 0.7); /* Black transparent base */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
   /* Optimize transitions - only animate specific properties */
@@ -704,7 +705,7 @@
               box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
               border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
               backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   
   /* Enable hardware acceleration */
   will-change: transform, box-shadow;
@@ -718,7 +719,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(20, 24, 40, 0.3);
+    background: rgba(0, 0, 0, 0.2); /* Black overlay for depth */
     z-index: -1;
     border-radius: inherit;
   }
@@ -726,12 +727,12 @@
   &:hover {
     /* Use translate3d for better performance */
     transform: translate3d(0, -8px, 0);
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(16px); /* Enhance blur on hover */
     -webkit-backdrop-filter: blur(16px);
     /* Enhanced box-shadow with glassmorphism effect */
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3),
-                0 8px 16px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6),
+                0 8px 16px rgba(255, 255, 255, 0.05);
     
     .card-overlay {
       opacity: 1;
@@ -743,19 +744,19 @@
     
     /* Enhance glassmorphism background on hover */
     &::before {
-      background: rgba(20, 24, 40, 0.2);
+      background: rgba(0, 0, 0, 0.1); /* Lighter on hover */
     }
   }
   
   &.featured {
-    border: 2px solid rgba(138, 43, 226, 0.8);
-    background: rgba(138, 43, 226, 0.04); /* Reduced opacity for better transparency */
-    backdrop-filter: blur(14px); /* Enhanced blur for featured cards */
-    -webkit-backdrop-filter: blur(14px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.8); /* Slightly darker for featured */
+    backdrop-filter: blur(16px); /* Enhanced blur for featured cards */
+    -webkit-backdrop-filter: blur(16px);
     
     /* Enhanced glassmorphism background for featured */
     &::before {
-      background: rgba(138, 43, 226, 0.05); /* Reduced purple tint for better transparency */
+      background: rgba(255, 255, 255, 0.02); /* Very subtle highlight */
     }
     
     /* Featured label positioned properly with z-index */
@@ -777,14 +778,38 @@
     }
     
     &:hover {
-      border-color: rgba(138, 43, 226, 1);
-      backdrop-filter: blur(18px); /* Extra enhanced blur on hover for featured */
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 20px 40px rgba(138, 43, 226, 0.3),
-                  0 8px 16px rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px); /* Extra enhanced blur on hover for featured */
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7),
+                  0 8px 16px rgba(255, 255, 255, 0.08);
       
       &::before {
-        background: rgba(138, 43, 226, 0.08); /* Reduced opacity for hover state transparency */
+        background: rgba(255, 255, 255, 0.03); /* Subtle hover highlight */
+      }
+    }
+  }
+  
+  &.ethereal-glassy {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.75); /* Slightly less transparent */
+    backdrop-filter: blur(15px); /* Enhanced blur for glassy effect */
+    -webkit-backdrop-filter: blur(15px);
+    
+    /* Enhanced glassmorphism background for ethereal */
+    &::before {
+      background: rgba(255, 255, 255, 0.015); /* Very subtle highlight */
+    }
+    
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(18px); /* Extra enhanced blur on hover */
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
+                  0 8px 16px rgba(255, 255, 255, 0.06);
+      
+      &::before {
+        background: rgba(255, 255, 255, 0.025); /* Subtle hover highlight */
       }
     }
   }
@@ -794,7 +819,7 @@
 .card-image {
   position: relative;
   width: 100%;
-  height: 240px;
+  height: 180px;
   overflow: hidden;
   
   img {
@@ -852,58 +877,66 @@
 
 /* Card Content */
 .card-content {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .album-title {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: bold;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.4rem 0;
   color: #ffffff;
 }
 
 .album-artist {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 0.8rem 0;
   font-weight: 500;
 }
 
 .album-meta {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.8rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  
+  .tracks, .year {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+  }
 }
 
 .album-description {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 0.8rem 0;
 }
 
 .album-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .tag {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
   padding: 0.3rem 0.8rem;
   border-radius: 15px;
   font-size: 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   /* Optimized transitions - specific properties only */
   transition: background-color 0.15s ease,
               border-color 0.15s ease;
   
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
   }
 }
 
@@ -1182,7 +1215,7 @@
 /* Album Cover Styling - Hardware Accelerated */
 .album-cover {
   width: 100%;
-  height: 200px; /* Reduced from 220px to 200px */
+  height: 100px; /* Reduced by 100px for more compact design */
   border-radius: 14px;
   overflow: hidden;
   margin-bottom: 1.25rem; /* Reduced from 1.5rem to 1.25rem */
@@ -1336,7 +1369,7 @@
   }
   
   .album-cover {
-    height: 250px;
+    height: 150px;
   }
 }
 
@@ -1352,6 +1385,72 @@
   }
   
   .album-cover {
-    height: 200px;
+    height: 100px;
+  }
+}
+
+/* PRISM UNREADABLE Styling - Minimal version with just image effects */
+.album-card.cd-unreadable {
+  .card-image {
+    img {
+      opacity: 0.8;
+      filter: contrast(1.2) brightness(0.8);
+    }
+    
+    // PS1-style scanlines overlay
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    // Subtle static effect
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 50px 50px, 30px 30px, 70px 70px;
+      animation: staticNoise 3s infinite linear;
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+}
+
+/* PlayStation 1 style static noise animation for CD unreadable */
+@keyframes staticNoise {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+  25% {
+    background-position: 10px 5px, -5px 10px, 15px -10px;
+  }
+  50% {
+    background-position: -5px 10px, 10px -5px, -10px 15px;
+  }
+  75% {
+    background-position: 15px -5px, -10px 15px, 5px -15px;
+  }
+  100% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
   }
 }

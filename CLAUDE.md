@@ -493,3 +493,5 @@ Invoke the @agent-design-review subagent for thorough design validation when:
 Completing significant UI/UX features
 Before finalizing PRs with visual changes
 Needing comprehensive accessibility and responsiveness testing
+
+the ng serve port is by default at 5005 and redirected to 5006

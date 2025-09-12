@@ -42,24 +42,59 @@ $transition: all 0.3s ease;
   z-index: 1000;
   max-height: 80vh;
   overflow-y: auto;
+  scroll-behavior: smooth;
   
+  /* Enhanced scrollbar styling for cross-device compatibility */
   &::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
   
   &::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 2px;
+    margin: 2px;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 2px;
+    min-height: 20px;
     
     &:hover {
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.6);
+    }
+    
+    &:active {
+      background: rgba(255, 255, 255, 0.8);
     }
   }
+  
+  /* Firefox scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
+  
+  /* Mobile touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    &::-webkit-scrollbar {
+      width: 6px;
+      -webkit-appearance: none;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 3px;
+      -webkit-appearance: none;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      -webkit-appearance: none;
+    }
+  }
+  
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
   
   .anim-btn {
     width: 36px;
@@ -99,7 +134,61 @@ $transition: all 0.3s ease;
   color: #333333;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   margin-top: 89px;
+  scroll-behavior: smooth;
+  
+  /* Enhanced scrollbar implementation for cross-device compatibility */
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    margin: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+    min-height: 20px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+    
+    &:active {
+      background: rgba(255, 255, 255, 0.8);
+    }
+  }
+  
+  /* Firefox scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
+  
+  /* Force scrollbar to be visible on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    &::-webkit-scrollbar {
+      width: 6px;
+      -webkit-appearance: none;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 3px;
+      -webkit-appearance: none;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      -webkit-appearance: none;
+    }
+  }
+  
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
   
   // Use responsive performance optimizations
   @include responsive.mobile-performance-optimizations;
@@ -291,6 +380,9 @@ $transition: all 0.3s ease;
   z-index: 2;
   @include responsive.responsive-container;
   @include responsive.responsive-padding(4);
+  max-width: 1200px;
+  margin: 0 auto; /* Center the main container */
+  width: 100%;
   
   // Responsive margins
   @include responsive.mobile {
@@ -1190,8 +1282,13 @@ $transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   max-width: 1000px;
-  margin: 4rem auto;
+  margin: 4rem 0;
   padding: 4rem 2rem;
+  text-align: center; /* Ensure the entire section is centered */
+  display: flex; /* Use flexbox for better control */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   
   /* Fix blank space issue - same as news section */
   min-height: auto !important;
@@ -1203,24 +1300,31 @@ $transition: all 0.3s ease;
   
   @include responsive.mobile {
     padding: 2rem 1rem;
-    margin: 2rem 1rem;
+    margin: 2rem 0 6rem 0;
     border-radius: 16px;
+  }
+  
+  @include responsive.tablet {
+    margin: 3rem 0 4rem 0;
   }
   
   .about-content {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
+    width: 100%; /* Ensure full width utilization */
     
     .section-title {
       @include fluid.section-title-typography;
       color: #ffffff;
+      text-align: center; /* Explicitly center the title */
     }
     
     .about-text {
       @include fluid.typography-body-large;
       color: rgba(255, 255, 255, 0.8);
       margin-bottom: clamp(1rem, 3vw, 2rem);
+      text-align: center; /* Explicitly center the text */
       
       &:last-child {
         margin-bottom: 0;
@@ -1237,6 +1341,7 @@ $transition: all 0.3s ease;
   max-width: 800px;
   margin: 2rem auto;
   padding: 1rem;
+  text-align: center; /* Center all content within news section */
   
   /* Override global section min-height to allow natural content sizing */
   min-height: auto !important;
@@ -1252,6 +1357,7 @@ $transition: all 0.3s ease;
     color: #333333;
     font-weight: 600;
     margin-bottom: clamp(1rem, 4vw, 2rem);
+    text-align: center; /* Explicitly center the title */
     
     @include fluid.accessible-typography;
   }
@@ -1261,9 +1367,11 @@ $transition: all 0.3s ease;
     backdrop-filter: blur(15px);
     padding: 1.5rem;
     border-radius: 16px;
-    margin-bottom: 1rem;
+    margin: 0 auto 1rem auto; /* Center the news item horizontally */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left; /* Reset text alignment inside cards to left */
+    max-width: 100%; /* Ensure it doesn't exceed container */
     
     &:last-child {
       margin-bottom: 0;

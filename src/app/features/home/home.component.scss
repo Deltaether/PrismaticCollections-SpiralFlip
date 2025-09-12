@@ -71,10 +71,10 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Home Page Container */
-.home-page {
+/* Home Page Container - DISABLED to prevent conflict with active home component */
+.home-page-disabled {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 25%, #1e1e1e 50%, #242424 75%, #1a1a1a 100%);
+  /* background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 25%, #1e1e1e 50%, #242424 75%, #1a1a1a 100%); */
   color: $light-text;
   overflow-y: auto;
   overflow-x: hidden;

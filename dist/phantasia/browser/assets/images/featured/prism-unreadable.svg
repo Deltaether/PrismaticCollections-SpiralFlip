@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 300" preserveAspectRatio="none">
+  <defs>
+    <!-- Modern 2025 glassmorphism gradients with orange/coral theme -->
+    <linearGradient id="prismOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff7f50;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff5252;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Metallic chrome gradient for modern tech feel -->
+    <linearGradient id="chromeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:0.9" />
+      <stop offset="25%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="50%" style="stop-color:#c0c0c0;stop-opacity:0.9" />
+      <stop offset="75%" style="stop-color:#a9a9a9;stop-opacity:0.85" />
+      <stop offset="100%" style="stop-color:#808080;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <!-- Glass morphism effect gradient -->
+    <linearGradient id="glassEffect" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.25" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+    </linearGradient>
+    
+    <!-- Dark overlay for depth -->
+    <linearGradient id="darkGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#141922;stop-opacity:0.3" />
+    </linearGradient>
+    
+    <!-- Core glow with orange theme -->
+    <radialGradient id="orangeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff7f50;stop-opacity:0.8" />
+      <stop offset="40%" style="stop-color:#ff6b6b;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#ff5252;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Glassmorphism blur filter -->
+    <filter id="glassBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.9 0"/>
+    </filter>
+    
+    <!-- Modern shadow with glow -->
+    <filter id="modernShadow" x="-100%" y="-100%" width="300%" height="300%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#ff7f50" flood-opacity="0.15"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+    
+    <!-- Chrome shine effect -->
+    <filter id="chromeShine" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feSpecularLighting result="specOut" in="coloredBlur" specularConstant="2" specularExponent="20" lighting-color="white">
+        <fePointLight x="50" y="50" z="200"/>
+      </feSpecularLighting>
+      <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut2"/>
+      <feComposite in="SourceGraphic" result="litPaint" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+  </defs>
+  
+  <!-- Dark sophisticated background matching site theme -->
+  <rect width="400" height="300" fill="#0a0a0f"/>
+  <rect width="400" height="300" fill="url(#darkGradient)" opacity="0.8"/>
+  
+  <!-- Subtle grid pattern for modern tech feel -->
+  <g stroke="#ff7f50" stroke-width="0.5" opacity="0.05">
+    <line x1="0" y1="50" x2="400" y2="50"/>
+    <line x1="0" y1="100" x2="400" y2="100"/>
+    <line x1="0" y1="150" x2="400" y2="150"/>
+    <line x1="0" y1="200" x2="400" y2="200"/>
+    <line x1="0" y1="250" x2="400" y2="250"/>
+    <line x1="50" y1="0" x2="50" y2="300"/>
+    <line x1="100" y1="0" x2="100" y2="300"/>
+    <line x1="150" y1="0" x2="150" y2="300"/>
+    <line x1="200" y1="0" x2="200" y2="300"/>
+    <line x1="250" y1="0" x2="250" y2="300"/>
+    <line x1="300" y1="0" x2="300" y2="300"/>
+    <line x1="350" y1="0" x2="350" y2="300"/>
+  </g>
+  
+  <!-- Main 3D prism with glassmorphism -->
+  <g transform="translate(200,130)">
+    
+    <!-- Back face - darker triangular -->
+    <polygon points="-45,40 45,40 0,-50" 
+             fill="url(#darkGradient)" 
+             opacity="0.6"/>
+    
+    <!-- Left face with glass effect -->
+    <polygon points="-70,60 -45,40 0,-50 -25,-60" 
+             fill="url(#glassEffect)" 
+             stroke="url(#chromeGradient)" 
+             stroke-width="1" 
+             opacity="0.8"
+             filter="url(#glassBlur)"/>
+    
+    <!-- Right face with orange gradient -->
+    <polygon points="45,40 70,60 25,-60 0,-50" 
+             fill="url(#prismOrange)" 
+             stroke="#ff5252" 
+             stroke-width="1" 
+             opacity="0.85"
+             filter="url(#modernShadow)"/>
+    
+    <!-- Front face - main glass triangular panel -->
+    <polygon points="-70,60 70,60 0,-80" 
+             fill="url(#glassEffect)" 
+             stroke="url(#prismOrange)" 
+             stroke-width="2" 
+             opacity="0.7"
+             filter="url(#glassBlur)">
+      <animate attributeName="opacity" values="0.7;0.85;0.7" dur="4s" repeatCount="indefinite"/>
+    </polygon>
+    
+    <!-- Inner crystal core -->
+    <g transform="scale(0.6)">
+      <polygon points="-50,45 50,45 0,-45" 
+               fill="none" 
+               stroke="url(#prismOrange)" 
+               stroke-width="2" 
+               opacity="0.9">
+        <animate attributeName="stroke-width" values="2;3;2" dur="3s" repeatCount="indefinite"/>
+      </polygon>
+      
+      <!-- Inner glow -->
+      <circle cx="0" cy="0" r="25" 
+              fill="url(#orangeGlow)" 
+              opacity="0.6">
+        <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Light refraction lines -->
+    <g stroke="url(#prismOrange)" stroke-width="1" opacity="0.5">
+      <line x1="-70" y1="-30" x2="-100" y2="-60" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="70" y1="-30" x2="100" y2="-60" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="-50" x2="0" y2="-90" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite"/>
+      </line>
+    </g>
+    
+    <!-- Floating particles for depth -->
+    <g>
+      <circle cx="-90" cy="-40" r="1.5" fill="#ff7f50" opacity="0">
+        <animate attributeName="opacity" values="0;0.8;0" dur="5s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="-40;-60;-40" dur="5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="90" cy="-40" r="1" fill="#ff6b6b" opacity="0">
+        <animate attributeName="opacity" values="0;0.6;0" dur="6s" begin="1s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="-40;-55;-40" dur="6s" begin="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="-70" r="1.5" fill="#ff5252" opacity="0">
+        <animate attributeName="opacity" values="0;0.7;0" dur="7s" begin="2s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="-70;-85;-70" dur="7s" begin="2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+  
+  <!-- Modern typography with glassmorphism background -->
+  <g transform="translate(200, 240)">
+    <!-- Text background panel -->
+    <rect x="-115" y="-15" width="225" height="30" 
+          rx="4" ry="4"
+          fill="url(#glassEffect)" 
+          stroke="url(#prismOrange)" 
+          stroke-width="0.5"
+          opacity="0.3"
+          filter="url(#glassBlur)"/>
+    
+    <!-- Main text -->
+    <text x="0" y="5" 
+          text-anchor="middle" 
+          font-family="'Segoe UI', system-ui, -apple-system, sans-serif" 
+          font-size="16" 
+          font-weight="300" 
+          fill="#ffffff" 
+          letter-spacing="4px">
+      PRISM://UNREADABLE
+      <animate attributeName="fill-opacity" values="0.7;1;0.7" dur="5s" repeatCount="indefinite"/>
+    </text>
+    
+    <!-- Text glow effect -->
+    <text x="0" y="5" 
+          text-anchor="middle" 
+          font-family="'Segoe UI', system-ui, -apple-system, sans-serif" 
+          font-size="16" 
+          font-weight="300" 
+          fill="url(#prismOrange)" 
+          letter-spacing="4px"
+          opacity="0.5"
+          filter="url(#glassBlur)">
+      PRISM://UNREADABLE
+    </text>
+  </g>
+  
+  <!-- Corner accents with orange theme -->
+  <g stroke="url(#prismOrange)" stroke-width="1.5" fill="none" opacity="0.4">
+    <path d="M15,15 L15,30 M15,15 L30,15"/>
+    <path d="M370,15 L385,15 M385,15 L385,30"/>
+    <path d="M15,285 L15,270 M15,285 L30,285"/>
+    <path d="M385,285 L370,285 M385,285 L385,270"/>
+  </g>
+  
+  <!-- Subtle scan line effect for tech feel -->
+  <line x1="0" y1="0" x2="0" y2="300" stroke="#ff7f50" stroke-width="0.5" opacity="0.1">
+    <animate attributeName="x1" values="0;400;0" dur="10s" repeatCount="indefinite"/>
+    <animate attributeName="x2" values="0;400;0" dur="10s" repeatCount="indefinite"/>
+  </line>
+  
+</svg>

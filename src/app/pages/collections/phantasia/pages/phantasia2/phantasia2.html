@@ -11,6 +11,7 @@
   <!-- Video Background with Seamless Loop -->
   <div class="video-background">
     <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
+      <source src="assets/images/project_phantasia2/animated_background_optimized.webm" type="video/webm">
       <source src="assets/images/project_phantasia2/animated_background_web.mp4" type="video/mp4">
     </video>
     <div class="video-overlay"></div>
@@ -18,9 +19,6 @@
 
   <!-- Video Title Section - Clean Structure for Perfect Centering -->
   <section class="video-title-section">
-    <!-- Background Rectangle - Low opacity black background -->
-    <div class="title-background-rectangle"></div>
-    
     <div class="title-container">
       <video #titleVideo class="title-video" autoplay muted playsinline preload="auto" 
              (loadedmetadata)="onTitleVideoLoaded()" 
@@ -31,19 +29,18 @@
         <!-- Fallback to static image if video fails -->
         <img src="assets/images/project_phantasia2/Logo_fx.png" alt="Phantasia Project II" class="title-image-fallback">
       </video>
-      <p class="title-subtitle">The highly anticipated sequel</p>
-    </div>
-    
-    <!-- Animated Scroll Indicator with Triangle Separator - moved to video title section bottom -->
-    <div class="scroll-indicator-container" 
-         *ngIf="showScrollIndicator()" 
-         [@scrollIndicator]="scrollIndicatorState"
-         (click)="scrollToContent()">
-      <div class="scroll-text">Scroll for More</div>
-      <div class="triangle-separator">
-        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
-          <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
-        </svg>
+      
+      <!-- Scroll Indicator - Now inside title-container -->
+      <div class="scroll-indicator-container" 
+           *ngIf="showScrollIndicator()" 
+           [@scrollIndicator]="scrollIndicatorState"
+           (click)="scrollToContent()">
+        <div class="scroll-text">Scroll for More</div>
+        <div class="triangle-separator">
+          <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
+            <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
+          </svg>
+        </div>
       </div>
     </div>
   </section>
@@ -53,6 +50,9 @@
 
     <!-- Enhanced CD Showcase - Always Visible -->
     <section class="cd-showcase" #cdShowcase>
+      
+      <!-- CD Showcase Title -->
+      <h2 class="cd-showcase-title">The highly anticipated sequel</h2>
 
       <!-- Modern Showcase Layout -->
       <div class="showcase-container">
@@ -61,20 +61,19 @@
             <div class="jacket-art">
               <img src="assets/images/project_phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
             </div>
-            <div class="jacket-spine"></div>
           </div>
           <div class="jacket-reflection"></div>
         </div>
         
         <div class="album-info">
           <div class="artist-info">
-            <h3 class="artists">SpiralFlip × Various Artists</h3>
-            <p class="collaboration-label">Evolved Masterpiece</p>
+            <h3 class="artists">"Defining your justice."</h3>
+            <p class="collaboration-label">A fantasy compilation album</p>
           </div>
           <div class="album-details">
             <div class="detail-item">
               <mat-icon>music_note</mat-icon>
-              <span>20 Epic Tracks</span>
+              <span>20 Tracks</span>
             </div>
             <div class="detail-item">
               <mat-icon>schedule</mat-icon>
@@ -87,14 +86,14 @@
           </div>
         </div>
       </div>
-      
-      <!-- Enhanced Music Player with Modern Positioning -->
-      <div class="player-container">
-        <div class="player-header">
-          <h4>Experience the Evolution</h4>
-        </div>
-        <app-music-player></app-music-player>
+
+      <!-- Experience the Evolution Text - moved below jacket-art -->
+      <div class="evolution-text">
+        <h4>Experience the Evolution</h4>
       </div>
+
+      <!-- Enhanced Music Player - directly at bottom of cd-showcase -->
+      <app-music-player></app-music-player>
     </section>
 
     <!-- Artist Social Links - Always Visible -->
@@ -109,10 +108,16 @@
             <h4>An</h4>
             <p>Professional Composer</p>
             <div class="social-links">
-              <a href="#" class="social-link">
-                <mat-icon>music_video</mat-icon>
+              <a href="#" class="social-link youtube-link" title="YouTube Channel">
+                <mat-icon>smart_display</mat-icon>
               </a>
-              <a href="#" class="social-link">
+              <a href="#" class="social-link spotify-link" title="Spotify Profile">
+                <mat-icon>library_music</mat-icon>
+              </a>
+              <a href="#" class="social-link soundcloud-link" title="SoundCloud Profile">
+                <mat-icon>cloud</mat-icon>
+              </a>
+              <a href="#" class="social-link website-link" title="Official Website">
                 <mat-icon>language</mat-icon>
               </a>
             </div>
@@ -127,10 +132,16 @@
             <h4>Feryquitous</h4>
             <p>Audio Engineer</p>
             <div class="social-links">
-              <a href="#" class="social-link">
-                <mat-icon>music_video</mat-icon>
+              <a href="#" class="social-link youtube-link" title="YouTube Channel">
+                <mat-icon>smart_display</mat-icon>
               </a>
-              <a href="#" class="social-link">
+              <a href="#" class="social-link spotify-link" title="Spotify Profile">
+                <mat-icon>library_music</mat-icon>
+              </a>
+              <a href="#" class="social-link twitter-link" title="Twitter Profile">
+                <mat-icon>alternate_email</mat-icon>
+              </a>
+              <a href="#" class="social-link website-link" title="Official Website">
                 <mat-icon>language</mat-icon>
               </a>
             </div>

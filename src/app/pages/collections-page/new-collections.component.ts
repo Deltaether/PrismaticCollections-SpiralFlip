@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
-import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
+import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
 
 /* Album/Prism Interface Definition */
 interface Album {
@@ -28,7 +28,7 @@ interface Album {
 @Component({
   selector: 'app-new-collections',
   standalone: true,
-  imports: [CommonModule, SiteHeaderComponent, TrianglesAnimationComponent],
+  imports: [CommonModule, SiteHeaderComponent, SquaresAnimationComponent],
   templateUrl: './new-collections.component.html',
   styleUrls: ['./new-collections.component.scss'],
   // Enable OnPush change detection for better performance
@@ -40,26 +40,26 @@ export class NewCollectionsComponent implements OnInit {
   albums: Album[] = [
     {
       id: 'phantasia',
-      title: 'Project Phantasia I',
+      title: 'Project: Phantasia',
       artist: 'Prismatic Collections',
-      coverImage: 'assets/images/thumbnails/phantasia_1_cover_thumbnail.webp',
+      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
       trackCount: 14,
       year: 2024,
       description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies.',
       tags: ['Ambient', 'Fantasy', 'Orchestral'],
-      featured: true,
+      featured: false,
       route: '/phantasia'
     },
     {
       id: 'phantasia2',
-      title: 'Phantasia Project II', 
+      title: 'Project: Phatasia II -Blinding Dawn-', 
       artist: 'Prismatic Collections',
       coverImage: 'assets/images/project_phantasia2/album_cover.png',
       trackCount: 14,
       year: 2025,
       description: 'The highly anticipated sequel featuring expanded orchestral arrangements and deeper ambient textures.',
       tags: ['Ambient', 'Fantasy', 'Orchestral'],
-      featured: false,
+      featured: true,
       route: '/phantasia/phantasia2'
     },
     {
@@ -80,7 +80,7 @@ export class NewCollectionsComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Component initialization - triangles now handled by TrianglesAnimationComponent
+    // Component initialization - squares now handled by SquaresAnimationComponent
   }
 
 

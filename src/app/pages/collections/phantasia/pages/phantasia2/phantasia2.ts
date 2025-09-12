@@ -85,8 +85,11 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   scrollIndicatorState: ScrollIndicatorState = 'hidden';
   showScrollIndicator = signal(true);
   
-  // Scroll management
+  // Scroll management and section snapping
   private scrollTimeoutId: number | null = null;
+  private isScrollSnapping = false;
+  private lastScrollTime = 0;
+  private scrollSections: HTMLElement[] = [];
 
   // Debug flag
   private readonly isDebugMode = true;
@@ -126,6 +129,11 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     
     // Set up smooth scroll behavior
     this.setupSmoothScrolling();
+    
+    // Set up section snapping after a delay to ensure DOM is ready
+    setTimeout(() => {
+      this.setupSectionSnapping();
+    }, 1000);
   }
 
   /**
@@ -431,39 +439,267 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   }
   
   /**
-   * Smooth scroll to CD showcase section
+   * Set up section snapping functionality
+   */
+  private setupSectionSnapping(): void {
+    if (typeof document === 'undefined') return;
+    
+    // Define scroll sections in order
+    const videoSection = document.querySelector('.video-title-section') as HTMLElement;
+    const cdSection = this.cdShowcase?.nativeElement;
+    const artistSection = document.querySelector('.artist-section') as HTMLElement;
+    
+    this.scrollSections = [videoSection, cdSection, artistSection].filter(section => section !== null && section !== undefined);
+    
+    if (this.scrollSections.length === 0) {
+      if (this.isDebugMode) {
+        console.warn('[Phantasia2Component] No scroll sections found for snapping');
+      }
+      return;
+    }
+    
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Section snapping set up with', this.scrollSections.length, 'sections');
+    }
+    
+    // Add scroll event listener to the album page container
+    const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+    if (albumPage) {
+      albumPage.addEventListener('scroll', this.handleSectionSnap.bind(this), { passive: false });
+      
+      // Also listen for wheel events for more responsive snapping
+      albumPage.addEventListener('wheel', this.handleWheelSnap.bind(this), { passive: false });
+      
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Scroll event listeners added for section snapping');
+      }
+    } else {
+      // Fallback to window scroll events
+      window.addEventListener('scroll', this.handleSectionSnap.bind(this), { passive: false });
+      window.addEventListener('wheel', this.handleWheelSnap.bind(this), { passive: false });
+      
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Window scroll event listeners added for section snapping (fallback)');
+      }
+    }
+  }
+  
+  /**
+   * Handle section snapping on scroll
+   */
+  private handleSectionSnap(): void {
+    if (this.isScrollSnapping) return;
+    
+    // Clear existing timeout
+    if (this.scrollTimeoutId) {
+      clearTimeout(this.scrollTimeoutId);
+    }
+    
+    // Debounce scroll snapping
+    this.scrollTimeoutId = window.setTimeout(() => {
+      this.performSectionSnap();
+    }, 150); // 150ms debounce
+  }
+  
+  /**
+   * Handle wheel events for immediate snapping
+   */
+  private handleWheelSnap(event: WheelEvent): void {
+    // Only snap on significant wheel events
+    if (Math.abs(event.deltaY) < 10) return;
+    
+    const now = Date.now();
+    
+    // Throttle wheel snapping
+    if (now - this.lastScrollTime < 500) return;
+    
+    this.lastScrollTime = now;
+    
+    // Determine scroll direction
+    const scrollingDown = event.deltaY > 0;
+    const currentSection = this.getCurrentSection();
+    const currentIndex = this.scrollSections.indexOf(currentSection);
+    
+    if (currentIndex === -1) return;
+    
+    // Calculate target section
+    let targetIndex = currentIndex;
+    if (scrollingDown && currentIndex < this.scrollSections.length - 1) {
+      targetIndex = currentIndex + 1;
+    } else if (!scrollingDown && currentIndex > 0) {
+      targetIndex = currentIndex - 1;
+    }
+    
+    // Perform snapping if target changed
+    if (targetIndex !== currentIndex) {
+      event.preventDefault();
+      this.snapToSection(this.scrollSections[targetIndex]);
+      
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Wheel snap to section', targetIndex);
+      }
+    }
+  }
+  
+  /**
+   * Perform section snapping to the nearest section
+   */
+  private performSectionSnap(): void {
+    if (this.isScrollSnapping || this.scrollSections.length === 0) return;
+    
+    const nearestSection = this.getNearestSection();
+    if (nearestSection) {
+      this.snapToSection(nearestSection);
+    }
+  }
+  
+  /**
+   * Get the current section based on scroll position
+   */
+  private getCurrentSection(): HTMLElement {
+    const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+    const scrollTop = albumPage ? albumPage.scrollTop : window.pageYOffset;
+    const viewportHeight = window.innerHeight;
+    const threshold = viewportHeight * 0.3; // 30% threshold
+    
+    for (const section of this.scrollSections) {
+      const sectionRect = section.getBoundingClientRect();
+      const sectionTop = albumPage ? sectionRect.top + scrollTop : section.offsetTop;
+      
+      if (scrollTop >= sectionTop - threshold && scrollTop < sectionTop + section.offsetHeight - threshold) {
+        return section;
+      }
+    }
+    
+    return this.scrollSections[0]; // Default to first section
+  }
+  
+  /**
+   * Get the nearest section to snap to
+   */
+  private getNearestSection(): HTMLElement | null {
+    if (this.scrollSections.length === 0) return null;
+    
+    const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+    const scrollTop = albumPage ? albumPage.scrollTop : window.pageYOffset;
+    const viewportHeight = window.innerHeight;
+    const snapPoint = scrollTop + viewportHeight * 0.5; // Center of viewport
+    
+    let nearestSection = this.scrollSections[0];
+    let minDistance = Infinity;
+    
+    for (const section of this.scrollSections) {
+      const sectionRect = section.getBoundingClientRect();
+      const sectionCenter = albumPage 
+        ? sectionRect.top + scrollTop + section.offsetHeight * 0.5
+        : section.offsetTop + section.offsetHeight * 0.5;
+      
+      const distance = Math.abs(snapPoint - sectionCenter);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestSection = section;
+      }
+    }
+    
+    return nearestSection;
+  }
+  
+  /**
+   * Snap to a specific section
+   */
+  private snapToSection(section: HTMLElement): void {
+    if (this.isScrollSnapping) return;
+    
+    this.isScrollSnapping = true;
+    
+    const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+    const sectionRect = section.getBoundingClientRect();
+    
+    let targetScrollTop: number;
+    
+    if (albumPage) {
+      // Calculate scroll position within the album page container
+      targetScrollTop = sectionRect.top + albumPage.scrollTop - (window.innerHeight * 0.1); // 10% from top
+      
+      albumPage.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
+    } else {
+      // Fallback to window scrolling
+      targetScrollTop = section.offsetTop - (window.innerHeight * 0.1);
+      
+      window.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
+    }
+    
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Snapping to section at position:', targetScrollTop);
+    }
+    
+    // Reset snapping flag after animation completes
+    setTimeout(() => {
+      this.isScrollSnapping = false;
+    }, 1000); // Allow time for smooth scroll to complete
+  }
+  
+  /**
+   * Smooth scroll to CD showcase section with improved functionality
    */
   scrollToContent(): void {
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] scrollToContent() triggered');
+    }
+    
     if (this.cdShowcase?.nativeElement) {
       const element = this.cdShowcase.nativeElement;
       
-      // Use smooth scrolling on the main phantasia album page container
+      // First, try scrolling within the album page container
       const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
       if (albumPage) {
-        // Get element position relative to the album page container
-        const containerRect = albumPage.getBoundingClientRect();
+        // Calculate the exact scroll position
         const elementRect = element.getBoundingClientRect();
-        const scrollTop = elementRect.top - containerRect.top + albumPage.scrollTop - 100; // Account for header offset
+        const containerRect = albumPage.getBoundingClientRect();
         
+        // Calculate target scroll position (center the element in viewport)
+        const targetScrollTop = elementRect.top - containerRect.top + albumPage.scrollTop - (window.innerHeight * 0.2);
+        
+        if (this.isDebugMode) {
+          console.log('[Phantasia2Component] Container scroll - Target position:', targetScrollTop);
+          console.log('[Phantasia2Component] Current scroll position:', albumPage.scrollTop);
+        }
+        
+        // Perform smooth scroll within the container
         albumPage.scrollTo({
-          top: scrollTop,
+          top: Math.max(0, targetScrollTop), // Ensure non-negative scroll
           behavior: 'smooth'
         });
         
-        if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Smooth scrolling to CD showcase section at position:', scrollTop);
-        }
       } else {
-        // Fallback to window scrolling if container not found
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
         if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Using fallback window scrolling');
+          console.log('[Phantasia2Component] Album page container not found, using window scroll');
         }
+        
+        // Fallback to window scrolling
+        const elementTop = element.offsetTop;
+        const targetPosition = elementTop - (window.innerHeight * 0.2); // 20% from top
+        
+        window.scrollTo({
+          top: Math.max(0, targetPosition),
+          behavior: 'smooth'
+        });
       }
       
       // Hide scroll indicator after first use
       this.hideScrollIndicatorAfterUse();
+      
+    } else {
+      if (this.isDebugMode) {
+        console.warn('[Phantasia2Component] CD showcase element not found for scrolling');
+      }
     }
   }
   
@@ -503,12 +739,28 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       clearTimeout(this.scrollTimeoutId);
       this.scrollTimeoutId = null;
     }
+    
+    // Clean up section snapping event listeners
+    const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+    if (albumPage) {
+      albumPage.removeEventListener('scroll', this.handleSectionSnap.bind(this));
+      albumPage.removeEventListener('wheel', this.handleWheelSnap.bind(this));
+    } else {
+      // Clean up window event listeners if used as fallback
+      window.removeEventListener('scroll', this.handleSectionSnap.bind(this));
+      window.removeEventListener('wheel', this.handleWheelSnap.bind(this));
+    }
 
     // Clean up user interaction listeners (in case they weren't removed yet)
     const handleFirstInteraction = () => {}; // Dummy function for cleanup
     this.document.removeEventListener('click', handleFirstInteraction);
     this.document.removeEventListener('touchstart', handleFirstInteraction);
     this.document.removeEventListener('keydown', handleFirstInteraction);
+    
+    // Reset section snapping variables
+    this.scrollSections = [];
+    this.isScrollSnapping = false;
+    this.lastScrollTime = 0;
     
     if (this.isDebugMode) {
       console.log(`[Phantasia2Component] Component destroyed, cleanup completed`);

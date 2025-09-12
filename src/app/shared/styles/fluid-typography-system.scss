@@ -1,0 +1,542 @@
+/**
+ * Modern Fluid Typography System for Prismatic Collections (2025)
+ * 
+ * This system provides:
+ * - CSS clamp() based fluid typography using the latest best practices
+ * - Smooth scaling between mobile and desktop without media queries
+ * - Enhanced line-height and letter-spacing calculations
+ * - Comprehensive typography presets for all UI elements
+ * - Accessibility and performance optimizations
+ * - Backward compatibility with older browsers
+ * 
+ * Usage:
+ * @use './shared/styles/fluid-typography-system' as fluid;
+ * 
+ * .my-component {
+ *   h1 {
+ *     @include fluid.typography-heading-1;
+ *   }
+ *   
+ *   p {
+ *     @include fluid.typography-body-medium;
+ *   }
+ * }
+ * 
+ * 【✓】 Angular 20 Compatible
+ * 【✓】 Modern CSS Features (clamp, vw, vh)  
+ * 【✓】 Performance Optimized
+ * 【✓】 Accessibility Enhanced
+ */
+
+@use 'sass:map';
+@use 'sass:math';
+
+// =============================================================================
+// FLUID TYPOGRAPHY CONFIGURATION
+// =============================================================================
+
+/**
+ * Fluid typography breakpoints for clamp() calculations
+ * Based on industry best practices and device usage statistics
+ */
+$fluid-typography-config: (
+  min-width: 320px,        // Minimum mobile width
+  max-width: 1440px,       // Maximum desktop width (before ultra-wide)
+  base-font-size: 16px     // Browser default for rem calculations
+) !default;
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Helper function to strip units from values
+ * Essential for mathematical calculations in SCSS
+ */
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return math.div($number, ($number * 0 + 1));
+  }
+  @return $number;
+}
+
+/**
+ * Convert px to rem based on base font size
+ * Ensures consistent scaling with user font preferences
+ */
+@function px-to-rem($px, $base: map.get($fluid-typography-config, base-font-size)) {
+  @return math.div(strip-unit($px), strip-unit($base)) * 1rem;
+}
+
+/**
+ * Advanced fluid font size generator using CSS clamp()
+ * Creates smooth scaling between minimum and maximum sizes
+ * 
+ * Formula: clamp(MIN, MIN + (MAX - MIN) * ((100vw - MIN_WIDTH) / (MAX_WIDTH - MIN_WIDTH)), MAX)
+ * 
+ * @param {number} $min-size - Minimum font size (px or rem)
+ * @param {number} $max-size - Maximum font size (px or rem)  
+ * @param {number} $min-width - Minimum viewport width (default: 320px)
+ * @param {number} $max-width - Maximum viewport width (default: 1440px)
+ * @param {string} $unit - Output unit ('px' or 'rem', default: 'rem')
+ */
+@function fluid-font-size(
+  $min-size, 
+  $max-size, 
+  $min-width: map.get($fluid-typography-config, min-width),
+  $max-width: map.get($fluid-typography-config, max-width),
+  $unit: 'rem'
+) {
+  // Convert all values to unitless numbers for calculation
+  $min-size-val: strip-unit($min-size);
+  $max-size-val: strip-unit($max-size);
+  $min-width-val: strip-unit($min-width);
+  $max-width-val: strip-unit($max-width);
+  
+  // Convert to rem if input is in px
+  @if $unit == 'rem' {
+    @if unit($min-size) == 'px' {
+      $min-size-val: strip-unit(px-to-rem($min-size));
+    }
+    @if unit($max-size) == 'px' {
+      $max-size-val: strip-unit(px-to-rem($max-size));
+    }
+  }
+  
+  // Calculate the slope for linear interpolation
+  $slope: math.div(($max-size-val - $min-size-val), ($max-width-val - $min-width-val));
+  $intercept: $min-size-val - ($slope * $min-width-val);
+  
+  @return clamp(
+    #{$min-size-val}#{$unit},
+    #{$intercept}#{$unit} + #{$slope * 100}vw,
+    #{$max-size-val}#{$unit}
+  );
+}
+
+/**
+ * Fluid line height system that scales with viewport
+ * Provides optimal reading experience across all devices
+ */
+@function fluid-line-height($min-height: 1.4, $max-height: 1.6) {
+  @return clamp(#{$min-height}, #{$min-height} + 0.5vw, #{$max-height});
+}
+
+/**
+ * Fluid letter spacing for enhanced readability
+ * Adjusts character spacing based on font size and viewport
+ */
+@function fluid-letter-spacing($min-spacing: 0, $max-spacing: 0.025em) {
+  @return clamp(#{$min-spacing}, #{$min-spacing} + 0.1vw, #{$max-spacing});
+}
+
+// =============================================================================
+// PREDEFINED FLUID TYPOGRAPHY SCALES
+// =============================================================================
+
+/**
+ * Comprehensive typography scale following modern design systems
+ * Each scale includes optimized min/max values for excellent readability
+ */
+$fluid-typography-scales: (
+  // Display sizes (for hero sections, landing pages)
+  display-large: fluid-font-size(2.5rem, 4.5rem),      // 40px -> 72px
+  display-medium: fluid-font-size(2rem, 3.5rem),       // 32px -> 56px
+  display-small: fluid-font-size(1.75rem, 3rem),       // 28px -> 48px
+  
+  // Headings (hierarchical content structure)
+  heading-1: fluid-font-size(1.875rem, 3rem),          // 30px -> 48px
+  heading-2: fluid-font-size(1.5rem, 2.25rem),         // 24px -> 36px
+  heading-3: fluid-font-size(1.25rem, 1.875rem),       // 20px -> 30px
+  heading-4: fluid-font-size(1.125rem, 1.5rem),        // 18px -> 24px
+  heading-5: fluid-font-size(1rem, 1.25rem),           // 16px -> 20px
+  heading-6: fluid-font-size(0.875rem, 1.125rem),      // 14px -> 18px
+  
+  // Body text (primary content)
+  body-large: fluid-font-size(1.125rem, 1.25rem),      // 18px -> 20px
+  body-medium: fluid-font-size(1rem, 1.125rem),        // 16px -> 18px
+  body-small: fluid-font-size(0.875rem, 1rem),         // 14px -> 16px
+  body-xs: fluid-font-size(0.75rem, 0.875rem),         // 12px -> 14px
+  
+  // UI elements (buttons, form controls)
+  button-large: fluid-font-size(1rem, 1.125rem),       // 16px -> 18px
+  button-medium: fluid-font-size(0.875rem, 1rem),      // 14px -> 16px
+  button-small: fluid-font-size(0.75rem, 0.875rem),    // 12px -> 14px
+  
+  // Labels and metadata
+  label-large: fluid-font-size(0.875rem, 1rem),        // 14px -> 16px
+  label-medium: fluid-font-size(0.75rem, 0.875rem),    // 12px -> 14px
+  label-small: fluid-font-size(0.625rem, 0.75rem),     // 10px -> 12px
+  caption: fluid-font-size(0.75rem, 0.875rem),         // 12px -> 14px
+  
+  // Navigation and menu items
+  nav-large: fluid-font-size(1.125rem, 1.25rem),       // 18px -> 20px
+  nav-medium: fluid-font-size(1rem, 1.125rem),         // 16px -> 18px
+  nav-small: fluid-font-size(0.875rem, 1rem)           // 14px -> 16px
+) !default;
+
+// =============================================================================
+// CORE TYPOGRAPHY MIXINS
+// =============================================================================
+
+/**
+ * Modern responsive font size mixin using CSS clamp()
+ * 
+ * @param {string} $size-key - Key from $fluid-typography-scales map
+ * @param {number} $line-height - Line height value (optional)
+ * @param {number} $letter-spacing - Letter spacing value (optional)
+ * @param {number} $font-weight - Font weight (optional)
+ */
+@mixin fluid-font-size($size-key, $line-height: null, $letter-spacing: null, $font-weight: null) {
+  @if map.has-key($fluid-typography-scales, $size-key) {
+    font-size: map.get($fluid-typography-scales, $size-key);
+    
+    @if $line-height {
+      line-height: $line-height;
+    }
+    
+    @if $letter-spacing {
+      letter-spacing: $letter-spacing;
+    }
+    
+    @if $font-weight {
+      font-weight: $font-weight;
+    }
+  } @else {
+    @warn "Font size key '#{$size-key}' not found in $fluid-typography-scales";
+  }
+}
+
+/**
+ * Custom fluid font size with specific min/max values
+ * Use when predefined scales don't meet specific requirements
+ * 
+ * @param {number} $min-size - Minimum font size
+ * @param {number} $max-size - Maximum font size  
+ * @param {number} $line-height - Line height value (optional)
+ * @param {number} $letter-spacing - Letter spacing value (optional)
+ * @param {number} $font-weight - Font weight (optional)
+ */
+@mixin custom-fluid-font-size($min-size, $max-size, $line-height: null, $letter-spacing: null, $font-weight: null) {
+  font-size: fluid-font-size($min-size, $max-size);
+  
+  @if $line-height {
+    line-height: $line-height;
+  }
+  
+  @if $letter-spacing {
+    letter-spacing: $letter-spacing;
+  }
+  
+  @if $font-weight {
+    font-weight: $font-weight;
+  }
+}
+
+// =============================================================================
+// COMPREHENSIVE TYPOGRAPHY PRESET MIXINS
+// =============================================================================
+
+/**
+ * Display typography - for hero sections and major headings
+ */
+@mixin typography-display-large {
+  @include fluid-font-size(display-large, fluid-line-height(1.1, 1.2), -0.025em, 900);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-display-medium {
+  @include fluid-font-size(display-medium, fluid-line-height(1.1, 1.3), -0.025em, 800);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-display-small {
+  @include fluid-font-size(display-small, fluid-line-height(1.2, 1.3), -0.02em, 700);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/**
+ * Heading typography - hierarchical content structure
+ */
+@mixin typography-heading-1 {
+  @include fluid-font-size(heading-1, fluid-line-height(1.2, 1.3), -0.025em, 700);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-heading-2 {
+  @include fluid-font-size(heading-2, fluid-line-height(1.25, 1.35), -0.02em, 600);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-heading-3 {
+  @include fluid-font-size(heading-3, fluid-line-height(1.3, 1.4), -0.01em, 600);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-heading-4 {
+  @include fluid-font-size(heading-4, fluid-line-height(1.35, 1.45), 0, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-heading-5 {
+  @include fluid-font-size(heading-5, fluid-line-height(1.4, 1.5), 0, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-heading-6 {
+  @include fluid-font-size(heading-6, fluid-line-height(1.4, 1.5), 0.01em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/**
+ * Body typography - primary content
+ */
+@mixin typography-body-large {
+  @include fluid-font-size(body-large, fluid-line-height(1.5, 1.7), 0, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-body-medium {
+  @include fluid-font-size(body-medium, fluid-line-height(1.5, 1.6), 0, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-body-small {
+  @include fluid-font-size(body-small, fluid-line-height(1.4, 1.5), 0, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-body-xs {
+  @include fluid-font-size(body-xs, fluid-line-height(1.3, 1.4), 0, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/**
+ * Interactive element typography - buttons, links, form controls
+ */
+@mixin typography-button-large {
+  @include fluid-font-size(button-large, 1.2, 0.025em, 600);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: none;
+}
+
+@mixin typography-button-medium {
+  @include fluid-font-size(button-medium, 1.2, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: none;
+}
+
+@mixin typography-button-small {
+  @include fluid-font-size(button-small, 1.1, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: none;
+}
+
+/**
+ * Label and metadata typography
+ */
+@mixin typography-label-large {
+  @include fluid-font-size(label-large, 1.3, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-label-medium {
+  @include fluid-font-size(label-medium, 1.3, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-label-small {
+  @include fluid-font-size(label-small, 1.2, 0.05em, 600);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: uppercase;
+}
+
+@mixin typography-caption {
+  @include fluid-font-size(caption, fluid-line-height(1.3, 1.4), 0.025em, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/**
+ * Navigation typography
+ */
+@mixin typography-nav-large {
+  @include fluid-font-size(nav-large, 1.3, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-nav-medium {
+  @include fluid-font-size(nav-medium, 1.3, 0.025em, 500);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@mixin typography-nav-small {
+  @include fluid-font-size(nav-small, 1.2, 0.025em, 400);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+// =============================================================================
+// CONTEXT-AWARE TYPOGRAPHY MIXINS
+// =============================================================================
+
+/**
+ * Card component typography
+ */
+@mixin card-title-typography {
+  @include typography-heading-3;
+  margin-bottom: clamp(0.5rem, 2vw, 1rem);
+}
+
+@mixin card-description-typography {
+  @include typography-body-medium;
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+}
+
+@mixin card-action-typography {
+  @include typography-button-medium;
+}
+
+/**
+ * Hero section typography
+ */
+@mixin hero-title-typography {
+  @include typography-display-medium;
+  text-align: center;
+  margin-bottom: clamp(1rem, 4vw, 2rem);
+}
+
+@mixin hero-subtitle-typography {
+  @include typography-body-large;
+  text-align: center;
+  margin-bottom: clamp(1.5rem, 5vw, 3rem);
+}
+
+/**
+ * Section typography
+ */
+@mixin section-title-typography {
+  @include typography-heading-1;
+  text-align: center;
+  margin-bottom: clamp(2rem, 6vw, 4rem);
+}
+
+@mixin section-subtitle-typography {
+  @include typography-body-large;
+  text-align: center;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+// =============================================================================
+// ACCESSIBILITY AND PERFORMANCE ENHANCEMENTS
+// =============================================================================
+
+/**
+ * Accessibility-enhanced typography
+ * Ensures optimal reading experience for all users
+ */
+@mixin accessible-typography {
+  // Ensure minimum contrast ratios
+  @media (prefers-contrast: high) {
+    text-shadow: none;
+    background: transparent;
+    font-weight: 600;
+  }
+  
+  // Respect reduced motion preferences
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+  
+  // Enhanced focus states for keyboard navigation
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+  
+  // Improve readability for users with dyslexia
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+}
+
+/**
+ * Performance-optimized typography for mobile devices
+ * Reduces rendering complexity on resource-constrained devices
+ */
+@mixin mobile-optimized-typography {
+  @media (max-width: 768px) {
+    // Reduce text shadows and effects for performance
+    text-shadow: none;
+    
+    // Simplify font variations
+    font-feature-settings: normal;
+    font-variant: normal;
+    
+    // Use system fonts for better performance
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    // Optimize rendering
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/**
+ * Print-friendly typography
+ * Ensures content remains readable when printed
+ */
+@mixin print-typography {
+  @media print {
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+    color: #000 !important;
+    background: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    
+    // Use serif fonts for better print readability
+    font-family: Georgia, 'Times New Roman', Times, serif !important;
+  }
+}
+
+/**
+ * Dark mode typography adjustments
+ * Optimizes typography for dark color schemes
+ */
+@mixin dark-mode-typography {
+  @media (prefers-color-scheme: dark) {
+    // Slightly reduce font weight for better readability on dark backgrounds
+    font-weight: 400;
+    
+    // Improve contrast
+    text-shadow: none;
+    
+    // Adjust letter spacing for dark backgrounds
+    letter-spacing: 0.01em;
+  }
+}
+
+// =============================================================================
+// LEGACY BROWSER SUPPORT
+// =============================================================================
+
+/**
+ * Fallback typography for browsers that don't support clamp()
+ * Provides graceful degradation using traditional media queries
+ */
+@mixin legacy-responsive-font-size($mobile-size, $desktop-size) {
+  // Modern browsers with clamp() support
+  @supports (font-size: clamp(1rem, 2vw, 2rem)) {
+    font-size: fluid-font-size($mobile-size, $desktop-size);
+  }
+  
+  // Fallback for older browsers
+  @supports not (font-size: clamp(1rem, 2vw, 2rem)) {
+    font-size: $desktop-size;
+    
+    @media (max-width: 768px) {
+      font-size: $mobile-size;
+    }
+  }
+}

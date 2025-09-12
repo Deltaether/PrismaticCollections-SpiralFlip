@@ -1,10 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, Inject, computed } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
+import { ResponsiveService } from '../../shared/services/responsive.service';
+import { ResponsiveFromDirective, ResponsiveToDirective } from '../../shared/directives/responsive.directive';
 
 /**
  * Main homepage component for Prismatic Collections
@@ -14,7 +16,14 @@ import { TrianglesAnimationComponent } from '../../shared/components/triangles-a
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, SiteHeaderComponent, TrianglesAnimationComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    SiteHeaderComponent, 
+    TrianglesAnimationComponent,
+    ResponsiveFromDirective,
+    ResponsiveToDirective
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,6 +34,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   // Flag for debug logging
   private readonly isDebugMode = false;
+  
+  // Responsive service integration
+  public readonly screenInfo = this.responsiveService.screenInfo;
+  public readonly isMobile = this.responsiveService.isMobile;
+  public readonly isTablet = this.responsiveService.isTablet;
+  public readonly isDesktop = this.responsiveService.isDesktop;
+  public readonly isTouchDevice = this.responsiveService.isTouchDevice;
+  
+  // Computed layout properties
+  public readonly gridColumns = computed(() => this.responsiveService.getGridColumns());
+  public readonly contentMaxWidth = computed(() => this.responsiveService.getContentMaxWidth());
   
   
   // Featured content sections
@@ -47,7 +67,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private router: Router, @Inject(DOCUMENT) private document: Document) {}
+  constructor(
+    private router: Router, 
+    @Inject(DOCUMENT) private document: Document,
+    public responsiveService: ResponsiveService
+  ) {}
 
   /**
    * Initialize component 

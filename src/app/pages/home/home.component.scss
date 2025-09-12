@@ -1,4 +1,5 @@
-/* Import unified background system */
+/* Import responsive design system and existing styles */
+@use '../../shared/styles/responsive-system.scss' as responsive;
 @use '../../shared/styles/typography-system.scss' as typo;
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
@@ -91,25 +92,31 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Home Page Container - Static Background Only */
+/* Home Page Container - Responsive Design */
 .home-page {
-  min-height: 100vh;
+  @include responsive.full-viewport-height;
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
   margin-top: 89px;
   
+  // Use responsive performance optimizations
+  @include responsive.mobile-performance-optimizations;
   /* Static Background: Only radial gradients and base gradient - NEVER animated */
-  background: 
-    radial-gradient(ellipse at 15% 25%, rgba(74, 158, 255, 0.12) 0%, transparent 40%),
-    radial-gradient(ellipse at 85% 75%, rgba(32, 178, 170, 0.10) 0%, transparent 45%),
-    linear-gradient(180deg,
-      #1a1a1f 0%,
-      #1f2429 25%,
-      #242932 50%,
-      #1d2127 75%,
-      #181820 100%
-    );
+  & {
+    background: 
+      radial-gradient(ellipse at 15% 25%, rgba(74, 158, 255, 0.12) 0%, transparent 40%),
+      radial-gradient(ellipse at 85% 75%, rgba(32, 178, 170, 0.10) 0%, transparent 45%),
+      linear-gradient(180deg,
+        #1a1a1f 0%,
+        #1f2429 25%,
+        #242932 50%,
+        #1d2127 75%,
+        #181820 100%
+      );
+  }
+  
+  @include responsive.retina-optimizations;
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
   &::before {
@@ -272,33 +279,60 @@ $transition: all 0.3s ease;
   }
   
   /* Let content determine height naturally */
-  height: auto;
+  & {
+    height: auto;
+  }
 }
 
-/* Main Content Container - Light Theme */
+/* Main Content Container - Responsive Design */
 .home-main {
   position: relative;
   z-index: 2;
-  padding: 0 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  @include responsive.responsive-container;
+  @include responsive.responsive-padding(4);
+  
+  // Responsive margins
+  @include responsive.mobile {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  @include responsive.desktop-large-up {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
 }
 
-/* Hero Section */
+/* Hero Section - Responsive Design */
 .hero {
   position: relative;
-  height: 40vh;
-  min-height: 330px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 3rem;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 3rem auto;
+  
+  // Responsive height and spacing
+  height: 40vh;
+  min-height: 330px;
+  
+  @include responsive.mobile {
+    height: 50vh;
+    min-height: 280px;
+    margin-bottom: 2rem;
+  }
+  
+  @include responsive.tablet {
+    height: 45vh;
+    min-height: 320px;
+  }
+  
+  @include responsive.desktop-large-up {
+    height: 35vh;
+    min-height: 400px;
+    margin-bottom: 4rem;
+  }
   
   /* Slightly transparent card styling for illuminated dark theme */
   background: linear-gradient(135deg, 
@@ -357,7 +391,7 @@ $transition: all 0.3s ease;
     position: relative;
     
     .title {
-      font-size: 3.5rem;
+      @include responsive.responsive-font-size(3.5, 2.0, 2.8);
       font-weight: 800;
       margin-bottom: 1rem;
       background: linear-gradient(to right, #ffffff, #e0e0e0);
@@ -366,29 +400,56 @@ $transition: all 0.3s ease;
       background-clip: text;
       position: relative;
       z-index: 1;
+      
+      // Additional responsive adjustments
+      @include responsive.mobile {
+        line-height: 1.1;
+        margin-bottom: 0.75rem;
+      }
+      
+      @include responsive.ultra-wide {
+        font-size: 4rem;
+      }
     }
     
     .subtitle {
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
-      color: rgba(255, 255, 255, 0.9); /* White text for dark background */
+      @include responsive.responsive-font-size(1.5, 1.0, 1.2);
+      color: rgba(255, 255, 255, 0.9);
       position: relative;
       z-index: 1;
+      
+      @include responsive.responsive-margin(2);
+      
+      @include responsive.mobile {
+        margin-bottom: 1.5rem;
+      }
     }
     
     .hero-buttons {
-      display: flex;
-      gap: 1rem;
+      @include responsive.responsive-flex(column, row);
       justify-content: center;
       position: relative;
       z-index: 1;
       
+      @include responsive.mobile {
+        gap: 0.75rem;
+      }
+      
       .button {
-        padding: 0.75rem 1.5rem;
+        @include responsive.touch-friendly;
         border-radius: 30px;
         font-weight: 600;
         cursor: pointer;
         transition: $transition;
+        
+        @include responsive.mobile {
+          padding: 0.6rem 1.2rem;
+          font-size: 0.9rem;
+        }
+        
+        @include responsive.tablet-up {
+          padding: 0.75rem 1.5rem;
+        }
         
         &.primary {
           background: $gradient-primary;
@@ -462,36 +523,57 @@ $transition: all 0.3s ease;
   }
   
   .featured-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 2rem;
-    justify-content: center !important;
-    align-items: flex-start;
-    max-width: 800px;
+    @include responsive.responsive-grid-columns(1, 1, 2, 2, 3);
+    justify-items: center;
+    max-width: 1200px;
     margin: 0 auto;
     
+    @include responsive.mobile {
+      gap: 1.5rem;
+    }
+    
+    @include responsive.tablet-up {
+      gap: 2rem;
+    }
+    
     .feature-card {
-      border-radius: $border-radius;
+      @include responsive.responsive-card;
       overflow: hidden;
       box-shadow: $box-shadow;
       transition: $transition;
       cursor: pointer;
       height: 100%;
-      width: 300px; // Fixed width ensures consistent sizing and better centering
-      max-width: 100%; // Responsive on smaller screens
+      width: 100%;
+      max-width: 400px;
       
-      &:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        
-        .card-image {
-          transform: scale(1.05);
+      @include responsive.mobile {
+        max-width: 100%;
+      }
+      
+      @include responsive.desktop-up {
+        max-width: 350px;
+      }
+      
+      @include responsive.hover-capable {
+        &:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          
+          .card-image {
+            transform: scale(1.05);
+          }
+        }
+      }
+      
+      @include responsive.touch-device {
+        &:active {
+          transform: scale(0.98);
         }
       }
       
       &.main-feature {
-        width: 100% !important; // Full width for main feature in flexbox
-        flex-basis: 100% !important; // Ensure full width
+        grid-column: 1 / -1; // Full width in grid
+        max-width: 100%;
         
         @media (min-width: 768px) {
           .card-content {
@@ -1100,15 +1182,21 @@ $transition: all 0.3s ease;
   }
 }
 
-/* About Section */
+/* About Section - Responsive Design */
 .about {
-  padding: 4rem 2rem;
+  @include responsive.responsive-padding(4);
   background: linear-gradient(135deg, rgba(15, 15, 15, 0.85) 0%, rgba(20, 20, 20, 0.9) 50%, rgba(10, 10, 10, 0.85) 100%);
   backdrop-filter: blur(5px);
-  margin: 4rem 0;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
+  
+  @include responsive.responsive-margin(4);
+  
+  @include responsive.mobile {
+    padding: 2rem 1rem;
+    margin: 2rem 0;
+  }
   
   .about-content {
     max-width: 800px;
@@ -1116,14 +1204,14 @@ $transition: all 0.3s ease;
     text-align: center;
     
     .section-title {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
+      @include responsive.responsive-font-size(2.5, 1.8, 2.0);
+      @include responsive.responsive-margin(2);
     }
     
     .about-text {
-      font-size: 1.1rem;
+      @include responsive.responsive-font-size(1.1, 1.0, 1.05);
       line-height: 1.8;
-      margin-bottom: 1.5rem;
+      @include responsive.responsive-margin(1.5);
       color: rgba(255, 255, 255, 0.8);
     }
   }
@@ -1165,202 +1253,19 @@ $transition: all 0.3s ease;
 }
 
 
-/* Modern Responsive Design - Mobile First Approach */
-
-/* Base Mobile Design (320px+) */
+/* Enhanced Responsive Background Optimizations */
 .home-page {
-  /* Reduce gradient complexity and diagonal strips on smaller screens for performance */
-  @media (max-width: 480px) {
-    background: 
-      /* Simplified diagonal strip pattern - wider spacing, fewer strips */
-      repeating-linear-gradient(
-        -45deg,
-        transparent 0px,
-        transparent 58px,
-        rgba(74, 158, 255, 0.015) 59px,   /* Single blue strip - more subtle */
-        rgba(74, 158, 255, 0.015) 60px,
-        transparent 61px,
-        transparent 179px,
-        rgba(32, 178, 170, 0.01) 180px,   /* Single teal strip - barely visible */
-        rgba(32, 178, 170, 0.01) 181px,
-        transparent 182px,
-        transparent 240px
-      ),
-      radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.06) 0%, transparent 60%),
-      linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
-  }
-  
-  /* Remove diagonal strips entirely on very small screens for optimal performance */
-  @media (max-width: 320px) {
+  // Background simplification for performance on mobile
+  @include responsive.mobile {
     background: 
       radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.06) 0%, transparent 60%),
       linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
   }
-}
-
-.home-main {
-  @media (max-width: 480px) {
-    padding: 0 1rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-}
-
-/* Small Mobile (320px - 480px) */
-@media (max-width: 480px) {
-  .hero {
-    height: 50vh;
-    min-height: 400px;
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-    
-    .hero-content {
-      .title {
-        font-size: 2rem;
-        line-height: 1.1;
-      }
-      
-      .subtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-      }
-      
-      .hero-buttons {
-        flex-direction: column;
-        gap: 0.75rem;
-        
-        .button {
-          padding: 0.6rem 1.2rem;
-          font-size: 0.9rem;
-        }
-      }
-    }
-  }
   
-  .features, .about, .news {
-    padding: 2rem 1rem;
-    
-    .section-title {
-      font-size: 1.8rem;
-      margin-bottom: 2rem;
-    }
-  }
-  
-  .featured-grid {
-    gap: 1.5rem;
-    
-    .feature-card {
-      width: 100% !important;
-      
-      .card-content {
-        padding: 1.2rem;
-      }
-    }
+  @include responsive.mobile-xs {
+    background: linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
   }
 }
 
-/* Large Mobile / Small Tablet (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
-  .hero {
-    height: 55vh;
-    min-height: 450px;
-    
-    .hero-content {
-      .title {
-        font-size: 2.5rem;
-      }
-      
-      .subtitle {
-        font-size: 1.2rem;
-      }
-    }
-  }
-  
-  .features {
-    .section-title, 
-    .about-content .section-title, 
-    .news .section-title {
-      font-size: 2rem;
-    }
-    
-    .featured-grid {
-      gap: 1.5rem;
-    }
-  }
-}
-
-/* Tablet (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .hero {
-    .hero-content {
-      .title {
-        font-size: 3rem;
-      }
-      
-      .subtitle {
-        font-size: 1.3rem;
-      }
-    }
-  }
-  
-  .home-main {
-    padding: 0 1.5rem;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-  }
-}
-
-/* Large Desktop (1025px - 1440px) */
-@media (min-width: 1025px) and (max-width: 1440px) {
-  .home-main {
-    max-width: 1200px;
-  }
-}
-
-/* Ultra-wide Desktop (1441px+) */
-@media (min-width: 1441px) {
-  .home-main {
-    max-width: 1400px;
-  }
-  
-  .hero {
-    .hero-content {
-      .title {
-        font-size: 4rem;
-      }
-      
-      .subtitle {
-        font-size: 1.6rem;
-      }
-    }
-  }
-}
-
-/* Touch-friendly interactions */
-@media (hover: none) and (pointer: coarse) {
-  .feature-card,
-  .button {
-    /* Increase touch targets for mobile */
-    min-height: 44px;
-    
-    &:hover {
-      /* Disable hover effects on touch devices */
-      transform: none;
-      box-shadow: inherit;
-    }
-    
-    &:active {
-      /* Add active states for touch feedback */
-      transform: scale(0.98);
-      transition: transform 0.1s ease;
-    }
-  }
-}
-
-/* High DPI / Retina displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .home-page::after {
-    /* Reduce texture complexity on high DPI to prevent performance issues */
-    background-size: 50px 50px, 40px 40px, 60px 60px;
-  }
-}
+/* Responsive design now handled by the comprehensive responsive system above */
+/* All old media queries replaced with responsive mixins for consistency and maintainability */

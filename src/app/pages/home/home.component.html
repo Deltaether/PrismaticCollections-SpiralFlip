@@ -4,8 +4,11 @@
   <!-- Site Header -->
   <app-site-header></app-site-header>
   
-  <!-- TypeScript-based Triangle Animation (Smooth JS animations) -->
-  <app-triangles-animation [count]="50" [enabled]="true"></app-triangles-animation>
+  <!-- TypeScript-based Triangle Animation (Responsive count based on device) -->
+  <app-triangles-animation 
+    [count]="isMobile() ? 25 : (isTablet() ? 35 : 50)" 
+    [enabled]="!responsiveService.prefersReducedMotion()">
+  </app-triangles-animation>
 
   <!-- Main Content - Same Pattern as Collections -->
   <main class="home-main">
@@ -17,7 +20,11 @@
         <p class="subtitle">Discover Our Curated Musical Experiences</p>
         <div class="hero-buttons">
           <button class="button primary" (click)="navigateTo('/collections')">
-            Explore Prisms
+            <span *appResponsiveTo="'tablet'">Explore</span>
+            <span *appResponsiveFrom="'desktop'">Explore Prisms</span>
+          </button>
+          <button class="button secondary" (click)="navigateTo('/phantasia/phantasia')" *appResponsiveFrom="'tablet'">
+            Enter Phantasia
           </button>
         </div>
       </div>

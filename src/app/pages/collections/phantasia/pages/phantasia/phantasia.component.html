@@ -1,74 +1,151 @@
-<div class="phantasia-experience" [class.loading]="isLoading">
+<!-- Loading Screen -->
+<app-loading-screen 
+  *ngIf="isLoading" 
+  [progress]="loadingProgress">
+</app-loading-screen>
+
+<div class="phantasia-album-page" *ngIf="!isLoading">
   <!-- Site Header - only shown when not inside the phantasia layout -->
   <app-site-header *ngIf="!isInsidePhantasiaLayout"></app-site-header>
 
-  <!-- Loading Screen -->
-  <app-scene-loader *ngIf="isLoading"></app-scene-loader>
-  
-  <!-- Desktop Experience with CD Cases -->
-  <ng-container>
-    <!-- Material Design intro content - positioned above CD cases for interaction priority -->
-    <div class="intro-content">
-      <mat-card class="hero-card">
-        <mat-card-header>
-          <mat-card-title>
-            <h1 class="mat-display-1">Project Phantasia</h1>
-          </mat-card-title>
-          <mat-card-subtitle class="mat-subtitle-1">
-            A Journey Through Electronic Dreams
-          </mat-card-subtitle>
-        </mat-card-header>
-      </mat-card>
-      
-      <mat-card class="description-card">
-        <mat-card-content>
-          <mat-chip-listbox class="highlight-chip">
-            <mat-chip-option selected>
-              <mat-icon>album</mat-icon>
-              Featured Collection
-            </mat-chip-option>
-          </mat-chip-listbox>
-          
-          <p class="mat-body-1 highlight-text">
-            Welcome to Project Phantasia, a groundbreaking double album that pushes the boundaries of electronic dance music.
-          </p>
-          
-          <p class="mat-body-1">
-            Created by legendary producers An and Feryquitous, this masterpiece combines cutting-edge sound design with 
-            ethereal melodies to create an unprecedented auditory experience.
-          </p>
-        </mat-card-content>
-      </mat-card>
-        
-      <div class="features-grid">
-        <mat-card class="feature-card" *ngFor="let feature of features">
-          <mat-card-header>
-            <div mat-card-avatar [style.background]="feature.color">
-              <mat-icon>{{feature.icon}}</mat-icon>
+  <!-- Video Background with Seamless Loop -->
+  <div class="video-background">
+    <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
+      <source src="assets/3d/CD_Case/pregen_bg_optimized.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <!-- Main Album Presentation Content -->
+  <div class="album-presentation">
+
+    <!-- Enhanced CD Showcase with Prominent Title -->
+    <section class="cd-showcase">
+      <!-- Main Section Title -->
+      <div class="section-title-container">
+        <video #titleVideo class="title-video" autoplay muted loop playsinline (loadedmetadata)="onTitleVideoLoaded()" (canplay)="onTitleVideoCanPlay()">
+          <source src="assets/images/ProjectPhan1_Title_anim_cropped_transparent.webm" type="video/webm">
+          <source src="assets/images/ProjectPhan1_Title_anim_cropped_transparent_improved.mp4" type="video/mp4">
+          <!-- Fallback image if video fails -->
+          <img src="assets/images/ProjectPhan1_title_white.png" alt="Project Phantasia I" class="title-image-fallback">
+        </video>
+        <p class="title-subtitle">An immersive orchestral journey</p>
+      </div>
+
+      <!-- Modern Showcase Layout -->
+      <div class="showcase-container">
+        <div class="cd-jacket">
+          <div class="jacket-3d-container">
+            <div class="jacket-art">
+              <img src="assets/images/phantasia_1_cover_optimized.webp" alt="Project Phantasia I Album Cover" class="album-cover">
             </div>
-            <mat-card-title class="mat-h3">{{feature.title}}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <p class="mat-body-2">{{feature.description}}</p>
-          </mat-card-content>
-        </mat-card>
+            <div class="jacket-spine"></div>
+          </div>
+          <div class="jacket-reflection"></div>
+        </div>
+        
+        <div class="album-info">
+          <div class="artist-info">
+            <h3 class="artists">An × Feryquitous</h3>
+            <p class="collaboration-label">Collaborative Masterpiece</p>
+          </div>
+          <div class="album-details">
+            <div class="detail-item">
+              <mat-icon>music_note</mat-icon>
+              <span>10 Epic Tracks</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>schedule</mat-icon>
+              <span>42 Minutes</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>style</mat-icon>
+              <span>Professional Orchestral</span>
+            </div>
+          </div>
+        </div>
       </div>
       
-      <div class="action-buttons">
-        <button mat-raised-button color="primary" class="explore-btn">
-          <mat-icon>play_circle</mat-icon>
-          Start Experience
-        </button>
-        <button mat-stroked-button color="accent" class="info-btn">
-          <mat-icon>info</mat-icon>
-          Learn More
-        </button>
+      <!-- Enhanced Music Player with Modern Positioning -->
+      <div class="player-container">
+        <div class="player-header">
+          <h4>Now Playing Experience</h4>
+        </div>
+        <app-music-player></app-music-player>
       </div>
-    </div>
-    
-    <!-- CD Cases - Always rendered but visually hidden during loading -->
-    <div class="cd-cases-container">
-      <app-cd-cases (loadingChange)="onCDCasesLoadingChange($event)"></app-cd-cases>
-    </div>
-  </ng-container>
+    </section>
+
+    <!-- Artist Social Links -->
+    <section class="artist-section">
+      <h3>Meet the Artists</h3>
+      <div class="artists-grid">
+        <div class="artist-card">
+          <div class="artist-avatar">
+            <span>An</span>
+          </div>
+          <div class="artist-info">
+            <h4>An</h4>
+            <p>Professional Composer</p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <mat-icon>music_video</mat-icon>
+              </a>
+              <a href="#" class="social-link">
+                <mat-icon>language</mat-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="artist-card">
+          <div class="artist-avatar">
+            <span>Fery</span>
+          </div>
+          <div class="artist-info">
+            <h4>Feryquitous</h4>
+            <p>Audio Engineer</p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <mat-icon>music_video</mat-icon>
+              </a>
+              <a href="#" class="social-link">
+                <mat-icon>language</mat-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="phantasia-footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="assets/images/prismcoll_logox.svg" alt="Prismatic Collections" />
+        </div>
+        
+        <div class="footer-links">
+          <div class="link-group">
+            <h3>Explore</h3>
+            <ul>
+              <li><a routerLink="/collections">Collections</a></li>
+              <li><a routerLink="/phantasia/phantasia">About</a></li>
+            </ul>
+          </div>
+          
+          <div class="link-group">
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="copyright">
+          © {{ currentYear }} Prismatic Collections. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>

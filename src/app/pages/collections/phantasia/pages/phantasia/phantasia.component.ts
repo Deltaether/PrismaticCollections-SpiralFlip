@@ -1,70 +1,84 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { CDCasesComponent } from '../../tools/cd-cases/cd-cases.component';
-import { SceneLoaderComponent } from '../../tools/cd-cases/scene-loader/scene-loader.component';
+import { MusicPlayerComponent } from '../../tools/music-player/music-player.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
+import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
 
 /**
- * Phantasia component that shows the 3D experience
- * This is the entry point for Project Phantasia 3D experience
- * 【✓】
+ * Phantasia component that shows the professional album presentation
+ * This is the entry point for Project Phantasia I album showcase
+ * Features video background, music player integration, and professional white-to-black theme
  */
 @Component({
   selector: 'app-phantasia',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    CDCasesComponent,
-    SceneLoaderComponent,
-    SiteHeaderComponent
+    MusicPlayerComponent,
+    SiteHeaderComponent,
+    LoadingScreenComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhantasiaComponent implements OnInit, OnDestroy {
-  // Flag to control loading state
+  @ViewChild('backgroundVideo', { static: false }) backgroundVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('titleVideo', { static: false }) titleVideo!: ElementRef<HTMLVideoElement>;
+
+  // Loading state management
   isLoading = true;
+  loadingProgress = 0;
 
-  // Track when loading started for minimum display time
-  private loadingStartTime = Date.now();
-  private readonly MINIMUM_LOADING_TIME = 3000; // 3 seconds minimum for aesthetic
-
+  // Video loading and fade control
+  private videoLoaded = false;
+  private videoElement: HTMLVideoElement | null = null;
+  private titleVideoElement: HTMLVideoElement | null = null;
+  private userHasInteracted = false;
+  private autoplayFailed = false;
+  private titleAutoplayFailed = false;
 
   // Debug flag
   private readonly isDebugMode = true;
-  
-  // Development mode - bypass all loading screens for testing recording controls
-  private readonly isDevelopmentMode = true;
 
-  // Features data for Material cards
-  features = [
+  // Current year for footer
+  readonly currentYear = new Date().getFullYear();
+
+  // Album features for the professional presentation
+  albumFeatures = [
     {
-      title: '2 Discs',
-      description: '20 original tracks spread across two themed discs',
-      icon: 'album',
-      color: 'linear-gradient(135deg, #ff6b6b, #ff8e8e)'
+      title: 'Professional Production',
+      description: 'Carefully crafted with studio-quality precision and clarity',
+      icon: 'headphones',
+      gradient: 'linear-gradient(135deg, #343a40, #212529)'
     },
     {
-      title: '160+ BPM',
-      description: 'High-energy compositions that will move your soul',
-      icon: 'graphic_eq',
-      color: 'linear-gradient(135deg, #4facfe, #00f2fe)'
+      title: 'Orchestral Excellence',
+      description: 'Rich symphonic arrangements with pristine audio engineering',
+      icon: 'piano',
+      gradient: 'linear-gradient(135deg, #495057, #343a40)'
     },
     {
-      title: 'Digital Art',
-      description: 'Stunning visual accompaniment for each track',
-      icon: 'palette',
-      color: 'linear-gradient(135deg, #667eea, #764ba2)'
+      title: 'Artist Collaboration',
+      description: 'An × Feryquitous bring their unique vision to life',
+      icon: 'group',
+      gradient: 'linear-gradient(135deg, #6c757d, #495057)'
+    },
+    {
+      title: 'Meticulous Detail',
+      description: 'Every element crafted with professional attention to detail',
+      icon: 'precision_manufacturing',
+      gradient: 'linear-gradient(135deg, #212529, #000000)'
     }
   ];
 
@@ -79,29 +93,22 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
       console.log(`[PhantasiaComponent] Current URL: ${this.router.url}`);
     }
 
-    // Add phantasia-3d-page class to body to prevent scrolling during 3D experience
-    this.document.body.classList.add('phantasia-3d-page');
+    // Add phantasia-album-page class to body for album presentation styling
+    this.document.body.classList.add('phantasia-album-page');
     
     if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Added phantasia-3d-page class to body`);
+      console.log(`[PhantasiaComponent] Added phantasia-album-page class to body`);
     }
 
-    
-    // Add a reasonable fallback timeout to prevent infinite loading
-    setTimeout(() => {
-      if (this.isLoading) {
-        if (this.isDebugMode) {
-          console.warn('[PhantasiaComponent] Fallback timeout - forcing loading to false after 10 seconds');
-        }
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      }
-    }, 10000); // 10 second fallback timeout
+    // Set up user interaction detection
+    this.setupUserInteractionDetection();
+
+    // Start loading sequence
+    this.startLoadingSequence();
   }
 
   /**
    * Determines if this component is inside the PhantasiaLayout
-   * 【✓】
    */
   get isInsidePhantasiaLayout(): boolean {
     // The URL will be /phantasia/phantasia when inside the layout
@@ -109,55 +116,294 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     return this.router.url.includes('/phantasia/');
   }
 
-
+  /**
+   * Handle title video loaded metadata
+   */
+  onTitleVideoLoaded(): void {
+    if (this.titleVideo?.nativeElement) {
+      this.titleVideoElement = this.titleVideo.nativeElement;
+      this.titleVideoElement.muted = true;
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Title video loaded');
+      }
+    }
+  }
 
   /**
-   * Handle CD Cases loading change
-   * 【✓】
+   * Handle title video can play event
    */
-  onCDCasesLoadingChange(isLoading: boolean): void {
-    if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] CD Cases loading state received: ${isLoading}, current isLoading: ${this.isLoading}`);
+  onTitleVideoCanPlay(): void {
+    if (this.titleVideoElement) {
+      this.attemptTitleVideoPlay();
     }
-    
-    // Update loading state only if CD Cases are done loading
-    if (!isLoading) {
-      // Calculate how long loading has been shown
-      const loadingDuration = Date.now() - this.loadingStartTime;
-      const remainingTime = Math.max(0, this.MINIMUM_LOADING_TIME - loadingDuration);
+  }
+
+  /**
+   * Handle video loaded event for seamless background playback
+   */
+  onVideoLoaded(): void {
+    if (this.backgroundVideo?.nativeElement) {
+      this.videoElement = this.backgroundVideo.nativeElement;
+      this.videoLoaded = true;
       
-      if (remainingTime > 0) {
-        // Wait for the remaining time to ensure minimum display duration
+      // Ensure video is muted for autoplay compliance
+      this.videoElement.muted = true;
+      
+      // Start video with fade-in effect
+      this.videoElement.style.opacity = '0';
+      this.attemptVideoPlay();
+
+      // Set up seamless looping with fade transition
+      this.setupVideoLoop();
+    }
+  }
+
+  /**
+   * Setup seamless video looping with fade transitions
+   */
+  private setupVideoLoop(): void {
+    if (!this.videoElement) return;
+
+    this.videoElement.addEventListener('timeupdate', () => {
+      if (!this.videoElement) return;
+      
+      // Start fade out 1 second before video ends
+      const timeRemaining = this.videoElement.duration - this.videoElement.currentTime;
+      if (timeRemaining <= 1 && timeRemaining > 0.5) {
+        this.videoElement.style.transition = 'opacity 1s ease-out';
+        this.videoElement.style.opacity = '0.3';
+      }
+    });
+
+    this.videoElement.addEventListener('ended', () => {
+      if (!this.videoElement) return;
+      
+      // Reset and restart with fade in
+      this.videoElement.currentTime = 0;
+      this.videoElement.style.opacity = '0';
+      
+      // Only attempt to play if user has interacted or autoplay worked initially
+      if (!this.autoplayFailed || this.userHasInteracted) {
+        this.videoElement.play().then(() => {
+          if (this.videoElement) {
+            this.videoElement.style.transition = 'opacity 1.5s ease-in';
+            this.videoElement.style.opacity = '1';
+          }
+        }).catch(error => {
+          if (this.isDebugMode) {
+            console.warn('[PhantasiaComponent] Video replay failed:', error);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Attempt to play video with proper error handling
+   */
+  private attemptVideoPlay(): void {
+    if (!this.videoElement) return;
+
+    const playPromise = this.videoElement.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Autoplay succeeded
+        this.autoplayFailed = false;
         if (this.isDebugMode) {
-          console.log(`[PhantasiaComponent] Waiting ${remainingTime}ms to maintain minimum loading display time (3s aesthetic)`);
+          console.log('[PhantasiaComponent] Video autoplay succeeded');
         }
+        this.fadeInVideo();
+      }).catch(error => {
+        // Autoplay failed - this is expected in many browsers
+        this.autoplayFailed = true;
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] Video autoplay failed (expected):', error.name);
+          console.log('[PhantasiaComponent] Video will start after user interaction');
+        }
+        // Still show the video element but don't fade it in until user interacts
+        this.showVideoWithoutPlay();
+      });
+    }
+  }
+
+  /**
+   * Fade in video after successful play
+   */
+  private fadeInVideo(): void {
+    if (!this.videoElement) return;
+    
+    setTimeout(() => {
+      if (this.videoElement) {
+        this.videoElement.style.transition = 'opacity 2s ease-in-out';
+        this.videoElement.style.opacity = '1';
+      }
+    }, 100);
+  }
+
+  /**
+   * Show video element without playing (fallback for autoplay failure)
+   */
+  private showVideoWithoutPlay(): void {
+    if (!this.videoElement) return;
+    
+    // Show the first frame of the video
+    this.videoElement.currentTime = 0;
+    setTimeout(() => {
+      if (this.videoElement) {
+        this.videoElement.style.transition = 'opacity 1s ease-in-out';
+        this.videoElement.style.opacity = '0.8'; // Slightly dimmed to indicate it's not playing
+      }
+    }, 100);
+  }
+
+  /**
+   * Set up user interaction detection to enable video playback
+   */
+  private setupUserInteractionDetection(): void {
+    const handleFirstInteraction = () => {
+      if (!this.userHasInteracted) {
+        this.userHasInteracted = true;
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] User interaction detected');
+        }
+        
+        // If autoplay failed, try to start videos now
+        if (this.autoplayFailed && this.videoElement) {
+          this.attemptVideoPlayAfterInteraction();
+        }
+        if (this.titleAutoplayFailed && this.titleVideoElement) {
+          this.attemptTitleVideoPlayAfterInteraction();
+        }
+        
+        // Remove event listeners after first interaction
+        this.document.removeEventListener('click', handleFirstInteraction);
+        this.document.removeEventListener('touchstart', handleFirstInteraction);
+        this.document.removeEventListener('keydown', handleFirstInteraction);
+      }
+    };
+
+    // Listen for user interactions
+    this.document.addEventListener('click', handleFirstInteraction, { passive: true });
+    this.document.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+    this.document.addEventListener('keydown', handleFirstInteraction, { passive: true });
+  }
+
+  /**
+   * Attempt to play title video with error handling
+   */
+  private attemptTitleVideoPlay(): void {
+    if (!this.titleVideoElement) return;
+
+    const playPromise = this.titleVideoElement.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        this.titleAutoplayFailed = false;
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] Title video autoplay succeeded');
+        }
+      }).catch(error => {
+        this.titleAutoplayFailed = true;
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] Title video autoplay failed (expected):', error.name);
+        }
+      });
+    }
+  }
+
+  /**
+   * Attempt to play video after user interaction
+   */
+  private attemptVideoPlayAfterInteraction(): void {
+    if (!this.videoElement) return;
+
+    this.videoElement.play().then(() => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Video started after user interaction');
+      }
+      this.fadeInVideo();
+    }).catch(error => {
+      if (this.isDebugMode) {
+        console.warn('[PhantasiaComponent] Video play failed even after user interaction:', error);
+      }
+    });
+  }
+
+  /**
+   * Attempt to play title video after user interaction
+   */
+  private attemptTitleVideoPlayAfterInteraction(): void {
+    if (!this.titleVideoElement) return;
+
+    this.titleVideoElement.play().then(() => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Title video started after user interaction');
+      }
+    }).catch(error => {
+      if (this.isDebugMode) {
+        console.warn('[PhantasiaComponent] Title video play failed even after user interaction:', error);
+      }
+    });
+  }
+
+  /**
+   * Start the loading sequence with progress simulation
+   */
+  private startLoadingSequence(): void {
+    this.isLoading = true;
+    this.loadingProgress = 0;
+    
+    const progressInterval = setInterval(() => {
+      this.loadingProgress += Math.random() * 15;
+      
+      if (this.loadingProgress >= 100) {
+        this.loadingProgress = 100;
+        clearInterval(progressInterval);
+        
+        // Add a small delay before hiding loading screen
         setTimeout(() => {
           this.isLoading = false;
-          if (this.isDebugMode) {
-            console.log(`[PhantasiaComponent] Loading screen shown for aesthetic minimum time - hiding now`);
-          }
           this.cdr.markForCheck();
-        }, remainingTime);
-      } else {
-        // Already shown for minimum time, hide immediately
-        this.isLoading = false;
-        if (this.isDebugMode) {
-          console.log(`[PhantasiaComponent] CD Cases finished loading - setting isLoading to false`);
-        }
-        this.cdr.markForCheck();
+          
+          if (this.isDebugMode) {
+            console.log('[PhantasiaComponent] Loading complete, showing main content');
+          }
+        }, 500);
       }
-    } else if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Not updating loading state - isLoading: ${isLoading}`);
+      
+      this.cdr.markForCheck();
+    }, 200);
+    
+    if (this.isDebugMode) {
+      console.log('[PhantasiaComponent] Loading sequence started');
     }
-    this.cdr.markForCheck();
   }
 
   ngOnDestroy(): void {
-    // Remove phantasia-3d-page class from body to restore normal scrolling
-    this.document.body.classList.remove('phantasia-3d-page');
+    // Remove phantasia-album-page class from body
+    this.document.body.classList.remove('phantasia-album-page');
+    
+    // Clean up video elements
+    if (this.videoElement) {
+      this.videoElement.pause();
+      this.videoElement.removeEventListener('timeupdate', () => {});
+      this.videoElement.removeEventListener('ended', () => {});
+      this.videoElement = null;
+    }
+    if (this.titleVideoElement) {
+      this.titleVideoElement.pause();
+      this.titleVideoElement = null;
+    }
+
+    // Clean up user interaction listeners (in case they weren't removed yet)
+    const handleFirstInteraction = () => {}; // Dummy function for cleanup
+    this.document.removeEventListener('click', handleFirstInteraction);
+    this.document.removeEventListener('touchstart', handleFirstInteraction);
+    this.document.removeEventListener('keydown', handleFirstInteraction);
     
     if (this.isDebugMode) {
-      console.log(`[PhantasiaComponent] Removed phantasia-3d-page class from body - scrolling restored`);
+      console.log(`[PhantasiaComponent] Component destroyed, cleanup completed`);
     }
   }
 }

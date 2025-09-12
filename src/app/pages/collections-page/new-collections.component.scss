@@ -1,6 +1,8 @@
 /* Import unified triangle animations and winter background system */
 /* Triangle animations now handled by TypeScript component */
 @use '../../shared/styles/unified-background.scss' as winter;
+@use '../../shared/styles/fluid-typography-system.scss' as fluid;
+@use '../../shared/styles/responsive-system.scss' as responsive;
 
 /* 
  * Z-INDEX HIERARCHY DOCUMENTATION
@@ -18,11 +20,78 @@
 /* Collections Page - Album Cards Implementation */
 
 .collections-page {
-  min-height: 100vh;
+  /* CRITICAL FIX: Force proper scrolling container with guaranteed content overflow */
+  min-height: calc(100vh + 400px); /* Force content to be much taller than viewport */
+  height: 100vh; /* FIXED: Constrain container to viewport height to force scrolling */
   color: #333333;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto; /* Enable vertical scrolling */
   margin-top: 89px;
+  scroll-behavior: smooth;
+  
+  /* ENHANCED: High-visibility scrollbar implementation for all browsers */
+  &::-webkit-scrollbar {
+    width: 12px; /* Wider for better visibility */
+    height: 12px;
+    background: rgba(0, 0, 0, 0.3); /* Dark background */
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.4); /* Darker track for contrast */
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.9); /* High contrast white thumb */
+    border-radius: 6px;
+    min-height: 30px;
+    border: 2px solid rgba(0, 0, 0, 0.3); /* Dark border for definition */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 1); /* Pure white on hover */
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+    }
+    
+    &:active {
+      background: rgba(240, 240, 240, 1);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+  }
+  
+  /* Enhanced Firefox scrollbar styling */
+  scrollbar-width: auto; /* Make scrollbar wider in Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.4);
+  
+  /* ENHANCED: Mobile scrollbar visibility for touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    &::-webkit-scrollbar {
+      width: 16px; /* Much wider for mobile touch */
+      background: rgba(0, 0, 0, 0.5);
+      -webkit-appearance: none;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.95); /* High contrast for mobile */
+      border-radius: 8px;
+      border: 3px solid rgba(0, 0, 0, 0.5);
+      min-height: 40px; /* Large touch target */
+      -webkit-appearance: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.6); /* Dark track for contrast */
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      -webkit-appearance: none;
+    }
+  }
+  
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
   
   /* Static Background: White gradient variations - Clean and professional */
   background: 
@@ -177,7 +246,7 @@
     animation: diagonalMorphingPatternT 12s ease-in-out infinite;
   }
   
-  /* Restore subtle animated texture */
+  /* FIXED: Restore subtle animated texture with lower z-index to avoid scrollbar conflicts */
   &::after {
     content: '';
     position: fixed;
@@ -192,14 +261,21 @@
     background-size: 100px 100px, 80px 80px, 120px 120px;
     animation: subtleFloat 20s infinite linear;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1; /* CRITICAL FIX: Negative z-index to prevent scrollbar interference */
   }
   
   /* Apply winter text colors */
   @include winter.winter-text-colors;
   
-  /* Let content determine height naturally */
-  height: auto;
+  /* Ensure debug elements don't interfere with scrolling */
+  .debug-toggle,
+  .debug-panel {
+    pointer-events: auto;
+    user-select: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+  }
 }
 
 /* Diagonal Line Animation Keyframes - 20 Variations Targeting the Diagonal Lines */
@@ -536,7 +612,7 @@
   }
 }
 
-/* Main Content Container - Same as home page */
+/* FIXED: Main Content Container with guaranteed content height */
 .collections-main {
   position: relative;
   z-index: 2;
@@ -544,7 +620,9 @@
   max-width: 1400px;
   margin: 0 auto;
   padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-bottom: 12rem; /* MASSIVE bottom padding to guarantee scrolling */
+  /* CRITICAL FIX: Force content much taller than viewport */
+  min-height: calc(100vh + 600px); /* Ensure significant content overflow */
 }
 
 /* Hero Section - Exact copy from home page */
@@ -618,22 +696,25 @@
     position: relative;
     
     .title {
-      font-size: 3.5rem;
+      @include fluid.hero-title-typography;
       font-weight: 300;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       letter-spacing: 0.05em;
-      margin-bottom: 1rem;
       color: #eeeeee;
       position: relative;
       z-index: 1;
+      
+      @include fluid.accessible-typography;
+      @include fluid.mobile-optimized-typography;
     }
     
     .subtitle {
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
+      @include fluid.hero-subtitle-typography;
       color: rgba(255, 255, 255, 0.9); /* White text for dark background */
       position: relative;
       z-index: 1;
+      
+      @include fluid.accessible-typography;
+      @include fluid.mobile-optimized-typography;
     }
     
     .hero-buttons {
@@ -882,40 +963,45 @@
 }
 
 .album-title {
-  font-size: 1.3rem;
+  @include fluid.typography-heading-4;
   font-weight: bold;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 clamp(0.25rem, 1vw, 0.5rem) 0;
   color: #ffffff;
+  
+  @include fluid.accessible-typography;
 }
 
 .album-artist {
-  font-size: 0.95rem;
+  @include fluid.typography-body-medium;
   color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 0.8rem 0;
+  margin: 0 0 clamp(0.6rem, 2vw, 1rem) 0;
   font-weight: 500;
+  
+  @include fluid.mobile-optimized-typography;
 }
 
 .album-meta {
   display: flex;
   gap: 1rem;
-  margin-bottom: 0.8rem;
-  font-size: 0.85rem;
+  margin-bottom: clamp(0.6rem, 2vw, 1rem);
+  @include fluid.typography-body-small;
   color: rgba(255, 255, 255, 0.5);
   
   .tracks, .year {
+    @include fluid.typography-label-small;
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.8);
-    padding: 0.3rem 0.6rem;
+    padding: clamp(0.2rem, 0.5vw, 0.4rem) clamp(0.4rem, 1vw, 0.8rem);
     border-radius: 12px;
-    font-size: 0.8rem;
   }
 }
 
 .album-description {
-  font-size: 0.9rem;
-  line-height: 1.4;
+  @include fluid.typography-body-small;
   color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 0.8rem 0;
+  margin: 0 0 clamp(0.6rem, 2vw, 1rem) 0;
+  
+  @include fluid.mobile-optimized-typography;
 }
 
 .album-tags {
@@ -1348,10 +1434,32 @@
   }
 }
 
-/* Responsive Design */
+/* ENHANCED: Mobile-specific scrollbar visibility with guaranteed content overflow */
 @media (max-width: 768px) {
+  .collections-page {
+    /* CRITICAL FIX: Force massive content height for mobile */
+    min-height: calc(100vh + 800px) !important;
+    height: 100vh !important; /* Fixed viewport height for scrolling */
+    
+    /* Mobile-specific scrollbar enhancements */
+    &::-webkit-scrollbar {
+      width: 18px !important; /* Extra wide for mobile */
+      background: rgba(0, 0, 0, 0.6) !important;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 1) !important; /* Pure white for maximum visibility */
+      border: 4px solid rgba(0, 0, 0, 0.7) !important;
+      border-radius: 9px !important;
+      min-height: 50px !important; /* Large touch target */
+    }
+  }
+  
   .collections-main {
     padding: 0 1rem;
+    /* CRITICAL FIX: Enormous bottom padding for mobile scrolling */
+    padding-bottom: 20rem !important;
+    min-height: calc(100vh + 800px) !important;
   }
   
   .page-header {
@@ -1367,6 +1475,8 @@
   .collections-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
+    /* Add minimum height to ensure scrolling is possible */
+    min-height: 80vh;
   }
   
   .collection-card {
@@ -1378,7 +1488,39 @@
   }
 }
 
+/* ENHANCED: iPhone and mobile device specific scrollbar optimizations */
+@media (max-width: 430px) {
+  .collections-page {
+    /* CRITICAL FIX: Extreme content height for iPhone scrolling */
+    min-height: calc(100vh + 1000px) !important;
+    height: 100vh !important; /* Viewport height constraint for overflow */
+    
+    /* iPhone-specific scrollbar styling for maximum visibility */
+    &::-webkit-scrollbar {
+      width: 20px !important; /* Maximum width for iPhone */
+      background: rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 1) !important;
+      border: 5px solid rgba(0, 0, 0, 0.8) !important;
+      border-radius: 10px !important;
+      min-height: 60px !important; /* Very large touch target */
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important; /* Glow effect */
+    }
+  }
+  
+  .collections-main {
+    padding-bottom: 25rem !important; /* Extreme padding for iPhone */
+    min-height: calc(100vh + 1000px) !important;
+  }
+}
+
 @media (max-width: 480px) {
+  .collections-page {
+    /* Mobile scrollbar styling removed - handled at body level */
+  }
+  
   .page-header {
     h1 {
       font-size: 2rem;
@@ -1457,5 +1599,246 @@
   }
   100% {
     background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+}
+
+/* DEBUG PANEL STYLES */
+.debug-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(45deg, #ff4444, #cc1111);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 15px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 68, 68, 0.6);
+  }
+  
+  &.active {
+    background: linear-gradient(45deg, #44ff44, #11cc11);
+    box-shadow: 0 4px 15px rgba(68, 255, 68, 0.4);
+  }
+}
+
+.debug-panel {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 450px;
+  max-height: 600px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+  border: 2px solid rgba(255, 68, 68, 0.6);
+  border-radius: 15px;
+  z-index: 9999;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  
+  &.open {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 68, 68, 0.3);
+    background: linear-gradient(90deg, rgba(255, 68, 68, 0.1) 0%, transparent 100%);
+    
+    h3 {
+      margin: 0;
+      color: #ff4444;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .debug-close {
+      background: none;
+      border: none;
+      color: #ff4444;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(255, 68, 68, 0.2);
+        transform: scale(1.2);
+      }
+    }
+  }
+  
+  .debug-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    
+    /* Enhanced scrollbar for debug panel */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 68, 68, 0.1);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 68, 68, 0.6);
+      border-radius: 4px;
+      
+      &:hover {
+        background: rgba(255, 68, 68, 0.8);
+      }
+    }
+  }
+  
+  .debug-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    
+    .debug-btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.download {
+        background: linear-gradient(45deg, #4a90e2, #357abd);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+      }
+      
+      &.test {
+        background: linear-gradient(45deg, #f39c12, #d68910);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
+      }
+      
+      &.inspect {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        }
+      }
+      
+      &.analyze {
+        background: linear-gradient(45deg, #9b59b6, #8e44ad);
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+        }
+      }
+    }
+  }
+  
+  .debug-logs {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    
+    /* Enhanced scrollbar for logs */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    }
+    
+    .log-entry {
+      color: #00ff00;
+      font-size: 11px;
+      line-height: 1.4;
+      margin-bottom: 5px;
+      word-wrap: break-word;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      // Different colors for different log types
+      &:contains('ERROR') {
+        color: #ff4444;
+      }
+      
+      &:contains('✅') {
+        color: #44ff44;
+      }
+      
+      &:contains('❌') {
+        color: #ff4444;
+      }
+      
+      &:contains('---') {
+        color: #ffff44;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* Mobile responsive adjustments for debug panel */
+@media (max-width: 768px) {
+  .debug-panel {
+    width: calc(100vw - 40px);
+    right: 20px;
+    left: 20px;
+    
+    .debug-buttons {
+      grid-template-columns: 1fr;
+    }
   }
 }

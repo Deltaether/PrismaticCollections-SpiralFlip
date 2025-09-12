@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
-import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
+import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
 import { ResponsiveService } from '../../shared/services/responsive.service';
 import { ResponsiveFromDirective, ResponsiveToDirective } from '../../shared/directives/responsive.directive';
 
@@ -20,7 +20,7 @@ import { ResponsiveFromDirective, ResponsiveToDirective } from '../../shared/dir
     CommonModule, 
     RouterModule, 
     SiteHeaderComponent, 
-    TrianglesAnimationComponent,
+    SquaresAnimationComponent,
     ResponsiveFromDirective,
     ResponsiveToDirective
   ],

@@ -4,11 +4,11 @@
   <!-- Site Header -->
   <app-site-header></app-site-header>
   
-  <!-- TypeScript-based Triangle Animation (Responsive count based on device) -->
-  <app-triangles-animation 
-    [count]="isMobile() ? 25 : (isTablet() ? 35 : 50)" 
+  <!-- TypeScript-based Square Animation (Responsive count based on device, space-like movement) -->
+  <app-squares-animation 
+    [count]="isMobile() ? 24 : (isTablet() ? 36 : 48)" 
     [enabled]="!responsiveService.prefersReducedMotion()">
-  </app-triangles-animation>
+  </app-squares-animation>
 
   <!-- Main Content - Same Pattern as Collections -->
   <main class="home-main">
@@ -22,9 +22,6 @@
           <button class="button primary" (click)="navigateTo('/collections')">
             <span *appResponsiveTo="'tablet'">Explore</span>
             <span *appResponsiveFrom="'desktop'">Explore Prisms</span>
-          </button>
-          <button class="button secondary" (click)="navigateTo('/phantasia/phantasia')" *appResponsiveFrom="'tablet'">
-            Enter Phantasia
           </button>
         </div>
       </div>

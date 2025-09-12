@@ -95,24 +95,24 @@ $transition: all 0.3s ease;
 /* Home Page Container - Responsive Design */
 .home-page {
   @include responsive.full-viewport-height;
-  color: #ffffff;
+  color: #333333;
   position: relative;
   overflow-x: hidden;
   margin-top: 89px;
   
   // Use responsive performance optimizations
   @include responsive.mobile-performance-optimizations;
-  /* Static Background: Only radial gradients and base gradient - NEVER animated */
+  /* Static Background: White gradient variations - Clean and professional */
   & {
     background: 
-      radial-gradient(ellipse at 15% 25%, rgba(74, 158, 255, 0.12) 0%, transparent 40%),
-      radial-gradient(ellipse at 85% 75%, rgba(32, 178, 170, 0.10) 0%, transparent 45%),
+      radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+      radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
       linear-gradient(180deg,
-        #1a1a1f 0%,
-        #1f2429 25%,
-        #242932 50%,
-        #1d2127 75%,
-        #181820 100%
+        #ffffff 0%,
+        #f8f9fa 25%,
+        #f5f5f5 50%,
+        #f0f0f0 75%,
+        #eeeeee 100%
       );
   }
   
@@ -131,16 +131,16 @@ $transition: all 0.3s ease;
         -45deg,
         transparent 0px,
         transparent 3px,
-        rgba(74, 158, 255, 0.035) 4px,
-        rgba(74, 158, 255, 0.035) 5px,
+        rgba(0, 0, 0, 0.02) 4px,
+        rgba(0, 0, 0, 0.02) 5px,
         transparent 6px,
         transparent 9px,
-        rgba(32, 178, 170, 0.03) 10px,
-        rgba(32, 178, 170, 0.03) 11px,
+        rgba(100, 100, 100, 0.015) 10px,
+        rgba(100, 100, 100, 0.015) 11px,
         transparent 12px,
         transparent 15px,
-        rgba(0, 206, 209, 0.025) 16px,
-        rgba(0, 206, 209, 0.025) 17px,
+        rgba(150, 150, 150, 0.01) 16px,
+        rgba(150, 150, 150, 0.01) 17px,
         transparent 18px,
         transparent 21px
       ),
@@ -148,8 +148,8 @@ $transition: all 0.3s ease;
         -75deg,
         transparent 0px,
         transparent 8px,
-        rgba(74, 158, 255, 0.02) 9px,
-        rgba(74, 158, 255, 0.02) 10px,
+        rgba(0, 0, 0, 0.008) 9px,
+        rgba(0, 0, 0, 0.008) 10px,
         transparent 11px,
         transparent 19px
       );
@@ -260,7 +260,7 @@ $transition: all 0.3s ease;
     animation: diagonalMorphingPatternT 12s ease-in-out infinite;
   }
   
-  /* Restore subtle animated texture */
+  /* Restore subtle animated texture optimized for white background */
   &::after {
     content: '';
     position: fixed;
@@ -269,9 +269,9 @@ $transition: all 0.3s ease;
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      radial-gradient(circle at 10% 10%, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+      radial-gradient(circle at 90% 90%, rgba(100, 100, 100, 0.02) 1px, transparent 1px),
+      radial-gradient(circle at 30% 70%, rgba(150, 150, 150, 0.01) 1px, transparent 1px);
     background-size: 100px 100px, 80px 80px, 120px 120px;
     animation: subtleFloat 20s infinite linear;
     pointer-events: none;
@@ -335,17 +335,19 @@ $transition: all 0.3s ease;
   }
   
   /* Slightly transparent card styling for illuminated dark theme */
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.25) 0%, 
-    rgba(255, 255, 255, 0.22) 50%, 
-    rgba(255, 255, 255, 0.18) 100%);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-sizing: border-box;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 3rem 2.5rem;
+  & {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.25) 0%, 
+      rgba(255, 255, 255, 0.22) 50%, 
+      rgba(255, 255, 255, 0.18) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 3rem 2.5rem;
+  }
   
   /* Additional glow effect */
   &::before {
@@ -392,14 +394,19 @@ $transition: all 0.3s ease;
     
     .title {
       @include responsive.responsive-font-size(3.5, 2.0, 2.8);
-      font-weight: 800;
-      margin-bottom: 1rem;
-      background: linear-gradient(to right, #ffffff, #e0e0e0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-      z-index: 1;
+      
+      & {
+        font-weight: 300;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #ffffff, #e0e0e0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 1;
+      }
       
       // Additional responsive adjustments
       @include responsive.mobile {
@@ -414,9 +421,12 @@ $transition: all 0.3s ease;
     
     .subtitle {
       @include responsive.responsive-font-size(1.5, 1.0, 1.2);
-      color: rgba(255, 255, 255, 0.9);
-      position: relative;
-      z-index: 1;
+      
+      & {
+        color: rgba(255, 255, 255, 0.9);
+        position: relative;
+        z-index: 1;
+      }
       
       @include responsive.responsive-margin(2);
       
@@ -426,21 +436,21 @@ $transition: all 0.3s ease;
     }
     
     .hero-buttons {
-      @include responsive.responsive-flex(column, row);
       justify-content: center;
       position: relative;
       z-index: 1;
+      @include responsive.responsive-flex(column, row);
       
       @include responsive.mobile {
         gap: 0.75rem;
       }
       
       .button {
-        @include responsive.touch-friendly;
         border-radius: 30px;
         font-weight: 600;
         cursor: pointer;
         transition: $transition;
+        @include responsive.touch-friendly;
         
         @include responsive.mobile {
           padding: 0.6rem 1.2rem;
@@ -523,10 +533,10 @@ $transition: all 0.3s ease;
   }
   
   .featured-grid {
-    @include responsive.responsive-grid-columns(1, 1, 2, 2, 3);
     justify-items: center;
     max-width: 1200px;
     margin: 0 auto;
+    @include responsive.responsive-grid-columns(1, 1, 2, 2, 3);
     
     @include responsive.mobile {
       gap: 1.5rem;
@@ -537,7 +547,6 @@ $transition: all 0.3s ease;
     }
     
     .feature-card {
-      @include responsive.responsive-card;
       overflow: hidden;
       box-shadow: $box-shadow;
       transition: $transition;
@@ -545,6 +554,7 @@ $transition: all 0.3s ease;
       height: 100%;
       width: 100%;
       max-width: 400px;
+      @include responsive.responsive-card;
       
       @include responsive.mobile {
         max-width: 100%;
@@ -1184,12 +1194,12 @@ $transition: all 0.3s ease;
 
 /* About Section - Responsive Design */
 .about {
-  @include responsive.responsive-padding(4);
   background: linear-gradient(135deg, rgba(15, 15, 15, 0.85) 0%, rgba(20, 20, 20, 0.9) 50%, rgba(10, 10, 10, 0.85) 100%);
   backdrop-filter: blur(5px);
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
+  @include responsive.responsive-padding(4);
   
   @include responsive.responsive-margin(4);
   
@@ -1209,10 +1219,10 @@ $transition: all 0.3s ease;
     }
     
     .about-text {
-      @include responsive.responsive-font-size(1.1, 1.0, 1.05);
       line-height: 1.8;
-      @include responsive.responsive-margin(1.5);
       color: rgba(255, 255, 255, 0.8);
+      @include responsive.responsive-font-size(1.1, 1.0, 1.05);
+      @include responsive.responsive-margin(1.5);
     }
   }
 }
@@ -1255,15 +1265,15 @@ $transition: all 0.3s ease;
 
 /* Enhanced Responsive Background Optimizations */
 .home-page {
-  // Background simplification for performance on mobile
+  // Background simplification for performance on mobile - WHITE THEME
   @include responsive.mobile {
     background: 
-      radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.06) 0%, transparent 60%),
-      linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
+      radial-gradient(ellipse at 50% 0%, rgba(74, 158, 255, 0.03) 0%, transparent 60%),
+      linear-gradient(180deg, #ffffff 0%, #f8f9fa 50%, #f5f5f5 100%);
   }
   
   @include responsive.mobile-xs {
-    background: linear-gradient(180deg, #0a0a0f 0%, #141922 50%, #0d1117 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 50%, #f5f5f5 100%);
   }
 }
 

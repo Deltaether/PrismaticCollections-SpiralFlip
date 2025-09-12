@@ -468,3 +468,28 @@ ssh root@212.227.85.148 "cd /var/www/phantasia && tar -xzf ~/phantasia-auth.tar.
 - **Security**: Suitable for testing, not production-level security
 
 This comprehensive documentation covers all critical aspects of the project's current state, authentication system, server configuration, GitHub integration, and deployment processes as of August 2025.
+
+
+Visual Development
+Design Principles
+Comprehensive design checklist in /context/design-principles.md
+Brand style guide in /context/style-guide.md
+When making visual (front-end, UI/UX) changes, always refer to these files for guidance
+Quick Visual Check
+IMMEDIATELY after implementing any front-end change:
+
+Identify what changed - Review the modified components/pages
+Navigate to affected pages - Use mcp__playwright__browser_navigate to visit each changed view
+Verify design compliance - Compare against /context/design-principles.md and /context/style-guide.md
+Validate feature implementation - Ensure the change fulfills the user's specific request
+Check acceptance criteria - Review any provided context files or requirements
+Capture evidence - Take full page screenshot at desktop viewport (1440px) of each changed view
+Check for errors - Run mcp__playwright__browser_console_messages
+This verification ensures changes meet design standards and user requirements.
+
+Comprehensive Design Review
+Invoke the @agent-design-review subagent for thorough design validation when:
+
+Completing significant UI/UX features
+Before finalizing PRs with visual changes
+Needing comprehensive accessibility and responsiveness testing

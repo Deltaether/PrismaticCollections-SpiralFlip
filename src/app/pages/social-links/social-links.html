@@ -4,72 +4,8 @@
   <!-- Site Header -->
   <app-site-header></app-site-header>
   
-  <!-- Animated Triangle Background -->
-  <div class="triangle-container">
-    <!-- First wave of triangles -->
-    <div class="triangle triangle-1"></div>
-    <div class="triangle triangle-2"></div>
-    <div class="triangle triangle-3"></div>
-    <div class="triangle triangle-4"></div>
-    <div class="triangle triangle-5"></div>
-    <div class="triangle triangle-6"></div>
-    <div class="triangle triangle-7"></div>
-    <div class="triangle triangle-8"></div>
-    
-    <!-- Second wave for waterfall effect -->
-    <div class="triangle triangle-9"></div>
-    <div class="triangle triangle-10"></div>
-    <div class="triangle triangle-11"></div>
-    <div class="triangle triangle-12"></div>
-    <div class="triangle triangle-13"></div>
-    <div class="triangle triangle-14"></div>
-    <div class="triangle triangle-15"></div>
-    <div class="triangle triangle-16"></div>
-    
-    <!-- Third wave for continuous flow -->
-    <div class="triangle triangle-17"></div>
-    <div class="triangle triangle-18"></div>
-    <div class="triangle triangle-19"></div>
-    <div class="triangle triangle-20"></div>
-    
-    <!-- Fourth wave for more population -->
-    <div class="triangle triangle-21"></div>
-    <div class="triangle triangle-22"></div>
-    <div class="triangle triangle-23"></div>
-    <div class="triangle triangle-24"></div>
-    <div class="triangle triangle-25"></div>
-    <div class="triangle triangle-26"></div>
-    <div class="triangle triangle-27"></div>
-    <div class="triangle triangle-28"></div>
-    
-    <!-- Fifth wave for dense waterfall -->
-    <div class="triangle triangle-29"></div>
-    <div class="triangle triangle-30"></div>
-    <div class="triangle triangle-31"></div>
-    <div class="triangle triangle-32"></div>
-    <div class="triangle triangle-33"></div>
-    <div class="triangle triangle-34"></div>
-    <div class="triangle triangle-35"></div>
-    <div class="triangle triangle-36"></div>
-    
-    <!-- Sixth wave for extra density -->
-    <div class="triangle triangle-37"></div>
-    <div class="triangle triangle-38"></div>
-    <div class="triangle triangle-39"></div>
-    <div class="triangle triangle-40"></div>
-    <div class="triangle triangle-41"></div>
-    <div class="triangle triangle-42"></div>
-    <div class="triangle triangle-43"></div>
-    <div class="triangle triangle-44"></div>
-    
-    <!-- Seventh wave for maximum density -->
-    <div class="triangle triangle-45"></div>
-    <div class="triangle triangle-46"></div>
-    <div class="triangle triangle-47"></div>
-    <div class="triangle triangle-48"></div>
-    <div class="triangle triangle-49"></div>
-    <div class="triangle triangle-50"></div>
-  </div>
+  <!-- TypeScript-based Triangle Animation (50 triangles for circles page, smooth JS animations) -->
+  <app-triangles-animation [count]="50" [enabled]="true"></app-triangles-animation>
 
   <!-- Main Content -->
   <main class="social-main">
@@ -83,6 +19,9 @@
           Explore our artists' social media platforms, follow their journeys, 
           and stay updated with their latest musical creations and collaborations.
         </p>
+      </div>
+      <div class="hero-background">
+        <div class="overlay"></div>
       </div>
     </section>
 

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
+import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
 
 interface SocialLink {
   platform: string;
@@ -25,7 +26,7 @@ interface Artist {
 @Component({
   selector: 'app-social-links',
   standalone: true,
-  imports: [CommonModule, SiteHeaderComponent],
+  imports: [CommonModule, SiteHeaderComponent, TrianglesAnimationComponent],
   templateUrl: './social-links.html',
   styleUrls: ['./social-links.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

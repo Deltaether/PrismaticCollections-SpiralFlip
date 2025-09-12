@@ -1,5 +1,4 @@
-/* Import unified triangle animations, enhanced design systems, and winter background */
-@use '../../shared/styles/triangle-animations.scss';
+/* Import enhanced design systems, and winter background - triangle animations now handled by TypeScript component */
 @use '../../shared/styles/typography-system.scss' as typo;
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
@@ -31,15 +30,37 @@ $transition: all 0.3s ease;
 /* Social Links Page Container - PERFORMANCE OPTIMIZED */
 .social-links-page {
   min-height: 100vh;
+  height: 100vh; /* Ensure definite height for overflow to work */
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   padding-top: 89px;
   
   /* Performance optimizations to prevent glitching */
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+  
+  /* Custom scrollbar styling matching home component */
+  &::-webkit-scrollbar {
+    width: 4px;
+    z-index: 1100; /* Ensure scrollbar is above content but below header */
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
   
   /* Static Background: Only radial gradients and base gradient - NEVER animated */
   background: 
@@ -274,11 +295,32 @@ $transition: all 0.3s ease;
     bottom: 0;
     background: radial-gradient(
       circle at center,
-      rgba(255, 127, 80, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 0%,
       transparent 60%
     );
     pointer-events: none;
     z-index: -1;
+  }
+  
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
+    }
   }
   
   .hero-content {
@@ -290,10 +332,7 @@ $transition: all 0.3s ease;
       font-size: 3.5rem;
       font-weight: 800;
       margin-bottom: 1rem;
-      background: linear-gradient(to right, #ff7f50, #ff5252);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #ffffff;
       position: relative;
       z-index: 1;
     }
@@ -547,7 +586,7 @@ $transition: all 0.3s ease;
       }
       
       &:hover {
-        border-color: var(--social-color);
+        border-color: rgba(255, 255, 255, 0.4);
         background: rgba(255, 255, 255, 0.1);
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -586,7 +625,7 @@ $transition: all 0.3s ease;
       .social-arrow {
         font-size: 0.9rem;
         transition: transform 0.3s ease;
-        color: var(--social-color, $primary-color);
+        color: rgba(255, 255, 255, 0.8);
       }
       
       .coming-soon-text {

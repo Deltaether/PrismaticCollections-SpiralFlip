@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
+import { TrianglesAnimationComponent } from '../../shared/components/triangles-animation/triangles-animation.component';
 
 interface NewsArticle {
   id: string;
@@ -43,7 +44,7 @@ interface NewsFilter {
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, FormsModule, SiteHeaderComponent],
+  imports: [CommonModule, FormsModule, SiteHeaderComponent, TrianglesAnimationComponent],
   templateUrl: './news.html',
   styleUrl: './news.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

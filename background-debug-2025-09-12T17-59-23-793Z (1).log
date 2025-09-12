@@ -1,0 +1,85 @@
+[2025-09-12T17:59:23.793Z] === EARLY STYLES DEBUG (MAIN.TS) ===
+[2025-09-12T17:59:23.794Z] Early HTML background: rgb(24, 26, 27)
+[2025-09-12T17:59:23.794Z] Early BODY background: rgb(24, 26, 27)
+[2025-09-12T17:59:23.794Z] Document ready state: interactive
+[2025-09-12T17:59:23.795Z] Total stylesheets loaded: 4
+[2025-09-12T17:59:23.795Z] Stylesheet 0: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css
+[2025-09-12T17:59:23.795Z] Stylesheet 1: https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600&display=swap
+[2025-09-12T17:59:23.795Z] Stylesheet 2: inline
+[2025-09-12T17:59:23.795Z] Stylesheet 3: http://localhost:5005/styles.css
+[2025-09-12T17:59:23.820Z] === APP COMPONENT INITIALIZED ===
+[2025-09-12T17:59:23.953Z] GLOBAL STYLE CHANGE DETECTED: {"element":"BODY","attribute":"class","oldValue":null,"newValue":"home-page-active"}
+[2025-09-12T17:59:23.957Z] FORCING HTML/BODY WHITE BACKGROUND EARLY
+[2025-09-12T17:59:23.958Z] Early forced backgrounds applied
+[2025-09-12T17:59:23.960Z] GLOBAL STYLE CHANGE DETECTED: {"element":"HTML","attribute":"style","oldValue":null,"newValue":"background-color: rgb(255, 255, 255);"}
+[2025-09-12T17:59:23.960Z] GLOBAL STYLE CHANGE DETECTED: {"element":"BODY","attribute":"style","oldValue":null,"newValue":"background-color: rgb(255, 255, 255);"}
+[2025-09-12T17:59:23.995Z] GLOBAL STYLE CHANGE DETECTED: {"element":"HTML","attribute":"style","oldValue":"background-color: rgb(255, 255, 255);","newValue":"background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);"}
+[2025-09-12T17:59:23.995Z] GLOBAL STYLE CHANGE DETECTED: {"element":"BODY","attribute":"style","oldValue":"background-color: rgb(255, 255, 255);","newValue":"background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);"}
+[2025-09-12T17:59:24.024Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.024Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.024Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.025Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.025Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.025Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.025Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.025Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.026Z] === AFTER GLOBAL STYLE CHANGE ===
+[2025-09-12T17:59:24.026Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.026Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.026Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.027Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.027Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.027Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.027Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.027Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.028Z] === AFTER GLOBAL STYLE CHANGE ===
+[2025-09-12T17:59:24.028Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.028Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.028Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.028Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.029Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.029Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.029Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.029Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.029Z] === AFTER GLOBAL STYLE CHANGE ===
+[2025-09-12T17:59:24.029Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.030Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.030Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.030Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.030Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.030Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.030Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.030Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.054Z] === AFTER GLOBAL STYLE CHANGE ===
+[2025-09-12T17:59:24.054Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.054Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.055Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.055Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.055Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.055Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.056Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.056Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.057Z] === AFTER GLOBAL STYLE CHANGE ===
+[2025-09-12T17:59:24.057Z] === GLOBAL STYLES DEBUG (APP COMPONENT) ===
+[2025-09-12T17:59:24.057Z] HTML background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.057Z] HTML background: rgb(24, 26, 27) none repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.058Z] BODY background-color: rgb(24, 26, 27)
+[2025-09-12T17:59:24.058Z] BODY background: rgb(24, 26, 27) repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 28px, rgba(0, 74, 160, 0.02) 29px, rgba(0, 74, 160, 0.02) 30px, rgba(0, 0, 0, 0) 31px, rgba(0, 0, 0, 0) 59px, rgba(26, 142, 136, 0.02) 60px, rgba(26, 142, 136, 0.02) 61px, rgba(0, 0, 0, 0) 62px, rgba(0, 0, 0, 0) 89px, rgba(0, 165, 167, 0.01) 90px, rgba(0, 165, 167, 0.01) 91px, rgba(0, 0, 0, 0) 92px, rgba(0, 0, 0, 0) 120px) repeat scroll 0% 0% / auto padding-box border-box
+[2025-09-12T17:59:24.058Z] HTML inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.058Z] BODY inline styles: background-color: rgb(255, 255, 255); --darkreader-inline-bgcolor: var(--darkreader-background-ffffff, #181a1b);
+[2025-09-12T17:59:24.058Z] CSS Custom Properties on :root:
+[2025-09-12T17:59:24.071Z] === WINDOW LOADED - FINAL STYLES CHECK ===
+[2025-09-12T17:59:24.087Z] Early HTML background: rgb(24, 26, 27)
+[2025-09-12T17:59:24.087Z] Early BODY background: rgb(24, 26, 27)
+[2025-09-12T17:59:24.087Z] Document ready state: complete
+[2025-09-12T17:59:24.088Z] Total stylesheets loaded: 10
+[2025-09-12T17:59:24.088Z] Stylesheet 0: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css
+[2025-09-12T17:59:24.089Z] Stylesheet 1: https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600&display=swap
+[2025-09-12T17:59:24.089Z] Stylesheet 2: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 3: http://localhost:5005/styles.css
+[2025-09-12T17:59:24.089Z] Stylesheet 4: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 5: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 6: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 7: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 8: inline
+[2025-09-12T17:59:24.089Z] Stylesheet 9: inline

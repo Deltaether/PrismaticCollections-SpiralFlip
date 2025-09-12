@@ -665,12 +665,13 @@ $transition-slow: all 0.5s ease;
   margin-bottom: 4rem;
   
   .filter-container {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(248, 249, 250, 0.4) 50%, rgba(255, 255, 255, 0.45) 100%);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(15, 15, 15, 0.9) 50%, rgba(25, 25, 25, 0.85) 100%);
+    backdrop-filter: blur(15px);
     border-radius: $card-radius;
     padding: 2rem;
-    box-shadow: $card-shadow;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 

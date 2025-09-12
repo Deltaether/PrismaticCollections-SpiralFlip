@@ -30,35 +30,6 @@
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-      <div class="section-separator-triangle">
-        <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
-          <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
-        </svg>
-      </div>
-      
-      <div class="featured-grid">
-        <div *ngFor="let section of featuredSections" 
-            [class]="section.id === 'unknown-prism' ? 'prism-card' : 'feature-card'" 
-            [class.main-feature]="section.isMain"
-            [class.cd-unreadable]="section.id === 'unknown-prism'"
-            (click)="navigateTo(section.route)">
-          <div class="card-image" 
-               [style.backgroundImage]="'url(' + section.image + ')'">
-            <div class="card-overlay" *ngIf="section.id !== 'unknown-prism'"></div>
-            <div class="prism-card-overlay" *ngIf="section.id === 'unknown-prism'"></div>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">{{ section.title }}</h3>
-            <p class="card-description">{{ section.description }}</p>
-            <div class="card-action">
-              <span class="explore-link">Explore</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- Latest News Section -->
     <section class="news">

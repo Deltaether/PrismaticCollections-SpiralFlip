@@ -75,6 +75,14 @@ app-home {
   width: 100%;
 }
 
+/* DEBUG: HTML EXPLICIT WHITE BACKGROUND */
+html {
+  background-color: #ffffff !important; /* DEBUG: Explicit white background for HTML */
+  background: #ffffff !important; /* DEBUG: Force HTML background to white */
+}
+
+/* DEBUG: HTML/BODY BACKGROUND DEBUGGING MARKERS */
+/* FORCE OVERRIDE DARK READER EXTENSION */
 html, body {
   height: 100%;
   width: 100%;
@@ -82,6 +90,13 @@ html, body {
   padding: 0;
   overflow: hidden; /* Hide default scrollbar on html/body */
   position: relative;
+  
+  /* Force white background even with Dark Reader */
+  background-color: #ffffff !important;
+  --darkreader-inline-bgcolor: #ffffff !important;
+  
+  /* DEBUG: Add data attributes for debugging identification */
+  /* These will help identify which CSS rules are being applied */
   
   // Enhanced touch support
   touch-action: manipulation;
@@ -124,6 +139,8 @@ body {
   color: #333333;
   min-height: 100%;
   
+  /* DEBUG: BODY BACKGROUND RULE - EXPECTED TO BE WHITE WITH PATTERNS */
+  /* This is the main background rule that should be white with subtle patterns */
   /* Enhanced responsive background system */
   background: 
     /* Subtle blue-teal diagonal strip pattern - visible on desktop */
@@ -145,7 +162,7 @@ body {
       transparent 120px
     ),
     /* Base white color */
-    #ffffff;
+    #ffffff !important; /* DEBUG: Added !important to force white background */
   
   // Mobile background simplification for performance
   @include responsive.mobile {
@@ -343,6 +360,15 @@ section {
   position: relative;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  
+  /* Exception for news and about sections - allow natural sizing */
+  &.news,
+  &.about {
+    min-height: auto !important;
+    height: auto !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: normal !important;
+  }
 }
 
 /* CRITICAL FIX: Override scroll-indicator-section to size naturally based on content */

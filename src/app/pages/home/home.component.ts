@@ -211,7 +211,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             });
           }
         } catch (e) {
-          console.log(`Cannot access stylesheet ${index}:`, e.message);
+          console.log(`Cannot access stylesheet ${index}:`, (e as Error).message);
         }
       });
     } catch (e) {
@@ -285,6 +285,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.isDebugMode) {
       console.log('[Home] Component destroyed');
+    }
+    
+    // Clean up mutation observers
+    if (this.styleObservers) {
+      this.styleObservers.forEach(observer => observer.disconnect());
+      this.styleObservers = [];
     }
     
     // Restore original overflow settings when leaving home page

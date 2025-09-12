@@ -50,3 +50,5 @@ remote_ssh/
 # Large video files excluded from git
 dist/**/twitter_crossfade.mp4
 dist/**/twitter_crossfade2.mp4
+dist/**/animated_background.mp4
+dist/**/Phantasi2_Logo_Animated.mov

@@ -88,7 +88,8 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Hide default scrollbar on html/body */
+  /* CRITICAL FIX: Allow page-level scrolling - DON'T hide overflow globally */
+  overflow: visible; /* Enable default scrolling capability */
   position: relative;
   
   /* Force white background even with Dark Reader */
@@ -131,6 +132,65 @@ body.phantasia-album-page {
 body.home-page-active {
   overflow: auto;
   overflow-x: hidden;
+}
+
+/* FIXED: Page-specific scrollbar configurations - Allow proper scrolling */
+/* Collections page - enable scrolling with visible scrollbars */
+body.collections-page-active {
+  overflow-y: auto !important; /* FIXED: Enable vertical scrolling with visible scrollbars */
+  overflow-x: hidden !important; /* Hide horizontal scrollbar only */
+  height: 100vh !important;
+  position: relative !important;
+}
+
+/* News page - enable scrolling with visible scrollbars */
+body.news-page-active {
+  overflow-y: auto !important; /* FIXED: Enable vertical scrolling with visible scrollbars */
+  overflow-x: hidden !important; /* Hide horizontal scrollbar only */
+  height: 100vh !important;
+  position: relative !important;
+}
+
+/* Social Links page - enable scrolling with visible scrollbars */
+body.social-links-page-active {
+  overflow-y: auto !important; /* FIXED: Enable vertical scrolling with visible scrollbars */
+  overflow-x: hidden !important; /* Hide horizontal scrollbar only */
+  height: 100vh !important;
+  position: relative !important;
+}
+
+/* ENHANCED: Global mobile scrollbar support for all pages */
+@media (hover: none) and (pointer: coarse) {
+  /* Mobile-specific scrollbar defaults for all scrollable elements */
+  ::-webkit-scrollbar {
+    width: 16px !important; /* Wider for mobile touch */
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 3px solid rgba(0, 0, 0, 0.5) !important;
+    border-radius: 8px !important;
+    min-height: 40px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 8px !important;
+  }
+}
+
+/* iPhone and very small mobile devices */
+@media (max-width: 430px) {
+  ::-webkit-scrollbar {
+    width: 18px !important; /* Even wider for small screens */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border: 4px solid rgba(0, 0, 0, 0.6) !important;
+    min-height: 50px !important;
+  }
 }
 
 body {
@@ -182,33 +242,31 @@ body {
   }
 }
 
-/* Custom Scrollbar Styles - Global Default */
+/* ENHANCED: Global Default Scrollbar Styles - High Visibility */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  background: transparent;
+  width: 12px; /* Wider default scrollbar */
+  height: 12px;
+  background: rgba(0, 0, 0, 0.2); /* Dark background for contrast */
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.3); /* Darker track */
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(110, 80, 60, 0.6); /* Increased opacity from 0.3 to 0.6 for better visibility */
-  border-radius: 10px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(110, 80, 60, 0.4); /* Increased border opacity too */
-  box-shadow: 
-    inset 0 0 15px rgba(110, 80, 60, 0.6),
-    0 0 5px rgba(110, 80, 60, 0.3);
+  background: rgba(255, 255, 255, 0.8); /* High contrast white thumb */
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.2); /* Dark border for definition */
+  min-height: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(110, 80, 60, 0.8); /* Increased hover opacity from 0.5 to 0.8 */
-  box-shadow: 
-    inset 0 0 20px rgba(110, 80, 60, 0.8),
-    0 0 7px rgba(110, 80, 60, 0.4);
+  background: rgba(255, 255, 255, 1); /* Pure white on hover */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(0, 0, 0, 0.3);
 }
 
 /* Enhanced Scrollbar Styles for Phantasia Album Page */
@@ -236,10 +294,10 @@ body.phantasia-album-page::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Firefox Scrollbar Styles */
+/* ENHANCED: Firefox Scrollbar Styles - High Visibility */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(110, 80, 60, 0.5) transparent;
+  scrollbar-width: auto; /* Make Firefox scrollbars wider */
+  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.3); /* White thumb, dark track */
 }
 
 /* Firefox Scrollbar for Phantasia Album Page */

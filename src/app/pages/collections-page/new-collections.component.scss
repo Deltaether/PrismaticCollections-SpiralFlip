@@ -19,21 +19,20 @@
 
 .collections-page {
   min-height: 100vh;
-  color: #ffffff;
+  color: #333333;
   position: relative;
   overflow-x: hidden;
   margin-top: 89px;
   
-  /* Static Background: Only radial gradients and base gradient - NEVER animated */
+  /* Static Background: White gradient variations - Clean and professional */
   background: 
-    radial-gradient(ellipse at 15% 25%, rgba(74, 158, 255, 0.12) 0%, transparent 40%),
-    radial-gradient(ellipse at 85% 75%, rgba(32, 178, 170, 0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
     linear-gradient(180deg,
-      #1a1a1f 0%,
-      #1f2429 25%,
-      #242932 50%,
-      #1d2127 75%,
-      #181820 100%
+      #ffffff 0%,
+      #f8f9fa 30%,
+      #e9ecef 60%,
+      #dee2e6 100%
     );
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
@@ -620,9 +619,11 @@
     
     .title {
       font-size: 3.5rem;
-      font-weight: 800;
+      font-weight: 300;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      letter-spacing: 0.05em;
       margin-bottom: 1rem;
-      color: #ffffff;
+      color: #eeeeee;
       position: relative;
       z-index: 1;
     }
@@ -650,8 +651,8 @@
         transition: all 0.3s ease;
         
         &.primary {
-          background: linear-gradient(135deg, #ff7f50, #ff5252);
-          color: #ffffff; /* White text for dark theme */
+          background: linear-gradient(135deg, #ffffff, #f0f0f0);
+          color: #333333; /* Dark text for light theme */
           border: none;
           
           &:hover {
@@ -694,7 +695,7 @@
 .album-card {
   position: relative;
   z-index: 20; /* Ensure cards are above all background elements */
-  background: rgba(0, 0, 0, 0.7); /* Black transparent base */
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.75) 100%); /* Black glassmorphism */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
@@ -705,7 +706,7 @@
               box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
               border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
               backdrop-filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   
   /* Enable hardware acceleration */
   will-change: transform, box-shadow;
@@ -727,7 +728,7 @@
   &:hover {
     /* Use translate3d for better performance */
     transform: translate3d(0, -8px, 0);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(16px); /* Enhance blur on hover */
     -webkit-backdrop-filter: blur(16px);
     /* Enhanced box-shadow with glassmorphism effect */
@@ -749,14 +750,14 @@
   }
   
   &.featured {
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.8); /* Slightly darker for featured */
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.90) 0%, rgba(0, 0, 0, 0.80) 100%); /* Enhanced black for featured */
     backdrop-filter: blur(16px); /* Enhanced blur for featured cards */
     -webkit-backdrop-filter: blur(16px);
     
     /* Enhanced glassmorphism background for featured */
     &::before {
-      background: rgba(255, 255, 255, 0.02); /* Very subtle highlight */
+      background: rgba(0, 0, 0, 0.3); /* Black highlight for featured */
     }
     
     /* Featured label positioned properly with z-index */
@@ -765,7 +766,7 @@
       position: absolute;
       top: 1rem;
       right: 1rem;
-      background: linear-gradient(45deg, #8a2be2, #9932cc);
+      background: linear-gradient(45deg, #dc2626, #b91c1c);
       color: white;
       padding: 0.3rem 0.8rem;
       border-radius: 20px;
@@ -778,38 +779,38 @@
     }
     
     &:hover {
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
       backdrop-filter: blur(20px); /* Extra enhanced blur on hover for featured */
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7),
                   0 8px 16px rgba(255, 255, 255, 0.08);
       
       &::before {
-        background: rgba(255, 255, 255, 0.03); /* Subtle hover highlight */
+        background: rgba(0, 0, 0, 0.4); /* Black hover highlight */
       }
     }
   }
   
   &.ethereal-glassy {
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    background: rgba(0, 0, 0, 0.75); /* Slightly less transparent */
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.78) 100%); /* Black glassy effect */
     backdrop-filter: blur(15px); /* Enhanced blur for glassy effect */
     -webkit-backdrop-filter: blur(15px);
     
     /* Enhanced glassmorphism background for ethereal */
     &::before {
-      background: rgba(255, 255, 255, 0.015); /* Very subtle highlight */
+      background: rgba(0, 0, 0, 0.25); /* Black highlight for ethereal */
     }
     
     &:hover {
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.45);
       backdrop-filter: blur(18px); /* Extra enhanced blur on hover */
       -webkit-backdrop-filter: blur(18px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
                   0 8px 16px rgba(255, 255, 255, 0.06);
       
       &::before {
-        background: rgba(255, 255, 255, 0.025); /* Subtle hover highlight */
+        background: rgba(0, 0, 0, 0.35); /* Black hover highlight for ethereal */
       }
     }
   }
@@ -819,7 +820,7 @@
 .card-image {
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 260px; /* Increased further from 220px to 260px for better character head visibility */
   overflow: hidden;
   
   img {
@@ -947,7 +948,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.75) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1000,8 +1001,8 @@
 }
 
 .scroll-card {
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.75) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 15px;
   padding: 1rem;
   text-align: center;
@@ -1115,7 +1116,7 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 0.8rem;
@@ -1143,13 +1144,16 @@
   
   h1 {
     font-size: 3.5rem;
-    font-weight: 700;
+    font-weight: 300;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    letter-spacing: 0.05em;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #ff5e00, #ff8c42);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 8px rgba(255, 94, 0, 0.3);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    text-shadow: none;
   }
   
   p {
@@ -1173,11 +1177,11 @@
 
 /* Individual Collection Card - Optimized for Performance */
 .collection-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.85);
   border-radius: 18px;
   padding: 1.25rem; /* Reduced from 1.5rem to 1.25rem */
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   // Use specific transitions instead of 'all' for better performance
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   position: relative;
@@ -1215,7 +1219,7 @@
 /* Album Cover Styling - Hardware Accelerated */
 .album-cover {
   width: 100%;
-  height: 100px; /* Reduced by 100px for more compact design */
+  height: 160px; /* Increased further from 130px to 160px for better character head visibility */
   border-radius: 14px;
   overflow: hidden;
   margin-bottom: 1.25rem; /* Reduced from 1.5rem to 1.25rem */
@@ -1229,6 +1233,7 @@
     // Add hardware acceleration
     will-change: transform;
     contain: layout style paint;
+    /* Remove translateY transform */
   }
     
   &:hover img {
@@ -1279,12 +1284,12 @@
   margin-bottom: 1.2rem; /* Reduced from 2rem to 1.2rem */
       
   .tag {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 25px;
     font-size: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     // Use specific transitions for better performance
     transition: background-color 0.15s ease, border-color 0.15s ease;
     

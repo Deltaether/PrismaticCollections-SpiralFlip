@@ -1,0 +1,179 @@
+/* 
+ * Unified Square Animation System
+ * Space-like animated background elements
+ * Inspired by the Now Loading component's rune animation system
+ * Optimized for performance with hardware acceleration
+ */
+
+/* Variables - Professional Space-like Color System */
+$primary-color: #ffffff; // Pure white for highlights
+$secondary-color: #1a1a1a; // Deep charcoal black
+$tertiary-color: #f8f9fa; // Soft off-white
+$quaternary-color: #2d3436; // Refined dark gray
+$space-blue: #4a9eff; // Space blue for effects
+$cosmic-teal: #20b2aa; // Cosmic teal for variety
+
+/* Square Container - Proper Z-Index for Background */
+.squares-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0; /* Above background, below content */
+  overflow: visible;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Base Square Style */
+.square {
+  position: absolute;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  animation: none;
+
+  // Inner square element with sophisticated styling
+  .square-inner {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+      rgba(60, 60, 60, 0.4), 
+      rgba(90, 90, 90, 0.3)
+    );
+    border-radius: 2px;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    position: relative;
+
+    // Sparkle effect
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3));
+      mix-blend-mode: screen;
+      animation: sparkle calc(4s * var(--speed)) infinite linear;
+      border-radius: 2px;
+    }
+
+    // Glow effect
+    &::after {
+      content: '';
+      position: absolute;
+      width: 140%;
+      height: 140%;
+      top: -20%;
+      left: -20%;
+      background: radial-gradient(circle at center,
+        rgba(120, 200, 255, 0.15) 0%,
+        rgba(70, 150, 255, 0.1) 30%,
+        transparent 70%
+      );
+      mix-blend-mode: screen;
+      opacity: 0.5;
+      border-radius: 50%;
+    }
+  }
+
+  // Clockwise movement animation
+  &.clockwise {
+    animation: square-move-clockwise calc(8s / var(--speed)) infinite linear;
+    animation-delay: calc(var(--delay) * -1s);
+  }
+
+  // Counter-clockwise movement animation  
+  &.counter-clockwise {
+    animation: square-move-counterclockwise calc(8s / var(--speed)) infinite linear;
+    animation-delay: calc(var(--delay) * -1s);
+  }
+}
+
+/* Space-like Movement Animations */
+@keyframes square-move-clockwise {
+  0% {
+    transform: translate(0, 0) scale(var(--scale)) rotate(calc(var(--rotation-offset) * 1deg));
+  }
+  25% {
+    transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(calc((90 + var(--rotation-offset)) * 1deg));
+  }
+  50% {
+    transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(calc((180 + var(--rotation-offset)) * 1deg));
+  }
+  75% {
+    transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(calc((270 + var(--rotation-offset)) * 1deg));
+  }
+  100% {
+    transform: translate(0, 0) scale(var(--scale)) rotate(calc((360 + var(--rotation-offset)) * 1deg));
+  }
+}
+
+@keyframes square-move-counterclockwise {
+  0% {
+    transform: translate(0, 0) scale(var(--scale)) rotate(calc(var(--rotation-offset) * 1deg));
+  }
+  25% {
+    transform: translate(var(--move-x), var(--move-y)) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 90) * 1deg));
+  }
+  50% {
+    transform: translate(0, var(--move-y)) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 180) * 1deg));
+  }
+  75% {
+    transform: translate(calc(var(--move-x) * -1), 0) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 270) * 1deg));
+  }
+  100% {
+    transform: translate(0, 0) scale(var(--scale)) rotate(calc((var(--rotation-offset) - 360) * 1deg));
+  }
+}
+
+/* Sparkle Animation for Inner Elements */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive Design - Mobile Optimizations */
+@media (max-width: 768px) {
+  .squares-container {
+    // Reduce performance impact on mobile
+    .square {
+      // Simplify animations for mobile performance
+      &.clockwise,
+      &.counter-clockwise {
+        animation-duration: calc(12s / var(--speed)); // Slower animations
+      }
+      
+      .square-inner {
+        // Reduce effects on mobile
+        &::before,
+        &::after {
+          animation-duration: calc(6s * var(--speed));
+        }
+      }
+    }
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .square {
+    animation: none !important;
+    
+    .square-inner {
+      &::before,
+      &::after {
+        animation: none !important;
+      }
+    }
+  }
+}

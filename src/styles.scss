@@ -121,7 +121,7 @@ body.home-page-active {
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #ffffff;
+  color: #333333;
   min-height: 100%;
   
   /* Enhanced responsive background system */
@@ -144,19 +144,19 @@ body {
       transparent 92px,
       transparent 120px
     ),
-    /* Base dark color */
-    #0a0a0f;
+    /* Base white color */
+    #ffffff;
   
   // Mobile background simplification for performance
   @include responsive.mobile {
-    background: #0a0a0f; // Solid color on mobile
+    background: #ffffff; // Solid white color on mobile
   }
   
   // Tablet gets simplified pattern
   @include responsive.tablet {
     background: 
       linear-gradient(135deg, rgba(74, 158, 255, 0.01) 0%, transparent 50%),
-      #0a0a0f;
+      #ffffff;
   }
   
   // High DPI optimization
@@ -345,6 +345,14 @@ section {
   scroll-snap-stop: always;
 }
 
+/* CRITICAL FIX: Override scroll-indicator-section to size naturally based on content */
+.scroll-indicator-section {
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  scroll-snap-align: none !important; /* Remove scroll snap behavior for scroll indicator */
+}
+
 /* Clean up top margins but use classes for better targeting */
 .no-top-margin,
 .main-layout > .main-content,
@@ -384,12 +392,11 @@ body.phantasia-album-page .video-title-section {
   overflow: visible !important;
 }
 
-/* Make CD showcase section exactly one viewport height */
+/* Allow CD showcase section to size naturally based on content */
 body.phantasia-album-page .cd-showcase {
-  min-height: 100vh !important;
-  height: 100vh !important;
-  max-height: 100vh !important;
-  padding-top: 2vh !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
   box-sizing: border-box !important;
 }
 
@@ -410,6 +417,6 @@ body.phantasia-album-page .title-video {
   object-fit: cover !important;
   object-position: center center !important;
   
-  /* Remove transforms to prevent cutting */
-  transform: none !important;
+  /* Allow component-specific transforms for positioning */
+  /* transform: none !important; -- REMOVED to allow translateY positioning */
 }

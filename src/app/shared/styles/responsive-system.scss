@@ -526,8 +526,8 @@ $spacing-scales: (
     box-shadow: none !important;
     text-shadow: none !important;
     
-    // Simplify gradients
-    background: var(--fallback-bg, #1a1a1f) !important;
+    // Simplify gradients  
+    background: var(--fallback-bg, #ffffff) !important;
     
     // Disable animations on very small screens
     animation: none !important;
@@ -604,9 +604,9 @@ $spacing-scales: (
  * Responsive card layout
  */
 @mixin responsive-card {
+  border-radius: 8px;
   @include responsive-container;
   @include responsive-padding(1.5);
-  border-radius: 8px;
   
   @include mobile {
     border-radius: 4px;

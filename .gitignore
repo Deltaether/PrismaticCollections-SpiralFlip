@@ -52,3 +52,20 @@ dist/**/twitter_crossfade.mp4
 dist/**/twitter_crossfade2.mp4
 dist/**/animated_background.mp4
 dist/**/Phantasi2_Logo_Animated.mov
+
+# Development and debugging files
+*.png
+*.jpg
+*.jpeg
+*.txt
+*.json
+*.py
+scrollbar-debug-*
+*_debug*
+*_test*
+authenticated_*
+debug_*
+fixed_*
+responsive_*
+test_*
+image copy*

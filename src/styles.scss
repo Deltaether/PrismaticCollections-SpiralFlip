@@ -1,5 +1,8 @@
-/* Main styles file with simplified theming system */
+/* Main styles file with comprehensive responsive system */
 @use './sass-options.scss';
+
+// Import responsive system first (highest priority)
+@use './app/shared/styles/responsive-system.scss' as responsive;
 
 // Import simplified theme system
 @use './app/styles/themes/simple-theme' as theme;
@@ -79,6 +82,18 @@ html, body {
   padding: 0;
   overflow: hidden; /* Hide default scrollbar on html/body */
   position: relative;
+  
+  // Enhanced touch support
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  
+  // Safe area support for devices with notches
+  @supports (padding: env(safe-area-inset-top)) {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* Prevent scrolling only on specific pages that need it (like 3D Phantasia pages) */
@@ -86,6 +101,15 @@ body.phantasia-3d-page {
   overflow: hidden !important; /* Prevent scrolling on 3D pages */
   height: 100vh !important;
   padding-top: 0 !important; /* Remove padding on 3D pages to utilize full viewport */
+}
+
+/* Enable scrolling for Phantasia Album pages */
+body.phantasia-album-page {
+  overflow-y: scroll !important; /* Force scrollbar to always show */
+  overflow-x: hidden !important; /* Hide horizontal scrollbar */
+  height: auto !important; /* Allow height to expand with content */
+  min-height: 100vh !important; /* Ensure minimum viewport height */
+  position: relative !important; /* Ensure proper positioning */
 }
 
 /* Home page layout: simple and clean like collections */
@@ -98,9 +122,11 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #ffffff;
-  /* Enhanced global background with subtle blue-teal diagonal strips */
+  min-height: 100%;
+  
+  /* Enhanced responsive background system */
   background: 
-    /* Subtle blue-teal diagonal strip pattern - barely visible relief effect */
+    /* Subtle blue-teal diagonal strip pattern - visible on desktop */
     repeating-linear-gradient(
       -45deg,
       transparent 0px,
@@ -120,10 +146,26 @@ body {
     ),
     /* Base dark color */
     #0a0a0f;
-  min-height: 100%;
+  
+  // Mobile background simplification for performance
+  @include responsive.mobile {
+    background: #0a0a0f; // Solid color on mobile
+  }
+  
+  // Tablet gets simplified pattern
+  @include responsive.tablet {
+    background: 
+      linear-gradient(135deg, rgba(74, 158, 255, 0.01) 0%, transparent 50%),
+      #0a0a0f;
+  }
+  
+  // High DPI optimization
+  @include responsive.retina {
+    background-attachment: fixed; // Prevent pattern scaling issues
+  }
 }
 
-/* Custom Scrollbar Styles */
+/* Custom Scrollbar Styles - Global Default */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -152,10 +194,41 @@ body {
     0 0 7px rgba(110, 80, 60, 0.4);
 }
 
+/* Enhanced Scrollbar Styles for Phantasia Album Page */
+body.phantasia-album-page::-webkit-scrollbar {
+  width: 14px !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  display: block !important;
+}
+
+body.phantasia-album-page::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.9) !important;
+  border-radius: 0 !important;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1) !important;
+}
+
+body.phantasia-album-page::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffffff 0%, #e9ecef 50%, #ffffff 100%) !important;
+  border-radius: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.phantasia-album-page::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%) !important;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important;
+}
+
 /* Firefox Scrollbar Styles */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(110, 80, 60, 0.5) transparent;
+}
+
+/* Firefox Scrollbar for Phantasia Album Page */
+body.phantasia-album-page * {
+  scrollbar-width: auto !important;
+  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.9) !important;
 }
 
 /* Active link style - restrict to non-collection areas by using more specific selectors */
@@ -173,6 +246,12 @@ app-root {
   width: 100%;
   position: relative;
   overflow: hidden; /* No scrolling at app-root level */
+}
+
+/* Override app-root for phantasia album pages to allow scrolling */
+body.phantasia-album-page app-root {
+  overflow: visible !important; /* Allow scrolling to pass through */
+  height: 100vh !important;
 }
 
 /* Prevent scrolling only on specific 3D Phantasia pages */
@@ -193,6 +272,12 @@ app-root > * {
   overflow-y: auto;
   overflow-x: hidden;
   height: 100vh; /* Full viewport height */
+}
+
+/* Override main content scrolling for phantasia album pages */
+body.phantasia-album-page app-root > * {
+  overflow: visible !important; /* Let scrolling be handled by phantasia-album-page */
+  height: auto !important;
 }
 
 /* Remove scrollbar from app-home specifically */
@@ -280,4 +365,51 @@ body.collections-page {
   .collections-container {
     padding-top: 1rem !important; /* Reduced from header height since body now has 90px padding-top */
   }
+}
+
+/* Critical: Force scrollbar visibility for phantasia-album-page */
+body.phantasia-album-page {
+  overflow-y: scroll !important; /* Force scrollbar to always show */
+  overflow-x: hidden !important;
+  height: 100vh !important; /* Ensure fixed height */
+  position: relative !important;
+}
+
+/* Responsive overrides for phantasia2 component - VIEWPORT SECTIONS */
+body.phantasia-album-page .video-title-section {
+  /* Make video title section exactly one viewport height */
+  min-height: 100vh !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: visible !important;
+}
+
+/* Make CD showcase section exactly one viewport height */
+body.phantasia-album-page .cd-showcase {
+  min-height: 100vh !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding-top: 2vh !important;
+  box-sizing: border-box !important;
+}
+
+/* Make artist section exactly one viewport height */
+body.phantasia-album-page .artist-section {
+  min-height: 100vh !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding-top: 2vh !important;
+  box-sizing: border-box !important;
+}
+
+body.phantasia-album-page .title-video {
+  /* Make title video same size as title section (100vh) */
+  width: 100% !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  
+  /* Remove transforms to prevent cutting */
+  transform: none !important;
 }

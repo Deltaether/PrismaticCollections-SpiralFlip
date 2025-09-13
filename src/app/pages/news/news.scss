@@ -45,6 +45,17 @@ $transition-slow: all 0.5s ease;
   margin-top: 89px;
   scroll-behavior: smooth;
   
+  /* Static Background: White gradient variations - Clean and professional */
+  background: 
+    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
+    linear-gradient(180deg,
+      #ffffff 0%,
+      #f8f9fa 30%,
+      #e9ecef 60%,
+      #dee2e6 100%
+    );
+  
   /* ENHANCED: High-visibility scrollbar for news page */
   &::-webkit-scrollbar {
     width: 12px; /* Wider for better visibility */
@@ -94,17 +105,6 @@ $transition-slow: all 0.5s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
   }
-  
-  /* Static Background: White gradient variations - Clean and professional */
-  background: 
-    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
-    linear-gradient(180deg,
-      #ffffff 0%,
-      #f8f9fa 30%,
-      #e9ecef 60%,
-      #dee2e6 100%
-    );
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
   &::before {
@@ -266,11 +266,11 @@ $transition-slow: all 0.5s ease;
     z-index: 0;
   }
   
-  /* Apply winter text colors */
-  @include winter.winter-text-colors;
-  
   /* Let content determine height naturally */
   height: auto;
+  
+  /* Apply winter text colors */
+  @include winter.winter-text-colors;
 }
 
 /* Diagonal Line Animation Keyframes - 20 Variations Targeting the Diagonal Lines */
@@ -688,6 +688,7 @@ $transition-slow: all 0.5s ease;
     
     .title {
       @include fluid.hero-title-typography;
+      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       letter-spacing: 0.05em;
       color: #eeeeee !important;

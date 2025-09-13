@@ -13,6 +13,15 @@
 @use './app/shared/styles/header-styles.scss' as header;
 @use './app/pages/collections-page/collection-header-global.scss' as phantasia;
 
+/* Font Definitions */
+@font-face {
+  font-family: 'DALFITRA';
+  src: url('./assets/fonts/DALFITRA.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* We're keeping the existing Phantasia Project styles in their original location
    and only organizing the common/shared styles into a more maintainable structure */
 

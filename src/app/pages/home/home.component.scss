@@ -44,6 +44,9 @@ $transition: all 0.3s ease;
   overflow-y: auto;
   scroll-behavior: smooth;
   
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
+  
   /* Enhanced scrollbar styling for cross-device compatibility */
   &::-webkit-scrollbar {
     width: 4px;
@@ -93,9 +96,6 @@ $transition: all 0.3s ease;
     }
   }
   
-  /* iOS Safari specific fixes */
-  -webkit-overflow-scrolling: touch;
-  
   .anim-btn {
     width: 36px;
     height: 36px;
@@ -139,6 +139,9 @@ $transition: all 0.3s ease;
   overflow-y: auto;
   margin-top: 89px;
   scroll-behavior: smooth;
+  
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
   
   /* Enhanced scrollbar implementation for cross-device compatibility */
   &::-webkit-scrollbar {
@@ -190,9 +193,6 @@ $transition: all 0.3s ease;
       -webkit-appearance: none;
     }
   }
-  
-  /* iOS Safari specific fixes */
-  -webkit-overflow-scrolling: touch;
   
   // Use responsive performance optimizations
   @include responsive.mobile-performance-optimizations;
@@ -382,11 +382,12 @@ $transition: all 0.3s ease;
 .home-main {
   position: relative;
   z-index: 2;
-  @include responsive.responsive-container;
-  @include responsive.responsive-padding(4);
   max-width: 1200px;
   margin: 0 auto; /* Center the main container */
   width: 100%;
+  
+  @include responsive.responsive-container;
+  @include responsive.responsive-padding(4);
   
   // Responsive margins
   @include responsive.mobile {
@@ -493,6 +494,7 @@ $transition: all 0.3s ease;
       @include fluid.hero-title-typography;
       
       & {
+        font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         font-weight: 300;
         letter-spacing: 0.05em;
         background: linear-gradient(to right, #ffffff, #e0e0e0);

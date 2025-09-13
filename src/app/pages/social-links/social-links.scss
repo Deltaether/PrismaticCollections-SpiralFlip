@@ -41,6 +41,18 @@ $transition: all 0.3s ease;
   padding-top: 89px;
   scroll-behavior: smooth;
   
+  /* Static Background: White gradient variations - Clean and professional */
+  background: 
+    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
+    linear-gradient(180deg,
+      #ffffff 0%,
+      #f8f9fa 25%,
+      #f5f5f5 50%,
+      #f0f0f0 75%,
+      #eeeeee 100%
+    );
+  
   /* Performance optimizations */
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -96,18 +108,6 @@ $transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
   }
-  
-  /* Static Background: White gradient variations - Clean and professional */
-  background: 
-    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
-    linear-gradient(180deg,
-      #ffffff 0%,
-      #f8f9fa 25%,
-      #f5f5f5 50%,
-      #f0f0f0 75%,
-      #eeeeee 100%
-    );
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element - GPU ACCELERATED */
   &::before {
@@ -275,11 +275,11 @@ $transition: all 0.3s ease;
     z-index: 0;
   }
   
-  /* Apply winter text colors */
-  @include winter.winter-text-colors;
-  
   /* Let content determine height naturally */
   height: auto;
+  
+  /* Apply winter text colors */
+  @include winter.winter-text-colors;
 }
 
 /* Main Content Container - Same as collections page */
@@ -367,6 +367,7 @@ $transition: all 0.3s ease;
     
     .title {
       @include fluid.hero-title-typography;
+      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       letter-spacing: 0.05em;
       color: #eeeeee !important;

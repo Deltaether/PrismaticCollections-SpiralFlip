@@ -31,6 +31,20 @@
   margin-top: 89px;
   scroll-behavior: smooth;
   
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Static Background: White gradient variations - Clean and professional */
+  background: 
+    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
+    linear-gradient(180deg,
+      #ffffff 0%,
+      #f8f9fa 30%,
+      #e9ecef 60%,
+      #dee2e6 100%
+    );
+  
   /* ENHANCED: Ultra-thin scrollbar implementation */
   &::-webkit-scrollbar {
     width: 3px; /* Ultra-thin scrollbar */
@@ -83,20 +97,6 @@
       -webkit-appearance: none;
     }
   }
-  
-  /* iOS Safari specific fixes */
-  -webkit-overflow-scrolling: touch;
-  
-  /* Static Background: White gradient variations - Clean and professional */
-  background: 
-    radial-gradient(ellipse at 15% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 85% 75%, rgba(248, 249, 250, 0.10) 0%, transparent 45%),
-    linear-gradient(180deg,
-      #ffffff 0%,
-      #f8f9fa 30%,
-      #e9ecef 60%,
-      #dee2e6 100%
-    );
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
   &::before {
@@ -612,7 +612,7 @@
   z-index: 2;
   max-width: 1400px;
   margin: 0 auto; /* Proper horizontal centering */
-  padding: 4rem 2rem 6rem 2rem; /* Combined padding for cleaner code */
+  padding: 4rem 2rem 0 2rem; /* Removed bottom padding */
   /* Ensure all child elements are properly centered */
   display: flex;
   flex-direction: column;
@@ -693,13 +693,14 @@
     position: relative;
     
     .title {
-      @include fluid.hero-title-typography;
+      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       letter-spacing: 0.05em;
       color: #eeeeee;
       position: relative;
       z-index: 1;
       
+      @include fluid.hero-title-typography;
       @include fluid.accessible-typography;
       @include fluid.mobile-optimized-typography;
     }

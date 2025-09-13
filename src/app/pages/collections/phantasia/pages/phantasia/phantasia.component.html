@@ -10,7 +10,7 @@
 
   <!-- Video Background with Seamless Loop -->
   <div class="video-background">
-    <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
+    <video #backgroundVideo class="bg-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()" (loadeddata)="onVideoLoaded()">
       <source src="assets/3d/CD_Case/pregen_bg_optimized.mp4" type="video/mp4">
     </video>
     <div class="video-overlay"></div>
@@ -39,7 +39,6 @@
             <div class="jacket-art">
               <img src="assets/images/phantasia_1_cover_optimized.webp" alt="Project Phantasia I Album Cover" class="album-cover">
             </div>
-            <div class="jacket-spine"></div>
           </div>
           <div class="jacket-reflection"></div>
         </div>
@@ -52,27 +51,23 @@
           <div class="album-details">
             <div class="detail-item">
               <mat-icon>music_note</mat-icon>
-              <span>10 Epic Tracks</span>
+              <span>14 Tracks</span>
             </div>
             <div class="detail-item">
               <mat-icon>schedule</mat-icon>
-              <span>42 Minutes</span>
+              <span>47 Minutes</span>
             </div>
             <div class="detail-item">
               <mat-icon>style</mat-icon>
-              <span>Professional Orchestral</span>
+              <span>Ambient Fantasy Orchestral</span>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Enhanced Music Player with Modern Positioning -->
-      <div class="player-container">
-        <div class="player-header">
-          <h4>Now Playing Experience</h4>
-        </div>
-        <app-music-player></app-music-player>
-      </div>
+      <!-- Music Player directly in CD Showcase -->
+      <h4>Experience the Evolution</h4>
+      <app-music-player></app-music-player>
     </section>
 
     <!-- Artist Social Links -->

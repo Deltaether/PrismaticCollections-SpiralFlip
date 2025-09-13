@@ -366,20 +366,36 @@ $transition: all 0.3s ease;
     position: relative;
     
     .title {
-      @include fluid.hero-title-typography;
-      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      font-weight: 300;
-      letter-spacing: 0.05em;
+      position: relative;
+      z-index: 1;
+      
+      // Proper fluid scaling for hero titles - 32px to 72px
+      font-size: clamp(2rem, 4vw + 1rem, 4.5rem) !important;
+      line-height: clamp(1.1, 1.15, 1.2) !important;
+      letter-spacing: clamp(-0.025em, -0.01vw, -0.015em) !important;
+      font-weight: 800 !important;
+      
+      // DALFITRA font family with proper fallbacks
+      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+      
+      // Enhanced visual properties
       color: #eeeeee !important;
       -webkit-text-fill-color: #eeeeee !important;
       background: none !important;
       -webkit-background-clip: unset !important;
       background-clip: unset !important;
-      position: relative;
-      z-index: 1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
       
-      @include fluid.accessible-typography;
-      @include fluid.mobile-optimized-typography;
+      // Responsive adjustments for better scaling
+      @media (max-width: 768px) {
+        font-size: clamp(1.75rem, 6vw, 2.5rem) !important; // Better tablet scaling
+        font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: clamp(1.5rem, 8vw, 2rem) !important; // Optimized mobile scaling
+        font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+      }
     }
     
     .subtitle {

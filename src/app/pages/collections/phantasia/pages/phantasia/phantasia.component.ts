@@ -159,41 +159,78 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Setup seamless video looping with fade transitions
+   * Setup seamless video looping with enhanced reliability
    */
   private setupVideoLoop(): void {
     if (!this.videoElement) return;
 
-    this.videoElement.addEventListener('timeupdate', () => {
-      if (!this.videoElement) return;
-      
-      // Start fade out 1 second before video ends
-      const timeRemaining = this.videoElement.duration - this.videoElement.currentTime;
-      if (timeRemaining <= 1 && timeRemaining > 0.5) {
-        this.videoElement.style.transition = 'opacity 1s ease-out';
-        this.videoElement.style.opacity = '0.3';
+    // Set video properties for reliable looping
+    this.videoElement.loop = true;
+    this.videoElement.muted = true;
+    this.videoElement.playsInline = true;
+
+    // Add event listeners for seamless looping
+    this.videoElement.addEventListener('loadstart', () => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Video loading started');
       }
     });
 
+    this.videoElement.addEventListener('canplaythrough', () => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Video can play through');
+      }
+    });
+
+    // Handle video seeking for seamless loop
+    this.videoElement.addEventListener('timeupdate', () => {
+      if (!this.videoElement) return;
+      
+      // Ensure video doesn't get stuck at the end
+      if (this.videoElement.currentTime >= this.videoElement.duration - 0.1) {
+        this.videoElement.currentTime = 0;
+      }
+    });
+
+    // Backup loop handling
     this.videoElement.addEventListener('ended', () => {
       if (!this.videoElement) return;
       
-      // Reset and restart with fade in
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Video ended, restarting loop');
+      }
+      
+      // Immediate restart for seamless loop
       this.videoElement.currentTime = 0;
-      this.videoElement.style.opacity = '0';
       
       // Only attempt to play if user has interacted or autoplay worked initially
       if (!this.autoplayFailed || this.userHasInteracted) {
-        this.videoElement.play().then(() => {
-          if (this.videoElement) {
-            this.videoElement.style.transition = 'opacity 1.5s ease-in';
-            this.videoElement.style.opacity = '1';
-          }
-        }).catch(error => {
+        this.videoElement.play().catch(error => {
           if (this.isDebugMode) {
             console.warn('[PhantasiaComponent] Video replay failed:', error);
           }
         });
+      }
+    });
+
+    // Handle video errors
+    this.videoElement.addEventListener('error', (e) => {
+      if (this.isDebugMode) {
+        console.error('[PhantasiaComponent] Video error:', e);
+      }
+    });
+
+    // Handle video stalling
+    this.videoElement.addEventListener('stalled', () => {
+      if (this.isDebugMode) {
+        console.warn('[PhantasiaComponent] Video stalled');
+      }
+    });
+
+    // Handle video waiting
+    this.videoElement.addEventListener('waiting', () => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Video waiting for data');
       }
     });
   }

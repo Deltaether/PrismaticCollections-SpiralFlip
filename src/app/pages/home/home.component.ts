@@ -6,7 +6,6 @@ import { takeUntil } from 'rxjs/operators';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
 import { ResponsiveService } from '../../shared/services/responsive.service';
-import { ResponsiveFromDirective, ResponsiveToDirective } from '../../shared/directives/responsive.directive';
 
 /**
  * Main homepage component for Prismatic Collections
@@ -20,9 +19,7 @@ import { ResponsiveFromDirective, ResponsiveToDirective } from '../../shared/dir
     CommonModule, 
     RouterModule, 
     SiteHeaderComponent, 
-    SquaresAnimationComponent,
-    ResponsiveFromDirective,
-    ResponsiveToDirective
+    SquaresAnimationComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],

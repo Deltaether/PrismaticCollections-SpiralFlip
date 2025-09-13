@@ -693,16 +693,30 @@
     position: relative;
     
     .title {
-      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      font-weight: 300;
-      letter-spacing: 0.05em;
-      color: #eeeeee;
       position: relative;
       z-index: 1;
       
-      @include fluid.hero-title-typography;
-      @include fluid.accessible-typography;
-      @include fluid.mobile-optimized-typography;
+      // Proper fluid scaling for hero titles - 32px to 72px
+      font-size: clamp(2rem, 4vw + 1rem, 4.5rem) !important;
+      line-height: clamp(1.1, 1.15, 1.2) !important;
+      letter-spacing: clamp(-0.025em, -0.01vw, -0.015em) !important;
+      font-weight: 800 !important;
+      
+      // DALFITRA font family with proper fallbacks
+      font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+      
+      // Enhanced visual properties
+      color: #eeeeee !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+      
+      // Responsive adjustments for better scaling
+      @media (max-width: 768px) {
+        font-size: clamp(1.75rem, 6vw, 2.5rem) !important; // Better tablet scaling
+      }
+      
+      @media (max-width: 480px) {
+        font-size: clamp(1.5rem, 8vw, 2rem) !important; // Optimized mobile scaling
+      }
     }
     
     .subtitle {
@@ -1238,7 +1252,7 @@
   h1 {
     font-size: 3.5rem;
     font-weight: 300;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     letter-spacing: 0.05em;
     margin-bottom: 1rem;
     color: #ffffff !important;

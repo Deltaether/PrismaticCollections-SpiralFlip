@@ -154,6 +154,91 @@ export class NewCollectionsComponent implements OnInit, OnDestroy, AfterViewInit
     }
   }
 
+  /**
+   * Check if scrollbar is necessary based on number of cards and viewport overflow
+   */
+  private checkScrollbarNecessity(): void {
+    const collectionsPage = this.elementRef.nativeElement.querySelector('.collections-page');
+    if (!collectionsPage) return;
+
+    const cardCount = this.albums.length;
+    const hasOverflow = this.checkForOverflow(collectionsPage);
+
+    // If 3 or less cards and no overflow, hide scrollbar
+    if (cardCount <= 3 && !hasOverflow) {
+      this.hideScrollbar(collectionsPage);
+    } else {
+      // If more than 3 cards OR there's overflow, show scrollbar
+      this.showScrollbar(collectionsPage);
+    }
+  }
+
+  /**
+   * Check if content overflows the viewport
+   */
+  private checkForOverflow(element: HTMLElement): boolean {
+    const elementRect = element.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    
+    // Check if any card extends beyond the viewport
+    const cards = element.querySelectorAll('.album-card, .collection-card');
+    for (let i = 0; i < cards.length; i++) {
+      const cardRect = cards[i].getBoundingClientRect();
+      if (cardRect.bottom > viewportHeight) {
+        return true;
+      }
+    }
+
+    // Also check if the overall content height exceeds viewport
+    return element.scrollHeight > element.clientHeight;
+  }
+
+  /**
+   * Hide scrollbar by setting overflow-y to hidden
+   */
+  private hideScrollbar(element: HTMLElement): void {
+    element.style.overflowY = 'hidden';
+    element.classList.add('no-scroll');
+  }
+
+  /**
+   * Show scrollbar by setting overflow-y to auto
+   */
+  private showScrollbar(element: HTMLElement): void {
+    element.style.overflowY = 'auto';
+    element.classList.remove('no-scroll');
+  }
+
+  /**
+   * Setup resize observer to recheck scrollbar necessity on viewport changes
+   */
+  private setupResizeObserver(): void {
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.checkScrollbarNecessity();
+      });
+
+      const collectionsPage = this.elementRef.nativeElement.querySelector('.collections-page');
+      if (collectionsPage) {
+        this.resizeObserver.observe(collectionsPage);
+      }
+    }
+  }
+
+  /**
+   * Handle window resize events
+   */
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    // Debounce resize checks
+    if (this.scrollTimer) {
+      clearTimeout(this.scrollTimer);
+    }
+    this.scrollTimer = setTimeout(() => {
+      this.checkScrollbarNecessity();
+    }, 150);
+  }
+
 
   /* Navigate to Album */
   navigateToAlbum(albumId: string): void {

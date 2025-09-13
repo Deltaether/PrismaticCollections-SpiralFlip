@@ -20,9 +20,10 @@
 /* Collections Page - Album Cards Implementation */
 
 .collections-page {
-  /* CRITICAL FIX: Force proper scrolling container with guaranteed content overflow */
-  min-height: calc(100vh + 400px); /* Force content to be much taller than viewport */
-  height: 100vh; /* FIXED: Constrain container to viewport height to force scrolling */
+  /* FIXED: Proper height management accounting for header to prevent viewport overflow */
+  height: calc(100vh - 89px); /* Exact height minus header to prevent overflow */
+  max-height: calc(100vh - 89px); /* Maximum height constraint to prevent viewport overflow */
+  min-height: calc(100vh - 89px); /* Minimum height matches calculated height */
   color: #333333;
   position: relative;
   overflow-x: hidden;
@@ -30,62 +31,55 @@
   margin-top: 89px;
   scroll-behavior: smooth;
   
-  /* ENHANCED: High-visibility scrollbar implementation for all browsers */
+  /* ENHANCED: Ultra-thin scrollbar implementation */
   &::-webkit-scrollbar {
-    width: 12px; /* Wider for better visibility */
-    height: 12px;
-    background: rgba(0, 0, 0, 0.3); /* Dark background */
+    width: 3px; /* Ultra-thin scrollbar */
+    height: 3px;
+    background: rgba(0, 0, 0, 0.15); /* Very subtle background */
   }
   
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.4); /* Darker track for contrast */
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2); /* Subtle track like Home component */
+    border-radius: 2px;
+    margin: 2px;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.9); /* High contrast white thumb */
-    border-radius: 6px;
-    min-height: 30px;
-    border: 2px solid rgba(0, 0, 0, 0.3); /* Dark border for definition */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.4); /* Subtle thumb like Home component */
+    border-radius: 2px;
+    min-height: 20px;
     
     &:hover {
-      background: rgba(255, 255, 255, 1); /* Pure white on hover */
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+      background: rgba(255, 255, 255, 0.6); /* Slightly brighter on hover */
     }
     
     &:active {
-      background: rgba(240, 240, 240, 1);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.8);
     }
   }
   
   /* Enhanced Firefox scrollbar styling */
-  scrollbar-width: auto; /* Make scrollbar wider in Firefox */
-  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.4);
+  scrollbar-width: thin; /* Thin scrollbar for Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
   
   /* ENHANCED: Mobile scrollbar visibility for touch devices */
   @media (hover: none) and (pointer: coarse) {
     &::-webkit-scrollbar {
-      width: 16px; /* Much wider for mobile touch */
-      background: rgba(0, 0, 0, 0.5);
+      width: 4px; /* Thin for mobile touch */
+      background: rgba(0, 0, 0, 0.25);
       -webkit-appearance: none;
     }
     
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.95); /* High contrast for mobile */
-      border-radius: 8px;
-      border: 3px solid rgba(0, 0, 0, 0.5);
-      min-height: 40px; /* Large touch target */
+      background: rgba(255, 255, 255, 0.5); /* Visible for mobile */
+      border-radius: 3px;
+      min-height: 30px; /* Touch target */
       -webkit-appearance: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
     
     &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.6); /* Dark track for contrast */
-      border-radius: 8px;
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3); /* Subtle track */
+      border-radius: 3px;
       -webkit-appearance: none;
     }
   }
@@ -612,17 +606,20 @@
   }
 }
 
-/* FIXED: Main Content Container with guaranteed content height */
+/* FIXED: Main Content Container with improved centering and layout */
 .collections-main {
   position: relative;
   z-index: 2;
-  padding: 0 2rem;
   max-width: 1400px;
-  margin: 0 auto;
-  padding-top: 4rem;
-  padding-bottom: 12rem; /* MASSIVE bottom padding to guarantee scrolling */
-  /* CRITICAL FIX: Force content much taller than viewport */
-  min-height: calc(100vh + 600px); /* Ensure significant content overflow */
+  margin: 0 auto; /* Proper horizontal centering */
+  padding: 4rem 2rem 6rem 2rem; /* Combined padding for cleaner code */
+  /* Ensure all child elements are properly centered */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Hero Section - Exact copy from home page */
@@ -757,19 +754,28 @@
   }
 }
 
-/* Albums Container */
+/* Albums Container - Improved centering */
 .albums-container {
   position: relative;
   width: 100%;
-  margin: 2rem 0;
+  max-width: 1200px; /* Constrain container width */
+  margin: 2rem auto; /* Center the container */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Albums Grid */
+/* Albums Grid - Enhanced centering and responsive layout */
 .albums-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
   padding: 1rem 0;
+  justify-items: center; /* Center grid items for better alignment */
+  place-items: center; /* Center both horizontally and vertically */
+  max-width: 100%; /* Prevent grid overflow */
+  width: 100%;
+  margin: 0 auto; /* Additional centering */
 }
 
 /* Album Card - Black Glassy Theme */
@@ -1434,17 +1440,17 @@
   }
 }
 
-/* ENHANCED: Mobile-specific scrollbar visibility with guaranteed content overflow */
+/* ENHANCED: Mobile-specific layout improvements */
 @media (max-width: 768px) {
   .collections-page {
-    /* CRITICAL FIX: Force massive content height for mobile */
-    min-height: calc(100vh + 800px) !important;
-    height: 100vh !important; /* Fixed viewport height for scrolling */
+    /* FIXED: Natural height instead of forced massive height */
+    min-height: 100vh;
+    height: auto; /* Natural height for mobile */
     
     /* Mobile-specific scrollbar enhancements */
     &::-webkit-scrollbar {
-      width: 18px !important; /* Extra wide for mobile */
-      background: rgba(0, 0, 0, 0.6) !important;
+      width: 3px !important; /* Very thin for mobile */
+      background: rgba(0, 0, 0, 0.3) !important;
     }
     
     &::-webkit-scrollbar-thumb {
@@ -1456,10 +1462,8 @@
   }
   
   .collections-main {
-    padding: 0 1rem;
-    /* CRITICAL FIX: Enormous bottom padding for mobile scrolling */
-    padding-bottom: 20rem !important;
-    min-height: calc(100vh + 800px) !important;
+    padding: 2rem 1rem 8rem 1rem; /* Extra bottom padding to ensure scrolling works */
+    min-height: auto; /* Let content determine height naturally */
   }
   
   .page-header {
@@ -1488,17 +1492,17 @@
   }
 }
 
-/* ENHANCED: iPhone and mobile device specific scrollbar optimizations */
+/* ENHANCED: iPhone and mobile device specific optimizations */
 @media (max-width: 430px) {
   .collections-page {
-    /* CRITICAL FIX: Extreme content height for iPhone scrolling */
-    min-height: calc(100vh + 1000px) !important;
-    height: 100vh !important; /* Viewport height constraint for overflow */
+    /* FIXED: Natural height instead of extreme forced height */
+    min-height: 100vh;
+    height: auto; /* Natural height for iPhone */
     
     /* iPhone-specific scrollbar styling for maximum visibility */
     &::-webkit-scrollbar {
-      width: 20px !important; /* Maximum width for iPhone */
-      background: rgba(0, 0, 0, 0.8) !important;
+      width: 3px !important; /* Very thin for iPhone */
+      background: rgba(0, 0, 0, 0.4) !important;
     }
     
     &::-webkit-scrollbar-thumb {
@@ -1511,8 +1515,8 @@
   }
   
   .collections-main {
-    padding-bottom: 25rem !important; /* Extreme padding for iPhone */
-    min-height: calc(100vh + 1000px) !important;
+    padding: 2rem 1rem 10rem 1rem; /* Extra bottom padding for iPhone scrolling */
+    min-height: auto; /* Let content determine height naturally */
   }
 }
 

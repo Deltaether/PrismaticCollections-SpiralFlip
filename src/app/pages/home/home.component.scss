@@ -72,7 +72,7 @@ $transition: all 0.3s ease;
   
   /* Firefox scrollbar styling */
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
+  scrollbar-color: rgba(255, 255, 255, 0.7) rgba(0, 0, 0, 0.3); /* More visible for Firefox */
   
   /* Mobile touch device optimizations */
   @media (hover: none) and (pointer: coarse) {
@@ -130,7 +130,9 @@ $transition: all 0.3s ease;
 
 /* Home Page Container - Responsive Design */
 .home-page {
-  @include responsive.full-viewport-height;
+  height: calc(100vh - 89px); /* Exact height minus header to prevent overflow */
+  max-height: calc(100vh - 89px); /* Maximum height constraint to prevent viewport overflow */
+  min-height: calc(100vh - 89px); /* Minimum height matches calculated height */
   color: #333333;
   position: relative;
   overflow-x: hidden;
@@ -145,28 +147,30 @@ $transition: all 0.3s ease;
   }
   
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3); /* Slightly darker track for contrast */
     border-radius: 2px;
     margin: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
   }
   
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.7); /* More visible scrollbar thumb */
     border-radius: 2px;
     min-height: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Border for better definition */
     
     &:hover {
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.9); /* Brighter on hover */
     }
     
     &:active {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 1); /* Fully opaque when active */
     }
   }
   
   /* Firefox scrollbar styling */
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
+  scrollbar-color: rgba(255, 255, 255, 0.7) rgba(0, 0, 0, 0.3); /* More visible for Firefox */
   
   /* Force scrollbar to be visible on touch devices */
   @media (hover: none) and (pointer: coarse) {

@@ -1,31 +1,6 @@
 <!-- Collections Page - Fresh Implementation -->
 <div class="collections-page anim-c">
   
-  <!-- Debug Panel -->
-  <div class="debug-panel" [class.open]="showDebugPanel">
-    <div class="debug-header">
-      <h3>🔍 Scrollbar Debug Panel</h3>
-      <button class="debug-close" (click)="toggleDebugPanel()">×</button>
-    </div>
-    <div class="debug-content">
-      <div class="debug-buttons">
-        <button (click)="downloadLogs()" class="debug-btn download">📥 Download Logs</button>
-        <button (click)="forceScrollTest()" class="debug-btn test">🔄 Force Scroll Test</button>
-        <button (click)="inspectElement()" class="debug-btn inspect">🔬 Inspect Element</button>
-        <button (click)="analyzeScrollbarSetup()" class="debug-btn analyze">📊 Re-analyze</button>
-      </div>
-      <div class="debug-logs">
-        <div class="log-entry" *ngFor="let log of debugLogs.slice(-20)">
-          {{ log }}
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Debug Toggle Button (Fixed Position) -->
-  <button class="debug-toggle" (click)="toggleDebugPanel()" [class.active]="showDebugPanel">
-    🔍 DEBUG
-  </button>
   
   <!-- Site Header -->
   <app-site-header></app-site-header>

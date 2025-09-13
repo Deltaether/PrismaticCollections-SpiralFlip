@@ -78,16 +78,8 @@ export class HomeComponent implements OnInit, OnDestroy {
    * 【✓】
    */
   ngOnInit(): void {
-    if (this.isDebugMode) {
-      console.log('[Home] Component initialized');
-    }
-    console.log('HOME COMPONENT LOADED - VERSION 3 (Scroll Fix Applied)');
-    
     // Enable scrolling for home page by adding body class only
     this.document.body.classList.add('home-page-active');
-    
-    // Log the featuredSections to verify the correct data
-    console.log('Featured Sections:', this.featuredSections);
   }
 
 
@@ -105,9 +97,6 @@ export class HomeComponent implements OnInit, OnDestroy {
    * 【✓】
    */
   ngOnDestroy(): void {
-    if (this.isDebugMode) {
-      console.log('[Home] Component destroyed');
-    }
     
     // Restore original overflow settings when leaving home page
     this.document.body.classList.remove('home-page-active');

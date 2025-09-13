@@ -36,9 +36,6 @@ interface Album {
 })
 export class NewCollectionsComponent implements OnInit, OnDestroy {
   
-  // Debug logging system
-  public debugLogs: string[] = [];
-  public showDebugPanel = false;
   
   /* Albums/Prisms Data */
   albums: Album[] = [
@@ -157,8 +154,6 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
     this.document.body.classList.add('collections-page-active');
     this.setupScrollbarVisibility();
     
-    // Initialize debug logging
-    this.initializeDebugLogging();
   }
 
   ngOnDestroy(): void {
@@ -222,161 +217,4 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
     return album.id;
   }
   
-  // Debug logging system
-  private initializeDebugLogging(): void {
-    this.log('=== SCROLLBAR DEBUG LOGGING INITIALIZED ===');
-    this.log(`Timestamp: ${new Date().toISOString()}`);
-    this.log(`User Agent: ${navigator.userAgent}`);
-    this.log(`Is iOS: ${this.isIOS}`);
-    this.log(`Screen Size: ${window.screen.width}x${window.screen.height}`);
-    this.log(`Viewport Size: ${window.innerWidth}x${window.innerHeight}`);
-    
-    // Initial analysis
-    setTimeout(() => {
-      this.analyzeScrollbarSetup();
-      // Start periodic monitoring
-      this.debugTimer = setInterval(() => {
-        this.monitorScrollState();
-      }, 2000);
-    }, 1000);
-  }
-  
-  private log(message: string): void {
-    const timestamp = new Date().toLocaleTimeString();
-    const logMessage = `[${timestamp}] ${message}`;
-    this.debugLogs.push(logMessage);
-    console.log('🔍 SCROLLBAR DEBUG:', logMessage);
-  }
-  
-  public analyzeScrollbarSetup(): void {
-    this.log('\n--- INITIAL SCROLLBAR ANALYSIS ---');
-    
-    const collectionsPage = this.document.querySelector('.collections-page') as HTMLElement;
-    if (collectionsPage) {
-      this.log('✅ Collections page element found');
-      
-      // Get computed styles
-      const computed = window.getComputedStyle(collectionsPage);
-      this.log(`Overflow-X: ${computed.overflowX}`);
-      this.log(`Overflow-Y: ${computed.overflowY}`);
-      this.log(`Height: ${computed.height}`);
-      this.log(`Max-Height: ${computed.maxHeight}`);
-      this.log(`Position: ${computed.position}`);
-      
-      // Check dimensions
-      const rect = collectionsPage.getBoundingClientRect();
-      this.log(`Element dimensions: ${rect.width}x${rect.height}`);
-      this.log(`Scroll dimensions: ${collectionsPage.scrollWidth}x${collectionsPage.scrollHeight}`);
-      this.log(`Client dimensions: ${collectionsPage.clientWidth}x${collectionsPage.clientHeight}`);
-      
-      // Check if scrollable
-      const isVerticallyScrollable = collectionsPage.scrollHeight > collectionsPage.clientHeight;
-      const isHorizontallyScrollable = collectionsPage.scrollWidth > collectionsPage.clientWidth;
-      this.log(`Is vertically scrollable: ${isVerticallyScrollable}`);
-      this.log(`Is horizontally scrollable: ${isHorizontallyScrollable}`);
-      
-      // Check scrollbar styles
-      this.log('\n--- CSS SCROLLBAR PROPERTIES ---');
-      const scrollbarWidth = computed.getPropertyValue('--webkit-scrollbar-width') || 'not set';
-      this.log(`Webkit scrollbar width: ${scrollbarWidth}`);
-      
-      // Check for webkit scrollbar support
-      const supportsWebkitScrollbar = 'WebkitAppearance' in document.documentElement.style;
-      this.log(`Supports webkit scrollbar: ${supportsWebkitScrollbar}`);
-      
-      // Check scrollbar color properties
-      this.log(`Scrollbar-width: ${computed.scrollbarWidth}`);
-      this.log(`Scrollbar-color: ${computed.scrollbarColor}`);
-      
-    } else {
-      this.log('❌ Collections page element NOT found');
-    }
-    
-    // Check body and html overflow
-    const body = this.document.body;
-    const html = this.document.documentElement;
-    const bodyStyles = window.getComputedStyle(body);
-    const htmlStyles = window.getComputedStyle(html);
-    
-    this.log('\n--- BODY & HTML OVERFLOW ---');
-    this.log(`Body overflow: ${bodyStyles.overflow}, ${bodyStyles.overflowX}, ${bodyStyles.overflowY}`);
-    this.log(`HTML overflow: ${htmlStyles.overflow}, ${htmlStyles.overflowX}, ${htmlStyles.overflowY}`);
-    this.log(`Body height: ${bodyStyles.height}, Body max-height: ${bodyStyles.maxHeight}`);
-    this.log(`HTML height: ${htmlStyles.height}, HTML max-height: ${htmlStyles.maxHeight}`);
-  }
-  
-  private monitorScrollState(): void {
-    const collectionsPage = this.document.querySelector('.collections-page') as HTMLElement;
-    if (collectionsPage) {
-      const scrollTop = collectionsPage.scrollTop;
-      const scrollLeft = collectionsPage.scrollLeft;
-      const maxScrollTop = collectionsPage.scrollHeight - collectionsPage.clientHeight;
-      const maxScrollLeft = collectionsPage.scrollWidth - collectionsPage.clientWidth;
-      
-      if (scrollTop > 0 || scrollLeft > 0) {
-        this.log(`Scroll position: top=${scrollTop}/${maxScrollTop}, left=${scrollLeft}/${maxScrollLeft}`);
-      }
-    }
-  }
-  
-  // Public methods for UI interaction
-  toggleDebugPanel(): void {
-    this.showDebugPanel = !this.showDebugPanel;
-    this.log(`Debug panel ${this.showDebugPanel ? 'opened' : 'closed'}`);
-  }
-  
-  downloadLogs(): void {
-    const logData = this.debugLogs.join('\n');
-    const blob = new Blob([logData], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = this.document.createElement('a');
-    a.href = url;
-    a.download = `scrollbar-debug-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    this.log('Debug logs downloaded');
-  }
-  
-  forceScrollTest(): void {
-    this.log('\n--- FORCE SCROLL TEST ---');
-    const collectionsPage = this.document.querySelector('.collections-page') as HTMLElement;
-    if (collectionsPage) {
-      // Try to scroll programmatically
-      collectionsPage.scrollTop = 100;
-      setTimeout(() => {
-        this.log(`After force scroll - scrollTop: ${collectionsPage.scrollTop}`);
-        this.analyzeScrollbarSetup();
-      }, 100);
-    }
-  }
-  
-  inspectElement(): void {
-    this.log('\n--- ELEMENT INSPECTION ---');
-    const collectionsPage = this.document.querySelector('.collections-page') as HTMLElement;
-    if (collectionsPage) {
-      // Log all applied CSS classes
-      this.log(`CSS Classes: ${collectionsPage.className}`);
-      
-      // Log all inline styles
-      this.log(`Inline styles: ${collectionsPage.style.cssText || 'none'}`);
-      
-      // Check parent element
-      const parent = collectionsPage.parentElement;
-      if (parent) {
-        const parentStyles = window.getComputedStyle(parent);
-        this.log(`Parent tag: ${parent.tagName}`);
-        this.log(`Parent overflow: ${parentStyles.overflow}, ${parentStyles.overflowX}, ${parentStyles.overflowY}`);
-        this.log(`Parent height: ${parentStyles.height}`);
-      }
-      
-      // Check all child elements that might affect scrolling
-      const children = Array.from(collectionsPage.children);
-      children.forEach((child, index) => {
-        if (child instanceof HTMLElement) {
-          const childStyles = window.getComputedStyle(child);
-          this.log(`Child ${index} (${child.tagName}): position=${childStyles.position}, height=${childStyles.height}`);
-        }
-      });
-    }
-  }
 }

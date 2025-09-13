@@ -111,6 +111,13 @@ $header-height: 90px; // Height of the site-header
   width: 100%;
   padding: 0;
   padding-top: 0; // Remove padding as phantasia page handles its own spacing
+  
+  // FIXED: Remove margin-top as phantasia2 component handles its own positioning
+  // The phantasia-album-page class manages the full viewport layout
+  margin-top: 0;
+  
+  // Add padding-right equivalent to scrollbar width (automatically calculated)
+  padding-right: calc(100vw - 100%);
 }
 
 // Footer styles

@@ -49,8 +49,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
 // Album page container with proper scroll handling
 .phantasia-album-page {
-  position: relative; // Changed from fixed to allow natural document flow
-  top: 0; // Reset top positioning
+  position: fixed; // FIXED: Use fixed positioning for full viewport control
+  top: 0; // Start from top of viewport
   left: 0;
   width: 100vw;
   height: 100vh !important; // Fixed viewport height for scrollable container
@@ -100,19 +100,20 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     background: rgba(0, 0, 0, 0.95) !important; // Match track background
   }
   
-  /* Critical Fix: Mobile header height adjustment for gap issue */
+  /* FIXED: Mobile adjustments only when header is NOT inside phantasia layout */
+  /* These adjustments are handled by the conditional header display logic */
   @media (max-width: 770px) {
-    /* Mobile viewport adjustments - match site-header mobile height of 70px */
-    top: 70px;
-    height: calc(100vh - 70px);
+    /* Mobile viewport - full viewport when inside phantasia layout */
+    top: 0;
+    height: 100vh;
     max-width: 100vw;
-    max-height: calc(100vh - 70px);
+    max-height: 100vh;
   }
   
   @media (max-width: 480px) {
-    /* Ultra-mobile viewport adjustments - maintain 70px header height */
-    top: 70px; 
-    height: calc(100vh - 70px);
+    /* Ultra-mobile viewport - full viewport when inside phantasia layout */
+    top: 0; 
+    height: 100vh;
   }
 }
 
@@ -153,7 +154,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 }
 
-// Main Album Presentation Container with natural document flow  
+// Main Album Presentation Container with optimized flow  
 .album-presentation {
   position: relative; // Natural document flow
   z-index: 1;
@@ -161,7 +162,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   height: auto; // FIXED: Remove forced height that created blank space
   min-height: auto; // FIXED: Allow natural content height
   width: 100vw;
-  margin-left: calc(-50vw + 50%); // Center the full-width content
+  margin-left: 0; // FIXED: Remove complex centering as container is already full width
   overflow: visible; // Remove scroll handling from this container
   scroll-behavior: smooth; // Enable smooth scrolling
   
@@ -307,7 +308,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       cursor: pointer;
       margin: 0 auto; // No top margin - directly below video title
       padding: 0.75rem 1rem;
-      padding-bottom: clamp(5vh, 10vh, 15vh); // Responsive padding-bottom with viewport units and bounds
+      padding-top: 42vh; // Fixed 42 viewport units spacing
+      padding-bottom: 0; // Reset bottom padding
       z-index: 10;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       
@@ -353,6 +355,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
   }
   
+  /* 【✓】 Move title video lower for improved visual separation */
   .title-video {
     width: clamp(70vw, 90vw, 110vw) !important; /* Increased responsive width with bounds */
     height: clamp(35vh, 50vh, 65vh) !important; /* Increased responsive height with bounds */
@@ -360,8 +363,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     margin: 0 auto !important;
     object-fit: cover !important;
     object-position: center center !important; /* Better centering */
-    transform: translateY(clamp(10vh, 15vh, 20vh)) !important; /* Move video title lower */
-    
+    /* Moved video title even lower (was clamp(18vh, 25vh, 32vh)) */
+    transform: translateY(clamp(24vh, 32vh, 40vh)) !important; /* Lowered by +6vh across all breakpoints */
     // GPU acceleration for smooth video scaling
     will-change: transform, filter;
     backface-visibility: hidden;
@@ -790,7 +793,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   -webkit-backdrop-filter: blur(0.56vw) saturate(1.2);
   border-radius: 1.94vw; /* 28px → responsive border radius */
   border: 0.07vw solid rgba(255, 255, 255, 0.15); /* 1px → responsive border */
-  margin: 0 auto; /* FIXED: Eliminate ALL top margin between sections */
+  margin: 2rem auto 0; /* FIXED: Add proper top margin for section spacing */
   max-width: min(83.33vw, 1200px); /* Responsive max-width with absolute limit */
   padding: 2.08vw 1.39vw; /* 3rem 2rem → responsive padding */
   position: relative;
@@ -1001,7 +1004,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   background: rgba(0, 0, 0, 0.9);
   color: white;
   padding: 2rem 2rem 1.5rem; // FIXED: Reduced footer padding
-  margin-top: 1rem; // FIXED: Reduced top margin
+  margin-top: 2rem; // FIXED: Proper top margin for footer spacing
   
   .footer-content {
     max-width: 1200px;

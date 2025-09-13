@@ -54,22 +54,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/collections-page/new-collections.component').then(m => m.NewCollectionsComponent)
       },
       {
-        path: 'disc-one',
-        loadComponent: () => import('./pages/collections/phantasia/pages/disc-one/disc-one.component').then(m => m.DiscOneComponent)
-      },
-      {
-        path: 'disc-two',
-        loadComponent: () => import('./pages/collections/phantasia/pages/disc-two/disc-two.component').then(m => m.DiscTwoComponent)
-      },
-      {
-        path: 'information',
-        loadComponent: () => import('./pages/collections/phantasia/pages/information/information.component').then(m => m.InformationComponent)
-      },
-      {
-        path: 'pv',
-        loadComponent: () => import('./pages/collections/phantasia/pages/pv/pv.component').then(m => m.PvComponent)
-      },
-      {
         path: 'phantasia2',
         loadComponent: () => import('./pages/collections/phantasia/pages/phantasia2/phantasia2').then(m => m.Phantasia2Component)
       }
@@ -84,46 +68,6 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./pages/collections/phantasia/pages/phantasia/phantasia.component').then(m => m.PhantasiaComponent)
-      }
-    ]
-  },
-  {
-    path: 'disc-1',
-    loadComponent: () => import('./pages/collections/phantasia/layout/layout.component').then(m => m.PhantasiaLayoutComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/collections/phantasia/pages/disc-one/disc-one.component').then(m => m.DiscOneComponent)
-      }
-    ]
-  },
-  {
-    path: 'disc-2',
-    loadComponent: () => import('./pages/collections/phantasia/layout/layout.component').then(m => m.PhantasiaLayoutComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/collections/phantasia/pages/disc-two/disc-two.component').then(m => m.DiscTwoComponent)
-      }
-    ]
-  },
-  {
-    path: 'pv',
-    loadComponent: () => import('./pages/collections/phantasia/layout/layout.component').then(m => m.PhantasiaLayoutComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/collections/phantasia/pages/pv/pv.component').then(m => m.PvComponent)
-      }
-    ]
-  },
-  {
-    path: 'information',
-    loadComponent: () => import('./pages/collections/phantasia/layout/layout.component').then(m => m.PhantasiaLayoutComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./pages/collections/phantasia/pages/information/information.component').then(m => m.InformationComponent)
       }
     ]
   },
@@ -142,14 +86,4 @@ export const routes: Routes = [
     redirectTo: 'phantasia/collections',
     pathMatch: 'full'
   },
-  {
-    path: 'disc-one',
-    redirectTo: 'phantasia/disc-one',
-    pathMatch: 'full'
-  },
-  {
-    path: 'disc-two',
-    redirectTo: 'phantasia/disc-two',
-    pathMatch: 'full'
-  }
 ]; 

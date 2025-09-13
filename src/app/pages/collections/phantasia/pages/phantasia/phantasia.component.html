@@ -8,11 +8,19 @@
   <!-- Site Header - only shown when not inside the phantasia layout -->
   <app-site-header *ngIf="!isInsidePhantasiaLayout"></app-site-header>
 
-  <!-- Video Background with Seamless Loop -->
+  <!-- Dual Video Background System -->
   <div class="video-background">
-    <video #backgroundVideo class="bg-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()" (loadeddata)="onVideoLoaded()">
+    <!-- Base video layer (new intro loop at 100% opacity) -->
+    <video #baseVideo class="base-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onBaseVideoLoaded()" (canplay)="onBaseVideoLoaded()" (loadeddata)="onBaseVideoLoaded()">
+      <source src="assets/images/intro_loop_vp9_optimized.webm" type="video/webm">
+      <source src="assets/images/Intro_to_loop_part_two_real.mp4" type="video/mp4">
+    </video>
+    
+    <!-- Filter video layer (original video at 20% opacity on top) -->
+    <video #backgroundVideo class="bg-video filter-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()" (loadeddata)="onVideoLoaded()">
       <source src="assets/3d/CD_Case/pregen_bg_optimized.mp4" type="video/mp4">
     </video>
+    
     <div class="video-overlay"></div>
   </div>
 

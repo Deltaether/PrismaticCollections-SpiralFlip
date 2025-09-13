@@ -33,6 +33,7 @@ import { LoadingScreenComponent } from '../../../../../components/loading-screen
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhantasiaComponent implements OnInit, OnDestroy {
+  @ViewChild('baseVideo', { static: false }) baseVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('backgroundVideo', { static: false }) backgroundVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('titleVideo', { static: false }) titleVideo!: ElementRef<HTMLVideoElement>;
 
@@ -42,6 +43,7 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
 
   // Video loading and fade control
   private videoLoaded = false;
+  private baseVideoElement: HTMLVideoElement | null = null;
   private videoElement: HTMLVideoElement | null = null;
   private titleVideoElement: HTMLVideoElement | null = null;
   private userHasInteracted = false;
@@ -139,7 +141,26 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle video loaded event for seamless background playback
+   * Handle base video loaded event for seamless background playback
+   */
+  onBaseVideoLoaded(): void {
+    if (this.baseVideo?.nativeElement) {
+      this.baseVideoElement = this.baseVideo.nativeElement;
+      
+      // Ensure video is muted for autoplay compliance
+      this.baseVideoElement.muted = true;
+      
+      // Start video with fade-in effect
+      this.baseVideoElement.style.opacity = '0';
+      this.attemptBaseVideoPlay();
+
+      // Set up seamless looping with fade transitions
+      this.setupBaseVideoLoop();
+    }
+  }
+
+  /**
+   * Handle filter video loaded event for seamless background playback
    */
   onVideoLoaded(): void {
     if (this.backgroundVideo?.nativeElement) {
@@ -159,7 +180,70 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Setup seamless video looping with enhanced reliability
+   * Setup seamless base video looping with enhanced reliability
+   */
+  private setupBaseVideoLoop(): void {
+    if (!this.baseVideoElement) return;
+
+    // Set video properties for reliable looping
+    this.baseVideoElement.loop = true;
+    this.baseVideoElement.muted = true;
+    this.baseVideoElement.playsInline = true;
+
+    // Add event listeners for seamless looping
+    this.baseVideoElement.addEventListener('loadstart', () => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Base video loading started');
+      }
+    });
+
+    this.baseVideoElement.addEventListener('canplaythrough', () => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Base video can play through');
+      }
+    });
+
+    // Handle video seeking for seamless loop
+    this.baseVideoElement.addEventListener('timeupdate', () => {
+      if (!this.baseVideoElement) return;
+      
+      // Ensure video doesn't get stuck at the end
+      if (this.baseVideoElement.currentTime >= this.baseVideoElement.duration - 0.1) {
+        this.baseVideoElement.currentTime = 0;
+      }
+    });
+
+    // Backup loop handling
+    this.baseVideoElement.addEventListener('ended', () => {
+      if (!this.baseVideoElement) return;
+      
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Base video ended, restarting loop');
+      }
+      
+      // Immediate restart for seamless loop
+      this.baseVideoElement.currentTime = 0;
+      
+      // Only attempt to play if user has interacted or autoplay worked initially
+      if (!this.autoplayFailed || this.userHasInteracted) {
+        this.baseVideoElement.play().catch(error => {
+          if (this.isDebugMode) {
+            console.warn('[PhantasiaComponent] Base video replay failed:', error);
+          }
+        });
+      }
+    });
+
+    // Handle video errors
+    this.baseVideoElement.addEventListener('error', (e) => {
+      if (this.isDebugMode) {
+        console.error('[PhantasiaComponent] Base video error:', e);
+      }
+    });
+  }
+
+  /**
+   * Setup seamless filter video looping with enhanced reliability
    */
   private setupVideoLoop(): void {
     if (!this.videoElement) return;
@@ -190,6 +274,11 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
       if (this.videoElement.currentTime >= this.videoElement.duration - 0.1) {
         this.videoElement.currentTime = 0;
       }
+      
+      // Ensure filter video opacity stays at 0.2 throughout playback
+      if (this.videoElement.style.opacity !== '0.2' && this.videoElement.style.opacity !== '0' && this.videoElement.style.opacity !== '0.16') {
+        this.videoElement.style.opacity = '0.2';
+      }
     });
 
     // Backup loop handling
@@ -197,17 +286,20 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
       if (!this.videoElement) return;
       
       if (this.isDebugMode) {
-        console.log('[PhantasiaComponent] Video ended, restarting loop');
+        console.log('[PhantasiaComponent] Filter video ended, restarting loop');
       }
       
       // Immediate restart for seamless loop
       this.videoElement.currentTime = 0;
       
+      // Ensure filter video maintains 20% opacity after restart
+      this.videoElement.style.opacity = '0.2';
+      
       // Only attempt to play if user has interacted or autoplay worked initially
       if (!this.autoplayFailed || this.userHasInteracted) {
         this.videoElement.play().catch(error => {
           if (this.isDebugMode) {
-            console.warn('[PhantasiaComponent] Video replay failed:', error);
+            console.warn('[PhantasiaComponent] Filter video replay failed:', error);
           }
         });
       }
@@ -236,7 +328,34 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Attempt to play video with proper error handling
+   * Attempt to play base video with proper error handling
+   */
+  private attemptBaseVideoPlay(): void {
+    if (!this.baseVideoElement) return;
+
+    const playPromise = this.baseVideoElement.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Autoplay succeeded
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] Base video autoplay succeeded');
+        }
+        this.fadeInBaseVideo();
+      }).catch(error => {
+        // Autoplay failed - this is expected in many browsers
+        if (this.isDebugMode) {
+          console.log('[PhantasiaComponent] Base video autoplay failed (expected):', error.name);
+          console.log('[PhantasiaComponent] Base video will start after user interaction');
+        }
+        // Still show the video element but don't fade it in until user interacts
+        this.showBaseVideoWithoutPlay();
+      });
+    }
+  }
+
+  /**
+   * Attempt to play filter video with proper error handling
    */
   private attemptVideoPlay(): void {
     if (!this.videoElement) return;
@@ -265,7 +384,37 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Fade in video after successful play
+   * Fade in base video after successful play
+   */
+  private fadeInBaseVideo(): void {
+    if (!this.baseVideoElement) return;
+    
+    setTimeout(() => {
+      if (this.baseVideoElement) {
+        this.baseVideoElement.style.transition = 'opacity 2s ease-in-out';
+        this.baseVideoElement.style.opacity = '1';
+      }
+    }, 100);
+  }
+
+  /**
+   * Show base video element without playing (fallback for autoplay failure)
+   */
+  private showBaseVideoWithoutPlay(): void {
+    if (!this.baseVideoElement) return;
+    
+    // Show the first frame of the video
+    this.baseVideoElement.currentTime = 0;
+    setTimeout(() => {
+      if (this.baseVideoElement) {
+        this.baseVideoElement.style.transition = 'opacity 1s ease-in-out';
+        this.baseVideoElement.style.opacity = '0.8'; // Slightly dimmed to indicate it's not playing
+      }
+    }, 100);
+  }
+
+  /**
+   * Fade in filter video after successful play (maintain 20% opacity for filter effect)
    */
   private fadeInVideo(): void {
     if (!this.videoElement) return;
@@ -273,13 +422,13 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       if (this.videoElement) {
         this.videoElement.style.transition = 'opacity 2s ease-in-out';
-        this.videoElement.style.opacity = '1';
+        this.videoElement.style.opacity = '0.2'; // Keep at 20% opacity for filter effect
       }
     }, 100);
   }
 
   /**
-   * Show video element without playing (fallback for autoplay failure)
+   * Show filter video element without playing (fallback for autoplay failure)
    */
   private showVideoWithoutPlay(): void {
     if (!this.videoElement) return;
@@ -289,7 +438,7 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       if (this.videoElement) {
         this.videoElement.style.transition = 'opacity 1s ease-in-out';
-        this.videoElement.style.opacity = '0.8'; // Slightly dimmed to indicate it's not playing
+        this.videoElement.style.opacity = '0.16'; // 20% of 0.8 = 0.16 for filter effect when not playing
       }
     }, 100);
   }
@@ -306,6 +455,9 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
         }
         
         // If autoplay failed, try to start videos now
+        if (this.autoplayFailed && this.baseVideoElement) {
+          this.attemptBaseVideoPlayAfterInteraction();
+        }
         if (this.autoplayFailed && this.videoElement) {
           this.attemptVideoPlayAfterInteraction();
         }
@@ -350,7 +502,25 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Attempt to play video after user interaction
+   * Attempt to play base video after user interaction
+   */
+  private attemptBaseVideoPlayAfterInteraction(): void {
+    if (!this.baseVideoElement) return;
+
+    this.baseVideoElement.play().then(() => {
+      if (this.isDebugMode) {
+        console.log('[PhantasiaComponent] Base video started after user interaction');
+      }
+      this.fadeInBaseVideo();
+    }).catch(error => {
+      if (this.isDebugMode) {
+        console.warn('[PhantasiaComponent] Base video play failed even after user interaction:', error);
+      }
+    });
+  }
+
+  /**
+   * Attempt to play filter video after user interaction
    */
   private attemptVideoPlayAfterInteraction(): void {
     if (!this.videoElement) return;
@@ -422,6 +592,12 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     this.document.body.classList.remove('phantasia-album-page');
     
     // Clean up video elements
+    if (this.baseVideoElement) {
+      this.baseVideoElement.pause();
+      this.baseVideoElement.removeEventListener('timeupdate', () => {});
+      this.baseVideoElement.removeEventListener('ended', () => {});
+      this.baseVideoElement = null;
+    }
     if (this.videoElement) {
       this.videoElement.pause();
       this.videoElement.removeEventListener('timeupdate', () => {});

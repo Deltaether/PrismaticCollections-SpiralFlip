@@ -29,11 +29,11 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Social Links Page Container - PERFORMANCE OPTIMIZED */
+/* Social Links Page Container - OPTIMIZED ARCHITECTURE */
 .social-links-page {
-  /* CRITICAL FIX: Force proper scrolling with guaranteed content overflow */
-  min-height: calc(100vh + 500px); /* Content much taller than viewport */
-  height: 100vh; /* Fixed viewport height to enable overflow scrolling */
+  /* ARCHITECTURAL FIX: Unified height management for reliable scrolling */
+  min-height: calc(100vh + 400px); /* Ensure content exceeds viewport */
+  height: auto; /* Allow natural content expansion */
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
@@ -58,30 +58,29 @@ $transition: all 0.3s ease;
   backface-visibility: hidden;
   perspective: 1000px;
   
-  /* ENHANCED: High-visibility scrollbar for social links page */
+  /* OPTIMIZED: Balanced high-visibility scrollbar for social links page */
   &::-webkit-scrollbar {
-    width: 12px; /* Wider for better visibility */
-    height: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 1100;
+    width: 10px; /* Optimal width for visibility without being intrusive */
+    height: 10px;
+    background: rgba(0, 0, 0, 0.6); /* Strong but not overpowering background */
   }
   
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.4); /* Darker track for contrast */
-    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.6); /* Consistent with scrollbar background */
+    border-radius: 5px; /* Smooth rounded corners */
     border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2px; /* Slight margin for refinement */
   }
   
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.9); /* High contrast white thumb */
-    border-radius: 6px;
-    min-height: 30px;
-    border: 2px solid rgba(0, 0, 0, 0.3); /* Dark border for definition */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    border-radius: 5px; /* Consistent radius */
+    min-height: 40px; /* Adequate touch target */
+    border: 1px solid rgba(0, 0, 0, 0.3); /* Subtle definition */
     
     &:hover {
-      background: rgba(255, 255, 255, 1); /* Pure white on hover */
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+      background: rgba(255, 255, 255, 1); /* Full opacity on hover */
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3); /* Subtle glow */
     }
     
     &:active {
@@ -90,22 +89,21 @@ $transition: all 0.3s ease;
   }
   
   /* Enhanced Firefox scrollbar */
-  scrollbar-width: auto;
-  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.4);
+  scrollbar-width: auto; /* Standard thick scrollbar */
+  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.6); /* High contrast for Firefox */
   
   /* Mobile scrollbar enhancements */
   @media (hover: none) and (pointer: coarse) {
     &::-webkit-scrollbar {
-      width: 16px; /* Wider for mobile touch */
-      background: rgba(0, 0, 0, 0.5);
+      width: 12px; /* Optimal mobile width */
+      background: rgba(0, 0, 0, 0.6);
     }
     
     &::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.95);
-      border: 3px solid rgba(0, 0, 0, 0.5);
-      border-radius: 8px;
+      border: 2px solid rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
       min-height: 40px; /* Large touch target */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
   }
   
@@ -275,14 +273,14 @@ $transition: all 0.3s ease;
     z-index: 0;
   }
   
-  /* Let content determine height naturally */
-  height: auto;
+  /* ARCHITECTURAL FIX: Remove conflicting height override */
+  /* Height is now managed by the unified system above */
   
   /* Apply winter text colors */
   @include winter.winter-text-colors;
 }
 
-/* Main Content Container - Same as collections page */
+/* Main Content Container - OPTIMIZED FOR SCROLLING */
 .social-main {
   position: relative;
   z-index: 2;
@@ -290,9 +288,9 @@ $transition: all 0.3s ease;
   max-width: 1400px;
   margin: 0 auto;
   padding-top: 4rem;
-  padding-bottom: 12rem; /* Massive padding to guarantee scrolling */
-  /* Ensure content height forces scrolling */
-  min-height: calc(100vh + 600px);
+  padding-bottom: clamp(8rem, 15vh, 16rem); /* Responsive bottom padding for scrolling */
+  /* ARCHITECTURAL FIX: Ensure content height reliably exceeds viewport */
+  min-height: calc(100vh + 300px); /* Reduced but reliable content overflow */
 }
 
 /* Hero Section - Exact copy from collections page */
@@ -1307,30 +1305,19 @@ $transition: all 0.3s ease;
   }
 }
 
-/* Responsive Adjustments */
+/* Responsive Adjustments - UNIFIED ARCHITECTURE */
 @media (max-width: 768px) {
   .social-links-page {
-    /* Mobile height override for scrolling */
-    min-height: calc(100vh + 700px) !important;
-    height: 100vh !important;
+    /* ARCHITECTURAL FIX: Remove conflicting height overrides */
+    /* Mobile height now managed by unified system */
     
-    /* Enhanced mobile scrollbar visibility */
-    &::-webkit-scrollbar {
-      width: 18px !important;
-      background: rgba(0, 0, 0, 0.6) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important;
-      border: 4px solid rgba(0, 0, 0, 0.7) !important;
-      border-radius: 9px !important;
-      min-height: 50px !important;
-    }
+    /* Mobile-optimized scrollbar from main definition is sufficient */
   }
   
   .social-main {
-    padding-bottom: 18rem !important;
-    min-height: calc(100vh + 800px) !important;
+    /* ARCHITECTURAL FIX: Use responsive padding instead of fixed overrides */
+    padding-bottom: clamp(12rem, 20vh, 18rem);
+    /* Content height managed by unified min-height system */
   }
   
   .hero {
@@ -1413,28 +1400,16 @@ $transition: all 0.3s ease;
 
 @media (max-width: 480px) {
   .social-links-page {
-    /* iPhone specific scrollbar enhancements */
-    min-height: calc(100vh + 900px) !important;
-    
-    &::-webkit-scrollbar {
-      width: 20px !important; /* Maximum width for iPhone */
-      background: rgba(0, 0, 0, 0.8) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important;
-      border: 5px solid rgba(0, 0, 0, 0.8) !important;
-      border-radius: 10px !important;
-      min-height: 60px !important; /* Very large touch target */
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important; /* Glow effect */
-    }
+    /* ARCHITECTURAL FIX: Remove iPhone-specific height conflicts */
+    /* Unified scrollbar system handles mobile optimization */
   }
   
   .social-main {
     padding: 0 1rem;
     padding-top: 2rem;
-    padding-bottom: 22rem !important; /* Extreme padding for iPhone */
-    min-height: calc(100vh + 900px) !important;
+    /* ARCHITECTURAL FIX: Use responsive clamp instead of extreme fixed values */
+    padding-bottom: clamp(16rem, 25vh, 22rem);
+    /* Unified height system ensures reliable scrolling */
   }
   
   .hero {

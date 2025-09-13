@@ -74,67 +74,6 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
       tags: ['ERROR', 'UNREADABLE', 'CORRUPTED'],
       featured: false,
       route: '/collections/unknown'
-    },
-    // CRITICAL FIX: Additional albums to ensure scrolling is required for testing scrollbar visibility
-    {
-      id: 'ethereal-dreams',
-      title: 'Ethereal Dreams',
-      artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
-      trackCount: 12,
-      year: 2024,
-      description: 'A dreamscape journey through ambient soundscapes and ethereal melodies.',
-      tags: ['Ambient', 'Ethereal', 'Dreams'],
-      featured: false,
-      route: '/collections/ethereal-dreams'
-    },
-    {
-      id: 'digital-horizons',
-      title: 'Digital Horizons',
-      artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
-      trackCount: 10,
-      year: 2024,
-      description: 'Electronic compositions exploring the intersection of digital and organic sounds.',
-      tags: ['Electronic', 'Digital', 'Ambient'],
-      featured: false,
-      route: '/collections/digital-horizons'
-    },
-    {
-      id: 'cosmic-wanderer',
-      title: 'Cosmic Wanderer',
-      artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
-      trackCount: 8,
-      year: 2025,
-      description: 'Space-inspired ambient music for interstellar journeys.',
-      tags: ['Space', 'Ambient', 'Cosmic'],
-      featured: false,
-      route: '/collections/cosmic-wanderer'
-    },
-    {
-      id: 'neon-nights',
-      title: 'Neon Nights',
-      artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
-      trackCount: 11,
-      year: 2024,
-      description: 'Synthwave and cyberpunk-inspired electronic compositions.',
-      tags: ['Synthwave', 'Electronic', 'Cyberpunk'],
-      featured: false,
-      route: '/collections/neon-nights'
-    },
-    {
-      id: 'forest-whispers',
-      title: 'Forest Whispers',
-      artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
-      trackCount: 9,
-      year: 2024,
-      description: 'Nature-inspired ambient music capturing the essence of ancient forests.',
-      tags: ['Nature', 'Ambient', 'Organic'],
-      featured: false,
-      route: '/collections/forest-whispers'
     }
   ];
 

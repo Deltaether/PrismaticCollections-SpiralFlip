@@ -907,7 +907,7 @@
 .card-image {
   position: relative;
   width: 100%;
-  height: 260px; /* Increased further from 220px to 260px for better character head visibility */
+  height: 220px; /* Reduced from 260px for smaller card size while maintaining aspect ratio */
   overflow: hidden;
   
   img {
@@ -1311,7 +1311,7 @@
 /* Album Cover Styling - Hardware Accelerated */
 .album-cover {
   width: 100%;
-  height: 160px; /* Increased further from 130px to 160px for better character head visibility */
+  height: 135px; /* Reduced from 160px for smaller card size while maintaining aspect ratio */
   border-radius: 14px;
   overflow: hidden;
   margin-bottom: 1.25rem; /* Reduced from 1.5rem to 1.25rem */
@@ -1488,7 +1488,7 @@
   }
   
   .album-cover {
-    height: 150px;
+    height: 130px; /* Reduced proportionally for mobile */
   }
 }
 
@@ -1536,7 +1536,7 @@
   }
   
   .album-cover {
-    height: 100px;
+    height: 85px; /* Reduced proportionally for iPhone */
   }
 }
 

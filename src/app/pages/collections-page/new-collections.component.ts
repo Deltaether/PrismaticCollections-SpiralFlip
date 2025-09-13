@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ElementRef, OnDestroy, HostListener, Inject, DOCUMENT } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, OnDestroy, HostListener, Inject, DOCUMENT, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
@@ -34,7 +34,7 @@ interface Album {
   // Enable OnPush change detection for better performance
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NewCollectionsComponent implements OnInit, OnDestroy {
+export class NewCollectionsComponent implements OnInit, OnDestroy, AfterViewInit {
   
   
   /* Albums/Prisms Data */
@@ -80,6 +80,7 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
   private scrollTimer: any;
   private isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   private debugTimer: any;
+  private resizeObserver?: ResizeObserver;
 
   constructor(
     private router: Router, 
@@ -92,7 +93,14 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
     // CRITICAL FIX: Set body class for global styles to take effect
     this.document.body.classList.add('collections-page-active');
     this.setupScrollbarVisibility();
-    
+  }
+
+  ngAfterViewInit(): void {
+    // Check scrollbar necessity after view initialization
+    setTimeout(() => {
+      this.checkScrollbarNecessity();
+      this.setupResizeObserver();
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -102,6 +110,10 @@ export class NewCollectionsComponent implements OnInit, OnDestroy {
     }
     if (this.debugTimer) {
       clearInterval(this.debugTimer);
+    }
+    // Clean up resize observer
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
     }
     // CRITICAL FIX: Remove body class on component destroy
     this.document.body.classList.remove('collections-page-active');

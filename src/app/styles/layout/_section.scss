@@ -1,6 +1,6 @@
 /* Section Layout Styles */
 section {
-  min-height: 100vh;
+  /* Content-based height - no more blank space */
   width: 100%;
   position: relative;
   scroll-snap-align: start;

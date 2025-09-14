@@ -336,7 +336,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
     .scroll-text {
       font-family: 'Inter', sans-serif;
-      font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+      font-size: clamp(1.3rem, 2.5vw, 2rem); //【✓】Made text a bit bigger for improved visibility
       font-weight: 300;
       color: rgba(255, 255, 255, 0.8);
       text-align: center;
@@ -365,6 +365,37 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
         color: rgba(255, 255, 255, 0.7);
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         animation: bounce 2s infinite;
+
+        // Responsive triangle sizes for different breakpoints
+        @media (max-width: 768px) {
+          width: clamp(20px, 2vw, 24px);
+          height: clamp(16px, 1.5vw, 18px);
+        }
+
+        @media (max-width: 480px) {
+          width: clamp(24px, 3vw, 28px);
+          height: clamp(18px, 2.2vw, 22px);
+        }
+
+        @media (max-width: 320px) {
+          width: 18px;
+          height: 14px;
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          width: clamp(18px, 1.8vw, 22px);
+          height: clamp(14px, 1.3vw, 16px);
+        }
+
+        @media (orientation: portrait) {
+          width: clamp(22px, 2.5vw, 26px);
+          height: clamp(16px, 1.8vw, 20px);
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+          width: clamp(20px, 2.2vw, 26px);
+          height: clamp(15px, 1.6vw, 20px);
+        }
       }
     }
   }
@@ -383,25 +414,26 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin: clamp(0.5rem, 2vh, 1.5rem) 10vw; // 10vw margins on left and right
-  max-width: 80vw; // Maximum 80vw to account for 10vw margins on each side
-  width: 80vw; // Fixed width using viewport units
+  // FIXED: Consistent margins with artist-cards-section
+  margin: clamp(0.5rem, 2vh, 1.5rem) 10vw;
+  max-width: 80vw;
+  width: 80vw;
   padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 3vw, 2rem) clamp(0.25rem, 1vh, 0.75rem);
   position: relative;
   box-sizing: border-box;
 
   @media (max-width: 768px) {
-    max-width: 80vw; // Keep viewport-based width
+    max-width: 80vw;
     width: 80vw;
-    margin: 1rem 10vw; // Maintain 10vw margins
+    margin: 1rem 10vw; // Consistent with artist-cards-section
     padding: 2rem 1rem 0.5rem;
     border-radius: 20px;
   }
 
   @media (max-width: 480px) {
-    max-width: 85vw; // Slightly wider on small screens
+    max-width: 85vw;
     width: 85vw;
-    margin: 0.5rem 7.5vw; // Proportionally adjusted margins
+    margin: 0.5rem 7.5vw; // Consistent with artist-cards-section
     padding: 1.5rem 0.75rem 0.5rem;
     border-radius: 16px;
   }
@@ -480,9 +512,21 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    // Removed justify-content: center to allow natural sizing
+    // FIXED: Center the jacket properly across all breakpoints
+    justify-content: center;
+    width: auto;
+    min-width: fit-content;
 
     @media (min-width: 1025px) {
+      // Desktop: Fixed width to accommodate 460px jacket
+      width: 460px;
+      min-width: 460px;
+    }
+
+    @media (max-width: 1024px) {
+      // Tablet: Flexible width but centered
+      width: 100%;
+      justify-content: center;
     }
   }
 
@@ -501,9 +545,13 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
   .music-player-section {
     align-items: center;
-    max-height: 140px; // Increased to accommodate better button proportions
-    overflow: visible; // Allow content to show
-    padding: 0.3rem 0; // Slightly more padding for better visual balance
+    // FIXED: Remove height constraints to allow natural sizing
+    min-height: 160px; // FIXED: Set minimum height to properly contain all sections
+    max-height: none; // FIXED: Remove max-height constraint
+    overflow: visible; // Allow controls to show
+    padding: 0.5rem 0;
+    box-sizing: border-box;
+    margin-top: auto; // Push to bottom of content section
 
     app-music-player {
       max-width: 600px;
@@ -511,17 +559,21 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       align-items: center;
 
       ::ng-deep .music-player-container {
-        height: auto !important; // Let it size naturally
-        max-height: 130px !important; // Increased for better button proportions
-        padding: 0.2rem !important; // Slightly more padding
+        height: auto !important;
+        min-height: 160px !important; // FIXED: Increased minimum height to properly contain all sections
+        max-height: none !important; // FIXED: Remove max-height constraint to allow natural sizing
+        padding: 0.2rem !important;
         margin: 0 !important;
-        overflow: visible !important; // Show all content
+        overflow: visible !important; // FIXED: Allow controls to show
+        box-sizing: border-box !important;
       }
 
       ::ng-deep .music-player {
-        height: auto !important; // Let it size to fit content
-        padding: 0.2rem !important; // More compact padding
-        overflow: visible !important; // Allow content to show
+        height: auto !important;
+        min-height: 155px !important; // FIXED: Increased minimum height to contain all content
+        max-height: none !important; // FIXED: Remove max-height constraint to allow natural sizing
+        padding: 0.2rem !important;
+        overflow: visible !important; // FIXED: Allow controls to show
         box-sizing: border-box !important;
 
         // Create a single unified container for all sections
@@ -618,17 +670,20 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
 
     @media (max-width: 768px) {
-      max-height: 80px; // Better height for tablet buttons
+      min-height: 120px; // FIXED: Set minimum height for tablet
+      max-height: none; // FIXED: Remove max-height constraint
       padding: 0.2rem 0; // Better padding
 
       app-music-player ::ng-deep .music-player-container {
-        height: 70px; // Better container height
+        min-height: 120px !important; // FIXED: Increased minimum height for tablet
+        max-height: none !important; // FIXED: Remove max-height constraint
         padding: 0.25rem; // More breathing room
       }
 
       app-music-player ::ng-deep .music-player {
         height: auto !important; // Auto height for fused layout
-        max-height: 65px !important; // Better height for tablet buttons
+        min-height: 115px !important; // FIXED: Increased minimum height for tablet
+        max-height: none !important; // FIXED: Remove max-height constraint
         padding: 0.25rem !important; // Better padding
         display: flex !important;
         flex-direction: column !important;
@@ -728,12 +783,14 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       padding: 0.2rem 0;
 
       app-music-player ::ng-deep .music-player-container {
-        height: 75px;
+        min-height: 110px !important; // FIXED: Increased minimum height for mobile
+        max-height: none !important; // FIXED: Remove max-height constraint
       }
 
       app-music-player ::ng-deep .music-player {
         height: auto !important; // Let it size to fit content
-        max-height: 68px !important; // Better mobile height
+        min-height: 105px !important; // FIXED: Increased minimum height for mobile
+        max-height: none !important; // FIXED: Remove max-height constraint
         padding: 0.2rem !important; // Better padding
         overflow: visible !important; // Allow content to show
         box-sizing: border-box !important;
@@ -916,24 +973,39 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
   .cd-jacket {
     position: relative;
-    width: clamp(600px, 50vw, 950px); // Made bigger for desktop
-    height: clamp(600px, 50vw, 950px); // Made bigger for desktop
+    // FIXED: Exact 460x460px for desktop/laptop breakpoints
+    width: 460px;
+    height: 460px;
     perspective: 55vw;
     flex-shrink: 0;
+    // FIXED: Center the jacket properly in its container
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    // Laptop breakpoint (1025px - 1440px) - keep 460x460px
+    @media (min-width: 1025px) and (max-width: 1440px) {
+      width: 460px;
+      height: 460px;
+    }
+
+    // Tablet breakpoint (769px - 1024px) - responsive but centered
     @media (max-width: 1024px) {
-      width: clamp(450px, 50vw, 600px); // Made bigger for tablets
-      height: clamp(450px, 50vw, 600px); // Made bigger for tablets
+      width: clamp(380px, 45vw, 460px);
+      height: clamp(380px, 45vw, 460px);
     }
 
+    // Mobile tablet breakpoint (481px - 768px) - responsive but centered
     @media (max-width: 768px) {
-      width: clamp(350px, 50vw, 450px); // Increased for mobile
-      height: clamp(350px, 50vw, 450px); // Increased for mobile
+      width: clamp(320px, 50vw, 380px);
+      height: clamp(320px, 50vw, 380px);
     }
 
+    // Mobile breakpoint (≤480px) - responsive but centered
     @media (max-width: 480px) {
-      width: clamp(280px, 60vw, 380px); // Increased for small mobile
-      height: clamp(280px, 60vw, 380px); // Increased for small mobile
+      width: clamp(280px, 60vw, 320px);
+      height: clamp(280px, 60vw, 320px);
     }
 
     .jacket-3d-container {
@@ -949,8 +1021,9 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
 
     .jacket-art {
-      width: 460px;
-      height: 460px;
+      // FIXED: Match container size exactly
+      width: 100%;
+      height: 100%;
       background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.08) 0%,
         rgba(255, 255, 255, 0.04) 25%,
@@ -1453,9 +1526,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   margin-top: 2rem;
 
   .footer-content {
-    max-width: 80vw; // Use viewport units instead of pixels
+    // FIXED: Consistent margins with all other sections
+    max-width: 80vw;
     width: 80vw;
-    margin: 0 10vw; // 10vw margins on left and right
+    margin: 0 10vw;
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     gap: 2rem;
@@ -1613,7 +1687,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     .title-video {
       object-fit: contain;
       // Remove transform override - let the main 768px rule handle scaling
-      transform: scale(1.4) !important; // Force tablet scaling to work properly
+      transform: scale(2.3) translateY(-20vh) !important; // Move video higher and scale for tablets
       max-width: 95vw !important;
       max-height: 75vh !important;
     }
@@ -1680,15 +1754,17 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 // Ultra-mobile optimizations
 @media (max-width: 480px) {
   .video-title-section {
-    height: calc(130vh - 89px); // Increased size for larger title on mobile
-    min-height: calc(130vh - 89px);
-    margin-top: 89px; // Header margin (89px equivalent)
+    height: calc(150vh - 89px);
+    min-height: calc(150vh - 89px);
+    margin-top: 89px;
     padding: 0;
 
     .title-video {
-      height: clamp(40vh, 55vh, 70vh); // Increased height for larger title on mobile
+      width: clamp(95vw, 100vw, 105vw) !important; // Make video title much wider on mobile
+      height: clamp(50vh, 65vh, 80vh) !important; // Make video title much taller on mobile
       object-fit: contain;
-      transform: translateY(clamp(-4vh, 0vh, 4vh));
+      //【✓】Moved title video even higher on mobile (now even higher than before)
+      transform: translateY(clamp(-28vh, -22vh, -16vh)) scale(2.3) !important; // Move title video even higher and make it bigger on mobile
     }
 
     .title-subtitle {
@@ -1699,7 +1775,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
   .cd-showcase {
     padding: 2rem 1rem 0.5rem;
-    margin: 0.5rem;
+    margin: 2rem 0.5rem; // Add top margin to prevent overlap
     border-radius: 20px;
 
     .showcase-main-content {
@@ -1710,17 +1786,94 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     .album-cover-section {
       width: 100%;
       display: flex;
-      justify-content: center; // Center the jacket-art on small mobile
+      justify-content: center;
+      overflow: hidden; // Prevent jacket-art overflow
+      max-width: 100%;
+      box-sizing: border-box;
+
+      .cd-jacket {
+        width: clamp(200px, 70vw, 300px) !important; // Responsive width that adapts to showcase
+        height: clamp(200px, 70vw, 300px) !important; // Responsive height that adapts to showcase
+        max-width: 70vw !important; // Limit to 70% of viewport to ensure it fits in showcase
+        max-height: 50vh !important; // Limit height to prevent overflow
+        box-sizing: border-box;
+        flex-shrink: 1;
+
+        .jacket-3d-container {
+          width: 100% !important;
+          height: 100% !important;
+          max-width: 100%;
+          max-height: 100%;
+        }
+
+        .jacket-art {
+          width: 100% !important;
+          height: 100% !important;
+          max-width: 100%;
+          max-height: 100%;
+          overflow: hidden !important;
+          box-sizing: border-box;
+
+          .album-cover {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: cover !important; // Better fit within container
+            object-position: center;
+          }
+        }
+      }
     }
 
     .album-content-section {
       width: 100%;
-    }
-
-    .album-content-section {
       gap: 1rem;
       text-align: center;
     }
+
+  }
+}
+
+/* ===== ARTIST CARDS SECTION =====
+ * Independent section for dynamic artist cards - prevents overlapping
+ * ================================================ */
+.artist-cards-section {
+  background: linear-gradient(135deg,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.21) 25%,
+    rgba(0, 0, 0, 0.24) 50%,
+    rgba(0, 0, 0, 0.27) 100%);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin: clamp(2rem, 4vh, 3rem) 10vw clamp(1rem, 2vh, 2rem);
+  max-width: 80vw;
+  width: 80vw;
+  padding: clamp(1.5rem, 3vh, 2.5rem) clamp(1rem, 3vw, 2rem);
+  position: relative;
+  box-sizing: border-box;
+  clear: both;
+
+  @media (max-width: 768px) {
+    max-width: 80vw;
+    width: 80vw;
+    margin: clamp(2rem, 4vh, 3rem) 10vw clamp(1rem, 2vh, 2rem);
+    padding: clamp(1.5rem, 2vh, 2rem) clamp(1rem, 2vw, 1.5rem);
+    border-radius: 20px;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 85vw;
+    width: 85vw;
+    margin: clamp(3rem, 5vh, 4rem) 7.5vw clamp(1rem, 2vh, 2rem); // Increased top margin to prevent overlap
+    padding: clamp(1.5rem, 2vh, 2rem) clamp(0.75rem, 2vw, 1.25rem);
+    border-radius: 16px;
+    clear: both !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
 
   .artist-section {
@@ -1730,7 +1883,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 
   .scroll-indicator-container {
-    bottom: clamp(0.5rem, 3vh, 1.5rem);
+    bottom: clamp(15vh, 20vh, 25vh) !important; // Move scroll indicator much higher on mobile
     padding: 0.75rem 1rem;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -1756,6 +1909,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     .showcase-main-content {
       gap: 2.5rem;
       min-height: auto;
+      // FIXED: Ensure proper tablet layout
+      overflow: hidden;
+      justify-content: center;
+      align-items: center;
     }
 
     .album-cover-section {
@@ -1763,12 +1920,38 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       display: flex;
       justify-content: center; // Center the jacket-art on medium tablets
       margin-bottom: 1rem;
+      // FIXED: Ensure jacket is properly contained
+      max-width: 100%;
+      overflow: hidden;
     }
 
     .album-content-section {
       width: 100%;
       gap: 2rem;
       text-align: center;
+      // FIXED: Ensure music player doesn't overflow
+      max-width: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    // FIXED: Specific tablet music player containment
+    .music-player-section {
+      min-height: 130px; // FIXED: Set minimum height for larger tablets
+      max-height: none; // FIXED: Remove max-height constraint
+      overflow: visible;
+
+      app-music-player ::ng-deep .music-player-container {
+        min-height: 125px !important; // FIXED: Set minimum height for larger tablets
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
+
+      app-music-player ::ng-deep .music-player {
+        min-height: 120px !important; // FIXED: Set minimum height for larger tablets
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
     }
   }
 
@@ -1785,9 +1968,9 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
     .title-video {
       object-fit: contain;
-      transform: scale(1.2); // Moderate scaling for larger tablets
-      width: clamp(85vw, 90vw, 95vw);
-      height: clamp(50vh, 65vh, 80vh);
+      transform: scale(1.35) translateY(-16vh); //【✓】Move title video further up and make it bigger for larger tablets
+      width: clamp(95vw, 105vw, 115vw);
+      height: clamp(60vh, 80vh, 100vh);
     }
   }
 
@@ -1804,11 +1987,34 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     .showcase-main-content {
       gap: 3rem;
       min-height: 380px;
+      // FIXED: Ensure proper laptop layout with 460px jacket
+      overflow: hidden;
+      align-items: center;
     }
 
+    // FIXED: Enforce exact 460x460px for laptop breakpoint
     .cd-jacket {
-      width: clamp(350px, 30vw, 500px);
-      height: clamp(350px, 30vw, 500px);
+      width: 460px;
+      height: 460px;
+    }
+
+    // FIXED: Ensure music player is properly contained on laptops
+    .music-player-section {
+      min-height: 160px; // FIXED: Set minimum height
+      max-height: none; // FIXED: Remove max-height constraint
+      overflow: visible;
+
+      app-music-player ::ng-deep .music-player-container {
+        min-height: 155px !important; // FIXED: Set minimum height
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
+
+      app-music-player ::ng-deep .music-player {
+        min-height: 150px !important; // FIXED: Set minimum height
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
     }
   }
 
@@ -1830,15 +2036,41 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     .showcase-main-content {
       gap: 3.5rem;
       min-height: 480px;
+      // FIXED: Ensure proper desktop layout
+      overflow: hidden;
+      align-items: center;
     }
 
+    // FIXED: Enforce exact 460x460px for desktop breakpoint
     .cd-jacket {
-      width: clamp(380px, 25vw, 450px);
-      height: clamp(380px, 25vw, 450px);
+      width: 460px;
+      height: 460px;
     }
 
     .album-content-section {
       gap: 2rem;
+      // FIXED: Ensure content doesn't overflow
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    // FIXED: Desktop music player containment
+    .music-player-section {
+      min-height: 170px; // FIXED: Set minimum height for desktop
+      max-height: none; // FIXED: Remove max-height constraint
+      overflow: visible;
+
+      app-music-player ::ng-deep .music-player-container {
+        min-height: 165px !important; // FIXED: Set minimum height for desktop
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
+
+      app-music-player ::ng-deep .music-player {
+        min-height: 160px !important; // FIXED: Set minimum height for desktop
+        max-height: none !important; // FIXED: Remove max-height constraint
+        overflow: visible !important;
+      }
     }
   }
 
@@ -2006,7 +2238,6 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 @media (orientation: portrait) {
   .video-title-section {
     .title-video {
-      transform: translate(-50%, -50%);
       position: absolute;
     }
 

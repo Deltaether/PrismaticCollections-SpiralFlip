@@ -99,15 +99,15 @@
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Dynamic Artist Cards - spans full available width below showcase content -->
-      <div class="artist-cards-section">
-        <app-dynamic-artist-cards
-          [showAllArtists]="false"
-          [maxVisibleCards]="8"
-          [enableAnimations]="true">
-        </app-dynamic-artist-cards>
-      </div>
+    <!-- Dynamic Artist Cards Section - Independent section for proper layout -->
+    <section class="artist-cards-section">
+      <app-dynamic-artist-cards
+        [showAllArtists]="false"
+        [maxVisibleCards]="8"
+        [enableAnimations]="true">
+      </app-dynamic-artist-cards>
     </section>
 
     <!-- Footer Section -->

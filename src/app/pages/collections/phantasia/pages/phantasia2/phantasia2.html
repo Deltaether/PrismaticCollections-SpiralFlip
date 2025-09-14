@@ -11,8 +11,8 @@
   <!-- Video Background with Seamless Loop -->
   <div class="video-background">
     <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
-      <source src="assets/images/project_phantasia2/animated_background_optimized.webm" type="video/webm">
-      <source src="assets/images/project_phantasia2/animated_background_web.mp4" type="video/mp4">
+      <source src="assets/videos/phantasia2/animated_background_optimized.webm" type="video/webm">
+      <source src="assets/videos/phantasia2/animated_background_web.mp4" type="video/mp4">
     </video>
     <div class="video-overlay"></div>
   </div>
@@ -24,10 +24,10 @@
              (loadedmetadata)="onTitleVideoLoaded()" 
              (canplay)="onTitleVideoCanPlay()"
              (ended)="onTitleVideoEnded()">
-        <source src="assets/images/project_phantasia2/ULTIMATE_alpha_with_flares.webm" type="video/webm">
-        <source src="assets/images/project_phantasia2/Phantasi2_Logo_Animated_web.mp4" type="video/mp4">
+        <source src="assets/videos/phantasia2/ULTIMATE_alpha_with_flares.webm" type="video/webm">
+        <source src="assets/videos/phantasia2/Phantasi2_Logo_Animated_web.mp4" type="video/mp4">
         <!-- Fallback to static image if video fails -->
-        <img src="assets/images/project_phantasia2/Logo_fx.png" alt="Phantasia Project II" class="title-image-fallback">
+        <img src="assets/videos/phantasia2/Logo_fx.png" alt="Phantasia Project II" class="title-image-fallback">
       </video>
       
       <!-- Scroll Indicator - Now inside title-container -->
@@ -59,7 +59,7 @@
         <div class="cd-jacket">
           <div class="jacket-3d-container">
             <div class="jacket-art">
-              <img src="assets/images/project_phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
+              <img src="assets/videos/phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
             </div>
           </div>
           <div class="jacket-reflection"></div>
@@ -87,74 +87,23 @@
         </div>
       </div>
 
-      <!-- Experience the Evolution Text - moved below jacket-art -->
-      <div class="evolution-text">
-        <h4>Experience the Evolution</h4>
-      </div>
 
-      <!-- Enhanced Music Player - directly at bottom of cd-showcase -->
+      <!-- Phantasia 2 Music Player - directly at bottom of cd-showcase -->
       <app-music-player></app-music-player>
-    </section>
 
-    <!-- Artist Social Links - Always Visible -->
-    <section class="artist-section">
-      <h3>Meet the Artists</h3>
-      <div class="artists-grid">
-        <div class="artist-card">
-          <div class="artist-avatar">
-            <span>An</span>
-          </div>
-          <div class="artist-info">
-            <h4>An</h4>
-            <p>Professional Composer</p>
-            <div class="social-links">
-              <a href="#" class="social-link youtube-link" title="YouTube Channel">
-                <mat-icon>smart_display</mat-icon>
-              </a>
-              <a href="#" class="social-link spotify-link" title="Spotify Profile">
-                <mat-icon>library_music</mat-icon>
-              </a>
-              <a href="#" class="social-link soundcloud-link" title="SoundCloud Profile">
-                <mat-icon>cloud</mat-icon>
-              </a>
-              <a href="#" class="social-link website-link" title="Official Website">
-                <mat-icon>language</mat-icon>
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="artist-card">
-          <div class="artist-avatar">
-            <span>Fery</span>
-          </div>
-          <div class="artist-info">
-            <h4>Feryquitous</h4>
-            <p>Audio Engineer</p>
-            <div class="social-links">
-              <a href="#" class="social-link youtube-link" title="YouTube Channel">
-                <mat-icon>smart_display</mat-icon>
-              </a>
-              <a href="#" class="social-link spotify-link" title="Spotify Profile">
-                <mat-icon>library_music</mat-icon>
-              </a>
-              <a href="#" class="social-link twitter-link" title="Twitter Profile">
-                <mat-icon>alternate_email</mat-icon>
-              </a>
-              <a href="#" class="social-link website-link" title="Official Website">
-                <mat-icon>language</mat-icon>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Dynamic Artist Cards - integrated within cd-showcase -->
+      <app-dynamic-artist-cards
+        [showAllArtists]="false"
+        [maxVisibleCards]="8"
+        [enableAnimations]="true">
+      </app-dynamic-artist-cards>
     </section>
 
     <!-- Footer Section -->
     <footer class="phantasia-footer">
       <div class="footer-content">
         <div class="footer-logo">
-          <img src="assets/images/prismcoll_logox.svg" alt="Prismatic Collections" />
+          <img src="assets/images/logos/prismcoll_logox.svg" alt="Prismatic Collections" />
         </div>
         
         <div class="footer-links">

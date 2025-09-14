@@ -1,5 +1,21 @@
 @use 'sass:color';
 
+/* ===== CRITICAL HORIZONTAL SCROLLBAR FIX =====
+ * Global override to prevent horizontal scrollbar on Phantasia2 page
+ * Applied at the highest level to override any conflicting styles
+ * ================================================= */
+
+// Cleaned up document level styles - removed overflow constraints
+html {
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
+body {
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
 /* ===== VIEWPORT RESPONSIVE DESIGN SYSTEM =====
  * Complete transformation to viewport units (vw, vh, vmin, vmax)
  * 
@@ -45,79 +61,96 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   height: 100%;
   position: relative;
   font-family: 'Inter', 'Roboto', sans-serif; // Professional sans-serif font
+  
+  // Removed overflow constraints for natural scrolling behavior
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
-// Album page container with proper scroll handling
-.phantasia-album-page {
-  position: fixed; // FIXED: Use fixed positioning for full viewport control
-  top: 0; // Start from top of viewport
+
+// Album page container with proper scroll handling and header clearance
+body.phantasia-album-page .phantasia-album-page {
+  position: fixed;
+  top: 90px; // Start below header (90px header height)
   left: 0;
   width: 100vw;
-  height: 100vh !important; // Fixed viewport height for scrollable container
-  min-height: 100vh; // Minimum viewport height
-  overflow-y: scroll !important; // Force scrollbar to always show
-  overflow-x: hidden;
+  height: calc(100vh - 90px); // Account for header height
+  overflow-y: auto !important; // CRITICAL FIX: Enable vertical scrolling in the container
+  overflow-x: hidden !important; // CRITICAL FIX: Prevent horizontal scrolling
   background: rgba(0, 0, 0, 0.3); // Black background with 30% opacity
   color: $charcoal;
   z-index: 1;
-  padding: 0; // Remove all padding
-  scroll-behavior: smooth; // Enable smooth scrolling
+  padding: 0;
+  margin: 0;
+
+  // CRITICAL FIX: Create isolated stacking context for scrollbar protection
+  isolation: isolate;
+  will-change: scroll-position;
+  contain: layout style;
+
+  // Unified scrollbar design matching website standard with video protection
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.9);
+
+  // Force all child elements to stay within bounds
+  * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
   
-  // Critical: Ensure scrollbar is always visible and styled
-  scrollbar-width: auto !important; // Firefox: force scrollbar to show
-  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.9) !important; // Firefox styling
-  
-  // Ultra-prominent scrollbar styling for enhanced visibility
   &::-webkit-scrollbar {
-    width: 16px !important; // Wider scrollbar for better visibility
-    background: rgba(0, 0, 0, 0.95) !important; // Nearly opaque dark background
-    display: block !important; // Force display
-    opacity: 1 !important; // Force opacity
-    -webkit-appearance: none !important; // Remove default styling
+    width: 12px;
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 1 !important;
+    z-index: 999999;
   }
   
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.95) !important; // Nearly opaque dark track
-    border-radius: 0 !important;
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2) !important; // White inner shadow
-    -webkit-appearance: none !important;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 6px;
+    opacity: 1 !important;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ffffff 0%, #e9ecef 50%, #ffffff 100%) !important; // White gradient
-    border-radius: 0 !important;
-    border: 2px solid rgba(0, 0, 0, 0.3) !important; // Dark border for contrast
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important; // Glowing white effect
-    -webkit-appearance: none !important;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%) !important; // Lighter on hover
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8) !important; // Stronger glow on hover
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    border: 2px solid rgba(0, 0, 0, 0.9);
+    opacity: 1 !important;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      opacity: 1 !important;
+    }
+    
+    &:active {
+      background: rgba(240, 240, 240, 1);
+      opacity: 1 !important;
+    }
   }
   
   &::-webkit-scrollbar-corner {
-    background: rgba(0, 0, 0, 0.95) !important; // Match track background
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 1 !important;
   }
   
   /* FIXED: Mobile adjustments only when header is NOT inside phantasia layout */
   /* These adjustments are handled by the conditional header display logic */
   @media (max-width: 770px) {
-    /* Mobile viewport - full viewport when inside phantasia layout */
-    top: 0;
-    height: 100vh;
+    /* Mobile viewport - account for header */
+    top: 90px;
+    height: calc(100vh - 90px);
     max-width: 100vw;
-    max-height: 100vh;
   }
   
   @media (max-width: 480px) {
-    /* Ultra-mobile viewport - full viewport when inside phantasia layout */
-    top: 0; 
-    height: 100vh;
+    /* Ultra-mobile viewport - account for header */
+    top: 90px; 
+    height: calc(100vh - 90px);
   }
 }
 
-// Video Background Styling
+// Video Background Styling with Enhanced Scrollbar Isolation
 .video-background {
   position: fixed;
   top: 0;
@@ -125,8 +158,17 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  overflow: hidden;
+  overflow: hidden !important; // CRITICAL FIX: Prevent video background from creating scrollbar
   pointer-events: none; // Ensure video doesn't interfere with interactions
+  
+  // CRITICAL FIX: Maximum isolation to prevent scrollbar opacity inheritance
+  isolation: isolate;
+  // Create separate layer for video rendering
+  contain: layout style paint;
+  // Prevent interaction with scrollbar layers
+  transform: translateZ(0);
+  // Force GPU layer for isolation
+  will-change: opacity;
   
   .bg-video {
     position: absolute;
@@ -141,6 +183,15 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     filter: brightness(1.05) saturate(1.08) contrast(1.03); // Very subtle enhancement
     object-fit: cover; // Ensure proper video scaling
     opacity: 1;
+    
+    // CRITICAL FIX: Complete isolation from parent rendering context
+    isolation: isolate;
+    // Force separate compositing layer to prevent opacity bleed
+    will-change: opacity, transform;
+    // Ensure video effects don't cascade to scrollbar
+    contain: layout style paint;
+    // Create independent stacking context
+    transform: translateZ(0) translate(-50%, -50%);
   }
   
   .video-overlay {
@@ -151,6 +202,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     height: 100%;
     background: rgba(0, 0, 0, 0.2); // Slightly darker overlay for Phantasia II
     z-index: 0;
+    
+    // CRITICAL FIX: Prevent overlay from affecting scrollbar
+    isolation: isolate;
+    contain: layout style paint;
+    transform: translateZ(0);
   }
 }
 
@@ -163,7 +219,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   min-height: auto; // FIXED: Allow natural content height
   width: 100vw;
   margin-left: 0; // FIXED: Remove complex centering as container is already full width
-  overflow: visible; // Remove scroll handling from this container
+  // Removed overflow constraint
   scroll-behavior: smooth; // Enable smooth scrolling
   
   /* Critical Fix: Match mobile header height adjustments */
@@ -213,26 +269,26 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   border: 1px solid rgba(255, 255, 255, 0.15);
   margin: 2rem auto;
   max-width: min(1200px, calc(100vw - 2rem)); /* Prevent viewport overflow */
-  padding: 3rem 2rem 0;
+  padding: 3rem 2rem 0.5rem; /* Tight bottom padding to eliminate blank space */
   position: relative;
   
   
-  /* Ensure content stays within viewport bounds */
-  box-sizing: border-box;
-  overflow: hidden;
+  /* CRITICAL FIX: Ensure content stays within viewport bounds and prevent horizontal overflow */
+  box-sizing: border-box !important;
+  max-width: 100% !important;
   
   /* Mobile-specific showcase improvements */
   @media (max-width: 768px) {
     max-width: calc(100vw - 1rem);
     margin: 1rem auto;
-    padding: 2rem 1rem 0;
+    padding: 2rem 1rem 0.5rem;
     border-radius: 20px;
   }
   
   @media (max-width: 480px) {
     max-width: calc(100vw - 0.5rem);
     margin: 0.5rem auto;
-    padding: 1.5rem 0.75rem 0;
+    padding: 1.5rem 0.75rem 0.5rem;
     border-radius: 16px;
   }
   
@@ -273,13 +329,20 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100vw;
-  height: auto; // FIXED: Remove forced heights completely
-  min-height: auto; // FIXED: Allow natural content height
-  max-height: none; // FIXED: Remove height restrictions
-  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
+  height: auto;
+  min-height: auto;
+  max-height: none;
+  // Removed overflow constraint
   text-align: center;
   z-index: 2;
+  
+  // Force containment of all child elements
+  contain: layout style;
+  
+  // CRITICAL FIX: Strict overflow containment for video content
+  contain: layout style;
   
   // Background Rectangle styling removed
   
@@ -308,7 +371,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       cursor: pointer;
       margin: 0 auto; // No top margin - directly below video title
       padding: 0.75rem 1rem;
-      padding-top: 42vh; // Fixed 42 viewport units spacing
+      padding-top: 32vh; // Fixed 32 viewport units spacing
       padding-bottom: 0; // Reset bottom padding
       z-index: 10;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -357,17 +420,22 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   
   /* 【✓】 Move title video lower for improved visual separation */
   .title-video {
-    width: clamp(70vw, 90vw, 110vw) !important; /* Increased responsive width with bounds */
-    height: clamp(35vh, 50vh, 65vh) !important; /* Increased responsive height with bounds */
-    max-width: min(95vw, 1400px) !important; /* Increased max width */
+    width: clamp(80vw, 90vw, 95vw) !important; /* Strictly within viewport bounds */
+    height: clamp(45vh, 60vh, 75vh) !important; /* Increased responsive height with bounds */
+    max-width: 95vw !important; /* Never exceed 95% of viewport */
     margin: 0 auto !important;
     object-fit: cover !important;
     object-position: center center !important; /* Better centering */
+    // Removed overflow constraint
     /* Moved video title even lower (was clamp(18vh, 25vh, 32vh)) */
     transform: translateY(clamp(24vh, 32vh, 40vh)) !important; /* Lowered by +6vh across all breakpoints */
     // GPU acceleration for smooth video scaling
     will-change: transform, filter;
     backface-visibility: hidden;
+    
+    // CRITICAL FIX: Ensure video content cannot cause horizontal overflow
+    // Removed overflow constraint
+    contain: layout style size;
     
     // Enhanced transparency support and visual effects
     filter: contrast(1.1) brightness(1.05) drop-shadow(0 0.28vw 1.11vw rgba(0, 0, 0, 0.5)); /* 4px 16px → responsive */
@@ -375,16 +443,16 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     
     // Responsive scaling with better performance
     @media (max-width: 768px) {
-      width: clamp(80vw, 95vw, 100vw) !important; /* Increased mobile width */
-      height: clamp(30vh, 45vh, 55vh) !important; /* Increased mobile height */
-      max-width: 98vw !important;
+      width: clamp(80vw, 85vw, 90vw) !important; /* Reduced to prevent any overflow */
+      height: clamp(40vh, 55vh, 70vh) !important; /* Increased mobile height */
+      max-width: 90vw !important; /* Strict mobile containment */
       transform: translateY(clamp(8vh, 12vh, 16vh)) !important; /* Move video title lower for mobile */
     }
-    
+
     @media (max-width: 480px) {
-      width: clamp(85vw, 95vw, 100vw) !important; /* Increased ultra-mobile width */
-      height: clamp(25vh, 40vh, 50vh) !important; /* Increased ultra-mobile height */
-      max-width: 100vw !important;
+      width: clamp(75vw, 80vw, 85vw) !important; /* Reduced to prevent any overflow */
+      height: clamp(35vh, 50vh, 65vh) !important; /* Increased ultra-mobile height */
+      max-width: 85vw !important; /* Strict ultra-mobile containment */
       transform: translateY(clamp(6vh, 10vh, 14vh)) !important; /* Move video title lower for ultra-mobile */
     }
     
@@ -541,7 +609,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       justify-content: center;
       position: relative;
       z-index: 2;
-      overflow: hidden; // Ensure proper clipping of content
+      // Removed overflow constraint // Ensure proper clipping of content
       
       // Premium shadow system
       box-shadow: 
@@ -768,12 +836,18 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
   }
 
-  // Music Player - Directly placed at bottom with minimal spacing
+  // Music Player - Directly placed at bottom with zero spacing
   app-music-player {
     display: block;
     width: 100%;
-    margin-top: 0.25rem; // FIXED: Minimal top margin for tight spacing
-    margin-bottom: 0; // FIXED: Ensure no bottom margin
+    margin: 0; // FIXED: Remove all margins
+    padding: 0; // FIXED: Remove all padding
+    
+    // CRITICAL FIX: Ensure music player cannot cause horizontal overflow
+    // Removed overflow constraint
+    // Removed overflow constraint
+    box-sizing: border-box !important;
+    max-width: 100% !important;
   }
   
 }
@@ -795,11 +869,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   border: 0.07vw solid rgba(255, 255, 255, 0.15); /* 1px → responsive border */
   margin: 2rem auto 0; /* FIXED: Add proper top margin for section spacing */
   max-width: min(83.33vw, 1200px); /* Responsive max-width with absolute limit */
-  padding: 2.08vw 1.39vw; /* 3rem 2rem → responsive padding */
+  padding: 2.08vw 1.39vw 0.69vw 1.39vw; /* 3rem 2rem 1rem 2rem → responsive padding with minimal bottom */
   position: relative;
   
   /* Critical: Prevent content overflow on mobile devices */
-  overflow: hidden;
+  // Removed overflow constraint
   box-sizing: border-box;
   
   /* Mobile-specific containment improvements */
@@ -886,7 +960,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       /* Ensure cards stay within bounds */
       box-sizing: border-box;
       max-width: 100%;
-      overflow: hidden;
+      // Removed overflow constraint
       
       /* Mobile-specific card adjustments */
       @media (max-width: 768px) {
@@ -1096,7 +1170,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
   
   .cd-showcase {
-    padding: 3.26vw 1.31vw 0; /* 2.5rem 1rem 0 → responsive mobile padding with no bottom */
+    padding: 3.26vw 1.31vw 0.65vw; /* 2.5rem 1rem 0.5rem → responsive mobile padding with minimal bottom */
     margin: 1.31vw; /* 1rem → responsive mobile margin */
     
     // Mobile performance optimization
@@ -1122,7 +1196,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
   
   .artist-section {
-    padding: 2.61vw 1.31vw; /* 2rem 1rem → responsive mobile padding */
+    padding: 2.61vw 1.31vw 0.65vw; /* 2rem 1rem 0.5rem → responsive mobile padding with minimal bottom */
     margin: 1.31vw; /* 1rem → responsive mobile margin */
     
     .artists-grid {
@@ -1168,7 +1242,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
   
   .cd-showcase {
-    padding: 4.17vw 1.04vw 0; /* 2rem 0.5rem 0 → responsive ultra-mobile padding with no bottom */
+    padding: 4.17vw 1.04vw 0.52vw; /* 2rem 0.5rem 0.25rem → responsive ultra-mobile padding with minimal bottom */
     margin: 1.04vw; /* 0.5rem → responsive ultra-mobile margin */
     border-radius: 4.17vw; /* 20px → responsive border radius */
     
@@ -1184,7 +1258,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
   
   .artist-section {
-    padding: 3.13vw 1.04vw; /* 1.5rem 0.5rem → responsive ultra-mobile padding */
+    padding: 3.13vw 1.04vw 0.52vw; /* 1.5rem 0.5rem 0.25rem → responsive ultra-mobile padding with minimal bottom */
     margin: 1.04vw; /* 0.5rem → responsive ultra-mobile margin */
     border-radius: 4.17vw; /* 20px → responsive border radius */
   }
@@ -1337,5 +1411,103 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     &:hover {
       transform: none;
     }
+  }
+}
+
+// COMPREHENSIVE SCROLLBAR AND OVERFLOW FIXES
+// Targeted fixes based on debug log analysis - addresses root causes without breaking layout
+
+// LOADING SCREEN SPECIFIC FIXES - Root cause of 10px horizontal overflow
+::ng-deep app-loading-screen {
+  .loader-container {
+    // Ensure loading screen never causes document overflow
+    // Removed overflow constraint
+    contain: layout size style !important;
+    
+    // Prevent any child elements from extending beyond viewport
+    .rune-effects {
+      // This was the specific culprit causing 10px overflow
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      left: 0 !important;
+      top: 0 !important;
+      contain: layout !important;
+      
+      // Use safer scaling animation that doesn't cause overflow
+      animation: effect-pulse-safe 8s infinite ease-in-out !important;
+    }
+    
+    .magical-circle {
+      // Constrain magical circles to safe bounds
+      max-width: min(800px, 90vw) !important;
+      max-height: min(800px, 90vh) !important;
+      
+      &.outer {
+        max-width: min(1000px, 95vw) !important;
+        max-height: min(1000px, 95vh) !important;
+      }
+    }
+    
+    // Prevent any transforms from causing overflow
+    * {
+      will-change: auto !important;
+      backface-visibility: hidden !important;
+    }
+  }
+}
+
+// PHANTASIA PAGE OVERFLOW PREVENTION - Without breaking functionality
+.phantasia-album-page {
+  // Removed overflow constraint
+  
+  // Ensure all child components stay within bounds
+  & > * {
+    max-width: 100vw;
+    contain: layout;
+  }
+  
+  // Specific component containment to prevent overflow
+  app-music-player,
+  app-dynamic-artist-cards,
+  .cd-showcase,
+  .video-background,
+  .video-title-section {
+    // Prevent these components from causing horizontal overflow
+    max-width: 100vw;
+    overflow-x: hidden;
+    
+    // Constrain any child elements with transforms
+    * {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}
+
+// GLOBAL TRANSFORM SAFETY - Prevent animations from causing overflow
+* {
+  // Only apply transform constraints where animations exist
+  &[style*="transform"],
+  &.animated,
+  &[class*="animate"] {
+    will-change: transform;
+    backface-visibility: hidden;
+    
+    // Ensure transforms don't extend beyond viewport
+    &:not(.loader-container *) {
+      contain: layout;
+    }
+  }
+}
+
+// SAFER ANIMATION KEYFRAME - Replacement for problematic effect-pulse
+@keyframes effect-pulse-safe {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1) !important;
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02) !important; // Much safer scaling that won't cause overflow
   }
 }

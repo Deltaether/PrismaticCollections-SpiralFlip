@@ -9,6 +9,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MusicPlayerComponent } from '../../tools/music-player/music-player.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
+import { DynamicArtistCardsComponent } from '../../components/dynamic-artist-cards/dynamic-artist-cards.component';
+import { DynamicArtistService } from '../../services/dynamic-artist.service';
+import { AudioService } from '../../tools/music-player/audio.service';
+import { Phantasia2Debug } from './phantasia2-debug';
 
 /**
  * Scroll indicator animation states
@@ -33,7 +37,8 @@ export type ScrollIndicatorState = 'visible' | 'hidden';
     MatChipsModule,
     MusicPlayerComponent,
     SiteHeaderComponent,
-    LoadingScreenComponent
+    LoadingScreenComponent,
+    DynamicArtistCardsComponent
   ],
   templateUrl: './phantasia2.html',
   styleUrls: ['./phantasia2.scss'],
@@ -91,8 +96,9 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   private lastScrollTime = 0;
   private scrollSections: HTMLElement[] = [];
 
-  // Debug flag
-  private readonly isDebugMode = true;
+  // Debug flag and comprehensive logging system
+  private readonly isDebugMode = false;
+  private debugSystem: Phantasia2Debug | null = null;
 
   // Current year for footer
   readonly currentYear = new Date().getFullYear();
@@ -100,7 +106,9 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
-    @Inject(DOCUMENT) private readonly document: Document
+    @Inject(DOCUMENT) private readonly document: Document,
+    private readonly dynamicArtistService: DynamicArtistService,
+    private readonly audioService: AudioService
   ) {}
 
   ngOnInit(): void {
@@ -108,9 +116,13 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       console.log(`[Phantasia2Component] Current URL: ${this.router.url}`);
     }
 
-    // Add phantasia-album-page class to body for album presentation styling
+    // Add phantasia-album-page class to html and body for album presentation styling
+    this.document.documentElement.classList.add('phantasia-album-page');
     this.document.body.classList.add('phantasia-album-page');
     
+    // CRITICAL FIX: Runtime horizontal scrollbar elimination
+    this.forceHorizontalScrollbarRemoval();
+
     if (this.isDebugMode) {
       console.log(`[Phantasia2Component] Added phantasia-album-page class to body`);
     }
@@ -120,20 +132,34 @@ export class Phantasia2Component implements OnInit, OnDestroy {
 
     // Start loading sequence
     this.startLoadingSequence();
-    
+
     // Show scroll indicator after loading
     setTimeout(() => {
       this.scrollIndicatorState = 'visible';
       this.cdr.markForCheck();
     }, 2000);
-    
+
     // Set up smooth scroll behavior
     this.setupSmoothScrolling();
-    
+
     // Set up section snapping after a delay to ensure DOM is ready
     setTimeout(() => {
       this.setupSectionSnapping();
     }, 1000);
+
+    // Initialize dynamic artist system
+    this.initializeDynamicArtistSystem();
+    
+    // Start enhanced debug monitoring with DOM ready detection
+    if (this.isDebugMode) {
+      this.debugSystem = new Phantasia2Debug(this.document);
+      // Start async monitoring that waits for DOM to be fully ready
+      this.debugSystem.startDebugMonitoring().then(() => {
+        console.log('[PHANTASIA2] Enhanced debug monitoring fully initialized');
+      }).catch(error => {
+        console.error('[PHANTASIA2] Debug monitoring initialization failed:', error);
+      });
+    }
   }
 
   /**
@@ -710,15 +736,70 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     this.showScrollIndicator.set(false);
     this.scrollIndicatorState = 'hidden';
     this.cdr.markForCheck();
-    
+
     if (this.isDebugMode) {
       console.log('[Phantasia2Component] Scroll indicator hidden after use');
     }
   }
 
+  /**
+   * Initialize the dynamic artist system
+   */
+  private initializeDynamicArtistSystem(): void {
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Initializing dynamic artist system');
+    }
+
+    // The services will initialize automatically through dependency injection
+    // This method is here for future enhancements if needed
+  }
+
+  /**
+   * CRITICAL FIX: Force removal of horizontal scrollbar at runtime
+   * This method applies aggressive CSS overrides to eliminate any horizontal scrolling
+   */
+  private forceHorizontalScrollbarRemoval(): void {
+    try {
+      // Apply styles to HTML element
+      const htmlElement = this.document.documentElement;
+      if (htmlElement) {
+        htmlElement.style.setProperty('overflow-x', 'hidden', 'important');
+        htmlElement.style.setProperty('max-width', '100vw', 'important');
+        htmlElement.style.setProperty('box-sizing', 'border-box', 'important');
+      }
+
+      // Apply styles to BODY element
+      const bodyElement = this.document.body;
+      if (bodyElement) {
+        bodyElement.style.setProperty('overflow-x', 'hidden', 'important');
+        bodyElement.style.setProperty('max-width', '100vw', 'important');
+        bodyElement.style.setProperty('box-sizing', 'border-box', 'important');
+      }
+
+      // Removed problematic DOM injection of overflow styles
+
+      // Removed problematic runtime horizontal scroll prevention code
+
+    } catch (error) {
+      if (this.isDebugMode) {
+        console.warn('[Phantasia2Component] Error applying horizontal scrollbar fix:', error);
+      }
+    }
+  }
+
   ngOnDestroy(): void {
-    // Remove phantasia-album-page class from body
+    // Save final debug log and cleanup debug system
+    if (this.debugSystem) {
+      this.debugSystem.saveDebugLogToFile();
+      this.debugSystem.cleanup();
+      this.debugSystem = null;
+    }
+    
+    // Remove phantasia-album-page class from html and body
+    this.document.documentElement.classList.remove('phantasia-album-page');
     this.document.body.classList.remove('phantasia-album-page');
+    
+    // Removed cleanup for problematic DOM injection code
     
     // Clean up video elements
     if (this.videoElement) {

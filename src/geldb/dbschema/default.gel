@@ -1,24 +1,43 @@
 module default {
-    
+
+    # SocialLinks type - represents social media links for artists
+    type SocialLinks {
+        youtube: str;
+        twitter: str;
+        instagram: str;
+        website: str;
+        carrd: str;
+        linktr: str;
+        bandcamp: str;
+        reelcrafter: str;
+        twitch: str;
+    }
+
     # Artist type - represents musical artists
     type Artist {
         required name: str {
             constraint exclusive;
         };
+        display_name: str;
         bio: str;
         country: str;
         genre: str;
         website: str;
+        avatar: str;
+        color: str;
+        social_links: SocialLinks;
         created_at: datetime {
             default := datetime_current();
         };
         updated_at: datetime {
             default := datetime_current();
         };
-        
+
         # Reverse relationship to albums
         multi albums := .<artist[is Album];
-        multi songs := .<artist[is Song];
+        multi songs := .<main_artist[is Song];
+        multi featured_songs := .<featured_artists[is Song];
+        multi collaborated_songs := .<collaborators[is Song];
     }
     
     # Album type - represents music albums
@@ -45,13 +64,22 @@ module default {
     # Song type - represents individual songs
     type Song {
         required title: str;
-        required artist: Artist;
+        required main_artist: Artist;
         album: Album;
         track_number: int32;
+        start_time_seconds: int32;
+        end_time_seconds: int32;
         duration_seconds: int32;
         genre: str;
         lyrics: str;
+        audio_file_path: str;
         audio_file_url: str;
+
+        # Multi-artist support for Phantasia tracks
+        multi featured_artists: Artist;
+        multi collaborators: Artist;
+        multi additional_artists: Artist;
+
         created_at: datetime {
             default := datetime_current();
         };

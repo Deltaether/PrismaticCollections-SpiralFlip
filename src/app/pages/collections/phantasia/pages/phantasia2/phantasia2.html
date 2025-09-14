@@ -20,8 +20,8 @@
   <!-- Video Title Section - Clean Structure for Perfect Centering -->
   <section class="video-title-section">
     <div class="title-container">
-      <video #titleVideo class="title-video" autoplay muted playsinline preload="auto" 
-             (loadedmetadata)="onTitleVideoLoaded()" 
+      <video #titleVideo class="title-video" autoplay muted playsinline preload="auto"
+             (loadedmetadata)="onTitleVideoLoaded()"
              (canplay)="onTitleVideoCanPlay()"
              (ended)="onTitleVideoEnded()">
         <source src="assets/videos/phantasia2/ULTIMATE_alpha_with_flares.webm" type="video/webm">
@@ -29,18 +29,20 @@
         <!-- Fallback to static image if video fails -->
         <img src="assets/videos/phantasia2/Logo_fx.png" alt="Phantasia Project II" class="title-image-fallback">
       </video>
-      
-      <!-- Scroll Indicator - Now inside title-container -->
-      <div class="scroll-indicator-container" 
-           *ngIf="showScrollIndicator()" 
-           [@scrollIndicator]="scrollIndicatorState"
-           (click)="scrollToContent()">
-        <div class="scroll-text">Scroll for More</div>
-        <div class="triangle-separator">
-          <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
-            <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
-          </svg>
-        </div>
+    </div>
+  </section>
+
+  <!-- Scroll Indicator Section - Independent section positioned above cd-showcase -->
+  <section class="scroll-indicator-section">
+    <div class="scroll-indicator-container"
+         *ngIf="showScrollIndicator()"
+         [@scrollIndicator]="scrollIndicatorState"
+         (click)="scrollToContent()">
+      <div class="scroll-text">Scroll for More</div>
+      <div class="triangle-separator">
+        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
+          <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
+        </svg>
       </div>
     </div>
   </section>
@@ -54,42 +56,49 @@
       <!-- CD Showcase Title -->
       <h2 class="cd-showcase-title">The highly anticipated sequel</h2>
 
-      <!-- Modern Showcase Layout -->
-      <div class="showcase-container">
-        <div class="cd-jacket">
-          <div class="jacket-3d-container">
-            <div class="jacket-art">
-              <img src="assets/videos/phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
+      <!-- Optimized Horizontal Layout for 1920x1080 -->
+      <div class="showcase-main-content">
+        <!-- Left side: Album Cover -->
+        <div class="album-cover-section">
+          <div class="cd-jacket">
+            <div class="jacket-3d-container">
+              <div class="jacket-art">
+                <img src="assets/videos/phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
+              </div>
             </div>
+            <div class="jacket-reflection"></div>
           </div>
-          <div class="jacket-reflection"></div>
         </div>
-        
-        <div class="album-info">
-          <div class="artist-info">
-            <h3 class="artists">"Defining your justice."</h3>
-            <p class="collaboration-label">A fantasy compilation album</p>
+
+        <!-- Right side: Album Info and Music Player -->
+        <div class="album-content-section">
+          <div class="album-info">
+            <div class="artist-info">
+              <h3 class="artists">"Defining your justice."</h3>
+              <p class="collaboration-label">A fantasy compilation album</p>
+            </div>
+            <div class="album-details">
+              <div class="detail-item">
+                <mat-icon>music_note</mat-icon>
+                <span>20 Tracks</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>schedule</mat-icon>
+                <span>83 Minutes</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>style</mat-icon>
+                <span>Ambient Fantasy Orchestral</span>
+              </div>
+            </div>
           </div>
-          <div class="album-details">
-            <div class="detail-item">
-              <mat-icon>music_note</mat-icon>
-              <span>20 Tracks</span>
-            </div>
-            <div class="detail-item">
-              <mat-icon>schedule</mat-icon>
-              <span>83 Minutes</span>
-            </div>
-            <div class="detail-item">
-              <mat-icon>style</mat-icon>
-              <span>Ambient Fantasy Orchestral</span>
-            </div>
+
+          <!-- Music Player positioned below album info -->
+          <div class="music-player-section">
+            <app-music-player></app-music-player>
           </div>
         </div>
       </div>
-
-
-      <!-- Phantasia 2 Music Player - directly at bottom of cd-showcase -->
-      <app-music-player></app-music-player>
 
       <!-- Dynamic Artist Cards - integrated within cd-showcase -->
       <app-dynamic-artist-cards

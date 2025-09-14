@@ -5,15 +5,19 @@
  * Applied at the highest level to override any conflicting styles
  * ================================================= */
 
-// Cleaned up document level styles - removed overflow constraints
+// CRITICAL FIX: Override global background to allow video background visibility
 html {
   max-width: 100vw !important;
   box-sizing: border-box !important;
+  background: transparent !important; // CRITICAL FIX: Remove white background
+  background-color: transparent !important; // CRITICAL FIX: Remove white background
 }
 
 body {
   max-width: 100vw !important;
   box-sizing: border-box !important;
+  background: transparent !important; // CRITICAL FIX: Remove white background
+  background-color: transparent !important; // CRITICAL FIX: Remove white background
 }
 
 /* ===== VIEWPORT RESPONSIVE DESIGN SYSTEM =====
@@ -61,7 +65,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   height: 100%;
   position: relative;
   font-family: 'Inter', 'Roboto', sans-serif; // Professional sans-serif font
-  
+  background: transparent !important; // CRITICAL FIX: Make host transparent to show video
+
   // Removed overflow constraints for natural scrolling behavior
   box-sizing: border-box !important;
   max-width: 100% !important;
@@ -77,16 +82,22 @@ body.phantasia-album-page .phantasia-album-page {
   height: calc(100vh - 90px); // Account for header height
   overflow-y: auto !important; // CRITICAL FIX: Enable vertical scrolling in the container
   overflow-x: hidden !important; // CRITICAL FIX: Prevent horizontal scrolling
-  background: rgba(0, 0, 0, 0.3); // Black background with 30% opacity
+  background: transparent; // CRITICAL FIX: Make background transparent to show video
   color: $charcoal;
   z-index: 1;
   padding: 0;
   margin: 0;
 
-  // CRITICAL FIX: Create isolated stacking context for scrollbar protection
-  isolation: isolate;
+  // CRITICAL FIX: Adjust video title section for header offset
+  .video-title-section {
+    height: calc(100vh - 90px) !important; // Account for header in video title section
+    min-height: calc(100vh - 90px) !important; // Ensure minimum height accounts for header
+  }
+
+  // CRITICAL FIX: Remove isolated stacking context to allow video background to be visible
+  // isolation: isolate; // REMOVED: This was blocking the video background
   will-change: scroll-position;
-  contain: layout style;
+  // contain: layout style; // REMOVED: CSS containment was creating isolated stacking context
 
   // Unified scrollbar design matching website standard with video protection
   scrollbar-width: thin;
@@ -150,50 +161,58 @@ body.phantasia-album-page .phantasia-album-page {
   }
 }
 
-// Video Background Styling with Enhanced Scrollbar Isolation
+/* ===== FLOWING VIDEO BACKGROUND THAT MOVES WITH CONTENT =====
+ * Video background flows naturally with page content instead of being fixed
+ * Creates immersive backdrop that moves with scrolling for better UX
+ * CRITICAL FIX: Remove fixed positioning to allow natural flow
+ * ============================================================== */
 .video-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  overflow: hidden !important; // CRITICAL FIX: Prevent video background from creating scrollbar
-  pointer-events: none; // Ensure video doesn't interfere with interactions
-  
-  // CRITICAL FIX: Maximum isolation to prevent scrollbar opacity inheritance
-  isolation: isolate;
-  // Create separate layer for video rendering
-  contain: layout style paint;
-  // Prevent interaction with scrollbar layers
-  transform: translateZ(0);
-  // Force GPU layer for isolation
-  will-change: opacity;
-  
+  position: fixed !important; // CRITICAL FIX: Use fixed positioning to stay behind scrollable content
+  top: 0 !important; // CRITICAL FIX: Start from the very top of the viewport
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important; // CRITICAL FIX: Cover full viewport height
+  z-index: -1 !important; // CRITICAL FIX: Higher z-index but still behind content
+  overflow: hidden !important; // Prevent any overflow issues
+  pointer-events: none !important; // Ensure video doesn't interfere with interactions
+
+  // CRITICAL FIX: Remove CSS containment to prevent stacking context isolation
+  // isolation: isolate; // REMOVED: This was blocking the video from appearing
+  // contain: layout style paint; // REMOVED: CSS containment was creating isolated context
+  transform: translateZ(0); // Force hardware acceleration
+  will-change: auto; // Less aggressive optimization
+
+  // ENHANCED: Ensure seamless flowing background behavior
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
   .bg-video {
     position: absolute;
     top: 50%;
     left: 50%;
-    min-width: 100%;
-    min-height: 100%;
+    min-width: 100vw; // ENHANCED: Use viewport units for better coverage
+    min-height: 100vh; // CHANGED: Use full viewport height for natural coverage
     width: auto;
     height: auto;
     z-index: -1;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0); // Combined transforms with hardware acceleration
     filter: brightness(1.05) saturate(1.08) contrast(1.03); // Very subtle enhancement
     object-fit: cover; // Ensure proper video scaling
     opacity: 1;
-    
-    // CRITICAL FIX: Complete isolation from parent rendering context
+
+    // ENHANCED: Optimized for flowing background video
     isolation: isolate;
-    // Force separate compositing layer to prevent opacity bleed
-    will-change: opacity, transform;
-    // Ensure video effects don't cascade to scrollbar
-    contain: layout style paint;
-    // Create independent stacking context
-    transform: translateZ(0) translate(-50%, -50%);
+    will-change: auto; // Changed from transform to auto for natural flow
+    contain: layout style paint; // Removed size containment for natural flow
+    backface-visibility: hidden; // Prevent flickering during scroll
+    -webkit-backface-visibility: hidden;
+
+    // ENHANCED: Smooth video playback during scroll
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
+    -moz-transform: translate(-50%, -50%) translateZ(0);
+    -ms-transform: translate(-50%, -50%) translateZ(0);
   }
-  
+
   .video-overlay {
     position: absolute;
     top: 0;
@@ -202,15 +221,36 @@ body.phantasia-album-page .phantasia-album-page {
     height: 100%;
     background: rgba(0, 0, 0, 0.2); // Slightly darker overlay for Phantasia II
     z-index: 0;
-    
+
     // CRITICAL FIX: Prevent overlay from affecting scrollbar
     isolation: isolate;
     contain: layout style paint;
     transform: translateZ(0);
   }
+
+  // Mobile adjustments for video background positioning
+  @media (max-width: 770px) {
+    // Ensure video background properly covers mobile viewport
+    top: 0 !important; // CHANGED: Remove header offset for natural flow
+    height: 100vh !important; // CHANGED: Use full viewport height
+
+    .bg-video {
+      min-height: 100vh !important; // CHANGED: Use full viewport height
+    }
+  }
+
+  @media (max-width: 480px) {
+    // Ultra-mobile video background adjustments
+    top: 0 !important; // CHANGED: Remove header offset for natural flow
+    height: 100vh !important; // CHANGED: Use full viewport height
+
+    .bg-video {
+      min-height: 100vh !important; // CHANGED: Use full viewport height
+    }
+  }
 }
 
-// Main Album Presentation Container with optimized flow  
+// Main Album Presentation Container with optimized flow
 .album-presentation {
   position: relative; // Natural document flow
   z-index: 1;
@@ -219,6 +259,7 @@ body.phantasia-album-page .phantasia-album-page {
   min-height: auto; // FIXED: Allow natural content height
   width: 100vw;
   margin-left: 0; // FIXED: Remove complex centering as container is already full width
+  background: transparent !important; // CRITICAL FIX: Make presentation container transparent
   // Removed overflow constraint
   scroll-behavior: smooth; // Enable smooth scrolling
   
@@ -255,21 +296,21 @@ body.phantasia-album-page .phantasia-album-page {
   }
 }
 
-// Enhanced CD Showcase Section with improved responsive containment
+// Enhanced CD Showcase Section with improved responsive containment and proper margins
 .cd-showcase {
   // Modern glassmorphism container with reduced opacity for video background visibility
-  background: linear-gradient(135deg, 
+  background: linear-gradient(135deg,
     rgba(0, 0, 0, 0.18) 0%,   // Reduced from 0.6 to 0.18 (0.3 * 0.6)
-    rgba(0, 0, 0, 0.21) 25%,  // Reduced from 0.7 to 0.21 (0.3 * 0.7) 
+    rgba(0, 0, 0, 0.21) 25%,  // Reduced from 0.7 to 0.21 (0.3 * 0.7)
     rgba(0, 0, 0, 0.24) 50%,  // Reduced from 0.8 to 0.24 (0.3 * 0.8)
     rgba(0, 0, 0, 0.27) 100%);// Reduced from 0.9 to 0.27 (0.3 * 0.9)
   backdrop-filter: blur(8px) saturate(1.2);
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin: 2rem auto;
-  max-width: min(1200px, calc(100vw - 2rem)); /* Prevent viewport overflow */
-  padding: 3rem 2rem 0.5rem; /* Tight bottom padding to eliminate blank space */
+  margin: clamp(0.5rem, 2vh, 1.5rem) clamp(4rem, 8vw, 12rem); /* ENHANCED: Added proper left/right margins for desktop centering */
+  max-width: min(1600px, calc(100vw - clamp(8rem, 16vw, 24rem))); /* ENHANCED: Reduced max-width and increased margin allowance for better 1080p fit */
+  padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 3vw, 2rem) clamp(0.25rem, 1vh, 0.75rem); /* OPTIMIZED: Reduced padding for compact layout */
   position: relative;
   
   
@@ -280,14 +321,14 @@ body.phantasia-album-page .phantasia-album-page {
   /* Mobile-specific showcase improvements */
   @media (max-width: 768px) {
     max-width: calc(100vw - 1rem);
-    margin: 1rem auto;
+    margin: 1rem auto; /* MAINTAINED: Keep auto centering for mobile */
     padding: 2rem 1rem 0.5rem;
     border-radius: 20px;
   }
-  
+
   @media (max-width: 480px) {
     max-width: calc(100vw - 0.5rem);
-    margin: 0.5rem auto;
+    margin: 0.5rem auto; /* MAINTAINED: Keep auto centering for ultra-mobile */
     padding: 1.5rem 0.75rem 0.5rem;
     border-radius: 16px;
   }
@@ -331,9 +372,10 @@ body.phantasia-album-page .phantasia-album-page {
   justify-content: center;
   width: 100%;
   max-width: 100vw;
-  height: auto;
-  min-height: auto;
+  height: 120vh; // ADJUSTED: Increased height to push title video lower and allow scroll indicator overlay
+  min-height: 120vh; // ADJUSTED: Ensure minimum height for proper spacing
   max-height: none;
+  clip-path: inset(0 0 20vh 0); // CLIPPED: Remove bottom 20vh to make space for scroll indicator
   // Removed overflow constraint
   text-align: center;
   z-index: 2;
@@ -359,80 +401,28 @@ body.phantasia-album-page .phantasia-album-page {
     will-change: transform;
     backface-visibility: hidden;
     transform: translateZ(0);
-    
-    // Scroll Indicator - Now inside title-container
-    .scroll-indicator-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
-      cursor: pointer;
-      margin: 0 auto; // No top margin - directly below video title
-      padding: 0.75rem 1rem;
-      padding-top: 32vh; // Fixed 32 viewport units spacing
-      padding-bottom: 0; // Reset bottom padding
-      z-index: 10;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      
-      &:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.2);
-      }
-      
-      .scroll-text {
-        font-family: 'Inter', sans-serif;
-        font-size: clamp(0.8rem, 1.2vw, 1.1rem); // Enhanced readability bounds: min 12.8px, max 17.6px
-        font-weight: 300;
-        color: rgba(255, 255, 255, 0.8);
-        text-align: center;
-        letter-spacing: 0.05em;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        margin: 0;
-        
-        // Additional mobile-specific font sizing for optimal readability
-        @media (max-width: 768px) {
-          font-size: clamp(0.85rem, 2.5vw, 1.0rem); // Mobile: min 13.6px, max 16px
-        }
-        
-        @media (max-width: 480px) {
-          font-size: clamp(0.9rem, 3vw, 1.0rem); // Ultra-mobile: min 14.4px, max 16px
-        }
-      }
-      
-      .triangle-separator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        
-        .triangle-icon {
-          width: clamp(16px, 1.5vw, 20px);
-          height: clamp(12px, 1vw, 14px);
-          color: rgba(255, 255, 255, 0.7);
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-          animation: bounce 2s infinite;
-        }
-      }
-    }
   }
   
-  /* 【✓】 Move title video lower for improved visual separation */
+  /* 【✓ FIXED】 Move title video to upper viewport for prominence */
   .title-video {
     width: clamp(80vw, 90vw, 95vw) !important; /* Strictly within viewport bounds */
-    height: clamp(45vh, 60vh, 75vh) !important; /* Increased responsive height with bounds */
+    height: clamp(25vh, 50vh, 65vh) !important; /* More consistent responsive height */
     max-width: 95vw !important; /* Never exceed 95% of viewport */
     margin: 0 auto !important;
     object-fit: cover !important;
     object-position: center center !important; /* Better centering */
-    // Removed overflow constraint
-    /* Moved video title even lower (was clamp(18vh, 25vh, 32vh)) */
-    transform: translateY(clamp(24vh, 32vh, 40vh)) !important; /* Lowered by +6vh across all breakpoints */
+    // FIXED: Single transform property positioning video in upper viewport
+    transform: translateY(clamp(-8vh, -4vh, 2vh)) !important; /* FIXED: Moved to upper portion of viewport */
     // GPU acceleration for smooth video scaling
     will-change: transform, filter;
     backface-visibility: hidden;
-    
+
+    // CRITICAL FIX: Override browser default video styles that cause conflicts
+    overflow: visible !important; /* Override user agent stylesheet overflow: clip */
+    overflow-x: visible !important; /* Override incomplete browser defaults */
+    overflow-y: visible !important; /* Override incomplete browser defaults */
+    overflow-clip-margin: initial !important; /* Reset browser default */
+
     // CRITICAL FIX: Ensure video content cannot cause horizontal overflow
     // Removed overflow constraint
     contain: layout style size;
@@ -446,14 +436,14 @@ body.phantasia-album-page .phantasia-album-page {
       width: clamp(80vw, 85vw, 90vw) !important; /* Reduced to prevent any overflow */
       height: clamp(40vh, 55vh, 70vh) !important; /* Increased mobile height */
       max-width: 90vw !important; /* Strict mobile containment */
-      transform: translateY(clamp(8vh, 12vh, 16vh)) !important; /* Move video title lower for mobile */
+      transform: translateY(clamp(-2vh, 2vh, 6vh)) !important; /* FIXED: Move video title to upper viewport for mobile */
     }
 
     @media (max-width: 480px) {
       width: clamp(75vw, 80vw, 85vw) !important; /* Reduced to prevent any overflow */
       height: clamp(35vh, 50vh, 65vh) !important; /* Increased ultra-mobile height */
       max-width: 85vw !important; /* Strict ultra-mobile containment */
-      transform: translateY(clamp(6vh, 10vh, 14vh)) !important; /* Move video title lower for ultra-mobile */
+      transform: translateY(clamp(-4vh, 0vh, 4vh)) !important; /* FIXED: Move video title to upper viewport for ultra-mobile */
     }
     
     // Fallback image styling
@@ -477,6 +467,72 @@ body.phantasia-album-page .phantasia-album-page {
     
     @media (max-width: 768px) {
       font-size: clamp(0.95rem, 1.21vw, 1.4rem); /* Smart responsive tablet font with bounds */
+    }
+  }
+}
+
+/* ===== SCROLL INDICATOR SECTION =====
+ * Independent section positioned between video title and cd-showcase
+ * Provides clear visual separation and proper spacing
+ * ================================== */
+.scroll-indicator-section {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; // ADJUSTED: Remove padding to allow tighter positioning
+  margin-top: -15vh; // ADJUSTED: Negative margin to pull the scroll indicator higher into the clipped space
+  z-index: 15; // Below video title (20) but above background (-1)
+
+  .scroll-indicator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.2);
+    }
+
+    .scroll-text {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.8rem, 1.2vw, 1.1rem); // Enhanced readability bounds
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      letter-spacing: 0.05em;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      margin: 0;
+
+      // Additional mobile-specific font sizing for optimal readability
+      @media (max-width: 768px) {
+        font-size: clamp(0.85rem, 2.5vw, 1.0rem); // Mobile: min 13.6px, max 16px
+      }
+
+      @media (max-width: 480px) {
+        font-size: clamp(0.9rem, 3vw, 1.0rem); // Ultra-mobile: min 14.4px, max 16px
+      }
+    }
+
+    .triangle-separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+
+      .triangle-icon {
+        width: clamp(16px, 1.5vw, 20px);
+        height: clamp(12px, 1vw, 14px);
+        color: rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        animation: bounce 2s infinite;
+      }
     }
   }
 }
@@ -539,7 +595,35 @@ body.phantasia-album-page .phantasia-album-page {
 }
 
 .cd-showcase {
-  
+
+  // CRITICAL FIX: Dynamic Artist Cards Overflow Prevention
+  app-dynamic-artist-cards {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    /* REMOVED: width: 100% !important; - Allow natural sizing */
+
+    // Ensure all child elements are also contained
+    * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+  }
+
+  // CRITICAL FIX: Music Player Responsiveness
+  app-music-player {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    /* REMOVED: width: 100% !important; - Allow natural sizing */
+
+    // Ensure all child elements are also contained
+    * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+  }
+
   // CD Showcase Title Styling - centered and moderate size
   .cd-showcase-title {
     font-family: 'Inter', sans-serif;
@@ -553,29 +637,100 @@ body.phantasia-album-page .phantasia-album-page {
     letter-spacing: clamp(0.3px, 0.035vw, 1px);
   }
   
-  .showcase-container {
+  /* NEW: Optimized horizontal layout for 1920x1080 */
+  .showcase-main-content {
     display: flex;
-    align-items: center;
-    gap: 2.78vw; /* 4rem → responsive gap */
-    margin-bottom: 2.08vw; /* 3rem → responsive margin */
-    
+    align-items: stretch;
+    gap: clamp(2rem, 4vw, 5rem); /* ENHANCED: Increased gap to accommodate larger album cover */
+    margin-bottom: clamp(1rem, 2vh, 2rem);
+    min-height: 450px; /* ENHANCED: Increased min-height to accommodate larger jacket art */
+    max-height: 500px; /* ENHANCED: Added max-height to ensure single viewport fit */
+
     @media (max-width: 1024px) {
       flex-direction: column;
-      gap: 2.08vw; /* 3rem → responsive tablet gap */
+      align-items: center;
+      gap: 2rem;
       text-align: center;
+      min-height: auto;
+    }
+  }
+
+  .album-cover-section {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (min-width: 1025px) {
+      width: 40%; /* ENHANCED: Increased from 35% to 40% to accommodate larger album cover */
+    }
+  }
+
+  .album-content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0; /* Allow content to shrink */
+    gap: clamp(1rem, 2vh, 2rem);
+
+    @media (min-width: 1025px) {
+      width: 60%; /* ENHANCED: Adjusted from 65% to 60% to balance with larger album cover section */
+    }
+  }
+
+  .music-player-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* REMOVED: width: 100%; - Allow natural sizing */
+
+    app-music-player {
+      /* REMOVED: width: 90%; - Allow natural content-based sizing */
+      max-width: 600px; /* KEPT: Maximum width constraint to prevent excessive stretching */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      /* Enhanced centering for music player controls */
+      ::ng-deep .music-player {
+        .controls-section {
+          .playback-controls {
+            justify-content: center !important;
+            margin: 0 auto !important;
+            /* REMOVED: width: 100% !important; - Allow natural button sizing */
+            display: flex !important;
+            align-items: center !important;
+
+            .play-pause-button {
+              margin: 0 auto !important;
+            }
+          }
+        }
+      }
     }
   }
   
   .cd-jacket {
     position: relative;
-    width: 27.78vw; /* 400px → responsive width */
-    height: 27.78vw; /* 400px → responsive height */
-    perspective: 69.44vw; /* 1000px → responsive perspective */
+    width: clamp(400px, 30vw, 550px); /* MAXIMIZED: Significantly increased size to fill container better */
+    height: clamp(400px, 30vw, 550px); /* MAXIMIZED: Maintain aspect ratio with larger dimensions */
+    perspective: 55vw;
     flex-shrink: 0;
-    
+
+    @media (max-width: 1024px) {
+      width: clamp(280px, 35vw, 400px);
+      height: clamp(280px, 35vw, 400px);
+    }
+
     @media (max-width: 768px) {
-      width: 41.67vw; /* 320px → responsive mobile width */
-      height: 41.67vw; /* 320px → responsive mobile height */
+      width: clamp(250px, 40vw, 320px);
+      height: clamp(250px, 40vw, 320px);
+    }
+
+    @media (max-width: 480px) {
+      width: clamp(200px, 50vw, 280px);
+      height: clamp(200px, 50vw, 280px);
     }
     
     .jacket-3d-container {
@@ -739,81 +894,95 @@ body.phantasia-album-page .phantasia-album-page {
   .album-info {
     flex: 1;
     min-width: 0;
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
     .artist-info {
-      margin-bottom: 1.74vw; /* 2.5rem → responsive margin */
+      margin-bottom: clamp(1rem, 2vh, 2rem);
       
       .artists {
         font-family: 'Inter', sans-serif;
-        font-size: clamp(1.5rem, 1.39vw, 2.5rem); /* Smart responsive font size with readability bounds */
+        font-size: clamp(1.75rem, 2.5vw, 3rem); /* Larger font for better hierarchy */
         font-weight: 600;
-        margin: 0 0 clamp(0.25rem, 0.35vw, 0.75rem) 0; /* Smart responsive margin */
+        margin: 0 0 clamp(0.5rem, 1vh, 1rem) 0;
         color: $primary-white;
-        text-shadow: 0 clamp(1px, 0.14vw, 3px) clamp(6px, 0.56vw, 12px) rgba(0, 0, 0, 0.7); /* Smart responsive shadow */
-        
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+        line-height: 1.2;
+
+        @media (max-width: 1024px) {
+          font-size: clamp(1.5rem, 3vw, 2.5rem);
+          text-align: center;
+        }
+
         @media (max-width: 768px) {
-          font-size: clamp(1.2rem, 2.08vw, 2rem); /* Smart responsive tablet font with bounds */
+          font-size: clamp(1.2rem, 2.5vw, 2rem);
         }
       }
       
       .collaboration-label {
-        font-size: clamp(0.85rem, 0.69vw, 1.2rem); /* Smart responsive font size with readability bounds */
+        font-size: clamp(1rem, 1.2vw, 1.4rem); /* Slightly larger for better readability */
         font-weight: 400;
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.8);
         margin: 0;
         font-style: italic;
-        text-shadow: 0 0.14vw 0.28vw rgba(0, 0, 0, 0.8); /* 2px 4px → responsive */
-        letter-spacing: 0.02vw; /* 0.3px → responsive spacing */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        letter-spacing: 0.5px;
         text-transform: uppercase;
+
+        @media (max-width: 1024px) {
+          text-align: center;
+        }
       }
     }
     
     .album-details {
       display: flex;
       flex-direction: column;
-      gap: 0.83vw; /* 1.2rem → responsive gap */
-      padding: 1.39vw; /* 2rem → responsive padding */
-      
+      gap: clamp(0.5rem, 1vh, 0.75rem); /* REDUCED: Smaller gaps between items */
+      padding: clamp(0.75rem, 1.5vh, 1rem); /* REDUCED: Less padding for more compact layout */
+      max-width: 90%; /* ADDED: Limit width to make more compact */
+
       // Modern glassmorphism background for details matching Phantasia I
-      background: linear-gradient(135deg, 
+      background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.06) 0%,
         rgba(255, 255, 255, 0.02) 50%,
         rgba(0, 0, 0, 0.08) 100%);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
-      border-radius: 1.11vw; /* 16px → responsive border radius */
-      border: 0.07vw solid rgba(255, 255, 255, 0.08); /* 1px → responsive border */
+      border-radius: clamp(12px, 1.5vh, 20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       
       .detail-item {
         display: flex;
         align-items: center;
-        gap: 1.11vw; /* 16px → responsive gap */
+        gap: clamp(0.75rem, 1vw, 1.25rem);
         color: rgba(255, 255, 255, 0.95);
-        font-size: clamp(0.9rem, 0.73vw, 1.3rem); /* Smart responsive font size with readability bounds */
+        font-size: clamp(1rem, 1.1vw, 1.4rem); /* Improved readability */
         font-weight: 400;
-        text-shadow: 0 0.14vw 0.56vw rgba(0, 0, 0, 0.6); /* 2px 8px → responsive */
-        padding: 0.56vw; /* 0.8rem → responsive padding */
-        border-radius: 0.83vw; /* 12px → responsive border radius */
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        padding: clamp(0.5rem, 1vh, 0.75rem);
+        border-radius: clamp(8px, 1vh, 12px);
         transition: all 0.3s ease;
         
         &:hover {
           background: rgba(255, 255, 255, 0.05);
-          transform: translateX(0.28vw); /* 4px → responsive translate */
+          transform: translateX(4px);
         }
-        
+
         mat-icon {
           color: rgba(255, 255, 255, 0.9);
-          font-size: 1.53vw; /* 22px → responsive font size */
-          width: 1.53vw; /* 22px → responsive width */
-          height: 1.53vw; /* 22px → responsive height */
-          
+          font-size: clamp(18px, 1.2vw, 24px);
+          width: clamp(18px, 1.2vw, 24px);
+          height: clamp(18px, 1.2vw, 24px);
+
           // Subtle icon glow effect
-          filter: drop-shadow(0 0 0.56vw rgba(255, 255, 255, 0.2)); /* 8px → responsive glow */
+          filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
         }
         
         span {
           font-weight: 500;
-          letter-spacing: 0.014vw; /* 0.2px → responsive spacing */
+          letter-spacing: 0.3px;
         }
       }
     }
@@ -836,18 +1005,37 @@ body.phantasia-album-page .phantasia-album-page {
     }
   }
 
-  // Music Player - Directly placed at bottom with zero spacing
-  app-music-player {
-    display: block;
-    width: 100%;
-    margin: 0; // FIXED: Remove all margins
-    padding: 0; // FIXED: Remove all padding
-    
-    // CRITICAL FIX: Ensure music player cannot cause horizontal overflow
-    // Removed overflow constraint
-    // Removed overflow constraint
-    box-sizing: border-box !important;
-    max-width: 100% !important;
+  // Music Player - Centered within its container
+  .music-player-section {
+    app-music-player {
+      display: block;
+      /* REMOVED: width: 100%; - Allow natural content sizing */
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box !important;
+      max-width: 100% !important;
+
+      /* Ensure perfect centering of music player controls */
+      ::ng-deep {
+        .music-player-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          /* REMOVED: width: 100%; - Allow natural container sizing */
+        }
+
+        .player-controls {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .play-pause-btn {
+          margin: 0 auto;
+        }
+      }
+    }
   }
   
 }
@@ -1017,8 +1205,10 @@ body.phantasia-album-page .phantasia-album-page {
           gap: 0.5rem;
           
           .social-link {
-            width: 40px;
-            height: 40px;
+            width: clamp(44px, 12vw, 48px); // Responsive with 44px minimum
+            height: clamp(44px, 12vw, 48px); // Responsive with 44px minimum
+            min-width: 44px; // iOS/Android minimum touch target
+            min-height: 44px; // iOS/Android minimum touch target
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1150,17 +1340,22 @@ body.phantasia-album-page .phantasia-album-page {
 @media (max-width: 768px) {
   // Mobile-optimized title section with viewport units
   .video-title-section {
-    padding: 1.96vw 0 1.31vw 0; /* 1.5rem 1rem → responsive mobile padding */
-    
+    height: calc(100vh - 90px); // CRITICAL FIX: Account for header on mobile
+    min-height: calc(100vh - 90px); // CRITICAL FIX: Ensure full height accounting for header
+    padding: 0; // CRITICAL FIX: Remove padding that could compress height
+
     .title-container {
       // Mobile-specific GPU acceleration
       transform: translate3d(0, 0, 0);
+      height: 100%; // CRITICAL FIX: Fill full parent height
     }
     
     .title-video {
-      max-width: 92vw; /* Already using viewport units */
-      height: 50vw !important; /* Optimized mobile height */
-      transform: translate3d(0, clamp(8vh, 12vh, 16vh), 0) !important; /* Move video lower with 3D transform for mobile */
+      width: clamp(88vw, 92vw, 95vw) !important; /* Larger mobile video for better visibility */
+      max-width: 95vw; /* Bigger max width for mobile */
+      height: clamp(40vh, 55vw, 70vh) !important; /* Bigger height - mix of vh and vw */
+      object-fit: contain !important; /* Preserve logo aspect ratio */
+      transform: translate3d(0, clamp(-2vh, 2vh, 6vh), 0) !important; /* FIXED: Position in upper viewport for mobile */
     }
     
     .title-subtitle {
@@ -1176,18 +1371,21 @@ body.phantasia-album-page .phantasia-album-page {
     // Mobile performance optimization
     will-change: transform;
     
-    .showcase-container {
-      gap: 2.61vw; /* 2rem → responsive mobile gap */
+    .showcase-main-content {
+      gap: 2rem; /* Consistent mobile gap */
+      min-height: auto; /* Remove fixed height on mobile */
     }
     
-    .cd-jacket .jacket-3d-container {
-      width: 36.58vw; /* 280px → responsive mobile width */
-      height: 36.58vw; /* 280px → responsive mobile height */
-      
-      // Reduce 3D effects on mobile for better performance
-      &:hover {
-        transform: rotateY(8deg) rotateX(3deg); /* Keep degrees as-is */
-      }
+    .album-cover-section {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .album-content-section {
+      width: 100%;
+      gap: 1.5rem;
+      text-align: center;
     }
     
     .album-info .artist-info .artists {
@@ -1207,9 +1405,8 @@ body.phantasia-album-page .phantasia-album-page {
   
   // Mobile scroll indicator adjustments
   .scroll-indicator-container {
-    margin: 1.96vw auto; /* 1.5rem → responsive mobile margin */
-    padding: 1.31vw; /* 1rem → responsive mobile padding */
-    padding-bottom: clamp(4vh, 8vh, 12vh); // Adjusted responsive padding-bottom for mobile
+    bottom: clamp(1rem, 4vh, 2rem); // CRITICAL FIX: Adjust bottom position for mobile
+    padding: 0.75rem 1rem; /* Consistent padding */
     
     .scroll-text {
       font-size: clamp(0.8rem, 1.18vw, 1.1rem); /* Mobile responsive with readability bounds */
@@ -1226,13 +1423,16 @@ body.phantasia-album-page .phantasia-album-page {
 // Ultra-mobile optimization with enhanced viewport units
 @media (max-width: 480px) {
   .video-title-section {
-    padding: 2.08vw 0 1.04vw 0; /* 1rem 0.5rem → responsive ultra-mobile padding */
-    height: 25vw !important; /* Smaller height for ultra-mobile */
+    height: calc(100vh - 90px); // CRITICAL FIX: Account for header on ultra-mobile
+    min-height: calc(100vh - 90px); // CRITICAL FIX: Ensure full height accounting for header
+    padding: 0; // CRITICAL FIX: Remove padding that could compress height
     
     .title-video {
-      max-width: 88vw; /* Already using viewport units */
-      height: 40vw !important; /* Ultra-mobile optimized height */
-      transform: translateY(clamp(4vh, 8vh, 12vh)) !important; /* Move video lower for ultra-mobile */
+      width: clamp(85vw, 90vw, 93vw) !important; /* Larger ultra-mobile video */
+      max-width: 93vw; /* Bigger max width for ultra-mobile */
+      height: clamp(35vh, 45vw, 65vh) !important; /* Bigger height for visibility */
+      object-fit: contain !important; /* Preserve logo aspect ratio */
+      transform: translateY(clamp(-4vh, 0vh, 4vh)) !important; /* FIXED: Position in upper viewport for ultra-mobile */
     }
     
     .title-subtitle {
@@ -1242,18 +1442,23 @@ body.phantasia-album-page .phantasia-album-page {
   }
   
   .cd-showcase {
-    padding: 4.17vw 1.04vw 0.52vw; /* 2rem 0.5rem 0.25rem → responsive ultra-mobile padding with minimal bottom */
-    margin: 1.04vw; /* 0.5rem → responsive ultra-mobile margin */
-    border-radius: 4.17vw; /* 20px → responsive border radius */
-    
-    .cd-jacket .jacket-3d-container {
-      width: 50vw; /* 240px → responsive ultra-mobile width */
-      height: 50vw; /* 240px → responsive ultra-mobile height */
-      
-      // Minimal hover effects for very small screens
-      &:hover {
-        transform: rotateY(5deg) rotateX(2deg); /* Keep degrees as-is */
-      }
+    padding: 2rem 1rem 0.5rem; /* Simplified ultra-mobile padding */
+    margin: 0.5rem;
+    border-radius: 20px;
+
+    .showcase-main-content {
+      gap: 1.5rem;
+      min-height: auto;
+    }
+
+    .album-cover-section,
+    .album-content-section {
+      width: 100%;
+    }
+
+    .album-content-section {
+      gap: 1rem;
+      text-align: center;
     }
   }
   
@@ -1265,9 +1470,8 @@ body.phantasia-album-page .phantasia-album-page {
   
   // Ultra-mobile scroll indicator adjustments with viewport units
   .scroll-indicator-container {
-    margin: 2.08vw auto; /* 1rem → responsive ultra-mobile margin */
-    padding: 1.67vw; /* 0.8rem → responsive ultra-mobile padding */
-    padding-bottom: clamp(3vh, 6vh, 10vh); // Adjusted responsive padding-bottom for ultra-mobile
+    bottom: clamp(0.5rem, 3vh, 1.5rem); // CRITICAL FIX: Adjust bottom position for ultra-mobile
+    padding: 0.75rem 1rem; /* Consistent padding */
     
     .scroll-text {
       font-size: clamp(0.75rem, 1.67vw, 1rem); /* Ultra-mobile responsive with readability bounds */
@@ -1279,6 +1483,99 @@ body.phantasia-album-page .phantasia-album-page {
       width: 5vw;
       height: 5vw;
     }
+  }
+}
+
+// Tablet breakpoint optimizations (769px - 1024px)
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cd-showcase {
+    .showcase-main-content {
+      gap: 2.5rem;
+      min-height: auto;
+    }
+
+    .album-cover-section {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .album-content-section {
+      width: 100%;
+      gap: 2rem;
+      text-align: center;
+    }
+  }
+  .video-title-section {
+    .title-video {
+      width: clamp(75vw, 80vw, 85vw) !important; /* Larger tablet video for visibility */
+      height: clamp(40vh, 45vh, 55vh) !important; /* Bigger height for tablets */
+      object-fit: contain !important; /* Preserve logo aspect ratio */
+      transform: translateY(clamp(-6vh, -2vh, 2vh)) !important; /* FIXED: Position for tablets in upper viewport */
+    }
+  }
+
+  .scroll-indicator-container {
+    bottom: clamp(2rem, 6vh, 3rem); // CRITICAL FIX: Adjust bottom position for tablet
+  }
+}
+
+// Laptop breakpoint optimizations (1025px - 1440px)
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .cd-showcase {
+    .showcase-main-content {
+      gap: 3rem;
+      min-height: 380px; /* Appropriate height for laptops */
+    }
+
+    .cd-jacket {
+      width: clamp(280px, 22vw, 330px);
+      height: clamp(280px, 22vw, 330px);
+    }
+  }
+  .video-title-section {
+    .title-video {
+      width: clamp(70vw, 75vw, 80vw) !important; /* Prominent laptop video size */
+      height: clamp(35vh, 45vh, 55vh) !important; /* Good visibility on laptops */
+      object-fit: contain !important; /* Preserve logo aspect ratio */
+      transform: translateY(clamp(-4vh, 0vh, 4vh)) !important; /* FIXED: Position in upper viewport for laptops */
+    }
+  }
+
+  .scroll-indicator-container {
+    bottom: clamp(3rem, 8vh, 4rem); // CRITICAL FIX: Adjust bottom position for laptop
+  }
+}
+
+// Full HD display optimizations (1920x1080 and similar)
+@media (min-width: 1441px) and (max-width: 1920px) {
+  .cd-showcase {
+    .showcase-main-content {
+      gap: 3.5rem;
+      min-height: 400px; /* Perfect for Full HD viewing */
+    }
+
+    .cd-jacket {
+      width: clamp(320px, 18vw, 380px);
+      height: clamp(320px, 18vw, 380px);
+    }
+
+    .album-content-section {
+      gap: 2rem;
+    }
+  }
+  .video-title-section {
+    .title-video {
+      width: clamp(65vw, 70vw, 75vw) !important; /* Optimal size for 1920x1080 */
+      height: clamp(35vh, 40vh, 50vh) !important; /* Proportioned for Full HD */
+      object-fit: contain !important; /* Preserve logo aspect ratio */
+      transform: translateY(clamp(-2vh, 2vh, 6vh)) !important; /* FIXED: Position in upper viewport for Full HD */
+    }
+  }
+
+  .scroll-indicator-container {
+    bottom: clamp(4rem, 10vh, 5rem); // CRITICAL FIX: Adjust bottom position for Full HD
   }
 }
 
@@ -1302,13 +1599,53 @@ body.phantasia-album-page .phantasia-album-page {
 }
 
 // Reduced motion accessibility
+// 1920x1080 Full HD optimization - ensure everything fits perfectly in single viewport
+@media (min-width: 1920px) and (max-width: 1920px) and (min-height: 1080px) and (max-height: 1080px) {
+  .cd-showcase {
+    max-width: 1500px; /* ENHANCED: Reduced from 1800px to 1500px for better margins */
+    margin: 0.5rem clamp(8rem, 12vw, 16rem); /* ENHANCED: Added specific left/right margins for Full HD */
+    padding: 1rem 2rem 0.75rem; /* Compact but readable padding */
+
+    .cd-showcase-title {
+      margin-bottom: 1.5rem; /* Reduced title margin for tighter layout */
+      font-size: 1.5rem; /* Optimized title size */
+    }
+
+    .showcase-main-content {
+      gap: 2.5rem; /* ENHANCED: Increased gap to accommodate larger album cover */
+      margin-bottom: 1rem; /* Compact bottom margin */
+      min-height: 400px; /* ENHANCED: Increased height for larger jacket art */
+      max-height: 450px; /* ENHANCED: Added max-height for single viewport fit */
+    }
+
+    .cd-jacket {
+      width: 380px; /* ENHANCED: Increased from 300px to 380px for better visibility */
+      height: 380px; /* ENHANCED: Maintain aspect ratio */
+    }
+
+    .album-content-section {
+      gap: 1.5rem; /* Tighter gap between album info and music player */
+    }
+
+    /* Ensure dynamic artist cards are visible but compact */
+    app-dynamic-artist-cards {
+      margin-top: 1rem;
+      max-height: 200px; /* ENHANCED: Limit height to ensure single viewport fit */
+      overflow-y: auto; /* Allow scrolling within cards if needed */
+      overflow-x: hidden; /* CRITICAL: Prevent horizontal overflow */
+      /* REMOVED: width: 100%; - Allow natural content sizing */
+      box-sizing: border-box; /* CRITICAL: Include padding in width calculation */
+    }
+  }
+}
+
 // Advanced viewport-based scaling strategies
 @media (min-width: 1921px) {
   // Large desktop optimizations using vmax for better scaling control
   .video-title-section {
     .title-video {
       height: 35vmax !important; /* Use vmax for ultra-wide screens */
-      transform: translateY(clamp(12vh, 18vh, 24vh)) !important; /* Move video lower for large screens */
+      transform: translateY(clamp(-6vh, -2vh, 2vh)) !important; /* FIXED: Position in upper viewport for large screens */
     }
     
     .title-subtitle {
@@ -1337,7 +1674,7 @@ body.phantasia-album-page .phantasia-album-page {
   .video-title-section {
     .title-video {
       height: 30vmin !important; /* Use vmin to prevent oversizing */
-      transform: translateY(clamp(8vh, 12vh, 16vh)) !important; /* Move video lower for ultra-wide screens */
+      transform: translateY(clamp(-8vh, -4vh, 0vh)) !important; /* FIXED: Position in upper viewport for ultra-wide screens */
     }
     
     // Ultra-wide scroll indicator adjustments
@@ -1358,7 +1695,7 @@ body.phantasia-album-page .phantasia-album-page {
   .video-title-section {
     .title-video {
       height: 25vh !important; /* Use vh for portrait */
-      transform: translateY(clamp(6vh, 10vh, 14vh)) !important; /* Move video lower for portrait orientation */
+      transform: translateY(clamp(-4vh, 0vh, 4vh)) !important; /* FIXED: Position in upper viewport for portrait orientation */
     }
     
     .title-subtitle {
@@ -1366,8 +1703,9 @@ body.phantasia-album-page .phantasia-album-page {
     }
     
     // Portrait scroll indicator adjustments
-    .title-container .scroll-indicator-container {
-      padding-bottom: clamp(4vh, 8vh, 12vh); // Adjusted padding-bottom for portrait orientation
+    .scroll-indicator-container {
+      padding-top: clamp(2rem, 8vh, 5rem); // Portrait: tighter spacing
+      margin: 0 auto clamp(1rem, 2vh, 3rem);
     }
   }
   
@@ -1376,6 +1714,77 @@ body.phantasia-album-page .phantasia-album-page {
       width: 60vw; /* Bigger relative to width in portrait */
       height: 60vw;
     }
+  }
+}
+
+// Critical landscape mobile fix - prevent scroll indicator from disappearing
+@media (orientation: landscape) and (max-height: 480px) {
+  .video-title-section {
+    .title-video {
+      height: clamp(30vh, 40vh, 50vh) !important; // Landscape mobile height
+      transform: translateY(clamp(-6vh, -2vh, 2vh)) !important; // FIXED: Upper viewport positioning for landscape
+    }
+  }
+
+  .scroll-indicator-container {
+    padding-top: clamp(0.5rem, 2vh, 1.5rem) !important; // Emergency fix: minimal spacing
+    margin: 0 auto 0.5rem !important;
+    min-height: 44px !important; // Ensure touch target
+  }
+}
+
+// Portrait mobile fix for very tall narrow screens
+@media (orientation: portrait) and (max-height: 812px) and (max-width: 480px) {
+  .scroll-indicator-container {
+    padding-top: clamp(2rem, 8vh, 5rem) !important; // Portrait: tighter spacing
+    margin: 0 auto clamp(0.5rem, 2vh, 2rem) !important;
+  }
+}
+
+// Ultra-wide screen optimization
+@media (min-width: 1920px) {
+  .scroll-indicator-container {
+    padding-top: clamp(10rem, 15vh, 20rem) !important; // Large screens: controlled scaling
+    margin: 0 auto clamp(3rem, 5vh, 8rem) !important;
+  }
+}
+
+// Ultra-small screen optimization (320px and below)
+@media (max-width: 320px) {
+  .scroll-indicator-container {
+    padding: 0.75rem 0.5rem !important;
+    margin: 0 auto 1rem !important;
+
+    .scroll-text {
+      font-size: 0.9rem !important; // Ensure readability
+      letter-spacing: 0.03em;
+    }
+  }
+
+  .video-title-section {
+    .title-container {
+      padding: 0.5rem !important;
+    }
+  }
+
+  .cd-showcase {
+    margin: 0.5rem auto;
+    padding: 1rem 0.5rem 0.5rem;
+  }
+
+  .artist-section {
+    .artists-grid {
+      grid-template-columns: 1fr; // Single column
+      gap: 0.75rem;
+    }
+  }
+}
+
+// Touch device optimization for better touch targets
+@media (hover: none) and (pointer: coarse) {
+  .scroll-indicator-container {
+    padding: 1rem 1.5rem !important;
+    min-height: 44px; // iOS/Android minimum touch target
   }
 }
 
@@ -1474,8 +1883,8 @@ body.phantasia-album-page .phantasia-album-page {
   .video-title-section {
     // Prevent these components from causing horizontal overflow
     max-width: 100vw;
-    overflow-x: hidden;
-    
+    overflow-x: hidden; /* ENABLED: Prevent horizontal overflow on all components */
+
     // Constrain any child elements with transforms
     * {
       max-width: 100%;

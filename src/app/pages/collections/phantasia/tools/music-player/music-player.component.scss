@@ -548,7 +548,7 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
   }
 
-  // Playback Controls - Professional Button Design
+  // Playback Controls - Professional Button Design with Perfect Centering
   .playback-controls {
     display: flex;
     align-items: center;
@@ -556,6 +556,9 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     gap: clamp(12px, 2vw, 16px);
     flex: 1;
     max-width: 180px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
 
     .control-button {
       position: relative;

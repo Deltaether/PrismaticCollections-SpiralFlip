@@ -3,10 +3,10 @@
 
 .dynamic-artist-cards {
   position: relative;
-  width: 100%;
-  max-width: 1200px;
+  width: 90%; /* REDUCED: From 100% to 90% for more compact layout */
+  max-width: 900px; /* REDUCED: From 1200px to 900px for tighter layout */
   margin: 0 auto;
-  padding: 1rem; // Further reduced from 2rem
+  padding: 0.75rem; /* REDUCED: Further reduced padding for compactness */
 
   // Enhanced background to match Phantasia 2 professional theme
   background: linear-gradient(135deg,

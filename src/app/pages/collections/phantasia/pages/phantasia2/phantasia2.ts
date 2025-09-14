@@ -679,53 +679,71 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     if (this.isDebugMode) {
       console.log('[Phantasia2Component] scrollToContent() triggered');
     }
-    
+
     if (this.cdShowcase?.nativeElement) {
       const element = this.cdShowcase.nativeElement;
-      
+
       // First, try scrolling within the album page container
       const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
       if (albumPage) {
-        // Calculate the exact scroll position
+        // Calculate scroll position to show CD showcase at the top of viewport
         const elementRect = element.getBoundingClientRect();
         const containerRect = albumPage.getBoundingClientRect();
-        
-        // Calculate target scroll position (center the element in viewport)
-        const targetScrollTop = elementRect.top - containerRect.top + albumPage.scrollTop - (window.innerHeight * 0.2);
-        
+
+        // Position CD showcase at top of viewport (with larger offset for header and spacing)
+        const targetScrollTop = elementRect.top - containerRect.top + albumPage.scrollTop - 100; // 100px offset from top to account for header
+
         if (this.isDebugMode) {
           console.log('[Phantasia2Component] Container scroll - Target position:', targetScrollTop);
           console.log('[Phantasia2Component] Current scroll position:', albumPage.scrollTop);
+          console.log('[Phantasia2Component] Element rect:', elementRect);
+          console.log('[Phantasia2Component] Container rect:', containerRect);
         }
-        
+
         // Perform smooth scroll within the container
         albumPage.scrollTo({
           top: Math.max(0, targetScrollTop), // Ensure non-negative scroll
           behavior: 'smooth'
         });
-        
+
       } else {
         if (this.isDebugMode) {
           console.log('[Phantasia2Component] Album page container not found, using window scroll');
         }
-        
+
         // Fallback to window scrolling
         const elementTop = element.offsetTop;
-        const targetPosition = elementTop - (window.innerHeight * 0.2); // 20% from top
-        
+        const targetPosition = elementTop - 100; // 100px from top to account for header
+
         window.scrollTo({
           top: Math.max(0, targetPosition),
           behavior: 'smooth'
         });
       }
-      
+
       // Hide scroll indicator after first use
       this.hideScrollIndicatorAfterUse();
-      
+
     } else {
       if (this.isDebugMode) {
         console.warn('[Phantasia2Component] CD showcase element not found for scrolling');
       }
+
+      // Fallback: scroll to approximate position (100vh to get past video section)
+      const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
+      if (albumPage) {
+        albumPage.scrollTo({
+          top: window.innerHeight - 90, // Full viewport height minus header
+          behavior: 'smooth'
+        });
+      } else {
+        window.scrollTo({
+          top: window.innerHeight - 90,
+          behavior: 'smooth'
+        });
+      }
+
+      this.hideScrollIndicatorAfterUse();
     }
   }
   

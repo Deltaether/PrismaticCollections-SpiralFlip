@@ -1,8 +1,6 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, HostListener, NgZone, OnInit, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, isDevMode } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { THREE, OrbitControls, CSS2DRenderer, CSS2DObject } from '../../../../../shared/three';
 import { CDCase, CaseSettings, SceneSettings, Config } from '../shared/interfaces';
 import config from './config/config.json';
 import { CDCasesService } from './services/cd-cases.service';

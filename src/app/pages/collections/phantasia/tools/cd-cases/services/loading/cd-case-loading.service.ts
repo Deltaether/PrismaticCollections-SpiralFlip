@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { THREE, GLTFLoader, DRACOLoader } from '../../../../../../shared/three';
 import { CDCase, Config } from '../../../shared/interfaces';
 import { CDCaseAnimationsService } from '../animations/cd-case-animations.service';
 import { CDCaseMaterialsService } from '../materials/cd-case-materials.service';
@@ -75,9 +73,9 @@ export class CDCaseLoadingService {
 
       // Load environment map
       const envMapPromise = new Promise<void>((resolve, reject) => {
-        console.log('[CDCaseLoadingService] Loading environment map: assets/images/composite.png');
+        console.log('[CDCaseLoadingService] Loading environment map: assets/images/ui/composite.png');
         new THREE.TextureLoader().load(
-          'assets/images/composite.png', 
+          'assets/images/ui/composite.png', 
           (texture) => {
             console.log('[CDCaseLoadingService] Environment map loaded successfully');
             this.materialsService.setupEnvironmentMap(scene, renderer, texture);

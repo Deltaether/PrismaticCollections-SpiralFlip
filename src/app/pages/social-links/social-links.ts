@@ -1,5 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
 
@@ -26,12 +27,12 @@ interface Artist {
 @Component({
   selector: 'app-social-links',
   standalone: true,
-  imports: [CommonModule, SiteHeaderComponent, SquaresAnimationComponent],
+  imports: [CommonModule, MatIconModule, SiteHeaderComponent, SquaresAnimationComponent],
   templateUrl: './social-links.html',
   styleUrls: ['./social-links.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SocialLinksComponent implements OnInit {
+export class SocialLinksComponent implements OnInit, OnDestroy {
   
   // Artist data with social links
   readonly artists: Artist[] = [
@@ -45,31 +46,31 @@ export class SocialLinksComponent implements OnInit {
         {
           platform: 'Spotify',
           url: 'https://open.spotify.com/artist/deltaether',
-          icon: '🎵',
+          icon: 'library_music',
           color: '#1DB954'
         },
         {
           platform: 'SoundCloud',
           url: 'https://soundcloud.com/deltaether',
-          icon: '🌤️',
+          icon: 'cloud',
           color: '#FF5500'
         },
         {
           platform: 'YouTube',
           url: 'https://youtube.com/@deltaether',
-          icon: '📺',
+          icon: 'play_circle',
           color: '#FF0000'
         },
         {
           platform: 'GitHub',
           url: 'https://github.com/deltaether',
-          icon: '💻',
+          icon: 'code',
           color: '#333'
         },
         {
           platform: 'Discord',
           url: '#',
-          icon: '💬',
+          icon: 'forum',
           color: '#5865F2'
         }
       ]
@@ -84,19 +85,19 @@ export class SocialLinksComponent implements OnInit {
         {
           platform: 'Bandcamp',
           url: '#',
-          icon: '🎪',
+          icon: 'music_note',
           color: '#629AA0'
         },
         {
           platform: 'Instagram',
           url: '#',
-          icon: '📸',
+          icon: 'photo_camera',
           color: '#E4405F'
         },
         {
           platform: 'Twitter',
           url: '#',
-          icon: '🐦',
+          icon: 'alternate_email',
           color: '#1DA1F2'
         }
       ]
@@ -111,7 +112,7 @@ export class SocialLinksComponent implements OnInit {
         {
           platform: 'Various Platforms',
           url: '#',
-          icon: '🌐',
+          icon: 'language',
           color: '#ff7f50'
         }
       ]
@@ -120,6 +121,13 @@ export class SocialLinksComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('Social Links component initialized');
+    // Add body class for global scrolling support
+    document.body.classList.add('social-links-page-active');
+  }
+  
+  ngOnDestroy(): void {
+    // Clean up body class when component is destroyed
+    document.body.classList.remove('social-links-page-active');
   }
 
   /**
@@ -179,7 +187,7 @@ export class SocialLinksComponent implements OnInit {
    */
   onAvatarError(event: any, artistName: string): void {
     console.warn(`Avatar image failed to load for ${artistName}, using default fallback`);
-    event.target.src = 'assets/images/default-avatar.svg';
+    event.target.src = 'assets/images/ui/default-avatar.svg';
     event.target.onerror = null; // Prevent infinite loop if default also fails
   }
 

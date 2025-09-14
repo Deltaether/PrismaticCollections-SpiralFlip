@@ -1,8 +1,9 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withPreloading } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { ScrollHelperService } from './shared/services/scroll-helper.service';
+import { SelectivePreloadStrategy } from './core/strategies/selective-preload.strategy';
 
 /**
  * Main application configuration
@@ -11,8 +12,9 @@ import { ScrollHelperService } from './shared/services/scroll-helper.service';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withPreloading(SelectivePreloadStrategy)),
     provideHttpClient(),
-    ScrollHelperService
+    ScrollHelperService,
+    SelectivePreloadStrategy
   ]
 }; 

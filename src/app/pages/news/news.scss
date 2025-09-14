@@ -1,10 +1,12 @@
 /* Import enhanced design systems, and winter background - triangle animations now handled by TypeScript component */
+@use "sass:color";
 @use '../../shared/styles/fluid-typography-system.scss' as fluid;
 @use '../../shared/styles/responsive-system.scss' as responsive;
 @use '../../shared/styles/typography-system.scss' as typo;
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
 @use '../../shared/styles/unified-background.scss' as winter;
+@use '../../../styles/mixins' as mixins;
 
 /* Variables - Match existing design system */
 $primary-color: #ff7f50;
@@ -56,55 +58,7 @@ $transition-slow: all 0.5s ease;
       #dee2e6 100%
     );
   
-  /* ENHANCED: High-visibility scrollbar for news page */
-  &::-webkit-scrollbar {
-    width: 12px; /* Wider for better visibility */
-    height: 12px;
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.4); /* Darker track */
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.9); /* High contrast white */
-    border-radius: 6px;
-    min-height: 30px;
-    border: 2px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    
-    &:hover {
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-    }
-    
-    &:active {
-      background: rgba(240, 240, 240, 1);
-    }
-  }
-  
-  /* Enhanced Firefox scrollbar */
-  scrollbar-width: auto;
-  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.4);
-  
-  /* Mobile scrollbar enhancements */
-  @media (hover: none) and (pointer: coarse) {
-    &::-webkit-scrollbar {
-      width: 16px; /* Wider for mobile */
-      background: rgba(0, 0, 0, 0.5);
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.95);
-      border: 3px solid rgba(0, 0, 0, 0.5);
-      border-radius: 8px;
-      min-height: 40px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-    }
-  }
+  /* Use browser default scrollbar - no custom styling */
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
   &::before {
@@ -248,6 +202,22 @@ $transition-slow: all 0.5s ease;
     animation: diagonalMorphingPatternT 12s ease-in-out infinite;
   }
   
+  /* ENHANCED: Specific scrollbar styling for anim-c variant */
+  &.anim-c {
+    /* Force scrollbar visibility and functionality */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: calc(100vh - 89px) !important; /* Fixed viewport height minus header */
+    
+    /* Use consistent scrollbar styling matching Home page */
+    @include mixins.base-scrollbar(4px, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.7));
+    
+    /* Mobile enhancements for anim-c - consistent with Home page */
+    @media (hover: none) and (pointer: coarse) {
+      @include mixins.base-scrollbar(6px, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.8));
+    }
+  }
+  
   /* Restore subtle animated texture */
   &::after {
     content: '';
@@ -267,7 +237,9 @@ $transition-slow: all 0.5s ease;
   }
   
   /* Let content determine height naturally */
-  height: auto;
+  & {
+    height: auto;
+  }
   
   /* Apply winter text colors */
   @include winter.winter-text-colors;
@@ -620,6 +592,26 @@ $transition-slow: all 0.5s ease;
   min-height: calc(100vh + 600px);
 }
 
+/* ENHANCED: Specific content height for anim-c to guarantee scrolling */
+.news-page.anim-c .news-main {
+  /* Force content to be much taller than viewport */
+  min-height: calc(100vh + 500px) !important;
+  padding-bottom: 20rem !important; /* Extra large bottom padding */
+  
+  /* Ensure all child elements contribute to scrollable height */
+  & > * {
+    margin-bottom: 2rem; /* Space between sections */
+  }
+  
+  /* Add visual height indicators for debugging and layout properties */
+  & {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
 /* Hero Section - Exact copy from collections page */
 .hero {
   position: relative;
@@ -666,7 +658,7 @@ $transition-slow: all 0.5s ease;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/assets/images/hero-bg.jpg');
+    background-image: url('/assets/images/ui/composite_bg.png');
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -685,20 +677,30 @@ $transition-slow: all 0.5s ease;
     text-align: center;
     z-index: 1;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
     
     .title {
       position: relative;
       z-index: 1;
-      
+      text-align: center;
+      width: 100%;
+      margin: 0 auto 1rem auto;
+
       // Proper fluid scaling for hero titles - 32px to 72px
       font-size: clamp(2rem, 4vw + 1rem, 4.5rem) !important;
       line-height: clamp(1.1, 1.15, 1.2) !important;
       letter-spacing: clamp(-0.025em, -0.01vw, -0.015em) !important;
       font-weight: 800 !important;
-      
+
       // DALFITRA font family with proper fallbacks
       font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-      
+
       // Enhanced visual properties
       color: #eeeeee !important;
       -webkit-text-fill-color: #eeeeee !important;
@@ -721,28 +723,38 @@ $transition-slow: all 0.5s ease;
     
     .subtitle {
       @include fluid.hero-subtitle-typography;
-      color: rgba(255, 255, 255, 0.9); /* White text for dark background */
-      position: relative;
-      z-index: 1;
       
+      // Move all properties inside a selector block to fix mixed declarations warning
+      & {
+        color: rgba(255, 255, 255, 0.9); /* White text for dark background */
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto 1rem auto;
+      }
+
       @include fluid.accessible-typography;
       @include fluid.mobile-optimized-typography;
     }
-    
+
     .description {
       color: rgba(255, 255, 255, 0.8);
       font-weight: 500;
       position: relative;
       z-index: 2;
+      text-align: center;
+      width: 100%;
+      margin: 0 auto;
     }
   }
 }
 
-/* Filters Section */
+/* Twitter Integration Section */
 .filters {
   margin-bottom: 4rem;
   
-  .filter-container {
+  .filter-container.twitter-integration {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(15, 15, 15, 0.9) 50%, rgba(25, 25, 25, 0.85) 100%);
     backdrop-filter: blur(15px);
     border-radius: $card-radius;
@@ -750,128 +762,514 @@ $transition-slow: all 0.5s ease;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     margin-bottom: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* Search Section */
-.search-section {
-  margin-bottom: 2rem;
-  
-  .search-input-container {
     position: relative;
-    max-width: 500px;
-    margin: 0 auto;
+    overflow: hidden;
     
-    .search-input {
-      width: 100%;
-      padding: 1rem 1.5rem;
-      padding-right: 3rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: $light-text;
-      font-size: 1rem;
-      transition: $transition;
-      
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        background: rgba(255, 255, 255, 0.1);
-      }
-      
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-      }
-    }
-    
-    .search-icon {
+    // Subtle glow effect
+    &::before {
+      content: '';
       position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.2rem;
-      color: rgba(255, 255, 255, 0.5);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        circle at 20% 20%,
+        rgba(29, 161, 242, 0.1) 0%,
+        transparent 50%
+      );
       pointer-events: none;
     }
   }
 }
 
-/* Category Filters */
-.category-filters {
+/* Twitter Header */
+.twitter-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1;
   
-  .filter-button {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+  .twitter-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    
+    .twitter-icon {
+      font-size: 1.8rem;
+      filter: hue-rotate(200deg) brightness(1.2);
+    }
+    
+    h3 {
+      color: $light-text;
+      margin: 0;
+      font-weight: 700;
+      
+      @include fluid.typography-heading-4;
+      @include fluid.accessible-typography;
+    }
+    
+    .twitter-handle {
+      color: rgba(29, 161, 242, 0.8);
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: rgba(29, 161, 242, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid rgba(29, 161, 242, 0.2);
+    }
+  }
+  
+  .follow-button {
+    background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+    color: white;
+    border: none;
     border-radius: 12px;
-    padding: 0.75rem 1.25rem;
-    color: $light-text;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: $transition;
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
+      
+      &::before {
+        left: 100%;
+      }
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    .follow-icon {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* Twitter Timeline Container */
+.twitter-timeline-container {
+  margin-bottom: 2rem;
+  
+  .twitter-timeline-wrapper {
+    position: relative;
+    min-height: 400px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    
+    &.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    &.error {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+/* Loading State */
+.twitter-loading {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(29, 161, 242, 0.3);
+    border-top: 3px solid #1da1f2;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    animation: spin 1s linear infinite;
+  }
+  
+  .loading-text {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.twitter-error {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  
+  .error-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .error-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .retry-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: $light-text;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: $transition;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
     font-weight: 500;
     
     &:hover {
+      background: rgba(255, 255, 255, 0.15);
       border-color: $primary-color;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
     
-    &.active {
-      background: $gradient-primary;
-      border-color: transparent;
-      color: white;
-      font-weight: 600;
-    }
-    
-    .filter-icon {
-      font-size: 1rem;
-    }
-  }
-}
-
-/* Filter Actions */
-.filter-actions {
-  text-align: center;
-  
-  .clear-filters {
-    background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: $transition;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    
-    &:hover {
-      border-color: $primary-color;
-      color: $light-text;
-    }
-    
-    .clear-icon {
+    .retry-icon {
       font-size: 0.8rem;
     }
   }
 }
 
+/* Manual Tweets */
+.manual-tweets {
+  padding: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+  
+  // Use browser default scrollbar - no custom styling
+}
+
+.tweet-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: $transition;
+  position: relative;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(29, 161, 242, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tweet-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  
+  .tweet-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(29, 161, 242, 0.3);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  .tweet-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .tweet-name {
+      color: $light-text;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    
+    .tweet-handle {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+    }
+    
+    .tweet-date {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.tweet-content {
+  margin-bottom: 1rem;
+  
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+    
+    ::ng-deep .tweet-hashtag {
+      color: #1da1f2;
+      font-weight: 500;
+    }
+    
+    ::ng-deep .tweet-mention {
+      color: #1da1f2;
+      font-weight: 500;
+    }
+  }
+  
+  .tweet-media {
+    margin-top: 1rem;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    &:hover img {
+      transform: scale(1.02);
+    }
+  }
+}
+
+.tweet-actions {
+  display: flex;
+  gap: 1rem;
+  
+  .tweet-action {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: $transition;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(29, 161, 242, 0.5);
+      color: #1da1f2;
+    }
+    
+    .action-icon {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+/* Twitter Footer */
+.twitter-footer {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  
+  .twitter-footer-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .twitter-footer-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+    .footer-link {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: $transition;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      border: none;
+      
+      &.primary {
+        background: linear-gradient(135deg, $primary-color, color.adjust($primary-color, $lightness: -10%));
+        color: white;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(255, 127, 80, 0.3);
+        }
+      }
+      
+      &.secondary {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.3);
+          color: $light-text;
+        }
+      }
+      
+      .link-icon {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+/* Responsive Design for Twitter Integration */
+@media (max-width: 768px) {
+  .twitter-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    
+    .twitter-title {
+      justify-content: center;
+      
+      h3 {
+        font-size: 1.3rem;
+      }
+    }
+    
+    .follow-button {
+      width: 100%;
+      max-width: 200px;
+      justify-content: center;
+    }
+  }
+  
+  .twitter-timeline-wrapper {
+    min-height: 300px;
+  }
+  
+  .tweet-card {
+    padding: 1.25rem;
+  }
+  
+  .tweet-header {
+    .tweet-avatar {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  
+  .twitter-footer-actions {
+    flex-direction: column;
+    align-items: center;
+    
+    .footer-link {
+      width: 100%;
+      max-width: 250px;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .filters {
+    .filter-container.twitter-integration {
+      padding: 1.5rem;
+    }
+  }
+  
+  .twitter-header {
+    .twitter-title {
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      h3 {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  .tweet-card {
+    padding: 1rem;
+  }
+  
+  .tweet-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .tweet-action {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .manual-tweets {
+    max-height: 400px;
+    padding: 0.75rem;
+  }
+}
+
+// Removed old search and filter styles as they're replaced by Twitter integration
+
 /* Section Titles */
 .section-title {
-  @include fluid.section-title-typography;
   position: relative;
   color: $light-text;
   font-weight: 700;
   
+  @include fluid.section-title-typography;
   @include fluid.accessible-typography;
   @include fluid.mobile-optimized-typography;
   
@@ -1071,25 +1469,26 @@ $transition-slow: all 0.5s ease;
 
 /* Article Content */
 .article-title {
-  @include fluid.typography-heading-3;
   color: $light-text;
   margin-bottom: clamp(0.375rem, 1.5vw, 0.625rem);
   transition: color 0.2s ease;
+  
+  @include fluid.typography-heading-3;
+  @include fluid.accessible-typography;
   
   .featured-article:hover &,
   .news-article:hover & {
     color: $primary-color;
   }
-  
-  @include fluid.accessible-typography;
 }
 
 .article-subtitle {
-  @include fluid.typography-body-large;
   color: $primary-color;
   margin-bottom: 1rem;
   font-weight: 500;
   opacity: 0.9;
+  
+  @include fluid.typography-body-large;
 }
 
 .article-excerpt {
@@ -1452,17 +1851,7 @@ $transition-slow: all 0.5s ease;
     min-height: calc(100vh + 700px) !important;
     height: 100vh !important;
     
-    /* Enhanced mobile scrollbar */
-    &::-webkit-scrollbar {
-      width: 18px !important;
-      background: rgba(0, 0, 0, 0.6) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important;
-      border: 4px solid rgba(0, 0, 0, 0.7) !important;
-      min-height: 50px !important;
-    }
+    /* Use browser default scrollbar - no custom styling */
   }
   
   .news-main {
@@ -1567,17 +1956,7 @@ $transition-slow: all 0.5s ease;
     /* iPhone specific enhancements */
     min-height: calc(100vh + 900px) !important;
     
-    &::-webkit-scrollbar {
-      width: 20px !important;
-      background: rgba(0, 0, 0, 0.8) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important;
-      border: 5px solid rgba(0, 0, 0, 0.8) !important;
-      min-height: 60px !important;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
-    }
+    /* Use browser default scrollbar - no custom styling */
   }
   
   .news-main {

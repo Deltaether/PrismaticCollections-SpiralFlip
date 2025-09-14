@@ -43,7 +43,7 @@ export class NewCollectionsComponent implements OnInit, OnDestroy, AfterViewInit
       id: 'phantasia',
       title: 'Project: Phantasia',
       artist: 'Prismatic Collections',
-      coverImage: 'assets/images/phantasia_1_cover_optimized.webp',
+      coverImage: 'assets/images/covers/phantasia_1_cover_optimized.webp',
       trackCount: 14,
       year: 2024,
       description: 'Our flagship collection featuring ethereal soundscapes, intricate rhythms, and emotional melodies.',

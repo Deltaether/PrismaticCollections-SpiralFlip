@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, merge } from 'rxjs';
-import { takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
-import { Track } from './audio.service';
+import { takeUntil, distinctUntilChanged, debounceTime, map } from 'rxjs/operators';
+import { Track } from '../../../../core/services/audio/audio.service';
 
 // Types used by the AudioHandlerService
 export interface AudioHandlerState {

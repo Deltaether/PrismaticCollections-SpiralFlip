@@ -6,8 +6,11 @@
 // Audio services
 export * from './audio';
 
-// Device detection
-export { DeviceDetectionService } from './device-detection.service';
+// Phantasia data services
+export { PhantasiaDataService } from './phantasia-data.service';
 
-// Navigation services  
-export { ScrollHelperService } from './navigation/scroll-helper.service';
+// Device detection
+export { DeviceDetectionService } from '../../services/device-detection.service';
+
+// Navigation services
+export { ScrollHelperService } from '../../shared/services/scroll-helper.service';

@@ -1,0 +1,95 @@
+<!-- Dynamic Artist Cards Container -->
+<div class="dynamic-artist-cards"
+     [@cardsContainer]="cardsAnimationTrigger"
+     [class.show-all-mode]="showAllArtists"
+     [class.dynamic-mode]="!showAllArtists">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <h3 class="section-title">
+      <span *ngIf="showAllArtists">All Featured Artists</span>
+      <span *ngIf="!showAllArtists && currentTrack">Currently Playing Artists</span>
+      <span *ngIf="!showAllArtists && !currentTrack">Featured Artists</span>
+    </h3>
+    <p class="section-subtitle" *ngIf="!showAllArtists">
+      Artists change dynamically with the music
+    </p>
+  </div>
+
+  <!-- Artist Cards Grid -->
+  <div class="artist-cards-grid" *ngIf="artistCards.length > 0">
+    <div class="artist-card"
+         *ngFor="let card of artistCards; trackBy: trackByArtistId"
+         [@cardAnimation]="card.animationState"
+         [@activeGlow]="card.isActive ? 'active' : 'inactive'"
+         [ngStyle]="getCardStyle(card)"
+         [class.active-artist]="card.isActive"
+         [class.inactive-artist]="!card.isActive">
+
+      <!-- Artist Avatar -->
+      <div class="artist-avatar">
+        <div class="avatar-image" [style.background-color]="card.color">
+          <span class="avatar-initials">{{ getArtistInitials(card.name) }}</span>
+        </div>
+        <div class="active-indicator" *ngIf="card.isActive"></div>
+      </div>
+
+      <!-- Artist Information -->
+      <div class="artist-info">
+        <h4 class="artist-name">{{ card.displayName }}</h4>
+        <p class="artist-role">{{ card.role }}</p>
+
+        <!-- Activity Status -->
+        <div class="activity-status" *ngIf="!showAllArtists">
+          <span class="status-indicator" [class.active]="card.isActive"></span>
+          <span class="status-text">
+            {{ card.isActive ? 'Currently Playing' : 'Featured Artist' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="social-links"
+           *ngIf="hasSocialLinks(card)"
+           [@socialLinksAnimation]="card.isActive ? 'show' : 'hide'">
+
+        <div class="social-links-grid">
+          <a class="social-link"
+             *ngFor="let link of getVisibleSocialLinks(card)"
+             [href]="link.url"
+             [title]="getSocialPlatformName(link.platform) + ' - ' + card.displayName"
+             target="_blank"
+             rel="noopener noreferrer"
+             (click)="onSocialLinkClick(link.url, link.platform, card.name)">
+
+            <mat-icon class="social-icon">{{ getSocialIcon(link.platform) }}</mat-icon>
+            <span class="social-platform-name">{{ getSocialPlatformName(link.platform) }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Glow Effect -->
+      <div class="card-glow" [style.background]="'radial-gradient(circle at center, ' + card.color + '20 0%, transparent 70%)'"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="artistCards.length === 0">
+    <div class="empty-content">
+      <mat-icon class="empty-icon">people</mat-icon>
+      <h4 class="empty-title">Loading Artists...</h4>
+      <p class="empty-message">Discovering the talented artists behind the music</p>
+    </div>
+  </div>
+
+  <!-- Dynamic Mode Info -->
+  <div class="dynamic-info" *ngIf="!showAllArtists && artistCards.length > 0">
+    <div class="info-content">
+      <mat-icon class="info-icon">info</mat-icon>
+      <p class="info-text">
+        Artist cards update in real-time as different tracks play.
+        <strong>{{ getActiveArtistCount() }}</strong> artists are currently featured.
+      </p>
+    </div>
+  </div>
+</div>

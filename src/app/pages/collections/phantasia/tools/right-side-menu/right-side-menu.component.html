@@ -28,7 +28,9 @@
           [class.active]="i === activeCaseIndex"
           (click)="onTrackSelected(i)"
         >
-          <div class="selector-arrow" *ngIf="i === activeCaseIndex">▶</div>
+          <div class="selector-arrow" *ngIf="i === activeCaseIndex">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          </div>
           <div class="track-number responsive-text">{{i + 1}}</div>
           <div class="track-info">
             <div class="track-title responsive-text">{{track.title}}</div>

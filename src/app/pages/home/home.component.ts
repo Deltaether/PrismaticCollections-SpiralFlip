@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       id: 'phantasia-album',
       title: 'Project Phantasia - CD Album',
       description: 'Experience our immersive musical album with 3D interactive CD cases and visual storytelling',
-      image: 'assets/images/albums/phantasia-cd-cover.jpg',
+      image: 'assets/images/covers/phantasia_1_cover_optimized.webp',
       route: '/phantasia/phantasia',
       isMain: true
     },

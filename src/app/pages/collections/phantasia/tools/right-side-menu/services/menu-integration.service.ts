@@ -159,7 +159,7 @@ export class MenuIntegrationService implements OnDestroy {
       console.log('[MenuIntegration] Attempting to load from alternate path');
     }
     
-    this.http.get(`assets/app/tools/right-side-menu/config/menu-config.json?t=${timestamp}`)
+    this.http.get(`assets/config/components/menu-config.json?t=${timestamp}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe(
         (config: any) => {

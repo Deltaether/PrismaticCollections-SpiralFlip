@@ -41,7 +41,7 @@ export interface AudioEvent {
 export type Section = 'introduction' | 'disc-1' | 'disc-2' | 'pv' | 'information';
 export type AudioError = 'LOAD_ERROR' | 'PLAY_ERROR' | 'PAUSE_ERROR' | 'NETWORK_ERROR' | 'UI_SOUND_ERROR';
 export type UISound = 'menu-click' | 'page-turn' | 'success' | 'error';
-export type TrackEvent = 'play' | 'pause' | 'ended' | 'timeupdate' | 'error' | 'loading' | 'loaded' | 'volumechange';
+export type TrackEvent = 'play' | 'pause' | 'ended' | 'timeupdate' | 'error' | 'loading' | 'loaded' | 'loadstart' | 'loadeddata' | 'volumechange';
 
 @Injectable({
   providedIn: 'root'
@@ -195,52 +195,82 @@ export class AudioService implements OnDestroy {
    */
   private handleAudioEvent(eventType: TrackEvent, event: Event): void {
     const currentState = this.audioStateSubject.value;
-    let newState: AudioState = { ...currentState };
 
     switch (eventType) {
       case 'play':
-        newState.isPlaying = true;
-        newState.loading = false;
+        this.audioStateSubject.next({
+          ...currentState,
+          isPlaying: true,
+          loading: false
+        });
         break;
       case 'pause':
-        newState.isPlaying = false;
+        this.audioStateSubject.next({
+          ...currentState,
+          isPlaying: false
+        });
         break;
       case 'ended':
-        newState.isPlaying = false;
-        newState.progress = 0;
-        newState.currentTime = 0;
+        this.audioStateSubject.next({
+          ...currentState,
+          isPlaying: false,
+          progress: 0,
+          currentTime: 0
+        });
         break;
       case 'timeupdate':
         if (this.audioElement) {
-          newState.currentTime = this.audioElement.currentTime;
-          newState.duration = this.audioElement.duration || 0;
-          newState.progress = newState.duration > 0 ? 
-            (newState.currentTime / newState.duration) * 100 : 0;
+          const currentTime = this.audioElement.currentTime;
+          const duration = this.audioElement.duration || 0;
+          const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+          
+          this.audioStateSubject.next({
+            ...currentState,
+            currentTime,
+            duration,
+            progress
+          });
         }
         break;
       case 'loadstart':
-        newState.loading = true;
+        this.audioStateSubject.next({
+          ...currentState,
+          loading: true
+        });
         break;
       case 'loadeddata':
-        newState.loading = false;
         if (this.audioElement) {
-          newState.duration = this.audioElement.duration || 0;
+          this.audioStateSubject.next({
+            ...currentState,
+            loading: false,
+            duration: this.audioElement.duration || 0
+          });
+        } else {
+          this.audioStateSubject.next({
+            ...currentState,
+            loading: false
+          });
         }
         break;
       case 'volumechange':
         if (this.audioElement) {
-          newState.volume = this.audioElement.volume;
-          newState.isMuted = this.audioElement.muted;
+          this.audioStateSubject.next({
+            ...currentState,
+            volume: this.audioElement.volume,
+            isMuted: this.audioElement.muted
+          });
         }
         break;
       case 'error':
-        newState.loading = false;
+        this.audioStateSubject.next({
+          ...currentState,
+          loading: false
+        });
         this.emitAudioEvent('error', { error: event });
         console.error('Audio playback error:', event);
         break;
     }
 
-    this.audioStateSubject.next(newState);
     this.emitAudioEvent(eventType);
   }
 

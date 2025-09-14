@@ -20,7 +20,7 @@ import { ResponsiveDirective, ResponsiveFromDirective, ResponsiveToDirective } f
         <!-- Site Logo/Title -->
         <div class="logo-container">
           <a class="logo-link" [routerLink]="['/']">
-            <img src="/assets/images/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
+            <img src="/assets/images/logos/prismcoll_logox.svg" alt="Prismatic Collections" class="logo-image">
           </a>
         </div>
 

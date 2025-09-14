@@ -25,50 +25,114 @@
       </div>
     </section>
 
-    <!-- Search and Filter Section -->
+    <!-- Twitter Integration Section -->
     <section class="filters">
-      <div class="filter-container">
+      <div class="filter-container twitter-integration">
         
-        <!-- Search Bar -->
-        <div class="search-section">
-          <div class="search-input-container">
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Search news articles..."
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-            >
-            <div class="search-icon">🔍</div>
+        <!-- Header -->
+        <div class="twitter-header">
+          <div class="twitter-title">
+            <mat-icon class="twitter-icon">alternate_email</mat-icon>
+            <h3>Latest from Prismatic Collections</h3>
+            <span class="twitter-handle">@prismcollect_</span>
+          </div>
+          <a 
+            href="https://x.com/prismcollect_" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="follow-button"
+            (click)="onFollowClick()">
+            <mat-icon class="follow-icon">add</mat-icon>
+            <span class="follow-text">Follow on X</span>
+          </a>
+        </div>
+        
+        <!-- Twitter Timeline Embed -->
+        <div class="twitter-timeline-container">
+          <div 
+            class="twitter-timeline-wrapper"
+            [class.loading]="twitterLoading()"
+            [class.error]="twitterError()">
+            
+            <!-- Loading State -->
+            <div class="twitter-loading" *ngIf="twitterLoading()">
+              <div class="loading-spinner"></div>
+              <p class="loading-text">Loading latest tweets...</p>
+            </div>
+            
+            <!-- Error State -->
+            <div class="twitter-error" *ngIf="twitterError()">
+              <mat-icon class="error-icon">warning</mat-icon>
+              <p class="error-text">Unable to load tweets</p>
+              <button class="retry-button" (click)="retryTwitterLoad()">
+                <mat-icon class="retry-icon">refresh</mat-icon>
+                Try Again
+              </button>
+            </div>
+            
+            <!-- Twitter Timeline (when loaded) -->
+            <div 
+              class="twitter-embed" 
+              *ngIf="!twitterLoading() && !twitterError()"
+              [innerHTML]="twitterEmbedHtml()">
+            </div>
+            
+            <!-- Fallback Manual Tweets -->
+            <div class="manual-tweets" *ngIf="!twitterLoading() && !twitterError() && !twitterEmbedHtml()">
+              <div class="tweet-card" *ngFor="let tweet of fallbackTweets(); trackBy: trackByTweetId">
+                <div class="tweet-header">
+                  <div class="tweet-avatar">
+                    <img src="/assets/images/artists/deltaether-avatar.svg" alt="Prismatic Collections" />
+                  </div>
+                  <div class="tweet-info">
+                    <span class="tweet-name">Prismatic Collections</span>
+                    <span class="tweet-handle">@prismcollect_</span>
+                    <span class="tweet-date">{{ formatTweetDate(tweet.date) }}</span>
+                  </div>
+                </div>
+                <div class="tweet-content">
+                  <p [innerHTML]="formatTweetContent(tweet.content)"></p>
+                  <div class="tweet-media" *ngIf="tweet.media">
+                    <img [src]="tweet.media" [alt]="tweet.content" loading="lazy" />
+                  </div>
+                </div>
+                <div class="tweet-actions">
+                  <button class="tweet-action" (click)="openTweetUrl(tweet.url)">
+                    <span class="action-icon">🔗</span>
+                    <span class="action-text">View on X</span>
+                  </button>
+                  <button class="tweet-action" (click)="shareTweet(tweet)">
+                    <span class="action-icon">↗️</span>
+                    <span class="action-text">Share</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
         
-        <!-- Category Filters -->
-        <div class="category-filters">
-          <button 
-            class="filter-button"
-            [class.active]="selectedCategory === ''"
-            (click)="onCategoryChange('')">
-            <span class="filter-icon">📰</span>
-            <span class="filter-label">All News</span>
-          </button>
-          
-          <button 
-            *ngFor="let category of categories" 
-            class="filter-button"
-            [class.active]="selectedCategory === category.value"
-            (click)="onCategoryChange(category.value)">
-            <span class="filter-icon">{{ category.icon }}</span>
-            <span class="filter-label">{{ category.label }}</span>
-          </button>
-        </div>
-        
-        <!-- Clear Filters -->
-        <div class="filter-actions" *ngIf="selectedCategory || searchTerm">
-          <button class="clear-filters" (click)="clearFilters()">
-            <span class="clear-icon">✕</span>
-            Clear Filters
-          </button>
+        <!-- Footer -->
+        <div class="twitter-footer">
+          <p class="twitter-footer-text">
+            Stay updated with our latest announcements, releases, and behind-the-scenes content.
+          </p>
+          <div class="twitter-footer-actions">
+            <a 
+              href="https://x.com/prismcollect_" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="footer-link primary">
+              <mat-icon class="link-icon">star</mat-icon>
+              View Full Timeline
+            </a>
+            <button 
+              class="footer-link secondary" 
+              (click)="refreshTwitterFeed()">
+              <mat-icon class="link-icon">refresh</mat-icon>
+              Refresh Feed
+            </button>
+          </div>
         </div>
         
       </div>
@@ -99,11 +163,11 @@
             <div class="article-meta">
               <span class="category-badge"
                     [style.background]="getCategoryGradient(article.category)">
-                <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
+                <mat-icon class="category-icon">{{ getCategoryIcon(article.category) }}</mat-icon>
                 {{ getCategoryLabel(article.category) }}
               </span>
               <span class="publish-date">{{ formatDate(article.publishDate) }}</span>
-              <span class="pinned-indicator" *ngIf="article.isPinned">📌 Pinned</span>
+              <span class="pinned-indicator" *ngIf="article.isPinned"><mat-icon>push_pin</mat-icon> Pinned</span>
             </div>
             
             <!-- Article Title and Subtitle -->
@@ -130,7 +194,7 @@
             <!-- Read More -->
             <div class="read-more">
               <span class="read-more-text">Read Full Article</span>
-              <span class="read-more-arrow">→</span>
+              <mat-icon class="read-more-arrow">arrow_forward</mat-icon>
             </div>
             
           </div>
@@ -149,12 +213,8 @@
         <div class="no-results-icon">🔍</div>
         <h3 class="no-results-title">No articles found</h3>
         <p class="no-results-text">
-          <span *ngIf="searchTerm || selectedCategory">No articles match your current filters.</span>
-          <span *ngIf="!searchTerm && !selectedCategory">No news articles are currently available.</span>
+          No news articles are currently available.
         </p>
-        <button class="clear-filters" *ngIf="searchTerm || selectedCategory" (click)="clearFilters()">
-          Clear filters and show all articles
-        </button>
       </div>
       
       <!-- Articles Grid -->
@@ -197,7 +257,7 @@
           <!-- Read More Indicator -->
           <div class="read-indicator">
             <span class="read-text">Read More</span>
-            <span class="read-arrow">→</span>
+            <mat-icon class="read-arrow">arrow_forward</mat-icon>
           </div>
           
         </article>
@@ -214,12 +274,12 @@
         </p>
         <div class="cta-buttons">
           <button class="button primary" (click)="router.navigate(['/socials'])">
-            <span class="button-icon">🔔</span>
+            <mat-icon class="button-icon">notifications</mat-icon>
             Follow Us
             <span class="button-description">Join our community channels</span>
           </button>
           <button class="button secondary" (click)="router.navigate(['/collections'])">
-            <span class="button-icon">🎨</span>
+            <mat-icon class="button-icon">palette</mat-icon>
             Explore Collections
             <span class="button-description">Discover our interactive experiences</span>
           </button>

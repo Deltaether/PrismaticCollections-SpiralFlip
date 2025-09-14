@@ -5,6 +5,7 @@
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
 @use '../../shared/styles/unified-background.scss' as winter;
+@use '../../../styles/mixins' as mixins;
 
 /* Variables */
 $primary-color: #ff7f50;
@@ -38,7 +39,7 @@ $transition: all 0.3s ease;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto; /* Enable vertical scrolling */
-  padding-top: 89px;
+  margin-top: 89px;
   scroll-behavior: smooth;
   
   /* Static Background: White gradient variations - Clean and professional */
@@ -58,53 +59,16 @@ $transition: all 0.3s ease;
   backface-visibility: hidden;
   perspective: 1000px;
   
-  /* OPTIMIZED: Balanced high-visibility scrollbar for social links page */
-  &::-webkit-scrollbar {
-    width: 10px; /* Optimal width for visibility without being intrusive */
-    height: 10px;
-    background: rgba(0, 0, 0, 0.6); /* Strong but not overpowering background */
-  }
+  /* Use browser default scrollbar - no custom styling */
   
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.6); /* Consistent with scrollbar background */
-    border-radius: 5px; /* Smooth rounded corners */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 2px; /* Slight margin for refinement */
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.9); /* High contrast white thumb */
-    border-radius: 5px; /* Consistent radius */
-    min-height: 40px; /* Adequate touch target */
-    border: 1px solid rgba(0, 0, 0, 0.3); /* Subtle definition */
+  /* ENHANCED: Specific scrollbar functionality for anim-a variant */
+  &.anim-a {
+    /* Force scrollbar visibility and functionality */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: calc(100vh - 89px) !important; /* Fixed viewport height minus header */
     
-    &:hover {
-      background: rgba(255, 255, 255, 1); /* Full opacity on hover */
-      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3); /* Subtle glow */
-    }
-    
-    &:active {
-      background: rgba(240, 240, 240, 1);
-    }
-  }
-  
-  /* Enhanced Firefox scrollbar */
-  scrollbar-width: auto; /* Standard thick scrollbar */
-  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.6); /* High contrast for Firefox */
-  
-  /* Mobile scrollbar enhancements */
-  @media (hover: none) and (pointer: coarse) {
-    &::-webkit-scrollbar {
-      width: 12px; /* Optimal mobile width */
-      background: rgba(0, 0, 0, 0.6);
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.95);
-      border: 2px solid rgba(0, 0, 0, 0.6);
-      border-radius: 6px;
-      min-height: 40px; /* Large touch target */
-    }
+    /* Use browser default scrollbar - no custom styling */
   }
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element - GPU ACCELERATED */
@@ -293,6 +257,26 @@ $transition: all 0.3s ease;
   min-height: calc(100vh + 300px); /* Reduced but reliable content overflow */
 }
 
+/* ENHANCED: Specific content height for anim-a to guarantee scrolling */
+.social-links-page.anim-a .social-main {
+  /* Force content to be much taller than viewport */
+  min-height: calc(100vh + 500px) !important;
+  padding-bottom: 20rem !important; /* Extra large bottom padding */
+  
+  /* Ensure all child elements contribute to scrollable height */
+  & > * {
+    margin-bottom: 2rem; /* Space between sections */
+  }
+  
+  /* Add visual height indicators for debugging and layout properties */
+  & {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
 /* Hero Section - Exact copy from collections page */
 .hero {
   position: relative;
@@ -343,7 +327,7 @@ $transition: all 0.3s ease;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/assets/images/hero-bg.jpg');
+    background-image: url('/assets/images/ui/composite_bg.png');
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -362,20 +346,30 @@ $transition: all 0.3s ease;
     text-align: center;
     z-index: 1;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
     
     .title {
       position: relative;
       z-index: 1;
-      
+      text-align: center;
+      width: 100%;
+      margin: 0 auto 1rem auto;
+
       // Proper fluid scaling for hero titles - 32px to 72px
       font-size: clamp(2rem, 4vw + 1rem, 4.5rem) !important;
       line-height: clamp(1.1, 1.15, 1.2) !important;
       letter-spacing: clamp(-0.025em, -0.01vw, -0.015em) !important;
       font-weight: 800 !important;
-      
+
       // DALFITRA font family with proper fallbacks
       font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-      
+
       // Enhanced visual properties
       color: #eeeeee !important;
       -webkit-text-fill-color: #eeeeee !important;
@@ -398,19 +392,29 @@ $transition: all 0.3s ease;
     
     .subtitle {
       @include fluid.hero-subtitle-typography;
-      color: rgba(255, 255, 255, 0.9);
-      position: relative;
-      z-index: 1;
       
+      // Move all properties inside a selector block to fix mixed declarations warning
+      & {
+        color: rgba(255, 255, 255, 0.9);
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto 1rem auto;
+      }
+
       @include fluid.accessible-typography;
       @include fluid.mobile-optimized-typography;
     }
-    
+
     .description {
       color: rgba(255, 255, 255, 0.8);
       font-weight: 500;
       position: relative;
       z-index: 2;
+      text-align: center;
+      width: 100%;
+      margin: 0 auto;
     }
   }
 }
@@ -420,10 +424,10 @@ $transition: all 0.3s ease;
   padding: 2rem 0;
   
   .section-title {
-    @include fluid.section-title-typography;
     position: relative;
     color: $light-text;
     
+    @include fluid.section-title-typography;
     @include fluid.accessible-typography;
     @include fluid.mobile-optimized-typography;
     

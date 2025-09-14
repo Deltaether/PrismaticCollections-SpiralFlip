@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { TestHomeComponent } from './pages/test-home/test-home.component';
 
 /**
  * Consolidated application routes
@@ -11,12 +9,12 @@ export const routes: Routes = [
   // Main Layout routes
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
     pathMatch: 'full'
   },
   {
     path: 'home',
-    component: HomeComponent
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
   },
   {
     path: 'collections',
@@ -32,7 +30,7 @@ export const routes: Routes = [
   },
   {
     path: 'test-home',
-    component: TestHomeComponent
+    loadComponent: () => import('./pages/test-home/test-home.component').then(m => m.TestHomeComponent)
   },
   
   // Phantasia Layout routes

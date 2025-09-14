@@ -1,8 +1,8 @@
+<!-- Site Header -->
+<app-site-header></app-site-header>
+
 <!-- Social Links Page -->
 <div class="social-links-page anim-a">
-  
-  <!-- Site Header -->
-  <app-site-header></app-site-header>
   
   <!-- TypeScript-based Square Animation (48 squares with space-like movement) -->
   <app-squares-animation [count]="48" [enabled]="true"></app-squares-animation>
@@ -65,9 +65,9 @@
                       [title]="link.url === '#' ? link.platform + ' - Coming Soon' : 'Visit ' + link.platform"
                       (click)="openSocialLink(link.url, link.platform)"
                       (mouseenter)="onSocialHover(link.platform)">
-                <span class="social-icon">{{ link.icon }}</span>
+                <mat-icon class="social-icon">{{ link.icon }}</mat-icon>
                 <span class="social-platform">{{ link.platform }}</span>
-                <span class="social-arrow" *ngIf="link.url !== '#'">→</span>
+                <mat-icon class="social-arrow" *ngIf="link.url !== '#'">arrow_forward</mat-icon>
                 <span class="coming-soon-text" *ngIf="link.url === '#'">Soon</span>
               </button>
             </div>

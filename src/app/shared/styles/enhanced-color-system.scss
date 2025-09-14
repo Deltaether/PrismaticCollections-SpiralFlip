@@ -24,9 +24,9 @@ $coral-900: #83361a;
 /* Semantic Color Categories for News */
 $news-categories: (
   'project-updates': (
-    'color': #6366f1,
-    'gradient': linear-gradient(135deg, #6366f1, #8b5cf6),
-    'light': rgba(99, 102, 241, 0.1),
+    'color': #6c757d,
+    'gradient': linear-gradient(135deg, #6c757d, #495057),
+    'light': rgba(108, 117, 125, 0.1),
     'icon': '🚀'
   ),
   'releases': (
@@ -42,9 +42,9 @@ $news-categories: (
     'icon': '📢'
   ),
   'technical-updates': (
-    'color': #8b5cf6,
-    'gradient': linear-gradient(135deg, #8b5cf6, #7c3aed),
-    'light': rgba(139, 92, 246, 0.1),
+    'color': #495057,
+    'gradient': linear-gradient(135deg, #495057, #343a40),
+    'light': rgba(73, 80, 87, 0.1),
     'icon': '⚙️'
   ),
   'community': (

@@ -12,13 +12,13 @@
   <div class="video-background">
     <!-- Base video layer (new intro loop at 100% opacity) -->
     <video #baseVideo class="base-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onBaseVideoLoaded()" (canplay)="onBaseVideoLoaded()" (loadeddata)="onBaseVideoLoaded()">
-      <source src="assets/images/intro_loop_vp9_optimized.webm" type="video/webm">
-      <source src="assets/images/Intro_to_loop_part_two_real.mp4" type="video/mp4">
+      <source src="assets/videos/phantasia1/intro_loop_vp9_optimized.webm" type="video/webm">
+      <source src="assets/videos/phantasia1/Intro_to_loop_part_two_real.mp4" type="video/mp4">
     </video>
     
     <!-- Filter video layer (original video at 20% opacity on top) -->
     <video #backgroundVideo class="bg-video filter-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()" (loadeddata)="onVideoLoaded()">
-      <source src="assets/3d/CD_Case/pregen_bg_optimized.mp4" type="video/mp4">
+      <source src="assets/videos/backgrounds/pregen_bg_optimized.mp4" type="video/mp4">
     </video>
     
     <div class="video-overlay"></div>
@@ -32,10 +32,10 @@
       <!-- Main Section Title -->
       <div class="section-title-container">
         <video #titleVideo class="title-video" autoplay muted loop playsinline (loadedmetadata)="onTitleVideoLoaded()" (canplay)="onTitleVideoCanPlay()">
-          <source src="assets/images/ProjectPhan1_Title_anim_cropped_transparent.webm" type="video/webm">
-          <source src="assets/images/ProjectPhan1_Title_anim_cropped_transparent_improved.mp4" type="video/mp4">
+          <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent.webm" type="video/webm">
+          <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent_improved.mp4" type="video/mp4">
           <!-- Fallback image if video fails -->
-          <img src="assets/images/ProjectPhan1_title_white.png" alt="Project Phantasia I" class="title-image-fallback">
+          <img src="assets/videos/phantasia1/ProjectPhan1_title_white.png" alt="Project Phantasia I" class="title-image-fallback">
         </video>
         <p class="title-subtitle">An immersive orchestral journey</p>
       </div>
@@ -45,7 +45,7 @@
         <div class="cd-jacket">
           <div class="jacket-3d-container">
             <div class="jacket-art">
-              <img src="assets/images/phantasia_1_cover_optimized.webp" alt="Project Phantasia I Album Cover" class="album-cover">
+              <img src="assets/images/covers/phantasia_1_cover_optimized.webp" alt="Project Phantasia I Album Cover" class="album-cover">
             </div>
           </div>
           <div class="jacket-reflection"></div>
@@ -74,7 +74,6 @@
       </div>
       
       <!-- Music Player directly in CD Showcase -->
-      <h4>Experience the Evolution</h4>
       <app-music-player></app-music-player>
     </section>
 
@@ -124,7 +123,7 @@
     <footer class="phantasia-footer">
       <div class="footer-content">
         <div class="footer-logo">
-          <img src="assets/images/prismcoll_logox.svg" alt="Prismatic Collections" />
+          <img src="assets/images/logos/prismcoll_logox.svg" alt="Prismatic Collections" />
         </div>
         
         <div class="footer-links">

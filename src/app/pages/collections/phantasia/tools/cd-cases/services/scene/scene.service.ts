@@ -1,6 +1,4 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { THREE, OrbitControls, CSS2DRenderer, CSS2DObject } from '../../../../../../shared/three';
 import { Injectable } from '@angular/core';
 import { Config, SceneSettings } from '../../../shared/interfaces';
 import { SceneEffectsService } from './scene-effects.service';

@@ -5,6 +5,7 @@
 @use '../../shared/styles/enhanced-color-system.scss' as colors;
 @use '../../shared/styles/accessibility-enhancements.scss' as a11y;
 @use '../../shared/styles/unified-background.scss' as winter;
+@use '../../../styles/mixins' as mixins;
 
 /* Variables - Professional Black+White Palette */
 $primary-color: #ffffff;
@@ -48,52 +49,11 @@ $transition: all 0.3s ease;
   -webkit-overflow-scrolling: touch;
   
   /* Enhanced scrollbar styling for cross-device compatibility */
-  &::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 2px;
-    margin: 2px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 2px;
-    min-height: 20px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.6);
-    }
-    
-    &:active {
-      background: rgba(255, 255, 255, 0.8);
-    }
-  }
-  
-  /* Firefox scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.7) rgba(0, 0, 0, 0.3); /* More visible for Firefox */
+  @include mixins.minimal-scrollbar(4px);
   
   /* Mobile touch device optimizations */
   @media (hover: none) and (pointer: coarse) {
-    &::-webkit-scrollbar {
-      width: 6px;
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 3px;
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.3);
-      -webkit-appearance: none;
-    }
+    @include mixins.minimal-scrollbar(6px);
   }
   
   .anim-btn {
@@ -143,56 +103,7 @@ $transition: all 0.3s ease;
   /* iOS Safari specific fixes */
   -webkit-overflow-scrolling: touch;
   
-  /* Enhanced scrollbar implementation for cross-device compatibility */
-  &::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3); /* Slightly darker track for contrast */
-    border-radius: 2px;
-    margin: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.7); /* More visible scrollbar thumb */
-    border-radius: 2px;
-    min-height: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.2); /* Border for better definition */
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.9); /* Brighter on hover */
-    }
-    
-    &:active {
-      background: rgba(255, 255, 255, 1); /* Fully opaque when active */
-    }
-  }
-  
-  /* Firefox scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.7) rgba(0, 0, 0, 0.3); /* More visible for Firefox */
-  
-  /* Force scrollbar to be visible on touch devices */
-  @media (hover: none) and (pointer: coarse) {
-    &::-webkit-scrollbar {
-      width: 6px;
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 3px;
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.3);
-      -webkit-appearance: none;
-    }
-  }
+  /* Use browser default scrollbar - no custom styling */
   
   // Use responsive performance optimizations
   @include responsive.mobile-performance-optimizations;
@@ -470,7 +381,7 @@ $transition: all 0.3s ease;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/assets/images/hero-bg.jpg');
+    background-image: url('/assets/images/ui/composite_bg.png');
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -614,8 +525,12 @@ $transition: all 0.3s ease;
   
   .section-title {
     @include fluid.section-title-typography;
-    position: relative;
-    color: $light-text;
+    
+    // Move all properties inside a selector block to fix mixed declarations warning
+    & {
+      position: relative;
+      color: $light-text;
+    }
     
     &:after {
       content: '';
@@ -1332,23 +1247,25 @@ $transition: all 0.3s ease;
     width: 100%; /* Ensure full width utilization */
     
     .section-title {
-      @include fluid.section-title-typography;
       color: #ffffff;
       text-align: center; /* Explicitly center the title */
+      
+      @include fluid.section-title-typography;
     }
     
     .about-text {
-      @include fluid.typography-body-large;
       color: rgba(255, 255, 255, 0.8);
       margin-bottom: clamp(1rem, 3vw, 2rem);
+      
       text-align: center; /* Explicitly center the text */
+      
+      @include fluid.typography-body-large;
+      @include fluid.accessible-typography;
+      @include fluid.mobile-optimized-typography;
       
       &:last-child {
         margin-bottom: 0;
       }
-      
-      @include fluid.accessible-typography;
-      @include fluid.mobile-optimized-typography;
     }
   }
 }
@@ -1370,12 +1287,12 @@ $transition: all 0.3s ease;
   }
   
   .section-title {
-    @include fluid.section-title-typography;
     color: #333333;
     font-weight: 600;
     margin-bottom: clamp(1rem, 4vw, 2rem);
     text-align: center; /* Explicitly center the title */
     
+    @include fluid.section-title-typography;
     @include fluid.accessible-typography;
   }
   
@@ -1395,26 +1312,27 @@ $transition: all 0.3s ease;
     }
     
     .news-date {
-      @include fluid.typography-label-medium;
       color: #4a90e2;
       font-weight: 600;
       margin-bottom: clamp(0.25rem, 1vw, 0.75rem);
+      
+      @include fluid.typography-label-medium;
     }
     
     .news-title {
-      @include fluid.typography-heading-4;
       color: #ffffff;
       font-weight: 500;
       margin-bottom: clamp(0.5rem, 2vw, 1rem);
       
+      @include fluid.typography-heading-4;
       @include fluid.accessible-typography;
     }
     
     .news-content {
-      @include fluid.typography-body-medium;
       color: rgba(255, 255, 255, 0.8);
       margin: 0;
       
+      @include fluid.typography-body-medium;
       @include fluid.accessible-typography;
       @include fluid.mobile-optimized-typography;
     }

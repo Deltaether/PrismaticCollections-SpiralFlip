@@ -5,7 +5,7 @@
     <video 
       #backgroundVideo 
       class="background-video"
-      [src]="'assets/3d/CD_Case/pregen_bg_optimized.mp4'"
+      [src]="'assets/videos/backgrounds/pregen_bg_optimized.mp4'"
       autoplay 
       loop 
       muted
@@ -29,7 +29,9 @@
       *ngIf="videoPlaybackFailed"
       (click)="forceVideoPlay()">
       <div class="play-button">
-        <div class="play-icon">▶</div>
+        <div class="play-icon">
+          <i class="fas fa-play" aria-hidden="true"></i>
+        </div>
         <div class="play-text">Click to start background video</div>
       </div>
     </div>

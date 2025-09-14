@@ -267,7 +267,10 @@ $fluid-typography-scales: (
  */
 @mixin typography-heading-1 {
   @include fluid-font-size(heading-1, fluid-line-height(1.2, 1.3), -0.025em, 700);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  & {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
 }
 
 @mixin typography-heading-2 {
@@ -276,13 +279,17 @@ $fluid-typography-scales: (
 }
 
 @mixin typography-heading-3 {
-  @include fluid-font-size(heading-3, fluid-line-height(1.3, 1.4), -0.01em, 600);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  @include fluid-font-size(heading-3, fluid-line-height(1.3, 1.4), -0.01em, 600);
 }
 
 @mixin typography-heading-4 {
   @include fluid-font-size(heading-4, fluid-line-height(1.35, 1.45), 0, 500);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  & {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
 }
 
 @mixin typography-heading-5 {
@@ -300,17 +307,20 @@ $fluid-typography-scales: (
  */
 @mixin typography-body-large {
   @include fluid-font-size(body-large, fluid-line-height(1.5, 1.7), 0, 400);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  & {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
 }
 
 @mixin typography-body-medium {
-  @include fluid-font-size(body-medium, fluid-line-height(1.5, 1.6), 0, 400);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  @include fluid-font-size(body-medium, fluid-line-height(1.5, 1.6), 0, 400);
 }
 
 @mixin typography-body-small {
-  @include fluid-font-size(body-small, fluid-line-height(1.4, 1.5), 0, 400);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  @include fluid-font-size(body-small, fluid-line-height(1.4, 1.5), 0, 400);
 }
 
 @mixin typography-body-xs {
@@ -328,10 +338,12 @@ $fluid-typography-scales: (
 }
 
 @mixin typography-button-medium {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  text-transform: none;
-  
   @include fluid-font-size(button-medium, 1.2, 0.025em, 500);
+  
+  & {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    text-transform: none;
+  }
 }
 
 @mixin typography-button-small {
@@ -349,14 +361,15 @@ $fluid-typography-scales: (
 }
 
 @mixin typography-label-medium {
-  @include fluid-font-size(label-medium, 1.3, 0.025em, 500);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  @include fluid-font-size(label-medium, 1.3, 0.025em, 500);
 }
 
 @mixin typography-label-small {
-  @include fluid-font-size(label-small, 1.2, 0.05em, 600);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   text-transform: uppercase;
+  @include fluid-font-size(label-small, 1.2, 0.05em, 600);
 }
 
 @mixin typography-caption {
@@ -415,8 +428,11 @@ $fluid-typography-scales: (
 
 @mixin hero-subtitle-typography {
   @include typography-body-large;
-  text-align: center;
-  margin-bottom: clamp(1.5rem, 5vw, 3rem);
+  
+  & {
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 5vw, 3rem);
+  }
 }
 
 /**
@@ -424,8 +440,11 @@ $fluid-typography-scales: (
  */
 @mixin section-title-typography {
   @include typography-heading-1;
-  text-align: center;
-  margin-bottom: clamp(2rem, 6vw, 4rem);
+  
+  & {
+    text-align: center;
+    margin-bottom: clamp(2rem, 6vw, 4rem);
+  }
 }
 
 @mixin section-subtitle-typography {

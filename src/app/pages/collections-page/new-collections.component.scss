@@ -3,6 +3,7 @@
 @use '../../shared/styles/unified-background.scss' as winter;
 @use '../../shared/styles/fluid-typography-system.scss' as fluid;
 @use '../../shared/styles/responsive-system.scss' as responsive;
+@use '../../../styles/mixins' as mixins;
 
 /* 
  * Z-INDEX HIERARCHY DOCUMENTATION
@@ -45,58 +46,7 @@
       #dee2e6 100%
     );
   
-  /* ENHANCED: Ultra-thin scrollbar implementation */
-  &::-webkit-scrollbar {
-    width: 3px; /* Ultra-thin scrollbar */
-    height: 3px;
-    background: rgba(0, 0, 0, 0.15); /* Very subtle background */
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2); /* Subtle track like Home component */
-    border-radius: 2px;
-    margin: 2px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.4); /* Subtle thumb like Home component */
-    border-radius: 2px;
-    min-height: 20px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.6); /* Slightly brighter on hover */
-    }
-    
-    &:active {
-      background: rgba(255, 255, 255, 0.8);
-    }
-  }
-  
-  /* Enhanced Firefox scrollbar styling */
-  scrollbar-width: thin; /* Thin scrollbar for Firefox */
-  scrollbar-color: rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.2);
-  
-  /* ENHANCED: Mobile scrollbar visibility for touch devices */
-  @media (hover: none) and (pointer: coarse) {
-    &::-webkit-scrollbar {
-      width: 4px; /* Thin for mobile touch */
-      background: rgba(0, 0, 0, 0.25);
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.5); /* Visible for mobile */
-      border-radius: 3px;
-      min-height: 30px; /* Touch target */
-      -webkit-appearance: none;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.3); /* Subtle track */
-      border-radius: 3px;
-      -webkit-appearance: none;
-    }
-  }
+  /* Use browser default scrollbar - no custom styling */
   
   /* Diagonal Lines Layer - Separate animatable pseudo-element */
   &::before {
@@ -672,7 +622,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/assets/images/hero-bg.jpg');
+    background-image: url('/assets/images/ui/composite_bg.png');
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -691,20 +641,30 @@
     text-align: center;
     z-index: 1;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
     
     .title {
       position: relative;
       z-index: 1;
-      
+      text-align: center;
+      width: 100%;
+      margin: 0 auto 1rem auto;
+
       // Proper fluid scaling for hero titles - 32px to 72px
       font-size: clamp(2rem, 4vw + 1rem, 4.5rem) !important;
       line-height: clamp(1.1, 1.15, 1.2) !important;
       letter-spacing: clamp(-0.025em, -0.01vw, -0.015em) !important;
       font-weight: 800 !important;
-      
+
       // DALFITRA font family with proper fallbacks
       font-family: 'DALFITRA', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-      
+
       // Enhanced visual properties
       color: #eeeeee !important;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
@@ -723,10 +683,17 @@
     
     .subtitle {
       @include fluid.hero-subtitle-typography;
-      color: rgba(255, 255, 255, 0.9); /* White text for dark background */
-      position: relative;
-      z-index: 1;
       
+      // Move all properties inside a selector block to fix mixed declarations warning
+      & {
+        color: rgba(255, 255, 255, 0.9); /* White text for dark background */
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto 1rem auto;
+      }
+
       @include fluid.accessible-typography;
       @include fluid.mobile-optimized-typography;
     }
@@ -987,18 +954,25 @@
 
 .album-title {
   @include fluid.typography-heading-4;
-  font-weight: bold;
-  margin: 0 0 clamp(0.25rem, 1vw, 0.5rem) 0;
-  color: #ffffff;
+  
+  // Move all properties inside a selector block to fix mixed declarations warning
+  & {
+    font-weight: bold;
+    margin: 0 0 clamp(0.25rem, 1vw, 0.5rem) 0;
+    color: #ffffff;
+  }
   
   @include fluid.accessible-typography;
 }
 
 .album-artist {
   @include fluid.typography-body-medium;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 clamp(0.6rem, 2vw, 1rem) 0;
-  font-weight: 500;
+  
+  & {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 clamp(0.6rem, 2vw, 1rem) 0;
+    font-weight: 500;
+  }
   
   @include fluid.mobile-optimized-typography;
 }
@@ -1007,23 +981,25 @@
   display: flex;
   gap: 1rem;
   margin-bottom: clamp(0.6rem, 2vw, 1rem);
-  @include fluid.typography-body-small;
   color: rgba(255, 255, 255, 0.5);
   
+  @include fluid.typography-body-small;
+  
   .tracks, .year {
-    @include fluid.typography-label-small;
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.8);
     padding: clamp(0.2rem, 0.5vw, 0.4rem) clamp(0.4rem, 1vw, 0.8rem);
     border-radius: 12px;
+    
+    @include fluid.typography-label-small;
   }
 }
 
 .album-description {
-  @include fluid.typography-body-small;
   color: rgba(255, 255, 255, 0.7);
   margin: 0 0 clamp(0.6rem, 2vw, 1rem) 0;
   
+  @include fluid.typography-body-small;
   @include fluid.mobile-optimized-typography;
 }
 
@@ -1186,7 +1162,7 @@
   }
   
   .explore-btn {
-    background: linear-gradient(45deg, #7c3aed, #a855f7);
+    background: linear-gradient(45deg, #6c757d, #495057);
     color: #ffffff;
     border: none;
     padding: 0.5rem 1rem;
@@ -1415,7 +1391,7 @@
 
 /* Explore Button Styling - Hardware Accelerated */
 .explore-btn {
-  background: linear-gradient(45deg, #7c3aed, #a855f7);
+  background: linear-gradient(45deg, #6c757d, #495057);
   color: #ffffff;
   border: none;
   padding: 1rem 2rem;
@@ -1437,8 +1413,8 @@
   &:hover {
     // Use translate3d for hardware acceleration
     transform: translate3d(0, -2px, 0);
-    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
-    background: linear-gradient(45deg, #8b5cf6, #c084fc);
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+    background: linear-gradient(45deg, #495057, #6c757d);
   }
   
   &:active {
@@ -1464,18 +1440,7 @@
     min-height: 100vh;
     height: auto; /* Natural height for mobile */
     
-    /* Mobile-specific scrollbar enhancements */
-    &::-webkit-scrollbar {
-      width: 3px !important; /* Very thin for mobile */
-      background: rgba(0, 0, 0, 0.3) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important; /* Pure white for maximum visibility */
-      border: 4px solid rgba(0, 0, 0, 0.7) !important;
-      border-radius: 9px !important;
-      min-height: 50px !important; /* Large touch target */
-    }
+    /* Use browser default scrollbar - no custom styling */
   }
   
   .collections-main {
@@ -1516,19 +1481,7 @@
     min-height: 100vh;
     height: auto; /* Natural height for iPhone */
     
-    /* iPhone-specific scrollbar styling for maximum visibility */
-    &::-webkit-scrollbar {
-      width: 3px !important; /* Very thin for iPhone */
-      background: rgba(0, 0, 0, 0.4) !important;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 1) !important;
-      border: 5px solid rgba(0, 0, 0, 0.8) !important;
-      border-radius: 10px !important;
-      min-height: 60px !important; /* Very large touch target */
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important; /* Glow effect */
-    }
+    /* Use browser default scrollbar - no custom styling */
   }
   
   .collections-main {

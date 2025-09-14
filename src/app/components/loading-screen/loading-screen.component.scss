@@ -13,6 +13,9 @@
   transition: opacity 0.5s ease;
   z-index: 99999;
   isolation: isolate;
+  
+  // Removed overflow constraint for natural scrolling behavior
+  contain: layout size style;
 }
 
 .loader-container.visible {
@@ -172,7 +175,9 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  overflow: visible;
+  // Removed overflow constraint for natural scrolling behavior
+  left: 0;
+  top: 0;
 }
 
 .rune {
@@ -238,7 +243,12 @@
     rgba(0, 0, 0, 0.02) 50%,
     transparent 100%
   );
-  animation: effect-pulse 8s infinite ease-in-out;
+  
+  // TARGETED FIX: Constrain scaling to prevent overflow
+  animation: effect-pulse-safe 8s infinite ease-in-out;
+  left: 0;
+  top: 0;
+  contain: layout;
 }
 
 .light-beams {
@@ -374,6 +384,17 @@
   50% {
     opacity: 0.8;
     transform: scale(1.1);
+  }
+}
+
+@keyframes effect-pulse-safe {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
   }
 }
 

@@ -7,6 +7,12 @@
 // Import simplified theme system
 @use './app/styles/themes/simple-theme' as theme;
 
+// Import Angular Material theme override to remove violet highlights
+@use './app/styles/material-theme-override.scss';
+
+// Import centralized mixins
+@use './styles/mixins' as mixins;
+
 // Import existing styles
 @use './app/styles/main.scss';
 @use './app/shared/styles/scroll-animations.scss' as scroll;
@@ -132,7 +138,7 @@ body.phantasia-3d-page {
 /* Home page layout: simple and clean like collections */
 body.home-page-active {
   overflow: auto;
-  overflow-x: hidden;
+  /* Removed overflow constraint for natural scrolling */
 }
 
 /* FIXED: Page-specific scrollbar configurations - Allow proper scrolling */
@@ -146,7 +152,7 @@ body.collections-page-active {
 /* News page - enable scrolling with visible scrollbars */
 body.news-page-active {
   overflow-y: auto !important; /* FIXED: Enable vertical scrolling with visible scrollbars */
-  overflow-x: hidden !important; /* Hide horizontal scrollbar only */
+  /* Removed overflow constraint for natural scrolling */
   height: 100vh !important;
   position: relative !important;
 }
@@ -154,42 +160,22 @@ body.news-page-active {
 /* Social Links page - enable scrolling with visible scrollbars */
 body.social-links-page-active {
   overflow-y: auto !important; /* FIXED: Enable vertical scrolling with visible scrollbars */
-  overflow-x: hidden !important; /* Hide horizontal scrollbar only */
+  /* Removed overflow constraint for natural scrolling */
   height: 100vh !important;
   position: relative !important;
 }
 
 /* ENHANCED: Global mobile scrollbar support for all pages */
 @media (hover: none) and (pointer: coarse) {
-  /* Mobile-specific scrollbar defaults for all scrollable elements */
-  ::-webkit-scrollbar {
-    width: 16px !important; /* Wider for mobile touch */
-    background: rgba(0, 0, 0, 0.4) !important;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 3px solid rgba(0, 0, 0, 0.5) !important;
-    border-radius: 8px !important;
-    min-height: 40px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.5) !important;
-    border-radius: 8px !important;
+  * {
+    @include mixins.mobile-scrollbar(16px);
   }
 }
 
 /* iPhone and very small mobile devices */
 @media (max-width: 430px) {
-  ::-webkit-scrollbar {
-    width: 18px !important; /* Even wider for small screens */
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    border: 4px solid rgba(0, 0, 0, 0.6) !important;
-    min-height: 50px !important;
+  * {
+    @include mixins.mobile-scrollbar(18px);
   }
 }
 
@@ -221,55 +207,13 @@ body {
 }
 
 /* ENHANCED: Global Default Scrollbar Styles - High Visibility */
-::-webkit-scrollbar {
-  width: 12px; /* Wider default scrollbar */
-  height: 12px;
-  background: rgba(0, 0, 0, 0.2); /* Dark background for contrast */
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3); /* Darker track */
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.8); /* High contrast white thumb */
-  border-radius: 6px;
-  border: 2px solid rgba(0, 0, 0, 0.2); /* Dark border for definition */
-  min-height: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 1); /* Pure white on hover */
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(0, 0, 0, 0.3);
+* {
+  @include mixins.base-scrollbar(12px, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.8));
 }
 
 /* Enhanced Scrollbar Styles for Phantasia Album Page */
-body.phantasia-album-page::-webkit-scrollbar {
-  width: 14px !important;
-  background: rgba(0, 0, 0, 0.9) !important;
-  display: block !important;
-}
-
-body.phantasia-album-page::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.9) !important;
-  border-radius: 0 !important;
-  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1) !important;
-}
-
-body.phantasia-album-page::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ffffff 0%, #e9ecef 50%, #ffffff 100%) !important;
-  border-radius: 0 !important;
-  border: 1px solid rgba(0, 0, 0, 0.2) !important;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-}
-
-body.phantasia-album-page::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%) !important;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important;
+body.phantasia-album-page {
+  @include mixins.phantasia-scrollbar(14px);
 }
 
 /* ENHANCED: Firefox Scrollbar Styles - High Visibility */
@@ -323,7 +267,7 @@ body.home-page-active app-root {
 /* Main scrollable content area - positioned below fixed header */
 app-root > * {
   overflow-y: auto;
-  overflow-x: hidden;
+  /* Removed overflow constraint for natural scrolling */
   height: 100vh; /* Full viewport height */
 }
 
@@ -342,7 +286,7 @@ app-home {
 body.home-page-active .home-page {
   height: 100vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  /* Removed overflow constraint for natural scrolling */
   scroll-behavior: smooth;
 }
 
@@ -437,9 +381,10 @@ body.collections-page {
   }
 }
 
-/* Body styling for phantasia-album-page - scrolling handled by component */
+/* Body and HTML styling for phantasia-album-page - prevent all scrolling except container */
+html.phantasia-album-page,
 body.phantasia-album-page {
-  overflow: hidden !important; /* Prevent body-level scrolling */
+  overflow: hidden !important; /* CRITICAL FIX: Prevent body and html scrolling, let .phantasia-album-page container handle it */
   height: 100vh !important; /* Ensure fixed height */
   position: relative !important;
 }

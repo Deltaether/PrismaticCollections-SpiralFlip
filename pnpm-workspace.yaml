@@ -3,3 +3,7 @@ ignoredBuiltDependencies:
   - esbuild
   - lmdb
   - msgpackr-extract
+
+overrides:
+  tmp@<=0.2.3: '>=0.2.4'
+  vite@>=7.1.0 <=7.1.4: '>=7.1.5'

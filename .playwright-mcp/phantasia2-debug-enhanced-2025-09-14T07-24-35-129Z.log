@@ -1,0 +1,1352 @@
+[2025-09-14T07:24:25.030Z] === PHANTASIA2 ENHANCED DEBUG MONITORING STARTED ===
+[2025-09-14T07:24:25.031Z] Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+[2025-09-14T07:24:25.031Z] Screen resolution: 1440x900
+[2025-09-14T07:24:25.032Z] Device pixel ratio: 1
+[2025-09-14T07:24:25.032Z] DOM ready state: complete
+[2025-09-14T07:24:25.032Z] Waiting for DOM to be fully loaded...
+[2025-09-14T07:24:25.128Z] Runtime horizontal scrollbar removal applied
+[2025-09-14T07:24:25.129Z] Window-level horizontal scroll prevention active
+[2025-09-14T07:24:25.129Z] Document scrollWidth: 1440
+[2025-09-14T07:24:25.129Z] Document clientWidth: 1430
+[2025-09-14T07:24:27.031Z] ✅ DOM is fully loaded, starting comprehensive analysis
+[2025-09-14T07:24:27.031Z] --- LOADING SCREEN PHASE DETECTION ---
+[2025-09-14T07:24:27.033Z] Loading container found: opacity=1, display=flex, visibility=visible
+[2025-09-14T07:24:27.033Z] 🎬 LOADING SCREEN PHASE: Active loading
+[2025-09-14T07:24:27.033Z] Setting up advanced monitoring...
+[2025-09-14T07:24:27.534Z] === COMPREHENSIVE ANALYSIS STARTING ===
+[2025-09-14T07:24:27.534Z] --- VIEWPORT & DOCUMENT ANALYSIS ---
+[2025-09-14T07:24:27.536Z] Document scrollWidth: 1440, clientWidth: 1430
+[2025-09-14T07:24:27.536Z] Body scrollWidth: 1440, clientWidth: 1440
+[2025-09-14T07:24:27.537Z] Viewport dimensions: 1440x900
+[2025-09-14T07:24:27.537Z] Screen dimensions: 1440x900
+[2025-09-14T07:24:27.537Z] Device pixel ratio: 1
+[2025-09-14T07:24:27.537Z] ⚠️ DOCUMENT HORIZONTAL OVERFLOW DETECTED!
+[2025-09-14T07:24:27.537Z] --- SCROLLBAR STATE ---
+[2025-09-14T07:24:27.537Z] Window scroll: X=0, Y=0
+[2025-09-14T07:24:27.537Z] Document scroll dimensions: 1440x990
+[2025-09-14T07:24:27.537Z] Viewport dimensions: 1440x900
+[2025-09-14T07:24:27.537Z] ✅ No horizontal scrollbar detected
+[2025-09-14T07:24:27.537Z] === LOADING SCREEN OVERFLOW ANALYSIS ===
+[2025-09-14T07:24:27.538Z] --- LOADER-CONTAINER ANALYSIS ---
+[2025-09-14T07:24:27.538Z]   Dimensions: 1440x900
+[2025-09-14T07:24:27.538Z]   Position: left=0, right=1440, top=90, bottom=990
+[2025-09-14T07:24:27.538Z]   ScrollDimensions: scrollWidth=1463, scrollHeight=1127
+[2025-09-14T07:24:27.538Z]   ClientDimensions: clientWidth=1440, clientHeight=900
+[2025-09-14T07:24:27.538Z]   CSS: position=fixed, overflow-x=hidden, overflow-y=hidden
+[2025-09-14T07:24:27.538Z]   CSS: width=1440px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.539Z]   CSS: transform=none, z-index=99999
+[2025-09-14T07:24:27.539Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (1463) > clientWidth (1440)
+[2025-09-14T07:24:27.539Z] Found 2 elements matching .magical-circle:
+[2025-09-14T07:24:27.539Z] --- .MAGICAL-CIRCLE-0 ANALYSIS ---
+[2025-09-14T07:24:27.539Z]   Dimensions: 1353.969970703125x1353.969970703125
+[2025-09-14T07:24:27.539Z]   Position: left=43.015045166015625, right=1396.9850158691406, top=-136.98495483398438, bottom=1216.9850158691406
+[2025-09-14T07:24:27.539Z]   ScrollDimensions: scrollWidth=993, scrollHeight=1008
+[2025-09-14T07:24:27.540Z]   ClientDimensions: clientWidth=983, clientHeight=998
+[2025-09-14T07:24:27.540Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.540Z]   CSS: width=1000px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.540Z]   CSS: transform=matrix(0.88117, -0.4728, 0.4728, 0.88117, 0, 0), z-index=auto
+[2025-09-14T07:24:27.540Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (993) > clientWidth (983)
+[2025-09-14T07:24:27.540Z] --- .MAGICAL-CIRCLE-1 ANALYSIS ---
+[2025-09-14T07:24:27.540Z]   Dimensions: 1130.137451171875x1130.137451171875
+[2025-09-14T07:24:27.540Z]   Position: left=154.93128967285156, right=1285.0687408447266, top=-25.068710327148438, bottom=1105.0687408447266
+[2025-09-14T07:24:27.540Z]   ScrollDimensions: scrollWidth=793, scrollHeight=808
+[2025-09-14T07:24:27.541Z]   ClientDimensions: clientWidth=783, clientHeight=798
+[2025-09-14T07:24:27.541Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.541Z]   CSS: width=800px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.541Z]   CSS: transform=matrix(0.739345, 0.673327, -0.673327, 0.739345, 0, 0), z-index=auto
+[2025-09-14T07:24:27.541Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (793) > clientWidth (783)
+[2025-09-14T07:24:27.541Z] Found 1 elements matching .magical-circle.outer:
+[2025-09-14T07:24:27.541Z] --- .MAGICAL-CIRCLE.OUTER-0 ANALYSIS ---
+[2025-09-14T07:24:27.541Z]   Dimensions: 1353.969970703125x1353.969970703125
+[2025-09-14T07:24:27.542Z]   Position: left=43.015045166015625, right=1396.9850158691406, top=-136.98495483398438, bottom=1216.9850158691406
+[2025-09-14T07:24:27.542Z]   ScrollDimensions: scrollWidth=993, scrollHeight=1008
+[2025-09-14T07:24:27.542Z]   ClientDimensions: clientWidth=983, clientHeight=998
+[2025-09-14T07:24:27.542Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.542Z]   CSS: width=1000px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.542Z]   CSS: transform=matrix(0.88117, -0.4728, 0.4728, 0.88117, 0, 0), z-index=auto
+[2025-09-14T07:24:27.542Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (993) > clientWidth (983)
+[2025-09-14T07:24:27.543Z] Found 1 elements matching .rune-effects:
+[2025-09-14T07:24:27.543Z] --- .RUNE-EFFECTS-0 ANALYSIS ---
+[2025-09-14T07:24:27.543Z]   Dimensions: 1486.693359375x929.183349609375
+[2025-09-14T07:24:27.543Z]   Position: left=-23.34661865234375, right=1463.3467407226562, top=75.40835571289062, bottom=1004.5917053222656
+[2025-09-14T07:24:27.543Z]   ScrollDimensions: scrollWidth=1440, scrollHeight=900
+[2025-09-14T07:24:27.543Z]   ClientDimensions: clientWidth=1440, clientHeight=900
+[2025-09-14T07:24:27.543Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.544Z]   CSS: width=1440px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.544Z]   CSS: transform=matrix(1.03243, 0, 0, 1.03243, 0, 0), z-index=auto
+[2025-09-14T07:24:27.544Z]   ⚠️ ELEMENT EXTENDS BEYOND VIEWPORT: right (1463.3467407226562) > viewport (1440)
+[2025-09-14T07:24:27.544Z] Found 1 elements matching .decorative-elements:
+[2025-09-14T07:24:27.544Z] --- .DECORATIVE-ELEMENTS-0 ANALYSIS ---
+[2025-09-14T07:24:27.544Z]   Dimensions: 1440x900
+[2025-09-14T07:24:27.544Z]   Position: left=0, right=1440, top=90, bottom=990
+[2025-09-14T07:24:27.544Z]   ScrollDimensions: scrollWidth=1440, scrollHeight=900
+[2025-09-14T07:24:27.544Z]   ClientDimensions: clientWidth=1440, clientHeight=900
+[2025-09-14T07:24:27.544Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.545Z]   CSS: width=1440px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.545Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.545Z] Found 4 elements matching .corner-line:
+[2025-09-14T07:24:27.545Z] --- .CORNER-LINE-0 ANALYSIS ---
+[2025-09-14T07:24:27.545Z]   Dimensions: 150x150
+[2025-09-14T07:24:27.545Z]   Position: left=50, right=200, top=140, bottom=290
+[2025-09-14T07:24:27.545Z]   ScrollDimensions: scrollWidth=148, scrollHeight=148
+[2025-09-14T07:24:27.545Z]   ClientDimensions: clientWidth=148, clientHeight=148
+[2025-09-14T07:24:27.545Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.545Z]   CSS: width=150px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.545Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.546Z] --- .CORNER-LINE-1 ANALYSIS ---
+[2025-09-14T07:24:27.546Z]   Dimensions: 150x150
+[2025-09-14T07:24:27.546Z]   Position: left=1240, right=1390, top=140, bottom=290
+[2025-09-14T07:24:27.546Z]   ScrollDimensions: scrollWidth=148, scrollHeight=148
+[2025-09-14T07:24:27.546Z]   ClientDimensions: clientWidth=148, clientHeight=148
+[2025-09-14T07:24:27.546Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.546Z]   CSS: width=150px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.546Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.546Z] --- .CORNER-LINE-2 ANALYSIS ---
+[2025-09-14T07:24:27.547Z]   Dimensions: 150x150
+[2025-09-14T07:24:27.547Z]   Position: left=50, right=200, top=790, bottom=940
+[2025-09-14T07:24:27.547Z]   ScrollDimensions: scrollWidth=148, scrollHeight=148
+[2025-09-14T07:24:27.547Z]   ClientDimensions: clientWidth=148, clientHeight=148
+[2025-09-14T07:24:27.547Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.547Z]   CSS: width=150px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.547Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.548Z] --- .CORNER-LINE-3 ANALYSIS ---
+[2025-09-14T07:24:27.548Z]   Dimensions: 150x150
+[2025-09-14T07:24:27.548Z]   Position: left=1240, right=1390, top=790, bottom=940
+[2025-09-14T07:24:27.548Z]   ScrollDimensions: scrollWidth=148, scrollHeight=148
+[2025-09-14T07:24:27.548Z]   ClientDimensions: clientWidth=148, clientHeight=148
+[2025-09-14T07:24:27.548Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.548Z]   CSS: width=150px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.548Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.549Z] Found 4 elements matching .mid-line:
+[2025-09-14T07:24:27.549Z] --- .MID-LINE-0 ANALYSIS ---
+[2025-09-14T07:24:27.549Z]   Dimensions: 100x100
+[2025-09-14T07:24:27.549Z]   Position: left=50, right=150, top=490, bottom=590
+[2025-09-14T07:24:27.549Z]   ScrollDimensions: scrollWidth=98, scrollHeight=96
+[2025-09-14T07:24:27.549Z]   ClientDimensions: clientWidth=98, clientHeight=96
+[2025-09-14T07:24:27.549Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.550Z]   CSS: width=100px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.550Z]   CSS: transform=matrix(1, 0, 0, 1, 0, -50), z-index=auto
+[2025-09-14T07:24:27.550Z] --- .MID-LINE-1 ANALYSIS ---
+[2025-09-14T07:24:27.550Z]   Dimensions: 100x100
+[2025-09-14T07:24:27.550Z]   Position: left=1290, right=1390, top=490, bottom=590
+[2025-09-14T07:24:27.550Z]   ScrollDimensions: scrollWidth=98, scrollHeight=96
+[2025-09-14T07:24:27.550Z]   ClientDimensions: clientWidth=98, clientHeight=96
+[2025-09-14T07:24:27.550Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.551Z]   CSS: width=100px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.551Z]   CSS: transform=matrix(1, 0, 0, 1, 0, -50), z-index=auto
+[2025-09-14T07:24:27.551Z] --- .MID-LINE-2 ANALYSIS ---
+[2025-09-14T07:24:27.551Z]   Dimensions: 100x100
+[2025-09-14T07:24:27.551Z]   Position: left=670, right=770, top=140, bottom=240
+[2025-09-14T07:24:27.551Z]   ScrollDimensions: scrollWidth=96, scrollHeight=98
+[2025-09-14T07:24:27.551Z]   ClientDimensions: clientWidth=96, clientHeight=98
+[2025-09-14T07:24:27.551Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.551Z]   CSS: width=100px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.551Z]   CSS: transform=matrix(1, 0, 0, 1, -50, 0), z-index=auto
+[2025-09-14T07:24:27.551Z] --- .MID-LINE-3 ANALYSIS ---
+[2025-09-14T07:24:27.551Z]   Dimensions: 100x100
+[2025-09-14T07:24:27.552Z]   Position: left=670, right=770, top=840, bottom=940
+[2025-09-14T07:24:27.552Z]   ScrollDimensions: scrollWidth=96, scrollHeight=98
+[2025-09-14T07:24:27.552Z]   ClientDimensions: clientWidth=96, clientHeight=98
+[2025-09-14T07:24:27.552Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.552Z]   CSS: width=100px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.552Z]   CSS: transform=matrix(1, 0, 0, 1, -50, 0), z-index=auto
+[2025-09-14T07:24:27.552Z] Found 1 elements matching .light-beams:
+[2025-09-14T07:24:27.552Z] --- .LIGHT-BEAMS-0 ANALYSIS ---
+[2025-09-14T07:24:27.552Z]   Dimensions: 1440x900
+[2025-09-14T07:24:27.553Z]   Position: left=0, right=1440, top=90, bottom=990
+[2025-09-14T07:24:27.553Z]   ScrollDimensions: scrollWidth=1425, scrollHeight=1159
+[2025-09-14T07:24:27.553Z]   ClientDimensions: clientWidth=1425, clientHeight=900
+[2025-09-14T07:24:27.553Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.553Z]   CSS: width=1440px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.553Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.553Z] Found 4 elements matching .beam:
+[2025-09-14T07:24:27.553Z] --- .BEAM-0 ANALYSIS ---
+[2025-09-14T07:24:27.553Z]   Dimensions: 390.18310546875x1371.632080078125
+[2025-09-14T07:24:27.554Z]   Position: left=517.408447265625, right=907.591552734375, top=-145.81607055664062, bottom=1225.8160095214844
+[2025-09-14T07:24:27.554Z]   ScrollDimensions: scrollWidth=1425, scrollHeight=2
+[2025-09-14T07:24:27.554Z]   ClientDimensions: clientWidth=1425, clientHeight=2
+[2025-09-14T07:24:27.554Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.554Z]   CSS: width=1425px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.554Z]   CSS: transform=matrix(-0.272462, 0.962166, -0.962166, -0.272462, -712.5, -1), z-index=auto
+[2025-09-14T07:24:27.554Z] --- .BEAM-1 ANALYSIS ---
+[2025-09-14T07:24:27.554Z]   Dimensions: 475.6666259765625x1343.93359375
+[2025-09-14T07:24:27.555Z]   Position: left=474.66668701171875, right=950.3333129882812, top=-131.96682739257812, bottom=1211.9667663574219
+[2025-09-14T07:24:27.555Z]   ScrollDimensions: scrollWidth=1425, scrollHeight=1
+[2025-09-14T07:24:27.555Z]   ClientDimensions: clientWidth=1425, clientHeight=1
+[2025-09-14T07:24:27.555Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.555Z]   CSS: width=1425px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.555Z]   CSS: transform=matrix(0.333139, -0.942878, 0.942878, 0.333139, -712.5, -0.5), z-index=auto
+[2025-09-14T07:24:27.555Z] --- .BEAM-2 ANALYSIS ---
+[2025-09-14T07:24:27.555Z]   Dimensions: 133.894775390625x1418.882568359375
+[2025-09-14T07:24:27.555Z]   Position: left=645.5526123046875, right=779.4473876953125, top=-169.44122314453125, bottom=1249.4413452148438
+[2025-09-14T07:24:27.555Z]   ScrollDimensions: scrollWidth=1425, scrollHeight=1
+[2025-09-14T07:24:27.555Z]   ClientDimensions: clientWidth=1425, clientHeight=1
+[2025-09-14T07:24:27.556Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.556Z]   CSS: width=1425px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.556Z]   CSS: transform=matrix(0.0932626, 0.995642, -0.995642, 0.0932626, -712.5, -0.5), z-index=auto
+[2025-09-14T07:24:27.556Z] --- .BEAM-3 ANALYSIS ---
+[2025-09-14T07:24:27.556Z]   Dimensions: 99.466064453125x174.50106811523438
+[2025-09-14T07:24:27.556Z]   Position: left=662.7669677734375, right=762.2330322265625, top=452.7494812011719, bottom=627.2505493164062
+[2025-09-14T07:24:27.556Z]   ScrollDimensions: scrollWidth=200, scrollHeight=1
+[2025-09-14T07:24:27.556Z]   ClientDimensions: clientWidth=200, clientHeight=1
+[2025-09-14T07:24:27.556Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.556Z]   CSS: width=200px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.556Z]   CSS: transform=matrix(0.49298, -0.87004, 0.87004, 0.49298, -100, -0.5), z-index=auto
+[2025-09-14T07:24:27.556Z] Found 1 elements matching .rune-circle:
+[2025-09-14T07:24:27.557Z] --- .RUNE-CIRCLE-0 ANALYSIS ---
+[2025-09-14T07:24:27.557Z]   Dimensions: 1440x900
+[2025-09-14T07:24:27.557Z]   Position: left=0, right=1440, top=90, bottom=990
+[2025-09-14T07:24:27.557Z]   ScrollDimensions: scrollWidth=1468, scrollHeight=930
+[2025-09-14T07:24:27.557Z]   ClientDimensions: clientWidth=1440, clientHeight=900
+[2025-09-14T07:24:27.557Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=hidden
+[2025-09-14T07:24:27.557Z]   CSS: width=1440px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.557Z]   CSS: transform=none, z-index=auto
+[2025-09-14T07:24:27.557Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (1468) > clientWidth (1440)
+[2025-09-14T07:24:27.558Z] Found 48 elements matching .rune:
+[2025-09-14T07:24:27.558Z] --- .RUNE-0 ANALYSIS ---
+[2025-09-14T07:24:27.558Z]   Dimensions: 25.0614013671875x25.0614013671875
+[2025-09-14T07:24:27.558Z]   Position: left=1176.6910400390625, right=1201.75244140625, top=700.2974243164062, bottom=725.3588256835938
+[2025-09-14T07:24:27.558Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.558Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.558Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.558Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.559Z]   CSS: transform=matrix(0.138946, 1.25335, -1.25335, 0.138946, -5.84074, 0), z-index=auto
+[2025-09-14T07:24:27.559Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.559Z] --- .RUNE-1 ANALYSIS ---
+[2025-09-14T07:24:27.559Z]   Dimensions: 40.37992858886719x40.3798828125
+[2025-09-14T07:24:27.559Z]   Position: left=223.9114227294922, right=264.2913513183594, top=767.98193359375, bottom=808.36181640625
+[2025-09-14T07:24:27.559Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.559Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.559Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.559Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.560Z]   CSS: transform=matrix(-1.31112, 0.932214, -0.932214, -1.31112, -22.1486, 0), z-index=auto
+[2025-09-14T07:24:27.560Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.560Z] --- .RUNE-2 ANALYSIS ---
+[2025-09-14T07:24:27.560Z]   Dimensions: 32.98185729980469x32.98185729980469
+[2025-09-14T07:24:27.560Z]   Position: left=195.62994384765625, right=228.61180114746094, top=130.7310333251953, bottom=163.712890625
+[2025-09-14T07:24:27.560Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.560Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.560Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.560Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.561Z]   CSS: transform=matrix(1.20972, 0.622601, -0.622601, 1.20972, 17.7927, 11.7063), z-index=auto
+[2025-09-14T07:24:27.561Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.561Z] --- .RUNE-3 ANALYSIS ---
+[2025-09-14T07:24:27.561Z]   Dimensions: 35.404052734375x35.404083251953125
+[2025-09-14T07:24:27.561Z]   Position: left=1112.98095703125, right=1148.385009765625, top=476.6260681152344, bottom=512.0301513671875
+[2025-09-14T07:24:27.561Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.561Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.561Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.562Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.562Z]   CSS: transform=matrix(-0.954703, -1.01219, 1.01219, -0.954703, -22.9264, 0), z-index=auto
+[2025-09-14T07:24:27.562Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.562Z] --- .RUNE-4 ANALYSIS ---
+[2025-09-14T07:24:27.562Z]   Dimensions: 24.75732421875x24.75732421875
+[2025-09-14T07:24:27.562Z]   Position: left=348.3638916015625, right=373.1212158203125, top=354.7812194824219, bottom=379.5385437011719
+[2025-09-14T07:24:27.563Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.563Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.563Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.563Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.563Z]   CSS: transform=matrix(1.1927, 0.182706, -0.182706, 1.1927, -5.05431, 13.5505), z-index=auto
+[2025-09-14T07:24:27.563Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.563Z] --- .RUNE-5 ANALYSIS ---
+[2025-09-14T07:24:27.564Z]   Dimensions: 38.850830078125x38.850830078125
+[2025-09-14T07:24:27.564Z]   Position: left=1112.8896484375, right=1151.740478515625, top=607.75146484375, bottom=646.602294921875
+[2025-09-14T07:24:27.564Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.564Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.564Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.564Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.564Z]   CSS: transform=matrix(-1.19486, 0.963517, -0.963517, -1.19486, 6.67442, 7.1144), z-index=auto
+[2025-09-14T07:24:27.564Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.565Z] --- .RUNE-6 ANALYSIS ---
+[2025-09-14T07:24:27.565Z]   Dimensions: 15.8394775390625x15.83953857421875
+[2025-09-14T07:24:27.565Z]   Position: left=1276.25341796875, right=1292.0928955078125, top=600.899169921875, bottom=616.7387084960938
+[2025-09-14T07:24:27.565Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.565Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.566Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.566Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.566Z]   CSS: transform=matrix(-0.57356, 0.306414, -0.306414, -0.57356, -20.905, 4.39706), z-index=auto
+[2025-09-14T07:24:27.567Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.567Z] --- .RUNE-7 ANALYSIS ---
+[2025-09-14T07:24:27.567Z]   Dimensions: 18.607421875x18.60736083984375
+[2025-09-14T07:24:27.567Z]   Position: left=1383.3037109375, right=1401.9111328125, top=840.5663452148438, bottom=859.1737060546875
+[2025-09-14T07:24:27.567Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.567Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.567Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.568Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.568Z]   CSS: transform=matrix(0.482382, -0.551358, 0.551358, 0.482382, 9.68554, 20.9794), z-index=auto
+[2025-09-14T07:24:27.568Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.568Z] --- .RUNE-8 ANALYSIS ---
+[2025-09-14T07:24:27.568Z]   Dimensions: 19.8350830078125x19.83514404296875
+[2025-09-14T07:24:27.568Z]   Position: left=717.1206665039062, right=736.9557495117188, top=504.12139892578125, bottom=523.95654296875
+[2025-09-14T07:24:27.568Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.568Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.569Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.569Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.569Z]   CSS: transform=matrix(1.0229, 0.0790458, -0.0790458, 1.0229, -1.97743, 19.0702), z-index=auto
+[2025-09-14T07:24:27.569Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.569Z] --- .RUNE-9 ANALYSIS ---
+[2025-09-14T07:24:27.569Z]   Dimensions: 35.52789306640625x35.527862548828125
+[2025-09-14T07:24:27.570Z]   Position: left=475.9606018066406, right=511.4884948730469, top=372.6130065917969, bottom=408.140869140625
+[2025-09-14T07:24:27.570Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.570Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.570Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.570Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.570Z]   CSS: transform=matrix(1.69207, 0.281696, -0.281696, 1.69207, 5.47455, 4.11131), z-index=auto
+[2025-09-14T07:24:27.570Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.571Z] --- .RUNE-10 ANALYSIS ---
+[2025-09-14T07:24:27.571Z]   Dimensions: 18.871337890625x18.871337890625
+[2025-09-14T07:24:27.571Z]   Position: left=574.8837280273438, right=593.7550659179688, top=658.5796508789062, bottom=677.4509887695312
+[2025-09-14T07:24:27.571Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.571Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.571Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.571Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.572Z]   CSS: transform=matrix(0.559455, -0.488953, 0.488953, 0.559455, 15.0381, 15.0622), z-index=auto
+[2025-09-14T07:24:27.572Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.572Z] --- .RUNE-11 ANALYSIS ---
+[2025-09-14T07:24:27.572Z]   Dimensions: 17.53509521484375x17.535110473632812
+[2025-09-14T07:24:27.572Z]   Position: left=847.98583984375, right=865.5209350585938, top=191.31564331054688, bottom=208.8507537841797
+[2025-09-14T07:24:27.572Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.573Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.573Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.573Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.573Z]   CSS: transform=matrix(-0.159111, -0.815062, 0.815062, -0.159111, -16.2622, 1.2082), z-index=auto
+[2025-09-14T07:24:27.573Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.573Z] --- .RUNE-12 ANALYSIS ---
+[2025-09-14T07:24:27.574Z]   Dimensions: 22.289794921875x22.289794921875
+[2025-09-14T07:24:27.574Z]   Position: left=1085.7132568359375, right=1108.0030517578125, top=907.3500366210938, bottom=929.6398315429688
+[2025-09-14T07:24:27.574Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.574Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.574Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.574Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.575Z]   CSS: transform=matrix(0.844767, -0.393557, 0.393557, 0.844767, 14.28, 23.1043), z-index=auto
+[2025-09-14T07:24:27.575Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.575Z] --- .RUNE-13 ANALYSIS ---
+[2025-09-14T07:24:27.575Z]   Dimensions: 31.636337280273438x31.6363525390625
+[2025-09-14T07:24:27.575Z]   Position: left=195.43792724609375, right=227.0742645263672, top=649.71240234375, bottom=681.3487548828125
+[2025-09-14T07:24:27.575Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.576Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.576Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.576Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.576Z]   CSS: transform=matrix(-0.0788363, 1.67874, -1.67874, -0.0788363, -1.27515, 15.6556), z-index=auto
+[2025-09-14T07:24:27.576Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.576Z] --- .RUNE-14 ANALYSIS ---
+[2025-09-14T07:24:27.576Z]   Dimensions: 13.8634033203125x13.86346435546875
+[2025-09-14T07:24:27.576Z]   Position: left=934.1558837890625, right=948.019287109375, top=794.51904296875, bottom=808.3825073242188
+[2025-09-14T07:24:27.576Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.576Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.577Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.577Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.577Z]   CSS: transform=matrix(-0.760938, -0.0092537, 0.0092537, -0.760938, 0.275086, 0.31015), z-index=auto
+[2025-09-14T07:24:27.577Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.577Z] --- .RUNE-15 ANALYSIS ---
+[2025-09-14T07:24:27.577Z]   Dimensions: 20.40576171875x20.40576171875
+[2025-09-14T07:24:27.577Z]   Position: left=692.74072265625, right=713.146484375, top=907.1307983398438, bottom=927.5365600585938
+[2025-09-14T07:24:27.577Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.578Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.578Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.578Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.578Z]   CSS: transform=matrix(-0.77296, -0.360694, 0.360694, -0.77296, 4.6311, 5.75557), z-index=auto
+[2025-09-14T07:24:27.578Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.578Z] --- .RUNE-16 ANALYSIS ---
+[2025-09-14T07:24:27.578Z]   Dimensions: 36.037567138671875x36.037567138671875
+[2025-09-14T07:24:27.578Z]   Position: left=280.01287841796875, right=316.0504455566406, top=317.018310546875, bottom=353.0558776855469
+[2025-09-14T07:24:27.578Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.579Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.579Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.579Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.579Z]   CSS: transform=matrix(-1.77657, -0.225522, 0.225522, -1.77657, 7.76605, 6.78708), z-index=auto
+[2025-09-14T07:24:27.579Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.579Z] --- .RUNE-17 ANALYSIS ---
+[2025-09-14T07:24:27.579Z]   Dimensions: 39.17431640625x39.17431640625
+[2025-09-14T07:24:27.580Z]   Position: left=604.300048828125, right=643.474365234375, top=322.06219482421875, bottom=361.23651123046875
+[2025-09-14T07:24:27.580Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.580Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.580Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.580Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.580Z]   CSS: transform=matrix(1.86869, -0.30766, 0.30766, 1.86869, 7.55909, 13.54), z-index=auto
+[2025-09-14T07:24:27.580Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.581Z] --- .RUNE-18 ANALYSIS ---
+[2025-09-14T07:24:27.581Z]   Dimensions: 24.488525390625x24.48858642578125
+[2025-09-14T07:24:27.581Z]   Position: left=1351.7379150390625, right=1376.2264404296875, top=302.4432067871094, bottom=326.9317932128906
+[2025-09-14T07:24:27.581Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.581Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.581Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.581Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.581Z]   CSS: transform=matrix(0.234804, -1.12567, 1.12567, 0.234804, -22.4709, 0), z-index=auto
+[2025-09-14T07:24:27.582Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.582Z] --- .RUNE-19 ANALYSIS ---
+[2025-09-14T07:24:27.582Z]   Dimensions: 35.7210693359375x35.721038818359375
+[2025-09-14T07:24:27.582Z]   Position: left=329.7345886230469, right=365.4556579589844, top=151.10911560058594, bottom=186.8301544189453
+[2025-09-14T07:24:27.582Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.582Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.582Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.582Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.582Z]   CSS: transform=matrix(0.553016, -1.43149, 1.43149, 0.553016, 25.2514, 31.4071), z-index=auto
+[2025-09-14T07:24:27.583Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.583Z] --- .RUNE-20 ANALYSIS ---
+[2025-09-14T07:24:27.583Z]   Dimensions: 37.0899658203125x37.089996337890625
+[2025-09-14T07:24:27.583Z]   Position: left=1320.4681396484375, right=1357.55810546875, top=307.7981262207031, bottom=344.88812255859375
+[2025-09-14T07:24:27.583Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.583Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.583Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.583Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.584Z]   CSS: transform=matrix(-0.0957668, 1.96479, -1.96479, -0.0957668, -4.47131, 16.1712), z-index=auto
+[2025-09-14T07:24:27.584Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.584Z] --- .RUNE-21 ANALYSIS ---
+[2025-09-14T07:24:27.584Z]   Dimensions: 46.173431396484375x46.1734619140625
+[2025-09-14T07:24:27.584Z]   Position: left=199.65716552734375, right=245.83059692382812, top=973.3821411132812, bottom=1019.5556030273438
+[2025-09-14T07:24:27.584Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.584Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.584Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.585Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.585Z]   CSS: transform=matrix(-0.946022, 1.61917, -1.61917, -0.946022, -3.81861, 19.5782), z-index=auto
+[2025-09-14T07:24:27.585Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.585Z] --- .RUNE-22 ANALYSIS ---
+[2025-09-14T07:24:27.585Z]   Dimensions: 45.09344482421875x45.09344482421875
+[2025-09-14T07:24:27.585Z]   Position: left=175.5411376953125, right=220.63458251953125, top=721.6685180664062, bottom=766.761962890625
+[2025-09-14T07:24:27.586Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.586Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.586Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.586Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.586Z]   CSS: transform=matrix(1.01819, 1.487, -1.487, 1.01819, -15.1934, 4.32463), z-index=auto
+[2025-09-14T07:24:27.586Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.587Z] --- .RUNE-23 ANALYSIS ---
+[2025-09-14T07:24:27.587Z]   Dimensions: 21.28497314453125x21.284912109375
+[2025-09-14T07:24:27.587Z]   Position: left=210.8240203857422, right=232.10899353027344, top=538.1412353515625, bottom=559.4261474609375
+[2025-09-14T07:24:27.587Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.587Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.587Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.587Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.588Z]   CSS: transform=matrix(0.108215, 1.07428, -1.07428, 0.108215, 14.6853, 21.0649), z-index=auto
+[2025-09-14T07:24:27.588Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.588Z] --- .RUNE-24 ANALYSIS ---
+[2025-09-14T07:24:27.588Z]   Dimensions: 25.34222412109375x25.3421630859375
+[2025-09-14T07:24:27.588Z]   Position: left=814.777587890625, right=840.1198120117188, top=794.4695434570312, bottom=819.8117065429688
+[2025-09-14T07:24:27.588Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.589Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.589Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.589Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.589Z]   CSS: transform=matrix(-0.241107, 1.16679, -1.16679, -0.241107, -29.1919, 0), z-index=auto
+[2025-09-14T07:24:27.589Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.589Z] --- .RUNE-25 ANALYSIS ---
+[2025-09-14T07:24:27.589Z]   Dimensions: 30.501708984375x30.5018310546875
+[2025-09-14T07:24:27.589Z]   Position: left=1297.0458984375, right=1327.547607421875, top=897.2739868164062, bottom=927.7758178710938
+[2025-09-14T07:24:27.590Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.590Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.590Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.590Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.590Z]   CSS: transform=matrix(-0.683912, -1.01063, 1.01063, -0.683912, 27.8124, 15.0562), z-index=auto
+[2025-09-14T07:24:27.591Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.591Z] --- .RUNE-26 ANALYSIS ---
+[2025-09-14T07:24:27.591Z]   Dimensions: 47.4317626953125x47.4317626953125
+[2025-09-14T07:24:27.591Z]   Position: left=1420.3189697265625, right=1467.750732421875, top=441.5812683105469, bottom=489.0130310058594
+[2025-09-14T07:24:27.591Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.591Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.591Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.592Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.592Z]   CSS: transform=matrix(-1.61124, -1.02386, 1.02386, -1.61124, 11.9255, 30.344), z-index=auto
+[2025-09-14T07:24:27.592Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.592Z]   ⚠️ ELEMENT EXTENDS BEYOND VIEWPORT: right (1467.750732421875) > viewport (1440)
+[2025-09-14T07:24:27.592Z] --- .RUNE-27 ANALYSIS ---
+[2025-09-14T07:24:27.592Z]   Dimensions: 43.66094970703125x43.660980224609375
+[2025-09-14T07:24:27.593Z]   Position: left=731.3604125976562, right=775.0213623046875, top=267.3967590332031, bottom=311.0577392578125
+[2025-09-14T07:24:27.593Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.593Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.593Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.593Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.593Z]   CSS: transform=matrix(1.23313, 1.19248, -1.19248, 1.23313, 19.8003, 23.696), z-index=auto
+[2025-09-14T07:24:27.594Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.594Z] --- .RUNE-28 ANALYSIS ---
+[2025-09-14T07:24:27.594Z]   Dimensions: 22.2943115234375x22.29425048828125
+[2025-09-14T07:24:27.594Z]   Position: left=1273.6878662109375, right=1295.982177734375, top=289.2032470703125, bottom=311.49749755859375
+[2025-09-14T07:24:27.594Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.594Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.594Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.595Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.595Z]   CSS: transform=matrix(1.04146, 0.197109, -0.197109, 1.04146, 13.6944, 15.3973), z-index=auto
+[2025-09-14T07:24:27.595Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.595Z] --- .RUNE-29 ANALYSIS ---
+[2025-09-14T07:24:27.595Z]   Dimensions: 19.392051696777344x19.392059326171875
+[2025-09-14T07:24:27.595Z]   Position: left=20.682559967041016, right=40.07461166381836, top=367.60980224609375, bottom=387.0018615722656
+[2025-09-14T07:24:27.595Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.596Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.596Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.596Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.596Z]   CSS: transform=matrix(-0.218957, -0.858379, 0.858379, -0.218957, 5.97234, 4.85271), z-index=auto
+[2025-09-14T07:24:27.596Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.596Z] --- .RUNE-30 ANALYSIS ---
+[2025-09-14T07:24:27.597Z]   Dimensions: 21.18792724609375x21.1878662109375
+[2025-09-14T07:24:27.597Z]   Position: left=368.2458190917969, right=389.4337463378906, top=600.45361328125, bottom=621.6414794921875
+[2025-09-14T07:24:27.597Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.597Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.597Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.597Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.598Z]   CSS: transform=matrix(0.183779, 0.993328, -0.993328, 0.183779, 16.3867, 32.8913), z-index=auto
+[2025-09-14T07:24:27.598Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.598Z] --- .RUNE-31 ANALYSIS ---
+[2025-09-14T07:24:27.598Z]   Dimensions: 25.661865234375x25.6619873046875
+[2025-09-14T07:24:27.598Z]   Position: left=1419.9818115234375, right=1445.6436767578125, top=612.2354125976562, bottom=637.8973999023438
+[2025-09-14T07:24:27.598Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.599Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.599Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.599Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.599Z]   CSS: transform=matrix(-0.86692, 0.558744, -0.558744, -0.86692, 18.9378, 24.8789), z-index=auto
+[2025-09-14T07:24:27.599Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.599Z]   ⚠️ ELEMENT EXTENDS BEYOND VIEWPORT: right (1445.6436767578125) > viewport (1440)
+[2025-09-14T07:24:27.600Z] --- .RUNE-32 ANALYSIS ---
+[2025-09-14T07:24:27.600Z]   Dimensions: 29.61053466796875x29.6104736328125
+[2025-09-14T07:24:27.600Z]   Position: left=586.6563720703125, right=616.2669067382812, top=977.0541381835938, bottom=1006.6646118164062
+[2025-09-14T07:24:27.600Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.600Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.600Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.601Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.601Z]   CSS: transform=matrix(0.782133, -0.862896, 0.862896, 0.782133, -15.3352, 0), z-index=auto
+[2025-09-14T07:24:27.601Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.601Z] --- .RUNE-33 ANALYSIS ---
+[2025-09-14T07:24:27.601Z]   Dimensions: 29.5361328125x29.536102294921875
+[2025-09-14T07:24:27.601Z]   Position: left=1145.513427734375, right=1175.049560546875, top=224.01319885253906, bottom=253.54930114746094
+[2025-09-14T07:24:27.601Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.602Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.602Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.602Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.602Z]   CSS: transform=matrix(-1.15007, -0.490826, 0.490826, -1.15007, -11.4997, 0), z-index=auto
+[2025-09-14T07:24:27.602Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.602Z] --- .RUNE-34 ANALYSIS ---
+[2025-09-14T07:24:27.603Z]   Dimensions: 39.877685546875x39.877685546875
+[2025-09-14T07:24:27.603Z]   Position: left=1340.7100830078125, right=1380.5877685546875, top=466.0924072265625, bottom=505.9700927734375
+[2025-09-14T07:24:27.603Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.603Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.603Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.603Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.604Z]   CSS: transform=matrix(1.69999, 0.515432, -0.515432, 1.69999, -15.5855, 0), z-index=auto
+[2025-09-14T07:24:27.604Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.604Z] --- .RUNE-35 ANALYSIS ---
+[2025-09-14T07:24:27.604Z]   Dimensions: 18.6121826171875x18.61224365234375
+[2025-09-14T07:24:27.604Z]   Position: left=1120.2088623046875, right=1138.821044921875, top=908.612060546875, bottom=927.2243041992188
+[2025-09-14T07:24:27.604Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.605Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.605Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.605Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.605Z]   CSS: transform=matrix(0.978165, -0.0558482, 0.0558482, 0.978165, 18.3899, 27.9025), z-index=auto
+[2025-09-14T07:24:27.605Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.605Z] --- .RUNE-36 ANALYSIS ---
+[2025-09-14T07:24:27.605Z]   Dimensions: 37.918731689453125x37.918701171875
+[2025-09-14T07:24:27.606Z]   Position: left=270.52001953125, right=308.4387512207031, top=657.4937744140625, bottom=695.4124755859375
+[2025-09-14T07:24:27.606Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.606Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.606Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.606Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.606Z]   CSS: transform=matrix(0.449524, 1.65707, -1.65707, 0.449524, -21.9894, 0), z-index=auto
+[2025-09-14T07:24:27.606Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.606Z] --- .RUNE-37 ANALYSIS ---
+[2025-09-14T07:24:27.607Z]   Dimensions: 39.622802734375x39.622802734375
+[2025-09-14T07:24:27.607Z]   Position: left=1138.111083984375, right=1177.73388671875, top=793.2730712890625, bottom=832.8958740234375
+[2025-09-14T07:24:27.607Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.607Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.607Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.607Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.607Z]   CSS: transform=matrix(0.946459, 1.2548, -1.2548, 0.946459, -2.84317, 19.3501), z-index=auto
+[2025-09-14T07:24:27.608Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.608Z] --- .RUNE-38 ANALYSIS ---
+[2025-09-14T07:24:27.608Z]   Dimensions: 37.39556884765625x37.39556884765625
+[2025-09-14T07:24:27.608Z]   Position: left=601.91552734375, right=639.3110961914062, top=439.8022155761719, bottom=477.1977844238281
+[2025-09-14T07:24:27.608Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.608Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.608Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.609Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.609Z]   CSS: transform=matrix(0.981981, -1.09555, 1.09555, 0.981981, -2.54293, 0), z-index=auto
+[2025-09-14T07:24:27.609Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.609Z] --- .RUNE-39 ANALYSIS ---
+[2025-09-14T07:24:27.609Z]   Dimensions: 45.17559814453125x45.1756591796875
+[2025-09-14T07:24:27.609Z]   Position: left=750.141845703125, right=795.3174438476562, top=631.2445068359375, bottom=676.420166015625
+[2025-09-14T07:24:27.609Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.609Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.609Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.610Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.610Z]   CSS: transform=matrix(-0.619515, -1.89024, 1.89024, -0.619515, 8.91715, 30.8636), z-index=auto
+[2025-09-14T07:24:27.610Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.610Z] --- .RUNE-40 ANALYSIS ---
+[2025-09-14T07:24:27.610Z]   Dimensions: 30.2049560546875x30.2049560546875
+[2025-09-14T07:24:27.610Z]   Position: left=1342.084228515625, right=1372.2891845703125, top=696.3975219726562, bottom=726.6024780273438
+[2025-09-14T07:24:27.611Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.611Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.611Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.611Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.611Z]   CSS: transform=matrix(0.26884, 1.40921, -1.40921, 0.26884, -6.53206, 0), z-index=auto
+[2025-09-14T07:24:27.611Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.611Z] --- .RUNE-41 ANALYSIS ---
+[2025-09-14T07:24:27.611Z]   Dimensions: 49.002197265625x49.002288818359375
+[2025-09-14T07:24:27.611Z]   Position: left=1192.328857421875, right=1241.3310546875, top=496.4408264160156, bottom=545.443115234375
+[2025-09-14T07:24:27.612Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.612Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.612Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.612Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.612Z]   CSS: transform=matrix(1.3527, -1.36964, 1.36964, 1.3527, 13.0643, 18.4419), z-index=auto
+[2025-09-14T07:24:27.612Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.612Z] --- .RUNE-42 ANALYSIS ---
+[2025-09-14T07:24:27.613Z]   Dimensions: 39.0411376953125x39.04107666015625
+[2025-09-14T07:24:27.613Z]   Position: left=1073.490234375, right=1112.5313720703125, top=438.9950866699219, bottom=478.0361633300781
+[2025-09-14T07:24:27.613Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.613Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.613Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.613Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.613Z]   CSS: transform=matrix(0.368188, -1.80076, 1.80076, 0.368188, -28.2548, 0), z-index=auto
+[2025-09-14T07:24:27.613Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.613Z] --- .RUNE-43 ANALYSIS ---
+[2025-09-14T07:24:27.613Z]   Dimensions: 32.205322265625x32.205322265625
+[2025-09-14T07:24:27.614Z]   Position: left=1290.9666748046875, right=1323.1719970703125, top=980.8572387695312, bottom=1013.0625610351562
+[2025-09-14T07:24:27.614Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.614Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.614Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.614Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.614Z]   CSS: transform=matrix(0.464549, -1.32464, 1.32464, 0.464549, -1.41508, 23.538), z-index=auto
+[2025-09-14T07:24:27.614Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.614Z] --- .RUNE-44 ANALYSIS ---
+[2025-09-14T07:24:27.614Z]   Dimensions: 34.3717041015625x34.37164306640625
+[2025-09-14T07:24:27.614Z]   Position: left=1335.2891845703125, right=1369.660888671875, top=718.0025024414062, bottom=752.3741455078125
+[2025-09-14T07:24:27.615Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.615Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.615Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.615Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.615Z]   CSS: transform=matrix(-1.39393, 0.515604, -0.515604, -1.39393, -3.41559, 27.7977), z-index=auto
+[2025-09-14T07:24:27.615Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.615Z] --- .RUNE-45 ANALYSIS ---
+[2025-09-14T07:24:27.615Z]   Dimensions: 26.0162353515625x26.0162353515625
+[2025-09-14T07:24:27.615Z]   Position: left=1251.213623046875, right=1277.2298583984375, top=753.9503784179688, bottom=779.9666137695312
+[2025-09-14T07:24:27.615Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.616Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.616Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.616Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.616Z]   CSS: transform=matrix(0.769032, -0.676312, 0.676312, 0.769032, 13.7842, 30.7554), z-index=auto
+[2025-09-14T07:24:27.616Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.616Z] --- .RUNE-46 ANALYSIS ---
+[2025-09-14T07:24:27.616Z]   Dimensions: 46.7547607421875x46.7547607421875
+[2025-09-14T07:24:27.617Z]   Position: left=719.5438232421875, right=766.298583984375, top=324.60699462890625, bottom=371.36175537109375
+[2025-09-14T07:24:27.617Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.617Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.617Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.617Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.617Z]   CSS: transform=matrix(-0.787012, 1.81048, -1.81048, -0.787012, -11.4694, 0), z-index=auto
+[2025-09-14T07:24:27.618Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.618Z] --- .RUNE-47 ANALYSIS ---
+[2025-09-14T07:24:27.618Z]   Dimensions: 39.761383056640625x39.761383056640625
+[2025-09-14T07:24:27.618Z]   Position: left=430.06329345703125, right=469.8246765136719, top=91.19743347167969, bottom=130.9588165283203
+[2025-09-14T07:24:27.618Z]   ScrollDimensions: scrollWidth=4, scrollHeight=22
+[2025-09-14T07:24:27.618Z]   ClientDimensions: clientWidth=3, clientHeight=18
+[2025-09-14T07:24:27.619Z]   CSS: position=absolute, overflow-x=hidden, overflow-y=auto
+[2025-09-14T07:24:27.619Z]   CSS: width=18px, max-width=100%, min-width=0px
+[2025-09-14T07:24:27.619Z]   CSS: transform=matrix(-0.885384, -1.32358, 1.32358, -0.885384, -1.0404, 0), z-index=auto
+[2025-09-14T07:24:27.619Z]   ⚠️ HORIZONTAL OVERFLOW: scrollWidth (4) > clientWidth (3)
+[2025-09-14T07:24:27.620Z] --- ANIMATION BOUNDS ANALYSIS ---
+[2025-09-14T07:24:27.620Z] Found 70 animated elements in loading screen:
+[2025-09-14T07:24:27.621Z] Animated Element 1: DIV.magical-circle outer
+[2025-09-14T07:24:27.621Z]   Rect: 43.02, -136.98, 1353.97x1353.97
+[2025-09-14T07:24:27.621Z]   Right edge: 1396.99px (viewport: 1440px)
+[2025-09-14T07:24:27.621Z]   Bottom edge: 1216.99px (viewport: 900px)
+[2025-09-14T07:24:27.621Z]   Animation: 30s linear 0s infinite reverse none running _ngcontent-ng-c3987364406_rotate
+[2025-09-14T07:24:27.622Z]   Transform: matrix(0.88117, -0.4728, 0.4728, 0.88117, 0, 0)
+[2025-09-14T07:24:27.622Z]   Position: absolute
+[2025-09-14T07:24:27.622Z]   Z-index: auto
+[2025-09-14T07:24:27.622Z]   🚨 VERTICAL OVERFLOW: 316.99px beyond viewport
+[2025-09-14T07:24:27.622Z] Animated Element 2: DIV.magical-circle
+[2025-09-14T07:24:27.622Z]   Rect: 154.93, -25.07, 1130.14x1130.14
+[2025-09-14T07:24:27.622Z]   Right edge: 1285.07px (viewport: 1440px)
+[2025-09-14T07:24:27.623Z]   Bottom edge: 1105.07px (viewport: 900px)
+[2025-09-14T07:24:27.623Z]   Animation: 20s linear 0s infinite normal none running _ngcontent-ng-c3987364406_rotate
+[2025-09-14T07:24:27.623Z]   Transform: matrix(0.739345, 0.673327, -0.673327, 0.739345, 0, 0)
+[2025-09-14T07:24:27.623Z]   Position: absolute
+[2025-09-14T07:24:27.623Z]   Z-index: auto
+[2025-09-14T07:24:27.623Z]   🚨 VERTICAL OVERFLOW: 205.07px beyond viewport
+[2025-09-14T07:24:27.624Z] Animated Element 3: DIV.rune-effects
+[2025-09-14T07:24:27.624Z]   Rect: -23.35, 75.41, 1486.69x929.18
+[2025-09-14T07:24:27.624Z]   Right edge: 1463.35px (viewport: 1440px)
+[2025-09-14T07:24:27.624Z]   Bottom edge: 1004.59px (viewport: 900px)
+[2025-09-14T07:24:27.624Z]   Animation: 8s ease-in-out 0s infinite normal none running _ngcontent-ng-c3987364406_effect-pulse-safe
+[2025-09-14T07:24:27.624Z]   Transform: matrix(1.03243, 0, 0, 1.03243, 0, 0)
+[2025-09-14T07:24:27.624Z]   Position: absolute
+[2025-09-14T07:24:27.625Z]   Z-index: auto
+[2025-09-14T07:24:27.625Z]   🚨 HORIZONTAL OVERFLOW: 23.35px beyond viewport
+[2025-09-14T07:24:27.625Z]   🚨 VERTICAL OVERFLOW: 104.59px beyond viewport
+[2025-09-14T07:24:27.625Z] Animated Element 4: DIV.decorative-elements
+[2025-09-14T07:24:27.625Z]   Rect: 0.00, 90.00, 1440.00x900.00
+[2025-09-14T07:24:27.625Z]   Right edge: 1440.00px (viewport: 1440px)
+[2025-09-14T07:24:27.625Z]   Bottom edge: 990.00px (viewport: 900px)
+[2025-09-14T07:24:27.626Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.626Z]   Transform: none
+[2025-09-14T07:24:27.626Z]   Position: absolute
+[2025-09-14T07:24:27.626Z]   Z-index: auto
+[2025-09-14T07:24:27.626Z]   🚨 VERTICAL OVERFLOW: 90.00px beyond viewport
+[2025-09-14T07:24:27.626Z] Animated Element 5: DIV.corner-line top-left
+[2025-09-14T07:24:27.627Z]   Rect: 50.00, 140.00, 150.00x150.00
+[2025-09-14T07:24:27.627Z]   Right edge: 200.00px (viewport: 1440px)
+[2025-09-14T07:24:27.627Z]   Bottom edge: 290.00px (viewport: 900px)
+[2025-09-14T07:24:27.627Z]   Animation: 3s ease 0s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.627Z]   Transform: none
+[2025-09-14T07:24:27.627Z]   Position: absolute
+[2025-09-14T07:24:27.627Z]   Z-index: auto
+[2025-09-14T07:24:27.628Z] Animated Element 6: DIV.corner-line top-right
+[2025-09-14T07:24:27.628Z]   Rect: 1240.00, 140.00, 150.00x150.00
+[2025-09-14T07:24:27.628Z]   Right edge: 1390.00px (viewport: 1440px)
+[2025-09-14T07:24:27.628Z]   Bottom edge: 290.00px (viewport: 900px)
+[2025-09-14T07:24:27.628Z]   Animation: 3s ease 0.75s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.628Z]   Transform: none
+[2025-09-14T07:24:27.628Z]   Position: absolute
+[2025-09-14T07:24:27.629Z]   Z-index: auto
+[2025-09-14T07:24:27.629Z] Animated Element 7: DIV.corner-line bottom-left
+[2025-09-14T07:24:27.629Z]   Rect: 50.00, 790.00, 150.00x150.00
+[2025-09-14T07:24:27.629Z]   Right edge: 200.00px (viewport: 1440px)
+[2025-09-14T07:24:27.629Z]   Bottom edge: 940.00px (viewport: 900px)
+[2025-09-14T07:24:27.629Z]   Animation: 3s ease 1.5s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.629Z]   Transform: none
+[2025-09-14T07:24:27.630Z]   Position: absolute
+[2025-09-14T07:24:27.630Z]   Z-index: auto
+[2025-09-14T07:24:27.630Z]   🚨 VERTICAL OVERFLOW: 40.00px beyond viewport
+[2025-09-14T07:24:27.630Z] Animated Element 8: DIV.corner-line bottom-right
+[2025-09-14T07:24:27.630Z]   Rect: 1240.00, 790.00, 150.00x150.00
+[2025-09-14T07:24:27.630Z]   Right edge: 1390.00px (viewport: 1440px)
+[2025-09-14T07:24:27.630Z]   Bottom edge: 940.00px (viewport: 900px)
+[2025-09-14T07:24:27.631Z]   Animation: 3s ease 2.25s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.631Z]   Transform: none
+[2025-09-14T07:24:27.631Z]   Position: absolute
+[2025-09-14T07:24:27.631Z]   Z-index: auto
+[2025-09-14T07:24:27.631Z]   🚨 VERTICAL OVERFLOW: 40.00px beyond viewport
+[2025-09-14T07:24:27.631Z] Animated Element 9: DIV.mid-line left
+[2025-09-14T07:24:27.631Z]   Rect: 50.00, 490.00, 100.00x100.00
+[2025-09-14T07:24:27.632Z]   Right edge: 150.00px (viewport: 1440px)
+[2025-09-14T07:24:27.632Z]   Bottom edge: 590.00px (viewport: 900px)
+[2025-09-14T07:24:27.632Z]   Animation: 3s ease 0.5s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.632Z]   Transform: matrix(1, 0, 0, 1, 0, -50)
+[2025-09-14T07:24:27.632Z]   Position: absolute
+[2025-09-14T07:24:27.632Z]   Z-index: auto
+[2025-09-14T07:24:27.633Z] Animated Element 10: DIV.mid-line right
+[2025-09-14T07:24:27.633Z]   Rect: 1290.00, 490.00, 100.00x100.00
+[2025-09-14T07:24:27.633Z]   Right edge: 1390.00px (viewport: 1440px)
+[2025-09-14T07:24:27.633Z]   Bottom edge: 590.00px (viewport: 900px)
+[2025-09-14T07:24:27.633Z]   Animation: 3s ease 1s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.634Z]   Transform: matrix(1, 0, 0, 1, 0, -50)
+[2025-09-14T07:24:27.634Z]   Position: absolute
+[2025-09-14T07:24:27.634Z]   Z-index: auto
+[2025-09-14T07:24:27.634Z] Animated Element 11: DIV.mid-line top
+[2025-09-14T07:24:27.634Z]   Rect: 670.00, 140.00, 100.00x100.00
+[2025-09-14T07:24:27.634Z]   Right edge: 770.00px (viewport: 1440px)
+[2025-09-14T07:24:27.634Z]   Bottom edge: 240.00px (viewport: 900px)
+[2025-09-14T07:24:27.635Z]   Animation: 3s ease 1.5s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.635Z]   Transform: matrix(1, 0, 0, 1, -50, 0)
+[2025-09-14T07:24:27.635Z]   Position: absolute
+[2025-09-14T07:24:27.635Z]   Z-index: auto
+[2025-09-14T07:24:27.635Z] Animated Element 12: DIV.mid-line bottom
+[2025-09-14T07:24:27.635Z]   Rect: 670.00, 840.00, 100.00x100.00
+[2025-09-14T07:24:27.635Z]   Right edge: 770.00px (viewport: 1440px)
+[2025-09-14T07:24:27.636Z]   Bottom edge: 940.00px (viewport: 900px)
+[2025-09-14T07:24:27.636Z]   Animation: 3s ease 2s infinite normal none running _ngcontent-ng-c3987364406_pulse
+[2025-09-14T07:24:27.636Z]   Transform: matrix(1, 0, 0, 1, -50, 0)
+[2025-09-14T07:24:27.636Z]   Position: absolute
+[2025-09-14T07:24:27.636Z]   Z-index: auto
+[2025-09-14T07:24:27.636Z]   🚨 VERTICAL OVERFLOW: 40.00px beyond viewport
+[2025-09-14T07:24:27.636Z] Animated Element 13: DIV.light-beams
+[2025-09-14T07:24:27.637Z]   Rect: 0.00, 90.00, 1440.00x900.00
+[2025-09-14T07:24:27.637Z]   Right edge: 1440.00px (viewport: 1440px)
+[2025-09-14T07:24:27.637Z]   Bottom edge: 990.00px (viewport: 900px)
+[2025-09-14T07:24:27.637Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.637Z]   Transform: none
+[2025-09-14T07:24:27.637Z]   Position: absolute
+[2025-09-14T07:24:27.637Z]   Z-index: auto
+[2025-09-14T07:24:27.637Z]   🚨 VERTICAL OVERFLOW: 90.00px beyond viewport
+[2025-09-14T07:24:27.637Z] Animated Element 14: DIV.beam beam-1
+[2025-09-14T07:24:27.638Z]   Rect: 517.41, -145.82, 390.18x1371.63
+[2025-09-14T07:24:27.638Z]   Right edge: 907.59px (viewport: 1440px)
+[2025-09-14T07:24:27.638Z]   Bottom edge: 1225.82px (viewport: 900px)
+[2025-09-14T07:24:27.638Z]   Animation: 8s linear 0s infinite normal none running _ngcontent-ng-c3987364406_beam-rotate, 4s ease-in-out 0s infinite normal none running _ngcontent-ng-c3987364406_beam-pulse
+[2025-09-14T07:24:27.638Z]   Transform: matrix(-0.272462, 0.962166, -0.962166, -0.272462, -712.5, -1)
+[2025-09-14T07:24:27.638Z]   Position: absolute
+[2025-09-14T07:24:27.638Z]   Z-index: auto
+[2025-09-14T07:24:27.638Z]   🚨 VERTICAL OVERFLOW: 325.82px beyond viewport
+[2025-09-14T07:24:27.639Z] Animated Element 15: DIV.beam beam-2
+[2025-09-14T07:24:27.639Z]   Rect: 474.67, -131.97, 475.67x1343.93
+[2025-09-14T07:24:27.639Z]   Right edge: 950.33px (viewport: 1440px)
+[2025-09-14T07:24:27.639Z]   Bottom edge: 1211.97px (viewport: 900px)
+[2025-09-14T07:24:27.639Z]   Animation: 12s linear 0s infinite reverse none running _ngcontent-ng-c3987364406_beam-rotate, 6s ease-in-out 1s infinite normal none running _ngcontent-ng-c3987364406_beam-pulse
+[2025-09-14T07:24:27.640Z]   Transform: matrix(0.333139, -0.942878, 0.942878, 0.333139, -712.5, -0.5)
+[2025-09-14T07:24:27.640Z]   Position: absolute
+[2025-09-14T07:24:27.640Z]   Z-index: auto
+[2025-09-14T07:24:27.640Z]   🚨 VERTICAL OVERFLOW: 311.97px beyond viewport
+[2025-09-14T07:24:27.640Z] Animated Element 16: DIV.beam beam-3
+[2025-09-14T07:24:27.640Z]   Rect: 645.55, -169.44, 133.89x1418.88
+[2025-09-14T07:24:27.640Z]   Right edge: 779.45px (viewport: 1440px)
+[2025-09-14T07:24:27.640Z]   Bottom edge: 1249.44px (viewport: 900px)
+[2025-09-14T07:24:27.641Z]   Animation: 10s linear 0s infinite normal none running _ngcontent-ng-c3987364406_beam-rotate, 5s ease-in-out 2s infinite normal none running _ngcontent-ng-c3987364406_beam-pulse
+[2025-09-14T07:24:27.641Z]   Transform: matrix(0.0932626, 0.995642, -0.995642, 0.0932626, -712.5, -0.5)
+[2025-09-14T07:24:27.641Z]   Position: absolute
+[2025-09-14T07:24:27.641Z]   Z-index: auto
+[2025-09-14T07:24:27.641Z]   🚨 VERTICAL OVERFLOW: 349.44px beyond viewport
+[2025-09-14T07:24:27.641Z] Animated Element 17: DIV.beam beam-4
+[2025-09-14T07:24:27.641Z]   Rect: 662.77, 452.75, 99.47x174.50
+[2025-09-14T07:24:27.641Z]   Right edge: 762.23px (viewport: 1440px)
+[2025-09-14T07:24:27.642Z]   Bottom edge: 627.25px (viewport: 900px)
+[2025-09-14T07:24:27.643Z]   Animation: 14s linear 0s infinite reverse none running _ngcontent-ng-c3987364406_beam-rotate, 7s ease-in-out 3s infinite normal none running _ngcontent-ng-c3987364406_beam-pulse
+[2025-09-14T07:24:27.643Z]   Transform: matrix(0.49298, -0.87004, 0.87004, 0.49298, -100, -0.5)
+[2025-09-14T07:24:27.643Z]   Position: absolute
+[2025-09-14T07:24:27.643Z]   Z-index: auto
+[2025-09-14T07:24:27.643Z] Animated Element 18: DIV.rune-circle
+[2025-09-14T07:24:27.643Z]   Rect: 0.00, 90.00, 1440.00x900.00
+[2025-09-14T07:24:27.643Z]   Right edge: 1440.00px (viewport: 1440px)
+[2025-09-14T07:24:27.643Z]   Bottom edge: 990.00px (viewport: 900px)
+[2025-09-14T07:24:27.644Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.644Z]   Transform: none
+[2025-09-14T07:24:27.644Z]   Position: absolute
+[2025-09-14T07:24:27.644Z]   Z-index: auto
+[2025-09-14T07:24:27.644Z]   🚨 VERTICAL OVERFLOW: 90.00px beyond viewport
+[2025-09-14T07:24:27.644Z] Animated Element 19: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.644Z]   Rect: 1176.69, 700.30, 25.06x25.06
+[2025-09-14T07:24:27.644Z]   Right edge: 1201.75px (viewport: 1440px)
+[2025-09-14T07:24:27.644Z]   Bottom edge: 725.36px (viewport: 900px)
+[2025-09-14T07:24:27.645Z]   Animation: 8s linear -5.08509s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.645Z]   Transform: matrix(0.138946, 1.25335, -1.25335, 0.138946, -5.84074, 0)
+[2025-09-14T07:24:27.645Z]   Position: absolute
+[2025-09-14T07:24:27.645Z]   Z-index: auto
+[2025-09-14T07:24:27.645Z] Animated Element 20: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.645Z]   Rect: 223.91, 767.98, 40.38x40.38
+[2025-09-14T07:24:27.645Z]   Right edge: 264.29px (viewport: 1440px)
+[2025-09-14T07:24:27.645Z]   Bottom edge: 808.36px (viewport: 900px)
+[2025-09-14T07:24:27.645Z]   Animation: 8s linear -3.94414s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.645Z]   Transform: matrix(-1.31112, 0.932214, -0.932214, -1.31112, -22.1486, 0)
+[2025-09-14T07:24:27.646Z]   Position: absolute
+[2025-09-14T07:24:27.646Z]   Z-index: auto
+[2025-09-14T07:24:27.646Z] Animated Element 21: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.646Z]   Rect: 195.63, 130.73, 32.98x32.98
+[2025-09-14T07:24:27.646Z]   Right edge: 228.61px (viewport: 1440px)
+[2025-09-14T07:24:27.646Z]   Bottom edge: 163.71px (viewport: 900px)
+[2025-09-14T07:24:27.646Z]   Animation: 8s linear -6.74929s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.646Z]   Transform: matrix(1.20972, 0.622601, -0.622601, 1.20972, 17.7927, 11.7063)
+[2025-09-14T07:24:27.646Z]   Position: absolute
+[2025-09-14T07:24:27.647Z]   Z-index: auto
+[2025-09-14T07:24:27.647Z] Animated Element 22: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.647Z]   Rect: 1112.98, 476.63, 35.40x35.40
+[2025-09-14T07:24:27.647Z]   Right edge: 1148.39px (viewport: 1440px)
+[2025-09-14T07:24:27.647Z]   Bottom edge: 512.03px (viewport: 900px)
+[2025-09-14T07:24:27.647Z]   Animation: 8s linear -4.0218s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.647Z]   Transform: matrix(-0.954703, -1.01219, 1.01219, -0.954703, -22.9264, 0)
+[2025-09-14T07:24:27.647Z]   Position: absolute
+[2025-09-14T07:24:27.647Z]   Z-index: auto
+[2025-09-14T07:24:27.648Z] Animated Element 23: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.648Z]   Rect: 348.36, 354.78, 24.76x24.76
+[2025-09-14T07:24:27.648Z]   Right edge: 373.12px (viewport: 1440px)
+[2025-09-14T07:24:27.648Z]   Bottom edge: 379.54px (viewport: 900px)
+[2025-09-14T07:24:27.648Z]   Animation: 8s linear -2.2199s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.648Z]   Transform: matrix(1.1927, 0.182706, -0.182706, 1.1927, -5.05431, 13.5505)
+[2025-09-14T07:24:27.648Z]   Position: absolute
+[2025-09-14T07:24:27.649Z]   Z-index: auto
+[2025-09-14T07:24:27.649Z] Animated Element 24: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.649Z]   Rect: 1112.89, 607.75, 38.85x38.85
+[2025-09-14T07:24:27.649Z]   Right edge: 1151.74px (viewport: 1440px)
+[2025-09-14T07:24:27.650Z]   Bottom edge: 646.60px (viewport: 900px)
+[2025-09-14T07:24:27.650Z]   Animation: 8s linear -6.3208s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.650Z]   Transform: matrix(-1.19486, 0.963517, -0.963517, -1.19486, 6.67442, 7.1144)
+[2025-09-14T07:24:27.650Z]   Position: absolute
+[2025-09-14T07:24:27.650Z]   Z-index: auto
+[2025-09-14T07:24:27.651Z] Animated Element 25: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.651Z]   Rect: 1276.25, 600.90, 15.84x15.84
+[2025-09-14T07:24:27.651Z]   Right edge: 1292.09px (viewport: 1440px)
+[2025-09-14T07:24:27.651Z]   Bottom edge: 616.74px (viewport: 900px)
+[2025-09-14T07:24:27.651Z]   Animation: 8s linear -3.36754s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.651Z]   Transform: matrix(-0.57356, 0.306414, -0.306414, -0.57356, -20.905, 4.39706)
+[2025-09-14T07:24:27.652Z]   Position: absolute
+[2025-09-14T07:24:27.652Z]   Z-index: auto
+[2025-09-14T07:24:27.652Z] Animated Element 26: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.652Z]   Rect: 1383.30, 840.57, 18.61x18.61
+[2025-09-14T07:24:27.652Z]   Right edge: 1401.91px (viewport: 1440px)
+[2025-09-14T07:24:27.652Z]   Bottom edge: 859.17px (viewport: 900px)
+[2025-09-14T07:24:27.652Z]   Animation: 8s linear -0.93867s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.652Z]   Transform: matrix(0.482382, -0.551358, 0.551358, 0.482382, 9.68554, 20.9794)
+[2025-09-14T07:24:27.653Z]   Position: absolute
+[2025-09-14T07:24:27.653Z]   Z-index: auto
+[2025-09-14T07:24:27.653Z] Animated Element 27: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.653Z]   Rect: 717.12, 504.12, 19.84x19.84
+[2025-09-14T07:24:27.653Z]   Right edge: 736.96px (viewport: 1440px)
+[2025-09-14T07:24:27.653Z]   Bottom edge: 523.96px (viewport: 900px)
+[2025-09-14T07:24:27.653Z]   Animation: 8s linear -1.85797s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.653Z]   Transform: matrix(1.0229, 0.0790458, -0.0790458, 1.0229, -1.97743, 19.0702)
+[2025-09-14T07:24:27.654Z]   Position: absolute
+[2025-09-14T07:24:27.654Z]   Z-index: auto
+[2025-09-14T07:24:27.654Z] Animated Element 28: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.654Z]   Rect: 475.96, 372.61, 35.53x35.53
+[2025-09-14T07:24:27.654Z]   Right edge: 511.49px (viewport: 1440px)
+[2025-09-14T07:24:27.654Z]   Bottom edge: 408.14px (viewport: 900px)
+[2025-09-14T07:24:27.655Z]   Animation: 8s linear -6.07387s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.655Z]   Transform: matrix(1.69207, 0.281696, -0.281696, 1.69207, 5.47455, 4.11131)
+[2025-09-14T07:24:27.655Z]   Position: absolute
+[2025-09-14T07:24:27.655Z]   Z-index: auto
+[2025-09-14T07:24:27.655Z] Animated Element 29: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.655Z]   Rect: 574.88, 658.58, 18.87x18.87
+[2025-09-14T07:24:27.655Z]   Right edge: 593.76px (viewport: 1440px)
+[2025-09-14T07:24:27.656Z]   Bottom edge: 677.45px (viewport: 900px)
+[2025-09-14T07:24:27.656Z]   Animation: 8s linear -7.07886s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.656Z]   Transform: matrix(0.559455, -0.488953, 0.488953, 0.559455, 15.0381, 15.0622)
+[2025-09-14T07:24:27.656Z]   Position: absolute
+[2025-09-14T07:24:27.656Z]   Z-index: auto
+[2025-09-14T07:24:27.656Z] Animated Element 30: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.656Z]   Rect: 847.99, 191.32, 17.54x17.54
+[2025-09-14T07:24:27.656Z]   Right edge: 865.52px (viewport: 1440px)
+[2025-09-14T07:24:27.656Z]   Bottom edge: 208.85px (viewport: 900px)
+[2025-09-14T07:24:27.656Z]   Animation: 8s linear -3.57313s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.657Z]   Transform: matrix(-0.159111, -0.815062, 0.815062, -0.159111, -16.2622, 1.2082)
+[2025-09-14T07:24:27.657Z]   Position: absolute
+[2025-09-14T07:24:27.657Z]   Z-index: auto
+[2025-09-14T07:24:27.657Z] Animated Element 31: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.657Z]   Rect: 1085.71, 907.35, 22.29x22.29
+[2025-09-14T07:24:27.657Z]   Right edge: 1108.00px (viewport: 1440px)
+[2025-09-14T07:24:27.657Z]   Bottom edge: 929.64px (viewport: 900px)
+[2025-09-14T07:24:27.658Z]   Animation: 8s linear -0.465839s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.658Z]   Transform: matrix(0.844767, -0.393557, 0.393557, 0.844767, 14.28, 23.1043)
+[2025-09-14T07:24:27.658Z]   Position: absolute
+[2025-09-14T07:24:27.658Z]   Z-index: auto
+[2025-09-14T07:24:27.658Z]   🚨 VERTICAL OVERFLOW: 29.64px beyond viewport
+[2025-09-14T07:24:27.658Z] Animated Element 32: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.659Z]   Rect: 195.44, 649.71, 31.64x31.64
+[2025-09-14T07:24:27.659Z]   Right edge: 227.07px (viewport: 1440px)
+[2025-09-14T07:24:27.659Z]   Bottom edge: 681.35px (viewport: 900px)
+[2025-09-14T07:24:27.659Z]   Animation: 8s linear -1.76399s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.659Z]   Transform: matrix(-0.0788363, 1.67874, -1.67874, -0.0788363, -1.27515, 15.6556)
+[2025-09-14T07:24:27.659Z]   Position: absolute
+[2025-09-14T07:24:27.659Z]   Z-index: auto
+[2025-09-14T07:24:27.659Z] Animated Element 33: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.659Z]   Rect: 934.16, 794.52, 13.86x13.86
+[2025-09-14T07:24:27.660Z]   Right edge: 948.02px (viewport: 1440px)
+[2025-09-14T07:24:27.660Z]   Bottom edge: 808.38px (viewport: 900px)
+[2025-09-14T07:24:27.660Z]   Animation: 8s linear -5.66736s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.660Z]   Transform: matrix(-0.760938, -0.0092537, 0.0092537, -0.760938, 0.275086, 0.31015)
+[2025-09-14T07:24:27.660Z]   Position: absolute
+[2025-09-14T07:24:27.660Z]   Z-index: auto
+[2025-09-14T07:24:27.660Z] Animated Element 34: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.660Z]   Rect: 692.74, 907.13, 20.41x20.41
+[2025-09-14T07:24:27.660Z]   Right edge: 713.15px (viewport: 1440px)
+[2025-09-14T07:24:27.661Z]   Bottom edge: 927.54px (viewport: 900px)
+[2025-09-14T07:24:27.661Z]   Animation: 8s linear -6.05466s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.661Z]   Transform: matrix(-0.77296, -0.360694, 0.360694, -0.77296, 4.6311, 5.75557)
+[2025-09-14T07:24:27.661Z]   Position: absolute
+[2025-09-14T07:24:27.661Z]   Z-index: auto
+[2025-09-14T07:24:27.661Z]   🚨 VERTICAL OVERFLOW: 27.54px beyond viewport
+[2025-09-14T07:24:27.661Z] Animated Element 35: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.661Z]   Rect: 280.01, 317.02, 36.04x36.04
+[2025-09-14T07:24:27.662Z]   Right edge: 316.05px (viewport: 1440px)
+[2025-09-14T07:24:27.662Z]   Bottom edge: 353.06px (viewport: 900px)
+[2025-09-14T07:24:27.662Z]   Animation: 8s linear -6.29805s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.662Z]   Transform: matrix(-1.77657, -0.225522, 0.225522, -1.77657, 7.76605, 6.78708)
+[2025-09-14T07:24:27.662Z]   Position: absolute
+[2025-09-14T07:24:27.662Z]   Z-index: auto
+[2025-09-14T07:24:27.662Z] Animated Element 36: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.662Z]   Rect: 604.30, 322.06, 39.17x39.17
+[2025-09-14T07:24:27.663Z]   Right edge: 643.47px (viewport: 1440px)
+[2025-09-14T07:24:27.663Z]   Bottom edge: 361.24px (viewport: 900px)
+[2025-09-14T07:24:27.663Z]   Animation: 8s linear -6.48866s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.663Z]   Transform: matrix(1.86869, -0.30766, 0.30766, 1.86869, 7.55909, 13.54)
+[2025-09-14T07:24:27.663Z]   Position: absolute
+[2025-09-14T07:24:27.663Z]   Z-index: auto
+[2025-09-14T07:24:27.663Z] Animated Element 37: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.664Z]   Rect: 1351.74, 302.44, 24.49x24.49
+[2025-09-14T07:24:27.664Z]   Right edge: 1376.23px (viewport: 1440px)
+[2025-09-14T07:24:27.664Z]   Bottom edge: 326.93px (viewport: 900px)
+[2025-09-14T07:24:27.664Z]   Animation: 8s linear -4.15023s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.664Z]   Transform: matrix(0.234804, -1.12567, 1.12567, 0.234804, -22.4709, 0)
+[2025-09-14T07:24:27.664Z]   Position: absolute
+[2025-09-14T07:24:27.665Z]   Z-index: auto
+[2025-09-14T07:24:27.665Z] Animated Element 38: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.665Z]   Rect: 329.73, 151.11, 35.72x35.72
+[2025-09-14T07:24:27.665Z]   Right edge: 365.46px (viewport: 1440px)
+[2025-09-14T07:24:27.665Z]   Bottom edge: 186.83px (viewport: 900px)
+[2025-09-14T07:24:27.665Z]   Animation: 8s linear -0.111536s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.666Z]   Transform: matrix(0.553016, -1.43149, 1.43149, 0.553016, 25.2514, 31.4071)
+[2025-09-14T07:24:27.666Z]   Position: absolute
+[2025-09-14T07:24:27.666Z]   Z-index: auto
+[2025-09-14T07:24:27.666Z] Animated Element 39: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.667Z]   Rect: 1320.47, 307.80, 37.09x37.09
+[2025-09-14T07:24:27.667Z]   Right edge: 1357.56px (viewport: 1440px)
+[2025-09-14T07:24:27.667Z]   Bottom edge: 344.89px (viewport: 900px)
+[2025-09-14T07:24:27.667Z]   Animation: 8s linear -2.02666s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.667Z]   Transform: matrix(-0.0957668, 1.96479, -1.96479, -0.0957668, -4.47131, 16.1712)
+[2025-09-14T07:24:27.668Z]   Position: absolute
+[2025-09-14T07:24:27.668Z]   Z-index: auto
+[2025-09-14T07:24:27.668Z] Animated Element 40: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.668Z]   Rect: 199.66, 973.38, 46.17x46.17
+[2025-09-14T07:24:27.668Z]   Right edge: 245.83px (viewport: 1440px)
+[2025-09-14T07:24:27.668Z]   Bottom edge: 1019.56px (viewport: 900px)
+[2025-09-14T07:24:27.668Z]   Animation: 8s linear -1.9979s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.669Z]   Transform: matrix(-0.946022, 1.61917, -1.61917, -0.946022, -3.81861, 19.5782)
+[2025-09-14T07:24:27.669Z]   Position: absolute
+[2025-09-14T07:24:27.669Z]   Z-index: auto
+[2025-09-14T07:24:27.669Z]   🚨 VERTICAL OVERFLOW: 119.56px beyond viewport
+[2025-09-14T07:24:27.669Z] Animated Element 41: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.669Z]   Rect: 175.54, 721.67, 45.09x45.09
+[2025-09-14T07:24:27.670Z]   Right edge: 220.63px (viewport: 1440px)
+[2025-09-14T07:24:27.670Z]   Bottom edge: 766.76px (viewport: 900px)
+[2025-09-14T07:24:27.670Z]   Animation: 8s linear -3.27188s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.670Z]   Transform: matrix(1.01819, 1.487, -1.487, 1.01819, -15.1934, 4.32463)
+[2025-09-14T07:24:27.671Z]   Position: absolute
+[2025-09-14T07:24:27.671Z]   Z-index: auto
+[2025-09-14T07:24:27.671Z] Animated Element 42: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.671Z]   Rect: 210.82, 538.14, 21.28x21.28
+[2025-09-14T07:24:27.671Z]   Right edge: 232.11px (viewport: 1440px)
+[2025-09-14T07:24:27.671Z]   Bottom edge: 559.43px (viewport: 900px)
+[2025-09-14T07:24:27.671Z]   Animation: 8s linear -6.85907s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.671Z]   Transform: matrix(0.108215, 1.07428, -1.07428, 0.108215, 14.6853, 21.0649)
+[2025-09-14T07:24:27.671Z]   Position: absolute
+[2025-09-14T07:24:27.672Z]   Z-index: auto
+[2025-09-14T07:24:27.672Z] Animated Element 43: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.672Z]   Rect: 814.78, 794.47, 25.34x25.34
+[2025-09-14T07:24:27.672Z]   Right edge: 840.12px (viewport: 1440px)
+[2025-09-14T07:24:27.672Z]   Bottom edge: 819.81px (viewport: 900px)
+[2025-09-14T07:24:27.672Z]   Animation: 8s linear -3.69063s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.672Z]   Transform: matrix(-0.241107, 1.16679, -1.16679, -0.241107, -29.1919, 0)
+[2025-09-14T07:24:27.672Z]   Position: absolute
+[2025-09-14T07:24:27.672Z]   Z-index: auto
+[2025-09-14T07:24:27.673Z] Animated Element 44: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.673Z]   Rect: 1297.05, 897.27, 30.50x30.50
+[2025-09-14T07:24:27.673Z]   Right edge: 1327.55px (viewport: 1440px)
+[2025-09-14T07:24:27.673Z]   Bottom edge: 927.78px (viewport: 900px)
+[2025-09-14T07:24:27.673Z]   Animation: 8s linear -7.69804s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.673Z]   Transform: matrix(-0.683912, -1.01063, 1.01063, -0.683912, 27.8124, 15.0562)
+[2025-09-14T07:24:27.673Z]   Position: absolute
+[2025-09-14T07:24:27.673Z]   Z-index: auto
+[2025-09-14T07:24:27.673Z]   🚨 VERTICAL OVERFLOW: 27.78px beyond viewport
+[2025-09-14T07:24:27.673Z] Animated Element 45: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.673Z]   Rect: 1420.32, 441.58, 47.43x47.43
+[2025-09-14T07:24:27.674Z]   Right edge: 1467.75px (viewport: 1440px)
+[2025-09-14T07:24:27.674Z]   Bottom edge: 489.01px (viewport: 900px)
+[2025-09-14T07:24:27.674Z]   Animation: 8s linear -0.306997s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.674Z]   Transform: matrix(-1.61124, -1.02386, 1.02386, -1.61124, 11.9255, 30.344)
+[2025-09-14T07:24:27.674Z]   Position: absolute
+[2025-09-14T07:24:27.674Z]   Z-index: auto
+[2025-09-14T07:24:27.674Z]   🚨 HORIZONTAL OVERFLOW: 27.75px beyond viewport
+[2025-09-14T07:24:27.674Z] Animated Element 46: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.674Z]   Rect: 731.36, 267.40, 43.66x43.66
+[2025-09-14T07:24:27.674Z]   Right edge: 775.02px (viewport: 1440px)
+[2025-09-14T07:24:27.675Z]   Bottom edge: 311.06px (viewport: 900px)
+[2025-09-14T07:24:27.675Z]   Animation: 8s linear -7.22279s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.675Z]   Transform: matrix(1.23313, 1.19248, -1.19248, 1.23313, 19.8003, 23.696)
+[2025-09-14T07:24:27.675Z]   Position: absolute
+[2025-09-14T07:24:27.675Z]   Z-index: auto
+[2025-09-14T07:24:27.675Z] Animated Element 47: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.675Z]   Rect: 1273.69, 289.20, 22.29x22.29
+[2025-09-14T07:24:27.675Z]   Right edge: 1295.98px (viewport: 1440px)
+[2025-09-14T07:24:27.676Z]   Bottom edge: 311.50px (viewport: 900px)
+[2025-09-14T07:24:27.676Z]   Animation: 8s linear -6.86575s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.676Z]   Transform: matrix(1.04146, 0.197109, -0.197109, 1.04146, 13.6944, 15.3973)
+[2025-09-14T07:24:27.676Z]   Position: absolute
+[2025-09-14T07:24:27.676Z]   Z-index: auto
+[2025-09-14T07:24:27.676Z] Animated Element 48: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.676Z]   Rect: 20.68, 367.61, 19.39x19.39
+[2025-09-14T07:24:27.676Z]   Right edge: 40.07px (viewport: 1440px)
+[2025-09-14T07:24:27.677Z]   Bottom edge: 387.00px (viewport: 900px)
+[2025-09-14T07:24:27.677Z]   Animation: 8s linear -6.04485s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.677Z]   Transform: matrix(-0.218957, -0.858379, 0.858379, -0.218957, 5.97234, 4.85271)
+[2025-09-14T07:24:27.677Z]   Position: absolute
+[2025-09-14T07:24:27.677Z]   Z-index: auto
+[2025-09-14T07:24:27.677Z] Animated Element 49: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.677Z]   Rect: 368.25, 600.45, 21.19x21.19
+[2025-09-14T07:24:27.677Z]   Right edge: 389.43px (viewport: 1440px)
+[2025-09-14T07:24:27.677Z]   Bottom edge: 621.64px (viewport: 900px)
+[2025-09-14T07:24:27.678Z]   Animation: 8s linear -0.677715s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.678Z]   Transform: matrix(0.183779, 0.993328, -0.993328, 0.183779, 16.3867, 32.8913)
+[2025-09-14T07:24:27.678Z]   Position: absolute
+[2025-09-14T07:24:27.678Z]   Z-index: auto
+[2025-09-14T07:24:27.678Z] Animated Element 50: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.678Z]   Rect: 1419.98, 612.24, 25.66x25.66
+[2025-09-14T07:24:27.678Z]   Right edge: 1445.64px (viewport: 1440px)
+[2025-09-14T07:24:27.678Z]   Bottom edge: 637.90px (viewport: 900px)
+[2025-09-14T07:24:27.679Z]   Animation: 8s linear -7.43789s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.679Z]   Transform: matrix(-0.86692, 0.558744, -0.558744, -0.86692, 18.9378, 24.8789)
+[2025-09-14T07:24:27.679Z]   Position: absolute
+[2025-09-14T07:24:27.679Z]   Z-index: auto
+[2025-09-14T07:24:27.679Z]   🚨 HORIZONTAL OVERFLOW: 5.64px beyond viewport
+[2025-09-14T07:24:27.679Z] Animated Element 51: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.679Z]   Rect: 586.66, 977.05, 29.61x29.61
+[2025-09-14T07:24:27.679Z]   Right edge: 616.27px (viewport: 1440px)
+[2025-09-14T07:24:27.679Z]   Bottom edge: 1006.66px (viewport: 900px)
+[2025-09-14T07:24:27.680Z]   Animation: 8s linear -4.61013s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.680Z]   Transform: matrix(0.782133, -0.862896, 0.862896, 0.782133, -15.3352, 0)
+[2025-09-14T07:24:27.680Z]   Position: absolute
+[2025-09-14T07:24:27.680Z]   Z-index: auto
+[2025-09-14T07:24:27.681Z]   🚨 VERTICAL OVERFLOW: 106.66px beyond viewport
+[2025-09-14T07:24:27.681Z] Animated Element 52: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.681Z]   Rect: 1145.51, 224.01, 29.54x29.54
+[2025-09-14T07:24:27.681Z]   Right edge: 1175.05px (viewport: 1440px)
+[2025-09-14T07:24:27.681Z]   Bottom edge: 253.55px (viewport: 900px)
+[2025-09-14T07:24:27.681Z]   Animation: 8s linear -4.94272s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.682Z]   Transform: matrix(-1.15007, -0.490826, 0.490826, -1.15007, -11.4997, 0)
+[2025-09-14T07:24:27.682Z]   Position: absolute
+[2025-09-14T07:24:27.682Z]   Z-index: auto
+[2025-09-14T07:24:27.682Z] Animated Element 53: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.682Z]   Rect: 1340.71, 466.09, 39.88x39.88
+[2025-09-14T07:24:27.683Z]   Right edge: 1380.59px (viewport: 1440px)
+[2025-09-14T07:24:27.683Z]   Bottom edge: 505.97px (viewport: 900px)
+[2025-09-14T07:24:27.683Z]   Animation: 8s linear -3.92372s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.683Z]   Transform: matrix(1.69999, 0.515432, -0.515432, 1.69999, -15.5855, 0)
+[2025-09-14T07:24:27.683Z]   Position: absolute
+[2025-09-14T07:24:27.684Z]   Z-index: auto
+[2025-09-14T07:24:27.684Z] Animated Element 54: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.684Z]   Rect: 1120.21, 908.61, 18.61x18.61
+[2025-09-14T07:24:27.684Z]   Right edge: 1138.82px (viewport: 1440px)
+[2025-09-14T07:24:27.684Z]   Bottom edge: 927.22px (viewport: 900px)
+[2025-09-14T07:24:27.684Z]   Animation: 8s linear -0.522906s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.684Z]   Transform: matrix(0.978165, -0.0558482, 0.0558482, 0.978165, 18.3899, 27.9025)
+[2025-09-14T07:24:27.685Z]   Position: absolute
+[2025-09-14T07:24:27.685Z]   Z-index: auto
+[2025-09-14T07:24:27.685Z]   🚨 VERTICAL OVERFLOW: 27.22px beyond viewport
+[2025-09-14T07:24:27.685Z] Animated Element 55: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.685Z]   Rect: 270.52, 657.49, 37.92x37.92
+[2025-09-14T07:24:27.685Z]   Right edge: 308.44px (viewport: 1440px)
+[2025-09-14T07:24:27.685Z]   Bottom edge: 695.41px (viewport: 900px)
+[2025-09-14T07:24:27.685Z]   Animation: 8s linear -4.38795s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.686Z]   Transform: matrix(0.449524, 1.65707, -1.65707, 0.449524, -21.9894, 0)
+[2025-09-14T07:24:27.686Z]   Position: absolute
+[2025-09-14T07:24:27.686Z]   Z-index: auto
+[2025-09-14T07:24:27.686Z] Animated Element 56: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.686Z]   Rect: 1138.11, 793.27, 39.62x39.62
+[2025-09-14T07:24:27.686Z]   Right edge: 1177.73px (viewport: 1440px)
+[2025-09-14T07:24:27.686Z]   Bottom edge: 832.90px (viewport: 900px)
+[2025-09-14T07:24:27.686Z]   Animation: 8s linear -1.99396s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.686Z]   Transform: matrix(0.946459, 1.2548, -1.2548, 0.946459, -2.84317, 19.3501)
+[2025-09-14T07:24:27.687Z]   Position: absolute
+[2025-09-14T07:24:27.687Z]   Z-index: auto
+[2025-09-14T07:24:27.687Z] Animated Element 57: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.687Z]   Rect: 601.92, 439.80, 37.40x37.40
+[2025-09-14T07:24:27.687Z]   Right edge: 639.31px (viewport: 1440px)
+[2025-09-14T07:24:27.687Z]   Bottom edge: 477.20px (viewport: 900px)
+[2025-09-14T07:24:27.687Z]   Animation: 8s linear -5.36202s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.687Z]   Transform: matrix(0.981981, -1.09555, 1.09555, 0.981981, -2.54293, 0)
+[2025-09-14T07:24:27.688Z]   Position: absolute
+[2025-09-14T07:24:27.688Z]   Z-index: auto
+[2025-09-14T07:24:27.688Z] Animated Element 58: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.688Z]   Rect: 750.14, 631.24, 45.18x45.18
+[2025-09-14T07:24:27.688Z]   Right edge: 795.32px (viewport: 1440px)
+[2025-09-14T07:24:27.688Z]   Bottom edge: 676.42px (viewport: 900px)
+[2025-09-14T07:24:27.688Z]   Animation: 8s linear -0.470227s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.688Z]   Transform: matrix(-0.619515, -1.89024, 1.89024, -0.619515, 8.91715, 30.8636)
+[2025-09-14T07:24:27.688Z]   Position: absolute
+[2025-09-14T07:24:27.689Z]   Z-index: auto
+[2025-09-14T07:24:27.689Z] Animated Element 59: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.689Z]   Rect: 1342.08, 696.40, 30.20x30.20
+[2025-09-14T07:24:27.689Z]   Right edge: 1372.29px (viewport: 1440px)
+[2025-09-14T07:24:27.689Z]   Bottom edge: 726.60px (viewport: 900px)
+[2025-09-14T07:24:27.689Z]   Animation: 8s linear -5.26116s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.689Z]   Transform: matrix(0.26884, 1.40921, -1.40921, 0.26884, -6.53206, 0)
+[2025-09-14T07:24:27.689Z]   Position: absolute
+[2025-09-14T07:24:27.690Z]   Z-index: auto
+[2025-09-14T07:24:27.690Z] Animated Element 60: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.690Z]   Rect: 1192.33, 496.44, 49.00x49.00
+[2025-09-14T07:24:27.690Z]   Right edge: 1241.33px (viewport: 1440px)
+[2025-09-14T07:24:27.690Z]   Bottom edge: 545.44px (viewport: 900px)
+[2025-09-14T07:24:27.690Z]   Animation: 8s linear -7.04024s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.690Z]   Transform: matrix(1.3527, -1.36964, 1.36964, 1.3527, 13.0643, 18.4419)
+[2025-09-14T07:24:27.691Z]   Position: absolute
+[2025-09-14T07:24:27.691Z]   Z-index: auto
+[2025-09-14T07:24:27.691Z] Animated Element 61: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.691Z]   Rect: 1073.49, 439.00, 39.04x39.04
+[2025-09-14T07:24:27.691Z]   Right edge: 1112.53px (viewport: 1440px)
+[2025-09-14T07:24:27.691Z]   Bottom edge: 478.04px (viewport: 900px)
+[2025-09-14T07:24:27.691Z]   Animation: 8s linear -3.72656s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.691Z]   Transform: matrix(0.368188, -1.80076, 1.80076, 0.368188, -28.2548, 0)
+[2025-09-14T07:24:27.691Z]   Position: absolute
+[2025-09-14T07:24:27.692Z]   Z-index: auto
+[2025-09-14T07:24:27.692Z] Animated Element 62: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.692Z]   Rect: 1290.97, 980.86, 32.21x32.21
+[2025-09-14T07:24:27.692Z]   Right edge: 1323.17px (viewport: 1440px)
+[2025-09-14T07:24:27.692Z]   Bottom edge: 1013.06px (viewport: 900px)
+[2025-09-14T07:24:27.692Z]   Animation: 8s linear -1.76489s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.692Z]   Transform: matrix(0.464549, -1.32464, 1.32464, 0.464549, -1.41508, 23.538)
+[2025-09-14T07:24:27.693Z]   Position: absolute
+[2025-09-14T07:24:27.693Z]   Z-index: auto
+[2025-09-14T07:24:27.693Z]   🚨 VERTICAL OVERFLOW: 113.06px beyond viewport
+[2025-09-14T07:24:27.693Z] Animated Element 63: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.693Z]   Rect: 1335.29, 718.00, 34.37x34.37
+[2025-09-14T07:24:27.693Z]   Right edge: 1369.66px (viewport: 1440px)
+[2025-09-14T07:24:27.693Z]   Bottom edge: 752.37px (viewport: 900px)
+[2025-09-14T07:24:27.693Z]   Animation: 8s linear -1.9798s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.693Z]   Transform: matrix(-1.39393, 0.515604, -0.515604, -1.39393, -3.41559, 27.7977)
+[2025-09-14T07:24:27.693Z]   Position: absolute
+[2025-09-14T07:24:27.694Z]   Z-index: auto
+[2025-09-14T07:24:27.694Z] Animated Element 64: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.694Z]   Rect: 1251.21, 753.95, 26.02x26.02
+[2025-09-14T07:24:27.694Z]   Right edge: 1277.23px (viewport: 1440px)
+[2025-09-14T07:24:27.694Z]   Bottom edge: 779.97px (viewport: 900px)
+[2025-09-14T07:24:27.694Z]   Animation: 8s linear -0.687194s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.694Z]   Transform: matrix(0.769032, -0.676312, 0.676312, 0.769032, 13.7842, 30.7554)
+[2025-09-14T07:24:27.694Z]   Position: absolute
+[2025-09-14T07:24:27.694Z]   Z-index: auto
+[2025-09-14T07:24:27.694Z] Animated Element 65: DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.695Z]   Rect: 719.54, 324.61, 46.75x46.75
+[2025-09-14T07:24:27.695Z]   Right edge: 766.30px (viewport: 1440px)
+[2025-09-14T07:24:27.695Z]   Bottom edge: 371.36px (viewport: 900px)
+[2025-09-14T07:24:27.695Z]   Animation: 8s linear -4.45802s infinite normal none running _ngcontent-ng-c3987364406_rune-move-counterclockwise
+[2025-09-14T07:24:27.695Z]   Transform: matrix(-0.787012, 1.81048, -1.81048, -0.787012, -11.4694, 0)
+[2025-09-14T07:24:27.695Z]   Position: absolute
+[2025-09-14T07:24:27.695Z]   Z-index: auto
+[2025-09-14T07:24:27.695Z] Animated Element 66: DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.695Z]   Rect: 430.06, 91.20, 39.76x39.76
+[2025-09-14T07:24:27.695Z]   Right edge: 469.82px (viewport: 1440px)
+[2025-09-14T07:24:27.695Z]   Bottom edge: 130.96px (viewport: 900px)
+[2025-09-14T07:24:27.696Z]   Animation: 8s linear -5.57628s infinite normal none running _ngcontent-ng-c3987364406_rune-move-clockwise
+[2025-09-14T07:24:27.696Z]   Transform: matrix(-0.885384, -1.32358, 1.32358, -0.885384, -1.0404, 0)
+[2025-09-14T07:24:27.696Z]   Position: absolute
+[2025-09-14T07:24:27.696Z]   Z-index: auto
+[2025-09-14T07:24:27.696Z] Animated Element 67: DIV.content
+[2025-09-14T07:24:27.697Z]   Rect: 600.00, 366.20, 240.00x347.58
+[2025-09-14T07:24:27.697Z]   Right edge: 840.00px (viewport: 1440px)
+[2025-09-14T07:24:27.697Z]   Bottom edge: 713.78px (viewport: 900px)
+[2025-09-14T07:24:27.697Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.697Z]   Transform: none
+[2025-09-14T07:24:27.697Z]   Position: relative
+[2025-09-14T07:24:27.698Z]   Z-index: 2
+[2025-09-14T07:24:27.698Z] Animated Element 68: DIV.logo-container
+[2025-09-14T07:24:27.698Z]   Rect: 600.00, 366.20, 240.00x259.98
+[2025-09-14T07:24:27.698Z]   Right edge: 840.00px (viewport: 1440px)
+[2025-09-14T07:24:27.698Z]   Bottom edge: 626.19px (viewport: 900px)
+[2025-09-14T07:24:27.698Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.699Z]   Transform: none
+[2025-09-14T07:24:27.699Z]   Position: relative
+[2025-09-14T07:24:27.699Z]   Z-index: 10
+[2025-09-14T07:24:27.699Z] Animated Element 69: IMG.logo
+[2025-09-14T07:24:27.699Z]   Rect: 600.00, 366.20, 240.00x259.98
+[2025-09-14T07:24:27.699Z]   Right edge: 840.00px (viewport: 1440px)
+[2025-09-14T07:24:27.700Z]   Bottom edge: 626.19px (viewport: 900px)
+[2025-09-14T07:24:27.700Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.700Z]   Transform: none
+[2025-09-14T07:24:27.700Z]   Position: static
+[2025-09-14T07:24:27.700Z]   Z-index: auto
+[2025-09-14T07:24:27.700Z] Animated Element 70: DIV.loading-text
+[2025-09-14T07:24:27.701Z]   Rect: 635.81, 688.19, 168.38x25.59
+[2025-09-14T07:24:27.701Z]   Right edge: 804.19px (viewport: 1440px)
+[2025-09-14T07:24:27.701Z]   Bottom edge: 713.78px (viewport: 900px)
+[2025-09-14T07:24:27.701Z]   Animation: none 0s ease 0s 1 normal none running
+[2025-09-14T07:24:27.701Z]   Transform: none
+[2025-09-14T07:24:27.701Z]   Position: static
+[2025-09-14T07:24:27.702Z]   Z-index: auto
+[2025-09-14T07:24:27.702Z] --- MAIN PAGE ELEMENTS ANALYSIS ---
+[2025-09-14T07:24:27.702Z] --- PHANTASIA-ALBUM-PAGE ANALYSIS ---
+[2025-09-14T07:24:27.702Z]   Dimensions: 1440x900
+[2025-09-14T07:24:27.702Z]   Position: left=0, right=1440, top=90, bottom=990
+[2025-09-14T07:24:27.703Z]   ScrollDimensions: scrollWidth=1440, scrollHeight=900
+[2025-09-14T07:24:27.703Z]   ClientDimensions: clientWidth=1440, clientHeight=900
+[2025-09-14T07:24:27.703Z]   CSS: position=relative, overflow-x=hidden, overflow-y=hidden
+[2025-09-14T07:24:27.703Z]   CSS: width=1440px, max-width=1440px, min-width=0px
+[2025-09-14T07:24:27.703Z]   CSS: transform=none, z-index=1
+[2025-09-14T07:24:27.704Z] Main element not found: .video-background
+[2025-09-14T07:24:27.704Z] Main element not found: .video-title-section
+[2025-09-14T07:24:27.704Z] Main element not found: .album-presentation
+[2025-09-14T07:24:27.704Z] Main element not found: .cd-showcase
+[2025-09-14T07:24:27.704Z] Main element not found: app-music-player
+[2025-09-14T07:24:27.704Z] Main element not found: app-dynamic-artist-cards
+[2025-09-14T07:24:27.705Z] Main element not found: .phantasia-footer
+[2025-09-14T07:24:27.705Z] --- ENHANCED OVERFLOW ELEMENT DETECTION ---
+[2025-09-14T07:24:27.706Z] Found 3 elements causing potential horizontal overflow:
+[2025-09-14T07:24:27.706Z] 1. DIV.rune-effects
+[2025-09-14T07:24:27.706Z]    Dimensions: 1486.69x929.18
+[2025-09-14T07:24:27.706Z]    Position: left=-23.35, right=1463.35
+[2025-09-14T07:24:27.706Z]    Overflow amount: 23.35px
+[2025-09-14T07:24:27.706Z]    CSS Position: absolute
+[2025-09-14T07:24:27.707Z]    CSS Transform: matrix(1.03243, 0, 0, 1.03243, 0, 0)
+[2025-09-14T07:24:27.707Z]    CSS Overflow-X: hidden
+[2025-09-14T07:24:27.707Z]    CSS Width: 1440px
+[2025-09-14T07:24:27.707Z]    CSS Max-Width: 100%
+[2025-09-14T07:24:27.707Z]    Parent: DIV.loader-container visible
+[2025-09-14T07:24:27.707Z]    ---
+[2025-09-14T07:24:27.708Z] 2. DIV.rune clockwise ng-star-inserted
+[2025-09-14T07:24:27.708Z]    Dimensions: 47.43x47.43
+[2025-09-14T07:24:27.708Z]    Position: left=1420.32, right=1467.75
+[2025-09-14T07:24:27.708Z]    Overflow amount: 27.75px
+[2025-09-14T07:24:27.708Z]    CSS Position: absolute
+[2025-09-14T07:24:27.708Z]    CSS Transform: matrix(-1.61124, -1.02386, 1.02386, -1.61124, 11.9255, 30.344)
+[2025-09-14T07:24:27.708Z]    CSS Overflow-X: hidden
+[2025-09-14T07:24:27.708Z]    CSS Width: 18px
+[2025-09-14T07:24:27.708Z]    CSS Max-Width: 100%
+[2025-09-14T07:24:27.708Z]    Parent: DIV.rune-circle
+[2025-09-14T07:24:27.709Z]    ---
+[2025-09-14T07:24:27.709Z] 3. DIV.rune counter-clockwise ng-star-inserted
+[2025-09-14T07:24:27.709Z]    Dimensions: 25.66x25.66
+[2025-09-14T07:24:27.709Z]    Position: left=1419.98, right=1445.64
+[2025-09-14T07:24:27.709Z]    Overflow amount: 5.64px
+[2025-09-14T07:24:27.709Z]    CSS Position: absolute
+[2025-09-14T07:24:27.709Z]    CSS Transform: matrix(-0.86692, 0.558744, -0.558744, -0.86692, 18.9378, 24.8789)
+[2025-09-14T07:24:27.709Z]    CSS Overflow-X: hidden
+[2025-09-14T07:24:27.710Z]    CSS Width: 18px
+[2025-09-14T07:24:27.710Z]    CSS Max-Width: 100%
+[2025-09-14T07:24:27.710Z]    Parent: DIV.rune-circle
+[2025-09-14T07:24:27.710Z]    ---
+[2025-09-14T07:24:27.710Z] --- INDIRECT OVERFLOW CAUSE ANALYSIS ---
+[2025-09-14T07:24:27.711Z] Found 1 elements with large spacing:
+[2025-09-14T07:24:27.711Z] 1. NAV.site-nav ng-star-inserted
+[2025-09-14T07:24:27.711Z]    Margin: 640px 0px 0px 0px
+[2025-09-14T07:24:27.711Z]    Padding: 0px 0px 50px 0px
+[2025-09-14T07:24:27.712Z] Viewport meta tag content: width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no
+[2025-09-14T07:24:27.712Z] --- DETECTING POTENTIAL CULPRITS ---
+[2025-09-14T07:24:27.713Z] Found 59 elements with transforms
+[2025-09-14T07:24:27.713Z]   Transform 0: DIV.magical-circle outer - transform: matrix(0.88117, -0.4728, 0.4728, 0.88117, 0, 0), bounds: 1396.9850158691406px
+[2025-09-14T07:24:27.713Z]   Transform 1: DIV.magical-circle - transform: matrix(0.739345, 0.673327, -0.673327, 0.739345, 0, 0), bounds: 1285.0687408447266px
+[2025-09-14T07:24:27.714Z]   Transform 2: DIV.rune-effects - transform: matrix(1.03243, 0, 0, 1.03243, 0, 0), bounds: 1463.3467407226562px
+[2025-09-14T07:24:27.714Z]   Transform 3: DIV.mid-line left - transform: matrix(1, 0, 0, 1, 0, -50), bounds: 150px
+[2025-09-14T07:24:27.714Z]   Transform 4: DIV.mid-line right - transform: matrix(1, 0, 0, 1, 0, -50), bounds: 1390px
+[2025-09-14T07:24:27.714Z]   Transform 5: DIV.mid-line top - transform: matrix(1, 0, 0, 1, -50, 0), bounds: 770px
+[2025-09-14T07:24:27.714Z]   Transform 6: DIV.mid-line bottom - transform: matrix(1, 0, 0, 1, -50, 0), bounds: 770px
+[2025-09-14T07:24:27.714Z]   Transform 7: DIV.beam beam-1 - transform: matrix(-0.272462, 0.962166, -0.962166, -0.272462, -712.5, -1), bounds: 907.591552734375px
+[2025-09-14T07:24:27.714Z]   Transform 8: DIV.beam beam-2 - transform: matrix(0.333139, -0.942878, 0.942878, 0.333139, -712.5, -0.5), bounds: 950.3333129882812px
+[2025-09-14T07:24:27.715Z]   Transform 9: DIV.beam beam-3 - transform: matrix(0.0932626, 0.995642, -0.995642, 0.0932626, -712.5, -0.5), bounds: 779.4473876953125px
+[2025-09-14T07:24:27.715Z]   Transform 10: DIV.beam beam-4 - transform: matrix(0.49298, -0.87004, 0.87004, 0.49298, -100, -0.5), bounds: 762.2330322265625px
+[2025-09-14T07:24:27.715Z]   Transform 11: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.138946, 1.25335, -1.25335, 0.138946, -5.84074, 0), bounds: 1201.75244140625px
+[2025-09-14T07:24:27.715Z]   Transform 12: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.31112, 0.932214, -0.932214, -1.31112, -22.1486, 0), bounds: 264.2913513183594px
+[2025-09-14T07:24:27.715Z]   Transform 13: DIV.rune clockwise ng-star-inserted - transform: matrix(1.20972, 0.622601, -0.622601, 1.20972, 17.7927, 11.7063), bounds: 228.61180114746094px
+[2025-09-14T07:24:27.715Z]   Transform 14: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.954703, -1.01219, 1.01219, -0.954703, -22.9264, 0), bounds: 1148.385009765625px
+[2025-09-14T07:24:27.715Z]   Transform 15: DIV.rune clockwise ng-star-inserted - transform: matrix(1.1927, 0.182706, -0.182706, 1.1927, -5.05431, 13.5505), bounds: 373.1212158203125px
+[2025-09-14T07:24:27.715Z]   Transform 16: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.19486, 0.963517, -0.963517, -1.19486, 6.67442, 7.1144), bounds: 1151.740478515625px
+[2025-09-14T07:24:27.716Z]   Transform 17: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.57356, 0.306414, -0.306414, -0.57356, -20.905, 4.39706), bounds: 1292.0928955078125px
+[2025-09-14T07:24:27.716Z]   Transform 18: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.482382, -0.551358, 0.551358, 0.482382, 9.68554, 20.9794), bounds: 1401.9111328125px
+[2025-09-14T07:24:27.716Z]   Transform 19: DIV.rune clockwise ng-star-inserted - transform: matrix(1.0229, 0.0790458, -0.0790458, 1.0229, -1.97743, 19.0702), bounds: 736.9557495117188px
+[2025-09-14T07:24:27.716Z]   Transform 20: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.69207, 0.281696, -0.281696, 1.69207, 5.47455, 4.11131), bounds: 511.4884948730469px
+[2025-09-14T07:24:27.716Z]   Transform 21: DIV.rune clockwise ng-star-inserted - transform: matrix(0.559455, -0.488953, 0.488953, 0.559455, 15.0381, 15.0622), bounds: 593.7550659179688px
+[2025-09-14T07:24:27.716Z]   Transform 22: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.159111, -0.815062, 0.815062, -0.159111, -16.2622, 1.2082), bounds: 865.5209350585938px
+[2025-09-14T07:24:27.716Z]   Transform 23: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.844767, -0.393557, 0.393557, 0.844767, 14.28, 23.1043), bounds: 1108.0030517578125px
+[2025-09-14T07:24:27.716Z]   Transform 24: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.0788363, 1.67874, -1.67874, -0.0788363, -1.27515, 15.6556), bounds: 227.0742645263672px
+[2025-09-14T07:24:27.717Z]   Transform 25: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.760938, -0.0092537, 0.0092537, -0.760938, 0.275086, 0.31015), bounds: 948.019287109375px
+[2025-09-14T07:24:27.717Z]   Transform 26: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.77296, -0.360694, 0.360694, -0.77296, 4.6311, 5.75557), bounds: 713.146484375px
+[2025-09-14T07:24:27.717Z]   Transform 27: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.77657, -0.225522, 0.225522, -1.77657, 7.76605, 6.78708), bounds: 316.0504455566406px
+[2025-09-14T07:24:27.717Z]   Transform 28: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.86869, -0.30766, 0.30766, 1.86869, 7.55909, 13.54), bounds: 643.474365234375px
+[2025-09-14T07:24:27.717Z]   Transform 29: DIV.rune clockwise ng-star-inserted - transform: matrix(0.234804, -1.12567, 1.12567, 0.234804, -22.4709, 0), bounds: 1376.2264404296875px
+[2025-09-14T07:24:27.717Z]   Transform 30: DIV.rune clockwise ng-star-inserted - transform: matrix(0.553016, -1.43149, 1.43149, 0.553016, 25.2514, 31.4071), bounds: 365.4556579589844px
+[2025-09-14T07:24:27.717Z]   Transform 31: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.0957668, 1.96479, -1.96479, -0.0957668, -4.47131, 16.1712), bounds: 1357.55810546875px
+[2025-09-14T07:24:27.718Z]   Transform 32: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.946022, 1.61917, -1.61917, -0.946022, -3.81861, 19.5782), bounds: 245.83059692382812px
+[2025-09-14T07:24:27.718Z]   Transform 33: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.01819, 1.487, -1.487, 1.01819, -15.1934, 4.32463), bounds: 220.63458251953125px
+[2025-09-14T07:24:27.718Z]   Transform 34: DIV.rune clockwise ng-star-inserted - transform: matrix(0.108215, 1.07428, -1.07428, 0.108215, 14.6853, 21.0649), bounds: 232.10899353027344px
+[2025-09-14T07:24:27.718Z]   Transform 35: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.241107, 1.16679, -1.16679, -0.241107, -29.1919, 0), bounds: 840.1198120117188px
+[2025-09-14T07:24:27.718Z]   Transform 36: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.683912, -1.01063, 1.01063, -0.683912, 27.8124, 15.0562), bounds: 1327.547607421875px
+[2025-09-14T07:24:27.718Z]   Transform 37: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.61124, -1.02386, 1.02386, -1.61124, 11.9255, 30.344), bounds: 1467.750732421875px
+[2025-09-14T07:24:27.719Z]   Transform 38: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.23313, 1.19248, -1.19248, 1.23313, 19.8003, 23.696), bounds: 775.0213623046875px
+[2025-09-14T07:24:27.719Z]   Transform 39: DIV.rune clockwise ng-star-inserted - transform: matrix(1.04146, 0.197109, -0.197109, 1.04146, 13.6944, 15.3973), bounds: 1295.982177734375px
+[2025-09-14T07:24:27.719Z]   Transform 40: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.218957, -0.858379, 0.858379, -0.218957, 5.97234, 4.85271), bounds: 40.07461166381836px
+[2025-09-14T07:24:27.719Z]   Transform 41: DIV.rune clockwise ng-star-inserted - transform: matrix(0.183779, 0.993328, -0.993328, 0.183779, 16.3867, 32.8913), bounds: 389.4337463378906px
+[2025-09-14T07:24:27.719Z]   Transform 42: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.86692, 0.558744, -0.558744, -0.86692, 18.9378, 24.8789), bounds: 1445.6436767578125px
+[2025-09-14T07:24:27.719Z]   Transform 43: DIV.rune clockwise ng-star-inserted - transform: matrix(0.782133, -0.862896, 0.862896, 0.782133, -15.3352, 0), bounds: 616.2669067382812px
+[2025-09-14T07:24:27.720Z]   Transform 44: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.15007, -0.490826, 0.490826, -1.15007, -11.4997, 0), bounds: 1175.049560546875px
+[2025-09-14T07:24:27.720Z]   Transform 45: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.69999, 0.515432, -0.515432, 1.69999, -15.5855, 0), bounds: 1380.5877685546875px
+[2025-09-14T07:24:27.720Z]   Transform 46: DIV.rune clockwise ng-star-inserted - transform: matrix(0.978165, -0.0558482, 0.0558482, 0.978165, 18.3899, 27.9025), bounds: 1138.821044921875px
+[2025-09-14T07:24:27.720Z]   Transform 47: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.449524, 1.65707, -1.65707, 0.449524, -21.9894, 0), bounds: 308.4387512207031px
+[2025-09-14T07:24:27.720Z]   Transform 48: DIV.rune clockwise ng-star-inserted - transform: matrix(0.946459, 1.2548, -1.2548, 0.946459, -2.84317, 19.3501), bounds: 1177.73388671875px
+[2025-09-14T07:24:27.720Z]   Transform 49: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.981981, -1.09555, 1.09555, 0.981981, -2.54293, 0), bounds: 639.3110961914062px
+[2025-09-14T07:24:27.721Z]   Transform 50: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.619515, -1.89024, 1.89024, -0.619515, 8.91715, 30.8636), bounds: 795.3174438476562px
+[2025-09-14T07:24:27.721Z]   Transform 51: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.26884, 1.40921, -1.40921, 0.26884, -6.53206, 0), bounds: 1372.2891845703125px
+[2025-09-14T07:24:27.721Z]   Transform 52: DIV.rune clockwise ng-star-inserted - transform: matrix(1.3527, -1.36964, 1.36964, 1.3527, 13.0643, 18.4419), bounds: 1241.3310546875px
+[2025-09-14T07:24:27.721Z]   Transform 53: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.368188, -1.80076, 1.80076, 0.368188, -28.2548, 0), bounds: 1112.5313720703125px
+[2025-09-14T07:24:27.721Z]   Transform 54: DIV.rune clockwise ng-star-inserted - transform: matrix(0.464549, -1.32464, 1.32464, 0.464549, -1.41508, 23.538), bounds: 1323.1719970703125px
+[2025-09-14T07:24:27.721Z]   Transform 55: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.39393, 0.515604, -0.515604, -1.39393, -3.41559, 27.7977), bounds: 1369.660888671875px
+[2025-09-14T07:24:27.722Z]   Transform 56: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.769032, -0.676312, 0.676312, 0.769032, 13.7842, 30.7554), bounds: 1277.2298583984375px
+[2025-09-14T07:24:27.722Z]   Transform 57: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.787012, 1.81048, -1.81048, -0.787012, -11.4694, 0), bounds: 766.298583984375px
+[2025-09-14T07:24:27.722Z]   Transform 58: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.885384, -1.32358, 1.32358, -0.885384, -1.0404, 0), bounds: 469.8246765136719px
+[2025-09-14T07:24:30.034Z] --- LOADING SCREEN PHASE DETECTION ---
+[2025-09-14T07:24:30.034Z] ❌ Loading screen container not found
+[2025-09-14T07:24:33.034Z] --- LOADING SCREEN PHASE DETECTION ---
+[2025-09-14T07:24:33.034Z] ❌ Loading screen container not found
+[2025-09-14T07:24:35.129Z] === ENHANCED DEBUG SUMMARY ===
+[2025-09-14T07:24:35.130Z] Total log entries: 1346
+[2025-09-14T07:24:35.130Z] Document final scrollWidth: 1440
+[2025-09-14T07:24:35.130Z] Viewport final width: 1440
+[2025-09-14T07:24:35.130Z] Final overflow amount: 0px
+[2025-09-14T07:24:35.131Z] Loading screen phase: not-found
+[2025-09-14T07:24:35.131Z] Loading screen present: false

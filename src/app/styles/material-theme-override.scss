@@ -1,0 +1,126 @@
+/**
+ * Angular Material Theme Override for Grayscale Colors
+ * This file overrides Angular Material's default purple theme with grayscale colors
+ * Uses direct CSS overrides instead of Angular Material theme system
+ */
+
+// Override specific Material components that might show purple
+.mat-button-toggle-group,
+.mat-button-toggle {
+  &.mat-button-toggle-checked {
+    background-color: #6c757d !important;
+    color: white !important;
+  }
+}
+
+.mat-chip.mat-standard-chip {
+  &.mat-chip-selected {
+    background-color: #6c757d !important;
+    color: white !important;
+  }
+}
+
+.mat-icon-button {
+  &:hover {
+    background-color: rgba(108, 117, 125, 0.1) !important;
+  }
+}
+
+.mat-button, .mat-raised-button, .mat-stroked-button, .mat-flat-button {
+  &.mat-primary {
+    background-color: #6c757d !important;
+    color: white !important;
+  }
+
+  &.mat-accent {
+    background-color: #495057 !important;
+    color: white !important;
+  }
+}
+
+// Override focus and active states
+.mat-button:focus,
+.mat-icon-button:focus,
+.mat-stroked-button:focus,
+.mat-flat-button:focus,
+.mat-raised-button:focus {
+  background-color: rgba(108, 117, 125, 0.1) !important;
+}
+
+// Remove purple ripple effects
+.mat-ripple-element {
+  background-color: rgba(108, 117, 125, 0.2) !important;
+}
+
+// Override Material icons hover states
+mat-icon {
+  &:hover {
+    color: #495057 !important;
+  }
+}
+
+// Override any remaining purple/violet colors
+* {
+  // Remove purple focus outlines
+  &:focus {
+    outline-color: #6c757d !important;
+  }
+
+  // Override accent colors that might be purple
+  &.mat-accent, &[color="accent"] {
+    color: #495057 !important;
+  }
+
+  // Override primary colors that might be purple
+  &.mat-primary, &[color="primary"] {
+    color: #6c757d !important;
+  }
+}
+
+// Specific fixes for components that use primary/accent colors
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #6c757d !important;
+}
+
+.mat-form-field.mat-focused .mat-form-field-ripple {
+  background-color: #6c757d !important;
+}
+
+// Override checkbox and radio button colors
+.mat-checkbox-checked .mat-checkbox-background,
+.mat-checkbox-indeterminate .mat-checkbox-background {
+  background-color: #6c757d !important;
+}
+
+.mat-radio-button.mat-accent .mat-radio-inner-circle,
+.mat-radio-button.mat-accent .mat-radio-outer-circle {
+  border-color: #6c757d !important;
+}
+
+.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  border-color: #6c757d !important;
+}
+
+.mat-radio-button.mat-accent .mat-radio-inner-circle {
+  background-color: #6c757d !important;
+}
+
+// Override slider colors
+.mat-slider-thumb,
+.mat-slider-track-fill {
+  background-color: #6c757d !important;
+}
+
+// Override progress bar colors
+.mat-progress-bar-fill::after {
+  background-color: #6c757d !important;
+}
+
+.mat-progress-spinner circle,
+.mat-spinner circle {
+  stroke: #6c757d !important;
+}

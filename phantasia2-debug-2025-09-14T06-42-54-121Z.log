@@ -1,0 +1,98 @@
+[2025-09-14T06:42:44.021Z] === PHANTASIA2 DEBUG MONITORING STARTED ===
+[2025-09-14T06:42:44.120Z] Runtime horizontal scrollbar removal applied
+[2025-09-14T06:42:44.120Z] Window-level horizontal scroll prevention active
+[2025-09-14T06:42:44.120Z] Document scrollWidth: 1631
+[2025-09-14T06:42:44.121Z] Document clientWidth: 1621
+[2025-09-14T06:42:45.029Z] --- ANALYZING ALL ELEMENTS FOR OVERFLOW ---
+[2025-09-14T06:42:45.031Z] Document scrollWidth: 1631, clientWidth: 1621
+[2025-09-14T06:42:45.031Z] Body scrollWidth: 1631, clientWidth: 1631
+[2025-09-14T06:42:45.031Z] Viewport width: 1631
+[2025-09-14T06:42:45.031Z] ⚠️ DOCUMENT HORIZONTAL OVERFLOW DETECTED!
+[2025-09-14T06:42:45.031Z] --- PHANTASIA-ALBUM-PAGE ANALYSIS ---
+[2025-09-14T06:42:45.032Z]   Dimensions: 1631x991
+[2025-09-14T06:42:45.032Z]   Position: left=0, right=1631, top=90, bottom=1081
+[2025-09-14T06:42:45.032Z]   ScrollDimensions: scrollWidth=1631, scrollHeight=991
+[2025-09-14T06:42:45.032Z]   ClientDimensions: clientWidth=1631, clientHeight=991
+[2025-09-14T06:42:45.032Z]   CSS: position=relative, overflow-x=hidden, overflow-y=hidden
+[2025-09-14T06:42:45.033Z]   CSS: width=1631px, max-width=1631px, min-width=0px
+[2025-09-14T06:42:45.033Z]   CSS: transform=none, z-index=1
+[2025-09-14T06:42:45.034Z] Element not found: .video-background
+[2025-09-14T06:42:45.034Z] Element not found: .video-title-section
+[2025-09-14T06:42:45.034Z] Element not found: .album-presentation
+[2025-09-14T06:42:45.034Z] Element not found: .cd-showcase
+[2025-09-14T06:42:45.034Z] Element not found: app-music-player
+[2025-09-14T06:42:45.034Z] Element not found: app-dynamic-artist-cards
+[2025-09-14T06:42:45.034Z] Element not found: .phantasia-footer
+[2025-09-14T06:42:45.035Z] Found 1 elements causing potential horizontal overflow:
+[2025-09-14T06:42:45.035Z] 1. DIV.rune-effects - width: 1634.786865234375px, right: 1625.3934326171875px, position: absolute, overflow-x: hidden
+[2025-09-14T06:42:45.035Z] --- SCROLLBAR STATE ---
+[2025-09-14T06:42:45.035Z] Window scroll: X=0, Y=0
+[2025-09-14T06:42:45.035Z] Document scroll dimensions: 1631x1081
+[2025-09-14T06:42:45.036Z] Viewport dimensions: 1631x991
+[2025-09-14T06:42:45.036Z] ✅ No horizontal scrollbar detected
+[2025-09-14T06:42:45.036Z] --- DETECTING POTENTIAL CULPRITS ---
+[2025-09-14T06:42:45.037Z] Found 59 elements with transforms
+[2025-09-14T06:42:45.037Z]   Transform 0: DIV.magical-circle outer - transform: matrix(0.980272, -0.197654, 0.197654, 0.980272, 0, 0), bounds: 1396.9628295898438px
+[2025-09-14T06:42:45.037Z]   Transform 1: DIV.magical-circle - transform: matrix(0.955794, 0.294036, -0.294036, 0.955794, 0, 0), bounds: 1307.9320068359375px
+[2025-09-14T06:42:45.037Z]   Transform 2: DIV.rune-effects - transform: matrix(1.01163, 0, 0, 1.01163, 0, 0), bounds: 1625.3934326171875px
+[2025-09-14T06:42:45.037Z]   Transform 3: DIV.mid-line left - transform: matrix(1, 0, 0, 1, 0, -50), bounds: 150px
+[2025-09-14T06:42:45.037Z]   Transform 4: DIV.mid-line right - transform: matrix(1, 0, 0, 1, 0, -50), bounds: 1566px
+[2025-09-14T06:42:45.037Z]   Transform 5: DIV.mid-line top - transform: matrix(1, 0, 0, 1, -50, 0), bounds: 858px
+[2025-09-14T06:42:45.038Z]   Transform 6: DIV.mid-line bottom - transform: matrix(1, 0, 0, 1, -50, 0), bounds: 858px
+[2025-09-14T06:42:45.038Z]   Transform 7: DIV.beam beam-1 - transform: matrix(0.734331, 0.678792, -0.678792, 0.734331, -800.5, -1), bounds: 1389.0106964111328px
+[2025-09-14T06:42:45.038Z]   Transform 8: DIV.beam beam-2 - transform: matrix(0.878821, -0.477151, 0.477151, 0.878821, -200, -0.5), bounds: 976.5028076171875px
+[2025-09-14T06:42:45.038Z]   Transform 9: DIV.beam beam-3 - transform: matrix(0.827086, 0.562075, -0.562075, 0.827086, -150, -0.5), bounds: 924.843994140625px
+[2025-09-14T06:42:45.038Z]   Transform 10: DIV.beam beam-4 - transform: matrix(0.910481, -0.413552, 0.413552, 0.910481, -100, -0.5), bounds: 891.7548217773438px
+[2025-09-14T06:42:45.038Z]   Transform 11: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.00949, 0.229962, -0.229962, -1.00949, -5.71137, 11.6799), bounds: 1331.5999755859375px
+[2025-09-14T06:42:45.038Z]   Transform 12: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.27221, -0.564103, 0.564103, 1.27221, -16.4836, 0), bounds: 131.24632263183594px
+[2025-09-14T06:42:45.038Z]   Transform 13: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.502467, 0.575793, -0.575793, 0.502467, -10.981, 8.22981), bounds: 68.87957763671875px
+[2025-09-14T06:42:45.038Z]   Transform 14: DIV.rune clockwise ng-star-inserted - transform: matrix(0.660574, 0.943201, -0.943201, 0.660574, 3.61376, 29.4156), bounds: 772.5477294921875px
+[2025-09-14T06:42:45.038Z]   Transform 15: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.63344, 1.06327, -1.06327, -1.63344, 2.64153, 23.061), bounds: 1038.2557373046875px
+[2025-09-14T06:42:45.039Z]   Transform 16: DIV.rune clockwise ng-star-inserted - transform: matrix(1.01995, -0.220199, 0.220199, 1.01995, -5.01969, 0), bounds: 1563.7197265625px
+[2025-09-14T06:42:45.039Z]   Transform 17: DIV.rune clockwise ng-star-inserted - transform: matrix(1.04665, -1.38306, 1.38306, 1.04665, 26.0248, 17.8184), bounds: 570.0640869140625px
+[2025-09-14T06:42:45.039Z]   Transform 18: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.523144, -1.05234, 1.05234, -0.523144, -10.7866, 5.1443), bounds: 1144.3927001953125px
+[2025-09-14T06:42:45.039Z]   Transform 19: DIV.rune clockwise ng-star-inserted - transform: matrix(0.867448, -0.589631, 0.589631, 0.867448, 1.10313, 1.5362), bounds: 1512.888671875px
+[2025-09-14T06:42:45.039Z]   Transform 20: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.514489, 0.798458, -0.798458, -0.514489, -30.8558, 0), bounds: 961.6951293945312px
+[2025-09-14T06:42:45.039Z]   Transform 21: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.2642, -1.41969, 1.41969, -1.2642, 16.6822, 16.1031), bounds: 1607.9779052734375px
+[2025-09-14T06:42:45.039Z]   Transform 22: DIV.rune clockwise ng-star-inserted - transform: matrix(0.796135, 0.972425, -0.972425, 0.796135, 11.6177, 28.5662), bounds: 1025.3629150390625px
+[2025-09-14T06:42:45.039Z]   Transform 23: DIV.rune clockwise ng-star-inserted - transform: matrix(0.868145, -0.368735, 0.368735, 0.868145, -10.9796, 0), bounds: 198.90235900878906px
+[2025-09-14T06:42:45.039Z]   Transform 24: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.54144, 0.398846, -0.398846, -1.54144, -6.11346, 14.2136), bounds: 1068.20849609375px
+[2025-09-14T06:42:45.039Z]   Transform 25: DIV.rune clockwise ng-star-inserted - transform: matrix(1.29294, 1.29062, -1.29062, 1.29294, -16.1287, 9.15526), bounds: 1378.7015380859375px
+[2025-09-14T06:42:45.039Z]   Transform 26: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.18889, 0.351557, -0.351557, 1.18889, -1.44655, 0), bounds: 73.16747283935547px
+[2025-09-14T06:42:45.040Z]   Transform 27: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.94704, -1.39184, 1.39184, -0.94704, 13.9249, 16.7709), bounds: 587.2404174804688px
+[2025-09-14T06:42:45.040Z]   Transform 28: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.690949, 0.796998, -0.796998, -0.690949, 16.2479, 7.83825), bounds: 1426.686279296875px
+[2025-09-14T06:42:45.040Z]   Transform 29: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.155336, 1.70673, -1.70673, -0.155336, 27.98, 20.4798), bounds: 700.9261474609375px
+[2025-09-14T06:42:45.040Z]   Transform 30: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.545843, -1.24156, 1.24156, -0.545843, -8.76503, 6.43275), bounds: 93.04035186767578px
+[2025-09-14T06:42:45.040Z]   Transform 31: DIV.rune clockwise ng-star-inserted - transform: matrix(1.07852, 1.08087, -1.08087, 1.07852, -7.50604, 10.0446), bounds: 300.00653076171875px
+[2025-09-14T06:42:45.040Z]   Transform 32: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.796664, -0.242211, 0.242211, -0.796664, 26.8304, 19.6738), bounds: 1373.2115478515625px
+[2025-09-14T06:42:45.040Z]   Transform 33: DIV.rune clockwise ng-star-inserted - transform: matrix(0.227439, 0.805613, -0.805613, 0.227439, -10.583, 20.9371), bounds: 1014.7613525390625px
+[2025-09-14T06:42:45.040Z]   Transform 34: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.579037, 1.43174, -1.43174, 0.579037, 12.2016, 21.0052), bounds: 1427.782958984375px
+[2025-09-14T06:42:45.040Z]   Transform 35: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.778991, -0.173028, 0.173028, -0.778991, -10.535, 0), bounds: 836.626953125px
+[2025-09-14T06:42:45.040Z]   Transform 36: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.250496, 1.20462, -1.20462, -0.250496, 10.8838, 24.7221), bounds: 189.30795288085938px
+[2025-09-14T06:42:45.040Z]   Transform 37: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.690594, 0.866621, -0.866621, -0.690594, 18.5161, 21.0354), bounds: 672.0935668945312px
+[2025-09-14T06:42:45.040Z]   Transform 38: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.96919, -0.1065, 0.1065, 1.96919, 25.0364, 20.9842), bounds: 1319.9832763671875px
+[2025-09-14T06:42:45.041Z]   Transform 39: DIV.rune clockwise ng-star-inserted - transform: matrix(0.118184, 0.700739, -0.700739, 0.118184, 12.9743, 16.3032), bounds: 547.9384155273438px
+[2025-09-14T06:42:45.041Z]   Transform 40: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.71286, -0.581061, 0.581061, 1.71286, -5.66556, 0), bounds: 1607.167236328125px
+[2025-09-14T06:42:45.041Z]   Transform 41: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.46965, -0.00106997, 0.00106997, 1.46965, 23.6622, 28.9848), bounds: 847.195556640625px
+[2025-09-14T06:42:45.041Z]   Transform 42: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.980285, -0.649977, 0.649977, 0.980285, 8.36655, 28.6978), bounds: 1389.1639404296875px
+[2025-09-14T06:42:45.041Z]   Transform 43: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.621353, -0.597398, 0.597398, 0.621353, -6.2634, 0), bounds: 1533.627197265625px
+[2025-09-14T06:42:45.041Z]   Transform 44: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.738505, 0.735293, -0.735293, -0.738505, 25.9621, 34.3598), bounds: 1158.976318359375px
+[2025-09-14T06:42:45.041Z]   Transform 45: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.23699, 1.23775, -1.23775, -1.23699, 17.5305, 30.7128), bounds: 1202.45947265625px
+[2025-09-14T06:42:45.041Z]   Transform 46: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.675519, -1.18802, 1.18802, -0.675519, -8.41693, 0), bounds: 788.6049194335938px
+[2025-09-14T06:42:45.041Z]   Transform 47: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.842434, -0.519841, 0.519841, -0.842434, -14.0185, 0), bounds: 629.3357543945312px
+[2025-09-14T06:42:45.041Z]   Transform 48: DIV.rune clockwise ng-star-inserted - transform: matrix(-1.22313, -0.323224, 0.323224, -1.22313, -4.11354, 0), bounds: 1413.8349609375px
+[2025-09-14T06:42:45.041Z]   Transform 49: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.11678, 0.773738, -0.773738, -1.11678, 22.9983, 26.2992), bounds: 850.1536865234375px
+[2025-09-14T06:42:45.041Z]   Transform 50: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(1.33957, 0.0815262, -0.0815262, 1.33957, -33.2077, 0), bounds: -1.6990623474121094px
+[2025-09-14T06:42:45.041Z]   Transform 51: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.816446, -1.38962, 1.38962, 0.816446, -14.4088, 8.52471), bounds: 1391.68017578125px
+[2025-09-14T06:42:45.042Z]   Transform 52: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-0.209093, 1.59482, -1.59482, -0.209093, -31.5557, 0), bounds: 1404.1014404296875px
+[2025-09-14T06:42:45.042Z]   Transform 53: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(-1.27137, -0.659423, 0.659423, -1.27137, 23.4048, 29.4503), bounds: 1357.3599853515625px
+[2025-09-14T06:42:45.042Z]   Transform 54: DIV.rune counter-clockwise ng-star-inserted - transform: matrix(0.811652, -0.721369, 0.721369, 0.811652, -3.52971, 21.3851), bounds: 1575.6268310546875px
+[2025-09-14T06:42:45.042Z]   Transform 55: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.283733, -1.14399, 1.14399, -0.283733, -3.32764, 18.4524), bounds: 653.7406005859375px
+[2025-09-14T06:42:45.042Z]   Transform 56: DIV.rune clockwise ng-star-inserted - transform: matrix(1.69559, -0.587502, 0.587502, 1.69559, -22.5893, 1.78068), bounds: 1369.36474609375px
+[2025-09-14T06:42:45.042Z]   Transform 57: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.0173412, 0.743521, -0.743521, -0.0173412, -8.07386, 0), bounds: 438.3207702636719px
+[2025-09-14T06:42:45.042Z]   Transform 58: DIV.rune clockwise ng-star-inserted - transform: matrix(-0.518966, -0.706433, 0.706433, -0.518966, 7.71024, 26.1241), bounds: 1336.31689453125px
+[2025-09-14T06:42:54.121Z] === FINAL DEBUG SUMMARY ===
+[2025-09-14T06:42:54.121Z] Total log entries: 94
+[2025-09-14T06:42:54.121Z] Document final scrollWidth: 1631
+[2025-09-14T06:42:54.121Z] Viewport final width: 1631
+[2025-09-14T06:42:54.121Z] Final overflow amount: 0px

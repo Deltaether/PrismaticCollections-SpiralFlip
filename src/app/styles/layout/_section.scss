@@ -1,8 +1,22 @@
-/* Section Layout Styles */
+/* Responsive Section Layout Styles */
 section {
-  /* Content-based height - no more blank space */
+  /* Content-based height with intelligent responsiveness */
   width: 100%;
   position: relative;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+
+  /* Responsive padding and margins */
+  padding: clamp(0.5rem, 2vh, 1.5rem) clamp(0.5rem, 2vw, 1.5rem);
+  margin: clamp(0.25rem, 1vh, 1rem) auto;
+
+  /* Intelligent spacing based on viewport */
+  @media (max-width: 768px) {
+    padding: clamp(0.25rem, 1vh, 1rem) clamp(0.25rem, 1vw, 1rem);
+  }
+
+  @media (min-width: 1920px) {
+    max-width: min(90vw, 1800px);
+    margin: clamp(1rem, 2vh, 2rem) auto;
+  }
 }

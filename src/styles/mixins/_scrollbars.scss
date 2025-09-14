@@ -1,0 +1,163 @@
+/**
+ * Centralized Scrollbar Mixins
+ * Provides consistent scrollbar styling across the application
+ * Eliminates duplication and provides easy customization
+ */
+
+@use "sass:color";
+
+// Base scrollbar mixin with default styling
+@mixin base-scrollbar($width: 8px, $track-bg: rgba(0, 0, 0, 0.1), $thumb-bg: rgba(0, 0, 0, 0.3)) {
+  // Firefox scrollbar support
+  scrollbar-width: thin;
+  scrollbar-color: $thumb-bg $track-bg;
+  
+  ::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+    background: $track-bg;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $track-bg;
+    border-radius: calc($width / 2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $thumb-bg;
+    border-radius: calc($width / 2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    &:hover {
+      background: color.adjust($thumb-bg, $lightness: 10%);
+    }
+  }
+}
+
+// Mobile optimized scrollbar mixin
+@mixin mobile-scrollbar($width: 16px) {
+  // Firefox mobile support - these properties need to be applied to the element using the mixin
+  scrollbar-width: thick;
+  scrollbar-color: rgba(255, 255, 255, 0.9) rgba(0, 0, 0, 0.4);
+  
+  ::-webkit-scrollbar {
+    width: $width !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 3px solid rgba(0, 0, 0, 0.5) !important;
+    border-radius: calc($width / 2) !important;
+    min-height: 40px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-radius: calc($width / 2) !important;
+  }
+}
+
+// Dark theme scrollbar mixin
+@mixin dark-scrollbar($width: 8px) {
+  // Firefox dark theme support
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+  
+  ::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: calc($width / 2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: calc($width / 2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+// Minimal scrollbar mixin (nearly invisible)
+@mixin minimal-scrollbar($width: 4px) {
+  // Firefox minimal support
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  
+  ::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: calc($width / 2);
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+// Hidden scrollbar mixin (scrollable but invisible)
+@mixin hidden-scrollbar() {
+  // Firefox hidden support
+  scrollbar-width: none;
+  
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+}
+
+// Phantasia theme specific scrollbar
+@mixin phantasia-scrollbar($width: 12px) {
+  // Firefox phantasia support
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 200, 255, 0.6) rgba(0, 0, 0, 0.3);
+  
+  ::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.1));
+    border-radius: calc($width / 2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(200, 200, 255, 0.6));
+    border-radius: calc($width / 2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    
+    &:hover {
+      background: linear-gradient(45deg, rgba(255, 255, 255, 0.6), rgba(200, 200, 255, 0.8));
+    }
+  }
+}

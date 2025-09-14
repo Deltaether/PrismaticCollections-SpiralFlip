@@ -1,0 +1,15 @@
+/**
+ * Mixins Barrel Import
+ * Centralizes all SCSS mixins for easy importing
+ */
+
+// Forward all mixins for external use
+@forward 'scrollbars';
+
+// Future mixins can be added here:
+// @forward 'animations';
+// @forward 'responsive'; 
+// @forward 'typography';
+
+// Note: Theme system variables should be imported directly 
+// in components to avoid conflicts

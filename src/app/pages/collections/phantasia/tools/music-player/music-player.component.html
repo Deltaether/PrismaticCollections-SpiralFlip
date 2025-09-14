@@ -1,74 +1,140 @@
-<div class="music-player">
-  <!-- Error message -->
-  <div class="error-message" *ngIf="error">{{error}}</div>
+<div class="music-player-container">
+  <!-- Enhanced Glassmorphism Background -->
+  <div class="player-backdrop"></div>
   
-  <!-- Loading indicator -->
-  <div class="loading-indicator" *ngIf="isLoading">Loading...</div>
-  
-  <!-- Enhanced Track info -->
-  <div class="enhanced-track-info" *ngIf="currentTrack && !isLoading">
-    <div class="track-title">{{ getTrackName(currentTrack) }}</div>
-    <div class="track-artist">{{ getArtistName() }}</div>
-  </div>
-
-  <!-- Current track subtitle (e.g. "Now Playing: An - Incident") -->
-  <div class="current-subtitle" *ngIf="currentSubtitle && !trackTitle && !isLoading">
-    {{ currentSubtitle }}
-  </div>
-
-  <!-- Time and progress -->
-  <div class="time-info" [class.disabled]="isLoading">
-    <span class="current-time">{{formatTime(currentTime)}}</span>
-    <div class="progress-bar" [class.disabled]="isLoading">
-      <input 
-        type="range" 
-        [min]="0" 
-        [max]="duration" 
-        [step]="0.01"
-        [value]="currentTime"
-        (input)="seek($any($event.target).value)"
-        class="progress-slider"
-        [disabled]="isLoading"
-      >
-    </div>
-    <span class="duration">{{formatTime(duration)}}</span>
-  </div>
-  
-  <div class="controls" [class.disabled]="isLoading">
-    <div class="volume-section">
-      <div class="volume-icon">
-        <span>🔊</span>
+  <!-- Main Player Content -->
+  <div class="music-player">
+    <!-- Status Messages Section -->
+    <div class="status-section">
+      <div class="error-message" *ngIf="error">
+        <div class="error-icon">⚠</div>
+        <span>{{error}}</span>
       </div>
-      <div class="volume-control">
-        <input 
-          type="range" 
-          [min]="0" 
-          [max]="1" 
-          [step]="0.01"
-          [value]="volume"
-          (input)="setVolume($any($event.target).value)"
-          class="volume-slider"
-          [disabled]="isLoading"
+      
+      <div class="loading-indicator" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <span>Loading audio...</span>
+      </div>
+    </div>
+    
+    <!-- Track Information Section -->
+    <div class="track-section" *ngIf="!isLoading">
+      <!-- Current Track Details -->
+      <div class="track-details" *ngIf="currentTrackInfo">
+        <div class="track-info-content">
+          <h4 class="track-title">{{ currentTrackInfo.title }}</h4>
+          <p class="track-artist">{{ currentTrackInfo.mainArtist }}</p>
+        </div>
+      </div>
+
+      <!-- Legacy track info for backward compatibility -->
+      <div class="track-info" *ngIf="!currentTrackInfo && currentTrack">
+        <div class="track-title">{{ getTrackName(currentTrack) }}</div>
+        <div class="track-artist">{{ getArtistName() }}</div>
+      </div>
+
+      <div class="current-subtitle" *ngIf="currentSubtitle && !trackTitle && !currentTrackInfo">
+        {{ currentSubtitle }}
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section" [class.disabled]="isLoading">
+      <div class="time-display">
+        <span class="current-time">{{formatTime(currentTime)}}</span>
+        <span class="duration">{{formatTime(duration)}}</span>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="(currentTime / duration) * 100"></div>
+          <input 
+            type="range" 
+            [min]="0" 
+            [max]="duration" 
+            [step]="0.01"
+            [value]="currentTime"
+            (input)="seek($any($event.target).value)"
+            class="progress-slider"
+            [disabled]="isLoading"
+            aria-label="Seek"
+          >
+        </div>
+      </div>
+    </div>
+    
+    <!-- Controls Section -->
+    <div class="controls-section" [class.disabled]="isLoading">
+      <!-- Volume Control -->
+      <div class="volume-section">
+        <div class="volume-icon-container" (click)="toggleMute()">
+          <img 
+            class="volume-icon" 
+            [src]="volume === 0 ? 'assets/icons/music-player/volume-mute.svg' : 'assets/icons/music-player/volume.svg'" 
+            alt="Volume"
+            [class.muted]="volume === 0"
+          >
+        </div>
+        <div class="volume-control">
+          <div class="volume-track">
+            <div class="volume-fill" [style.width.%]="volume * 100"></div>
+            <input 
+              type="range" 
+              [min]="0" 
+              [max]="1" 
+              [step]="0.01"
+              [value]="volume"
+              (input)="setVolume($any($event.target).value)"
+              class="volume-slider"
+              [disabled]="isLoading"
+              aria-label="Volume"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="playback-controls">
+        <button 
+          class="control-button previous-button" 
+          (click)="previousTrack()" 
+          [disabled]="isLoading" 
+          aria-label="Previous track"
         >
+          <img 
+            class="control-icon" 
+            src="assets/icons/music-player/skip-back.svg" 
+            alt="Previous"
+          >
+        </button>
+        
+        <button 
+          class="control-button play-pause-button" 
+          (click)="togglePlay()"
+          [class.playing]="isPlaying"
+          [disabled]="isLoading"
+          [attr.aria-label]="isPlaying ? 'Pause' : 'Play'"
+        >
+          <img 
+            class="control-icon" 
+            [src]="isPlaying ? 'assets/icons/music-player/pause.svg' : 'assets/icons/music-player/play.svg'" 
+            [alt]="isPlaying ? 'Pause' : 'Play'"
+          >
+        </button>
+        
+        <button 
+          class="control-button next-button" 
+          (click)="nextTrack()" 
+          [disabled]="isLoading" 
+          aria-label="Next track"
+        >
+          <img 
+            class="control-icon" 
+            src="assets/icons/music-player/skip-forward.svg" 
+            alt="Next"
+          >
+        </button>
       </div>
-    </div>
-
-    <div class="playback-controls">
-      <button class="control-button previous" (click)="previousTrack()" [disabled]="isLoading">
-        <i class="control-icon">⏮</i>
-      </button>
-      <button 
-        class="control-button play-button" 
-        (click)="togglePlay()"
-        [class.playing]="isPlaying"
-        [disabled]="isLoading"
-      >
-        <i class="control-icon play-icon" *ngIf="!isPlaying">▶</i>
-        <i class="control-icon pause-icon" *ngIf="isPlaying">⏸</i>
-      </button>
-      <button class="control-button next" (click)="nextTrack()" [disabled]="isLoading">
-        <i class="control-icon">⏭</i>
-      </button>
     </div>
   </div>
 </div> 

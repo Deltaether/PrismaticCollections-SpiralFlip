@@ -553,7 +553,7 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(12px, 2vw, 16px);
+    gap: clamp(14px, 2.2vw, 18px); // Slightly more gap to prevent crowding
     flex: 1;
     max-width: 180px;
     width: 100%;

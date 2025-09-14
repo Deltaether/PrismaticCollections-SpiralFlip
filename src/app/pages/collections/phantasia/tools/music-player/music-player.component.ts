@@ -38,8 +38,8 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   currentTrack = '';
   currentTime = 0;
   duration = 0;
-  volume = 0.1;
-  previousVolume = 0.1;
+  volume = 0.5;
+  previousVolume = 0.5;
   error = '';
   currentSubtitle: string = '';
 

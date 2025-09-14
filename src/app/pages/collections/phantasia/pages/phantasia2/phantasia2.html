@@ -100,12 +100,14 @@
         </div>
       </div>
 
-      <!-- Dynamic Artist Cards - integrated within cd-showcase -->
-      <app-dynamic-artist-cards
-        [showAllArtists]="false"
-        [maxVisibleCards]="8"
-        [enableAnimations]="true">
-      </app-dynamic-artist-cards>
+      <!-- Dynamic Artist Cards - spans full available width below showcase content -->
+      <div class="artist-cards-section">
+        <app-dynamic-artist-cards
+          [showAllArtists]="false"
+          [maxVisibleCards]="8"
+          [enableAnimations]="true">
+        </app-dynamic-artist-cards>
+      </div>
     </section>
 
     <!-- Footer Section -->

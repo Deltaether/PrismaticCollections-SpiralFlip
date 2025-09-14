@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, ViewChild, ElementRef, signal, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, ViewChild, ElementRef, signal, HostBinding } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
@@ -43,7 +43,7 @@ export type ScrollIndicatorState = 'visible' | 'hidden';
   templateUrl: './phantasia2.html',
   styleUrls: ['./phantasia2.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None, // Disable view encapsulation to override global styles
+  // Using default ViewEncapsulation.Emulated for proper component isolation
   animations: [
     // Scroll indicator animation with smooth fade and bounce effects
     trigger('scrollIndicator', [
@@ -96,9 +96,13 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   private lastScrollTime = 0;
   private scrollSections: HTMLElement[] = [];
 
-  // Debug flag and comprehensive logging system
+  // Debug flag - simplified for production readiness
   private readonly isDebugMode = false;
   private debugSystem: Phantasia2Debug | null = null;
+
+  // Host binding for component-specific styling
+  @HostBinding('class.phantasia2-component') componentClass = true;
+  @HostBinding('class.phantasia-album-page') albumPageClass = true;
 
   // Current year for footer
   readonly currentYear = new Date().getFullYear();
@@ -116,12 +120,8 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       console.log(`[Phantasia2Component] Current URL: ${this.router.url}`);
     }
 
-    // Add phantasia-album-page class to html and body for album presentation styling
-    this.document.documentElement.classList.add('phantasia-album-page');
-    this.document.body.classList.add('phantasia-album-page');
-    
-    // CRITICAL FIX: Runtime horizontal scrollbar elimination
-    this.forceHorizontalScrollbarRemoval();
+    // Component-level initialization - no global DOM manipulation
+    // Styling is handled through host bindings and component SCSS
 
     if (this.isDebugMode) {
       console.log(`[Phantasia2Component] Added phantasia-album-page class to body`);
@@ -772,38 +772,6 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     // This method is here for future enhancements if needed
   }
 
-  /**
-   * CRITICAL FIX: Force removal of horizontal scrollbar at runtime
-   * This method applies aggressive CSS overrides to eliminate any horizontal scrolling
-   */
-  private forceHorizontalScrollbarRemoval(): void {
-    try {
-      // Apply styles to HTML element
-      const htmlElement = this.document.documentElement;
-      if (htmlElement) {
-        htmlElement.style.setProperty('overflow-x', 'hidden', 'important');
-        htmlElement.style.setProperty('max-width', '100vw', 'important');
-        htmlElement.style.setProperty('box-sizing', 'border-box', 'important');
-      }
-
-      // Apply styles to BODY element
-      const bodyElement = this.document.body;
-      if (bodyElement) {
-        bodyElement.style.setProperty('overflow-x', 'hidden', 'important');
-        bodyElement.style.setProperty('max-width', '100vw', 'important');
-        bodyElement.style.setProperty('box-sizing', 'border-box', 'important');
-      }
-
-      // Removed problematic DOM injection of overflow styles
-
-      // Removed problematic runtime horizontal scroll prevention code
-
-    } catch (error) {
-      if (this.isDebugMode) {
-        console.warn('[Phantasia2Component] Error applying horizontal scrollbar fix:', error);
-      }
-    }
-  }
 
   ngOnDestroy(): void {
     // Save final debug log and cleanup debug system
@@ -812,12 +780,9 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       this.debugSystem.cleanup();
       this.debugSystem = null;
     }
-    
-    // Remove phantasia-album-page class from html and body
-    this.document.documentElement.classList.remove('phantasia-album-page');
-    this.document.body.classList.remove('phantasia-album-page');
-    
-    // Removed cleanup for problematic DOM injection code
+
+    // Component cleanup - no global DOM manipulation needed
+    // Host bindings are automatically removed when component is destroyed
     
     // Clean up video elements
     if (this.videoElement) {

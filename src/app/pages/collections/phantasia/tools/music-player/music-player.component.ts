@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Howl } from 'howler';
 import { AudioService } from './audio.service';
 import { DynamicArtistService, TrackWithArtists } from '../../services/dynamic-artist.service';
+import { MusicStateManagerService } from '../../../../../services/music-state-manager.service';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -55,6 +56,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   constructor(
     private readonly audioService: AudioService,
     private readonly dynamicArtistService: DynamicArtistService,
+    private readonly musicStateManager: MusicStateManagerService,
     private readonly cdr: ChangeDetectorRef
   ) {
     // Enhanced debugging for Track 8 loading issues
@@ -226,21 +228,29 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
           this.audio.volume(0);
         }
         this.updateDynamicArtistTime();
+        // Notify centralized state manager
+        this.musicStateManager.updateDuration(this.duration);
         this.cdr.markForCheck();
       },
       onplay: () => {
         this.isPlaying = true;
         this.updateTime();
         this.updateDynamicArtistTime();
+        // Notify centralized state manager
+        this.musicStateManager.setPlayingState(true);
         this.cdr.markForCheck();
       },
       onpause: () => {
         this.isPlaying = false;
+        // Notify centralized state manager
+        this.musicStateManager.setPlayingState(false);
         this.cdr.markForCheck();
       },
       onend: () => {
         this.isPlaying = false;
         this.currentTime = 0;
+        // Notify centralized state manager
+        this.musicStateManager.setPlayingState(false);
         this.nextTrack();
         this.cdr.markForCheck();
       },
@@ -432,6 +442,8 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       this.audio.play();
     }
     this.isPlaying = !this.isPlaying;
+    // Notify centralized state manager
+    this.musicStateManager.setPlayingState(this.isPlaying);
     this.cdr.markForCheck();
   }
 
@@ -450,6 +462,8 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
 
     this.audio.volume(value);
+    // Notify centralized state manager
+    this.musicStateManager.updateVolume(value);
     this.cdr.markForCheck();
   }
 

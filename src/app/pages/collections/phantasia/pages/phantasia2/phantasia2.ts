@@ -10,7 +10,7 @@ import { MusicPlayerComponent } from '../../tools/music-player/music-player.comp
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
 import { DynamicArtistCardsComponent } from '../../../../../components/dynamic-artist-cards/dynamic-artist-cards.component';
-import { AudioService } from '../../tools/music-player/audio.service';
+import { AudioService, AudioState } from '../../../../../pages/collections/phantasia/services/audio.service';
 import { Phantasia2Debug } from './phantasia2-debug';
 
 /**
@@ -107,6 +107,9 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   // Current year for footer
   readonly currentYear = new Date().getFullYear();
 
+  // Artist display mode management
+  artistDisplayMode = signal<'showcase' | 'currently-playing' | 'all'>('showcase');
+
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
@@ -148,6 +151,9 @@ export class Phantasia2Component implements OnInit, OnDestroy {
 
     // Initialize dynamic artist system
     this.initializeDynamicArtistSystem();
+
+    // Set up artist display mode switching
+    this.setupArtistDisplayModeLogic();
     
     // Start enhanced debug monitoring with DOM ready detection
     if (this.isDebugMode) {
@@ -769,6 +775,35 @@ export class Phantasia2Component implements OnInit, OnDestroy {
 
     // The services will initialize automatically through dependency injection
     // This method is here for future enhancements if needed
+  }
+
+  /**
+   * Set up artist display mode switching logic
+   * Default: showcase mode (all 31 artists)
+   * When music plays: switch to currently-playing mode (track-specific artists)
+   */
+  private setupArtistDisplayModeLogic(): void {
+    // Listen to audio service for play/pause state changes
+    this.audioService.audioState$.subscribe((audioState: AudioState) => {
+      if (audioState.isPlaying && audioState.currentTrack) {
+        // Switch to currently-playing mode when music starts
+        this.artistDisplayMode.set('currently-playing');
+        if (this.isDebugMode) {
+          console.log('[Phantasia2Component] Switched to currently-playing mode for track:', audioState.currentTrack);
+        }
+      } else {
+        // Switch back to showcase mode when music stops or no track
+        this.artistDisplayMode.set('showcase');
+        if (this.isDebugMode) {
+          console.log('[Phantasia2Component] Switched to showcase mode (music stopped or no track)');
+        }
+      }
+      this.cdr.markForCheck();
+    });
+
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Artist display mode logic initialized - starting in showcase mode');
+    }
   }
 
 

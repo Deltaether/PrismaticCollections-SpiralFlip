@@ -6,6 +6,7 @@ import { ArtistCreditService, ArtistContribution } from '../../services/artist-c
 import { AudioService, AudioState } from '../../pages/collections/phantasia/services/audio.service';
 import { CurrentlyPlayingArtistsService } from './currently-playing-artists.service';
 import { DynamicArtistService, TrackWithArtists } from '../../pages/collections/phantasia/services/dynamic-artist.service';
+import { MusicStateManagerService, ArtistFilteringState } from '../../services/music-state-manager.service';
 import { ArtistCardComponent } from './artist-card/artist-card.component';
 
 /**
@@ -64,6 +65,16 @@ export interface ArtistCardData {
       transition('* => void', [
         animate('200ms ease-in', style({ opacity: 0, transform: 'scale(0.9)' }))
       ])
+    ]),
+    trigger('modeTransition', [
+      state('showcase', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('currently-playing', style({ opacity: 1, transform: 'translateY(0)' })),
+      transition('showcase => currently-playing', [
+        animate('400ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition('currently-playing => showcase', [
+        animate('600ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
     ])
   ]
 })
@@ -74,7 +85,20 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   @Input() showAllArtists = false;
   @Input() maxVisibleCards = 8;
   @Input() enableAnimations = true;
-  @Input() displayMode: 'currently-playing' | 'showcase' | 'all' = 'currently-playing';
+
+  private _displayMode: 'currently-playing' | 'showcase' | 'all' = 'currently-playing';
+  @Input() set displayMode(mode: 'currently-playing' | 'showcase' | 'all') {
+    const previousMode = this._displayMode;
+    this._displayMode = mode;
+
+    // Handle mode change after initialization
+    if (previousMode !== mode && !this.isLoading()) {
+      this.handleDisplayModeChange(mode);
+    }
+  }
+  get displayMode(): 'currently-playing' | 'showcase' | 'all' {
+    return this._displayMode;
+  }
 
   /**
    * Component state signals
@@ -85,6 +109,7 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   readonly isLoading = signal(true);
   readonly currentTrack = signal<string | null>(null);
   readonly totalArtistsCount = signal(0);
+  readonly animationState = signal<'showcase' | 'currently-playing'>('showcase');
 
   /**
    * Artist card identifier mapping
@@ -130,7 +155,8 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
     private artistCreditService: ArtistCreditService,
     private audioService: AudioService,
     private currentlyPlayingService: CurrentlyPlayingArtistsService,
-    private dynamicArtistService: DynamicArtistService
+    private dynamicArtistService: DynamicArtistService,
+    private musicStateManager: MusicStateManagerService
   ) {}
 
   ngOnInit(): void {
@@ -144,7 +170,7 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize all artist cards with proper identifiers
+   * Initialize all artist cards with proper identifiers using centralized state manager
    */
   private initializeArtistCards(): void {
     try {
@@ -155,11 +181,9 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
       const showcaseSelection = this.createShowcaseSelection(allArtists);
       this.showcaseArtists.set(showcaseSelection);
 
-      // Set initial display based on display mode
-      if (this.displayMode === 'showcase' || this.displayMode === 'all') {
-        this.artistCards.set(this.displayMode === 'all' ? 
-          this.createAllArtistCards(allArtists) : showcaseSelection);
-      }
+      // Get initial state from music state manager
+      const initialFilteringState = this.musicStateManager.getCurrentArtistFilteringState();
+      this.updateCardsFromFilteringState(initialFilteringState);
 
       this.isLoading.set(false);
     } catch (error) {
@@ -169,69 +193,31 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Setup real-time updates based on audio state
+   * Setup real-time updates using centralized music state manager
    */
   private setupRealtimeUpdates(): void {
-    // PRIMARY: Listen to DynamicArtistService for current track changes (Phantasia 2)
-    this.dynamicArtistService.currentTrack$.pipe(
+    // PRIMARY: Listen to centralized music state manager for artist filtering changes
+    this.musicStateManager.artistFilteringState$.pipe(
       takeUntil(this.destroy$)
-    ).subscribe(currentTrack => {
-      console.log('[DynamicArtistCards] Current track changed:', currentTrack?.title, 'by', currentTrack?.mainArtist);
+    ).subscribe(filteringState => {
+      console.log('[DynamicArtistCards] Artist filtering state changed:',
+                  `Mode: ${filteringState.mode}, Current artists: ${filteringState.currentArtists.length}, All artists: ${filteringState.allArtists.length}`);
 
-      if (currentTrack) {
-        this.currentTrack.set(currentTrack.id);
-
-        if (this.displayMode === 'currently-playing') {
-          // Update cards immediately based on track change
-          this.updateCardsForCurrentTrack(currentTrack);
-        }
-      } else {
-        this.currentTrack.set(null);
-        if (this.displayMode === 'currently-playing') {
-          // Fall back to showcase mode when no track is playing
-          this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
-        }
-      }
+      this.updateCardsFromFilteringState(filteringState);
     });
 
-    // SECONDARY: Listen to CurrentlyPlayingArtistsService for artist updates
-    this.currentlyPlayingService.currentlyPlayingArtists$.pipe(
+    // SECONDARY: Listen to display info updates
+    this.musicStateManager.displayInfo$.pipe(
       takeUntil(this.destroy$)
-    ).subscribe(playingArtists => {
-      console.log('[DynamicArtistCards] Currently playing artists changed:', playingArtists.map(a => a.artistDisplayName));
-
-      if (this.displayMode === 'currently-playing' && playingArtists.length > 0) {
-        const playingCards = playingArtists.map(artist => this.createArtistCard(artist, true));
-        this.currentlyPlayingArtists.set(playingCards);
-        this.artistCards.set(playingCards.slice(0, this.maxVisibleCards));
-
-        console.log('[DynamicArtistCards] Updated artist cards for currently playing artists:',
-                    playingCards.map(c => c.artist.artistDisplayName));
-      } else if (this.displayMode === 'currently-playing' && playingArtists.length === 0) {
-        // Fall back to showcase mode when no artists are playing
-        this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
-      }
+    ).subscribe(displayInfo => {
+      console.log('[DynamicArtistCards] Display info updated:', displayInfo);
     });
 
-    // FALLBACK: Legacy audio service for non-Phantasia 2 pages
-    this.audioService.audioState$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(audioState => {
-      // Only use if DynamicArtistService isn't providing a track
-      if (!this.currentTrack()) {
-        this.currentTrack.set(audioState.currentTrack);
-
-        if (this.displayMode === 'currently-playing') {
-          if (audioState.isPlaying && audioState.currentTrack) {
-            // Use legacy system - will be picked up by CurrentlyPlayingArtistsService
-            console.log('[DynamicArtistCards] Using legacy audio state for track:', audioState.currentTrack);
-          } else {
-            // Fall back to showcase mode
-            this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
-          }
-        }
-      }
-    });
+    // FALLBACK: Keep legacy subscriptions for compatibility during transition
+    if (this.displayMode !== 'currently-playing') {
+      // Only use legacy subscriptions when not in currently-playing mode
+      this.setupLegacyFallbackUpdates();
+    }
   }
 
   /**
@@ -385,6 +371,86 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle display mode changes dynamically
+   */
+  private handleDisplayModeChange(newMode: 'currently-playing' | 'showcase' | 'all'): void {
+    console.log('[DynamicArtistCards] Display mode changed to:', newMode);
+
+    if (newMode === 'showcase') {
+      // Switch to showcase mode - show curated featured artists
+      this.animationState.set('showcase');
+      const showcaseCards = this.showcaseArtists();
+      this.artistCards.set(showcaseCards);
+      console.log('[DynamicArtistCards] Switched to showcase mode - showing', showcaseCards.length, 'featured artists');
+    } else if (newMode === 'currently-playing') {
+      // Switch to currently-playing mode
+      this.animationState.set('currently-playing');
+      const currentlyPlaying = this.currentlyPlayingArtists();
+      if (currentlyPlaying.length > 0) {
+        this.artistCards.set(currentlyPlaying.slice(0, this.maxVisibleCards));
+        console.log('[DynamicArtistCards] Switched to currently-playing mode - showing', currentlyPlaying.length, 'artists');
+      } else {
+        // Fallback to showcase if no currently playing artists
+        console.log('[DynamicArtistCards] No currently playing artists - falling back to showcase');
+        this.handleDisplayModeChange('showcase');
+      }
+    } else if (newMode === 'all') {
+      // Show all artists
+      this.animationState.set('showcase'); // Use showcase animation for 'all' mode
+      const allArtists = this.artistCreditService.getAllPhantasia2Artists();
+      this.artistCards.set(this.createAllArtistCards(allArtists));
+    }
+  }
+
+  /**
+   * Track by function for ngFor optimization
+   */
+  /**
+   * Update cards from artist filtering state
+   */
+  private updateCardsFromFilteringState(filteringState: ArtistFilteringState): void {
+    if (filteringState.mode === 'music-playing' && filteringState.currentArtists.length > 0) {
+      // Music is playing - show current artists
+      const playingCards = filteringState.currentArtists.map(artist => this.createArtistCard(artist, true));
+      this.currentlyPlayingArtists.set(playingCards);
+      this.artistCards.set(playingCards.slice(0, this.maxVisibleCards));
+      this.animationState.set('currently-playing');
+
+      // Update current track if available
+      const musicState = this.musicStateManager.getCurrentMusicState();
+      this.currentTrack.set(musicState.currentTrack?.id || null);
+
+      console.log('[DynamicArtistCards] Updated to music-playing mode with', playingCards.length, 'artists');
+    } else {
+      // No music playing - show all artists in showcase mode
+      const allArtistCards = filteringState.allArtists.map(artist => this.createArtistCard(artist, false));
+      this.artistCards.set(allArtistCards.slice(0, this.maxVisibleCards));
+      this.showcaseArtists.set(allArtistCards);
+      this.currentlyPlayingArtists.set([]);
+      this.animationState.set('showcase');
+      this.currentTrack.set(null);
+
+      console.log('[DynamicArtistCards] Updated to no-music mode with', allArtistCards.length, 'artists');
+    }
+  }
+
+  /**
+   * Setup legacy fallback updates for compatibility
+   */
+  private setupLegacyFallbackUpdates(): void {
+    // Only used when not in currently-playing mode or during transition
+    this.currentlyPlayingService.currentlyPlayingArtists$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(playingArtists => {
+      // Only use legacy if music state manager hasn't provided current artists
+      const currentFilteringState = this.musicStateManager.getCurrentArtistFilteringState();
+      if (currentFilteringState.mode === 'no-music' && playingArtists.length > 0) {
+        console.log('[DynamicArtistCards] Using legacy fallback for', playingArtists.length, 'artists');
+      }
+    });
+  }
+
+  /**
    * Track by function for ngFor optimization
    */
   trackByCardId(index: number, card: ArtistCardData): string {
@@ -392,31 +458,18 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get current display title
+   * Get current display title from music state manager
    */
   get displayTitle(): string {
-    const currentTrack = this.currentTrack();
-    const playingArtists = this.currentlyPlayingArtists();
-    
-    if (currentTrack && playingArtists.length > 0) {
-      return 'Currently Playing Artists';
-    }
-    
-    return this.showAllArtists ? 'All Phantasia 2 Artists' : 'Featured Artists';
+    const displayInfo = this.musicStateManager.getCurrentArtistFilteringState();
+    return displayInfo.displayTitle;
   }
 
   /**
-   * Get subtitle based on current state
+   * Get subtitle from music state manager
    */
   get displaySubtitle(): string {
-    const currentTrack = this.currentTrack();
-    const playingArtists = this.currentlyPlayingArtists();
-    const totalCards = this.artistCards().length;
-    
-    if (currentTrack && playingArtists.length > 0) {
-      return `Artists change dynamically with the music. ${playingArtists.length} artists are currently featured.`;
-    }
-    
-    return `Showcasing ${totalCards} of ${this.totalArtistsCount()} artists from the album.`;
+    const displayInfo = this.musicStateManager.getCurrentArtistFilteringState();
+    return displayInfo.displaySubtitle;
   }
 }

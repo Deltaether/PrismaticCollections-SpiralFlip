@@ -8,8 +8,9 @@
   </div>
 
   <!-- Artist Cards Grid -->
-  <div class="artist-cards-grid" 
-       [@cardsContainer] 
+  <div class="artist-cards-grid"
+       [@cardsContainer]
+       [@modeTransition]="animationState()"
        *ngIf="artistCards().length > 0">
     
     <app-artist-card

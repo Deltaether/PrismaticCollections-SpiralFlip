@@ -451,11 +451,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   -webkit-backdrop-filter: blur(clamp(6px, 1vw, 12px)) saturate(1.2);
   border-radius: clamp(18px, 3.5vw, 36px);
   border: clamp(1px, 0.15vw, 2px) solid rgba(255, 255, 255, 0.15);
-  // FIXED: Consistent margins and width calculation with artist-cards-section
+  // PROFESSIONAL: Container approach for all screen sizes
   margin: clamp(2rem, 4vh, 3rem) auto clamp(1rem, 2vh, 2rem);
-  max-width: calc(100vw - 20vw); // Equivalent to 80vw but accounts for 10vw margins on each side
-  width: calc(100vw - 20vw);
-  padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 3vw, 2rem) clamp(0.25rem, 1vh, 0.75rem);
+  max-width: min(1800px, 95vw); // ULTRA-WIDE FIX: Optimal content width across all screens
+  width: 100%;
+  padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 3vw, 3rem) clamp(0.25rem, 1vh, 0.75rem);
   position: relative;
   box-sizing: border-box;
 
@@ -535,14 +535,14 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   .showcase-main-content {
     display: flex;
     align-items: stretch;
-    gap: clamp(3rem, 6vw, 8rem); // FIXED: Increased gap for ultra-wide screens (3rem min, 6vw preferred, 8rem max)
+    gap: min(3rem, 5vw); // PROFESSIONAL: Intelligent gap that prevents over-stretching on ultra-wide
     min-height: clamp(350px, 60vh, 500px);
     max-height: none; // Allow natural sizing
 
-    // Ultra-wide specific spacing improvements
-    @media (min-width: 2000px) {
-      gap: clamp(6rem, 8vw, 12rem); // Extra spacing for ultra-wide displays
-    }
+    // PROFESSIONAL CONTAINER: Prevent ultra-wide over-stretching
+    max-width: 1800px; // ULTRA-WIDE FIX: Optimal content width limit
+    margin: 0 auto; // Center the content container
+    width: 100%; // Full width up to max-width
 
     @media (max-width: 1024px) {
       flex-direction: column;
@@ -587,9 +587,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center; // FIXED: Center content vertically to align music player with album artwork
+    align-items: center; // Center content horizontally for better alignment
     min-width: 0;
-    gap: clamp(1rem, 2vh, 2rem);
+    gap: clamp(1.5rem, 3vh, 3rem); // Increased gap for better spacing between album info and music player
     // Add left margin to ensure spacing from album cover
     margin-left: clamp(0rem, 1vw, 2rem);
 
@@ -608,17 +609,22 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 
   .music-player-section {
+    flex: 0 0 auto; // FIXED: Don't let music player expand to fill space
+    display: flex;
     align-items: center;
+    justify-content: center; // Center the music player horizontally
+    width: 100%; // Ensure full width for centered content
     // FIXED: Remove height constraints to allow natural sizing
     min-height: clamp(140px, 20vh, 180px); // Responsive minimum height
     max-height: none; // Allow natural sizing
     overflow: visible; // Allow controls to show
     padding: 0.5rem 0;
     box-sizing: border-box;
-    margin-top: auto; // Push to bottom of content section
+    // REMOVED: margin-top: auto - no longer needed since parent centers content
 
     app-music-player {
-      max-width: 600px;
+      max-width: min(900px, 85vw); // Increased from 600px to allow wider music player
+      width: 100%;
       display: flex;
       align-items: center;
 
@@ -1222,12 +1228,13 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 
   .album-info {
-    flex: 1;
+    flex: 0 0 auto; // FIXED: Don't let album info expand to fill space
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%; // Ensure full width for centered content
 
     .artist-info {
       margin-bottom: clamp(1rem, 2vh, 2rem);
@@ -1915,11 +1922,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  // FIXED: Consistent margins and width calculation with cd-showcase
+  // PROFESSIONAL: Container approach consistent with cd-showcase
   margin: clamp(2rem, 4vh, 3rem) auto clamp(1rem, 2vh, 2rem);
-  max-width: calc(100vw - 20vw); // Equivalent to 80vw but accounts for 10vw margins on each side
-  width: calc(100vw - 20vw);
-  padding: clamp(1.5rem, 3vh, 2.5rem) clamp(1rem, 3vw, 2rem);
+  max-width: min(1800px, 95vw); // ULTRA-WIDE FIX: Optimal content width across all screens
+  width: 100%;
+  padding: clamp(1.5rem, 3vh, 2.5rem) clamp(1rem, 3vw, 3rem);
   position: relative;
   box-sizing: border-box;
   clear: both;
@@ -1971,10 +1978,6 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
 // Tablet optimizations (769px - 1024px) - Fixed for proper display
 @media (min-width: 769px) and (max-width: 1024px) {
-  // VIEWPORT DISPLACEMENT: Ensure consistent margin-top: 100vh for tablet breakpoint
-  .album-presentation {
-  }
-
   .cd-showcase {
     margin-top: clamp(3rem, 6vh, 5rem); // Prevent overlapping with video section
 
@@ -2061,10 +2064,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 
   .cd-showcase {
-    // FIXED: Use identical width and margin calculations as artist-cards-section
-    max-width: calc(100vw - 20vw);
-    width: calc(100vw - 20vw);
+    // PROFESSIONAL: Optimal width for laptop screens without over-constraining
+    max-width: min(1400px, 90vw);
+    width: 100%;
     margin: clamp(2rem, 4vh, 3rem) auto clamp(1rem, 2vh, 2rem);
+    padding: 0 clamp(1rem, 3vw, 3rem); // Smart padding instead of restrictive width
 
     .showcase-main-content {
       gap: 3rem;
@@ -2101,10 +2105,11 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   }
 
   .artist-cards-section {
-    // FIXED: Explicit width and margin consistency with cd-showcase in 1440px breakpoint
-    max-width: calc(100vw - 20vw);
-    width: calc(100vw - 20vw);
+    // PROFESSIONAL: Consistent with cd-showcase for optimal laptop layout
+    max-width: min(1400px, 90vw);
+    width: 100%;
     margin: clamp(2rem, 4vh, 3rem) auto clamp(1rem, 2vh, 2rem);
+    padding: 0 clamp(1rem, 3vw, 3rem); // Smart padding for better content flow
   }
 
   // 【✓】Moved video even lower for laptop breakpoint (extra offset)
@@ -2179,6 +2184,30 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
   .scroll-indicator-container {
     bottom: clamp(4rem, 10vh, 5rem);
+  }
+}
+
+// PROFESSIONAL: Ultra-wide optimizations (2560px+, 4K+)
+@media (min-width: 2000px) {
+  .cd-showcase {
+    // Ultra-wide: Use larger max-width for better proportions
+    max-width: min(2200px, 90vw);
+    padding: clamp(2rem, 3vh, 3rem) clamp(2rem, 4vw, 4rem) clamp(0.5rem, 1vh, 1rem);
+
+    .showcase-main-content {
+      gap: 4rem; // Larger gap for ultra-wide screens
+      min-height: 600px; // Increase minimum height for better proportions
+    }
+
+    .cd-jacket {
+      width: 520px; // Larger album art for ultra-wide
+      height: 520px;
+    }
+  }
+
+  .artist-cards-section {
+    max-width: min(2200px, 90vw);
+    padding: clamp(2rem, 3vh, 3rem) clamp(2rem, 4vw, 4rem);
   }
 }
 

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, combineLatest, Subject, EMPTY } from 'rxjs';
+import { map, distinctUntilChanged, debounceTime, takeUntil, startWith, shareReplay, switchMap } from 'rxjs/operators';
 import { ArtistCreditService, ArtistContribution } from '../../services/artist-credit.service';
 import { AudioService, AudioState } from '../../pages/collections/phantasia/services/audio.service';
 import { DynamicArtistService, TrackWithArtists } from '../../pages/collections/phantasia/services/dynamic-artist.service';
@@ -36,24 +36,28 @@ export interface CurrentlyPlayingArtist extends ArtistContribution {
 @Injectable({
   providedIn: 'root'
 })
-export class CurrentlyPlayingArtistsService {
+export class CurrentlyPlayingArtistsService implements OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   private readonly currentlyPlayingArtistsSubject = new BehaviorSubject<ArtistContribution[]>([]);
   private readonly trackArtistCacheMap = new Map<string, ArtistContribution[]>();
+  private readonly maxCacheSize = 50; // Prevent unlimited cache growth
+  private cacheAccessOrder: string[] = []; // LRU cache implementation
+  private isDebugMode = false; // Performance debugging flag
   
   // Public observables
   readonly currentlyPlayingArtists$ = this.currentlyPlayingArtistsSubject.asObservable();
   
-  // Enhanced observable with playing context
-  readonly currentlyPlayingArtistsWithContext$: Observable<CurrentlyPlayingArtist[]> = 
+  // Enhanced observable with playing context - optimized with shareReplay for performance
+  readonly currentlyPlayingArtistsWithContext$: Observable<CurrentlyPlayingArtist[]> =
     combineLatest([
       this.audioService.audioState$,
       this.currentlyPlayingArtists$
     ]).pipe(
       map(([audioState, artists]) => this.enhanceArtistsWithContext(audioState, artists)),
-      distinctUntilChanged((prev, curr) => 
-        JSON.stringify(prev.map(a => a.id)) === JSON.stringify(curr.map(a => a.id))
-      ),
-      debounceTime(100) // Prevent excessive updates
+      distinctUntilChanged((prev, curr) => this.compareArtistArrays(prev, curr)),
+      debounceTime(50), // Reduced debounce for faster response
+      shareReplay(1), // Cache last result for multiple subscribers
+      takeUntil(this.destroy$)
     );
 
   constructor(
@@ -64,6 +68,15 @@ export class CurrentlyPlayingArtistsService {
     this.initializeService();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.clearCache();
+    if (this.isDebugMode) {
+      console.log('[CurrentlyPlayingArtistsService] Service destroyed, cache cleared');
+    }
+  }
+
   /**
    * Initialize the service and setup audio state monitoring
    */
@@ -71,30 +84,33 @@ export class CurrentlyPlayingArtistsService {
     // Pre-populate cache with all track artist data
     this.populateTrackArtistCache();
 
-    // Primary: Monitor DynamicArtistService for current track changes (Phantasia 2)
+    // Primary: Monitor DynamicArtistService for current track changes (Phantasia 2) - optimized
     this.dynamicArtistService.currentTrack$.pipe(
       distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-      debounceTime(50)
+      debounceTime(25), // Faster response time
+      takeUntil(this.destroy$)
     ).subscribe(currentTrack => {
       this.updateCurrentlyPlayingArtistsFromDynamicService(currentTrack);
     });
 
-    // Fallback: Monitor legacy audio state changes for other sections
+    // Fallback: Monitor legacy audio state changes for other sections - optimized
     this.audioService.audioState$.pipe(
       distinctUntilChanged((prev, curr) =>
         prev.currentTrack === curr.currentTrack &&
         prev.isPlaying === curr.isPlaying
       ),
-      debounceTime(50)
-    ).subscribe(audioState => {
-      // Only use legacy service if dynamic service isn't providing a track
-      this.dynamicArtistService.currentTrack$.pipe(
-        map(dynamicTrack => dynamicTrack === null)
-      ).subscribe(noDynamicTrack => {
-        if (noDynamicTrack) {
-          this.updateCurrentlyPlayingArtists(audioState);
-        }
-      });
+      debounceTime(25),
+      switchMap(audioState =>
+        this.dynamicArtistService.currentTrack$.pipe(
+          map(dynamicTrack => ({ audioState, noDynamicTrack: dynamicTrack === null })),
+          startWith({ audioState, noDynamicTrack: true })
+        )
+      ),
+      takeUntil(this.destroy$)
+    ).subscribe(({ audioState, noDynamicTrack }) => {
+      if (noDynamicTrack) {
+        this.updateCurrentlyPlayingArtists(audioState);
+      }
     });
   }
 
@@ -209,12 +225,13 @@ export class CurrentlyPlayingArtistsService {
   }
 
   /**
-   * Get artists for a specific track with caching
+   * Get artists for a specific track with LRU caching
    */
   private getArtistsForTrack(trackId: string): ArtistContribution[] {
-    // Direct cache lookup
+    // Direct cache lookup with LRU update
     const cachedArtists = this.trackArtistCacheMap.get(trackId);
     if (cachedArtists) {
+      this.updateCacheAccess(trackId);
       return cachedArtists;
     }
 
@@ -222,7 +239,7 @@ export class CurrentlyPlayingArtistsService {
     const trackCredits = this.artistCreditService.getTrackCredits(trackId);
     if (trackCredits) {
       const sortedArtists = this.sortArtistsByPriority(trackCredits.allContributions);
-      this.trackArtistCacheMap.set(trackId, sortedArtists); // Cache for future use
+      this.setCacheWithLRU(trackId, sortedArtists);
       return sortedArtists;
     }
 
@@ -370,5 +387,78 @@ export class CurrentlyPlayingArtistsService {
    */
   clearCurrentlyPlayingArtists(): void {
     this.currentlyPlayingArtistsSubject.next([]);
+  }
+
+  /**
+   * Optimized array comparison for distinctUntilChanged
+   */
+  private compareArtistArrays(prev: CurrentlyPlayingArtist[], curr: CurrentlyPlayingArtist[]): boolean {
+    if (prev.length !== curr.length) return false;
+
+    // Fast comparison using IDs only
+    for (let i = 0; i < prev.length; i++) {
+      if (prev[i].id !== curr[i].id) return false;
+    }
+    return true;
+  }
+
+  /**
+   * LRU cache management - update access order
+   */
+  private updateCacheAccess(trackId: string): void {
+    const index = this.cacheAccessOrder.indexOf(trackId);
+    if (index > -1) {
+      this.cacheAccessOrder.splice(index, 1);
+    }
+    this.cacheAccessOrder.push(trackId);
+  }
+
+  /**
+   * Set cache with LRU eviction policy
+   */
+  private setCacheWithLRU(trackId: string, artists: ArtistContribution[]): void {
+    // Evict oldest entries if cache is full
+    if (this.trackArtistCacheMap.size >= this.maxCacheSize) {
+      const oldestKey = this.cacheAccessOrder.shift();
+      if (oldestKey) {
+        this.trackArtistCacheMap.delete(oldestKey);
+        if (this.isDebugMode) {
+          console.log(`[CurrentlyPlayingArtistsService] Evicted cache entry: ${oldestKey}`);
+        }
+      }
+    }
+
+    this.trackArtistCacheMap.set(trackId, artists);
+    this.updateCacheAccess(trackId);
+
+    if (this.isDebugMode) {
+      console.log(`[CurrentlyPlayingArtistsService] Cached artists for track: ${trackId}`);
+    }
+  }
+
+  /**
+   * Clear entire cache for memory management
+   */
+  private clearCache(): void {
+    this.trackArtistCacheMap.clear();
+    this.cacheAccessOrder = [];
+  }
+
+  /**
+   * Get cache statistics for performance monitoring
+   */
+  getCacheStats(): { size: number; maxSize: number; hitRate: number } {
+    return {
+      size: this.trackArtistCacheMap.size,
+      maxSize: this.maxCacheSize,
+      hitRate: this.cacheAccessOrder.length > 0 ? this.trackArtistCacheMap.size / this.cacheAccessOrder.length : 0
+    };
+  }
+
+  /**
+   * Enable/disable debug mode for performance monitoring
+   */
+  setDebugMode(enabled: boolean): void {
+    this.isDebugMode = enabled;
   }
 }

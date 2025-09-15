@@ -1,6 +1,6 @@
-<!-- Dynamic Artist Cards Container -->
+<!-- Dynamic Artist Cards Container - Optimized with minimal binding -->
 <div class="dynamic-artist-cards"
-     [@cardsContainer]="cardsAnimationTrigger"
+     [@cardsContainer]="cardsAnimationTrigger()"
      [class.show-all-mode]="showAllArtists"
      [class.dynamic-mode]="!showAllArtists">
 
@@ -8,18 +8,18 @@
   <div class="section-header">
     <h3 class="section-title">
       <span *ngIf="showAllArtists">All Featured Artists</span>
-      <span *ngIf="!showAllArtists && currentTrack">Currently Playing Artists</span>
-      <span *ngIf="!showAllArtists && !currentTrack">Featured Artists</span>
+      <span *ngIf="!showAllArtists && currentTrack()">Currently Playing Artists</span>
+      <span *ngIf="!showAllArtists && !currentTrack()">Featured Artists</span>
     </h3>
     <p class="section-subtitle" *ngIf="!showAllArtists">
       Artists change dynamically with the music
     </p>
   </div>
 
-  <!-- Artist Cards Grid -->
-  <div class="artist-cards-grid" *ngIf="artistCards.length > 0">
+  <!-- Artist Cards Grid - Optimized with async pipe -->
+  <div class="artist-cards-grid" *ngIf="(optimizedArtistCards$ | async) as cards">
     <div class="artist-card"
-         *ngFor="let card of artistCards; trackBy: trackByArtistId"
+         *ngFor="let card of cards; trackBy: trackByArtistId"
          [@cardAnimation]="card.animationState"
          [@activeGlow]="card.isActive ? 'active' : 'inactive'"
          [ngStyle]="getCardStyle(card)"
@@ -73,8 +73,8 @@
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="artistCards.length === 0">
+  <!-- Empty State - Optimized with async pipe -->
+  <div class="empty-state" *ngIf="(optimizedArtistCards$ | async)?.length === 0">
     <div class="empty-content">
       <mat-icon class="empty-icon">people</mat-icon>
       <h4 class="empty-title">Loading Artists...</h4>
@@ -82,13 +82,13 @@
     </div>
   </div>
 
-  <!-- Dynamic Mode Info -->
-  <div class="dynamic-info" *ngIf="!showAllArtists && artistCards.length > 0">
+  <!-- Dynamic Mode Info - Optimized with computed values -->
+  <div class="dynamic-info" *ngIf="!showAllArtists && (optimizedArtistCards$ | async) as cards && cards.length > 0">
     <div class="info-content">
       <mat-icon class="info-icon">info</mat-icon>
       <p class="info-text">
         Artist cards update in real-time as different tracks play.
-        <strong>{{ getActiveArtistCount() }}</strong> artists are currently featured.
+        <strong>{{ cards.filter(c => c.isActive).length }}</strong> artists are currently featured.
       </p>
     </div>
   </div>

@@ -158,7 +158,7 @@ export class ArtistCreditService {
     },
     'Iku Hoshifuri': {
       displayName: 'Iku Hoshifuri',
-      avatar: '/assets/images/artists/Iku Hoshifuri.png',
+      avatar: '/assets/images/artists/Iku-Hoshifuri.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -169,7 +169,7 @@ export class ArtistCreditService {
     },
     'Justin Thornburgh': {
       displayName: 'Justin Thornburgh',
-      avatar: '/assets/images/artists/Justin Thornburgh.png',
+      avatar: '/assets/images/artists/Justin-Thornburgh.png',
       color: '#DDA0DD',
       primaryRoles: ['Accordion', 'Instrumentalist'],
       socialLinks: {
@@ -190,7 +190,7 @@ export class ArtistCreditService {
     },
     'Rita Kamishiro': {
       displayName: 'Rita Kamishiro',
-      avatar: '/assets/images/artists/Rita Kamishiro.png',
+      avatar: '/assets/images/artists/Rita-Kamishiro.png',
       color: '#E17055',
       primaryRoles: ['Viola', 'Instrumentalist'],
       socialLinks: {
@@ -201,7 +201,7 @@ export class ArtistCreditService {
     },
     'Marcus Ho': {
       displayName: 'Marcus Ho',
-      avatar: '/assets/images/artists/Marcus Ho.png',
+      avatar: '/assets/images/artists/Marcus-Ho.png',
       color: '#6C5CE7',
       primaryRoles: ['Cello', 'Instrumentalist'],
       socialLinks: {
@@ -255,7 +255,7 @@ export class ArtistCreditService {
     },
     'Mei Naganowa': {
       displayName: 'Mei Naganowa',
-      avatar: '/assets/images/artists/Mei Naganowa.png',
+      avatar: '/assets/images/artists/Mei-Naganowa.png',
       color: '#00CEC9',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -265,7 +265,7 @@ export class ArtistCreditService {
     },
     "Evin a'k": {
       displayName: "Evin a'k",
-      avatar: '/assets/images/artists/Evin a\'k.png',
+      avatar: "/assets/images/artists/Evin-ak.png",
       color: '#FDCB6E',
       primaryRoles: ['Electronic Producer', 'Bass'],
       socialLinks: {
@@ -287,7 +287,7 @@ export class ArtistCreditService {
     },
     'Elliot Hsu': {
       displayName: 'Elliot Hsu',
-      avatar: '/assets/images/artists/Elliot Hsu.png',
+      avatar: '/assets/images/artists/Elliot-Hsu.png',
       color: '#55A3FF',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -332,7 +332,7 @@ export class ArtistCreditService {
     },
     '伍一': {
       displayName: '伍一',
-      avatar: '/assets/images/artists/伍一.png',
+      avatar: '/assets/images/artists/Wu-Yi.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -354,7 +354,7 @@ export class ArtistCreditService {
     },
     'MoAE': {
       displayName: 'MoAE:.',
-      avatar: '/assets/images/artists/MoAE:..png',
+      avatar: '/assets/images/artists/MoAE.png',
       color: '#00B894',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -365,7 +365,7 @@ export class ArtistCreditService {
     },
     'dystopian tanuki': {
       displayName: 'dystopian tanuki',
-      avatar: '/assets/images/artists/dystopian tanuki.png',
+      avatar: '/assets/images/artists/dystopian-tanuki.png',
       color: '#636E72',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -396,7 +396,7 @@ export class ArtistCreditService {
     },
     'Bigg Milk': {
       displayName: 'Bigg Milk',
-      avatar: '/assets/images/artists/Bigg Milk.png',
+      avatar: '/assets/images/artists/Bigg-Milk.png',
       color: '#00CEC9',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -418,7 +418,7 @@ export class ArtistCreditService {
     },
     'Sad Keyboard Guy': {
       displayName: 'Sad Keyboard Guy',
-      avatar: '/assets/images/artists/Sad Keyboard Guy.png',
+      avatar: '/assets/images/artists/Sad-Keyboard-Guy.png',
       color: '#74B9FF',
       primaryRoles: ['Keyboard', 'Composer'],
       socialLinks: {
@@ -501,6 +501,21 @@ export class ArtistCreditService {
     return Array.from(allArtists.values()).sort((a, b) =>
       a.artistDisplayName.localeCompare(b.artistDisplayName)
     );
+  }
+
+  /**
+   * Get artist data by name with properly encoded avatar URL
+   */
+  getArtistData(artistName: string): any {
+    const artistData = this.completeArtistDatabase[artistName];
+    if (!artistData) {
+      return null;
+    }
+
+    return {
+      ...artistData,
+      avatar: artistData.avatar
+    };
   }
 
   /**
@@ -820,6 +835,7 @@ export class ArtistCreditService {
       socialLinks: artistData.socialLinks
     };
   }
+
 
   /**
    * Generate consistent artist ID

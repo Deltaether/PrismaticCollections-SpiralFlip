@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { trigger, state, style, transition, animate, query, stagger, keyframes } from '@angular/animations';
 import { DynamicArtistService, Artist, TrackWithArtists } from '../../services/dynamic-artist.service';
 import { AudioService } from '../../tools/music-player/audio.service';
-import { Subject, combineLatest } from 'rxjs';
-import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { PerformanceMonitorService } from '../../services/performance-monitor.service';
+import { Subject, combineLatest, Observable, BehaviorSubject } from 'rxjs';
+import { takeUntil, distinctUntilChanged, debounceTime, map, startWith, shareReplay } from 'rxjs/operators';
 
 /**
  * Animation states for artist cards
@@ -146,169 +147,187 @@ interface ArtistCardData extends Artist {
 })
 export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly isDebugMode = true;
+  private readonly isDebugMode = false; // Disabled for production performance
+  private readonly animationTimeouts = new Set<number>(); // Track timeouts for cleanup
+  private readonly cardUpdateSubject = new BehaviorSubject<ArtistCardData[]>([]);
 
   // Input properties
   @Input() showAllArtists = false;
   @Input() maxVisibleCards = 8;
   @Input() enableAnimations = true;
 
-  // Component state
-  artistCards: ArtistCardData[] = [];
-  currentTrack: TrackWithArtists | null = null;
-  isPlaying = false;
-  currentTime = 0;
-  cardsAnimationTrigger = 0;
+  // Reactive component state using signals for optimal performance
+  private readonly currentArtistsSignal = signal<Artist[]>([]);
+  private readonly currentTrackSignal = signal<TrackWithArtists | null>(null);
+  private readonly isPlayingSignal = signal<boolean>(false);
+  private readonly currentTimeSignal = signal<number>(0);
+  private readonly cardsAnimationTriggerSignal = signal<number>(0);
+
+  // Computed properties for optimal template binding
+  artistCards = computed(() => this.createOptimizedCardData(this.currentArtistsSignal()));
+  currentTrack = computed(() => this.currentTrackSignal());
+  isPlaying = computed(() => this.isPlayingSignal());
+  currentTime = computed(() => this.currentTimeSignal());
+  cardsAnimationTrigger = computed(() => this.cardsAnimationTriggerSignal());
+
+  // Optimized observables with shareReplay for multiple template subscriptions
+  readonly optimizedArtistCards$: Observable<ArtistCardData[]> = this.cardUpdateSubject.pipe(
+    distinctUntilChanged((prev, curr) => this.compareCardArrays(prev, curr)),
+    debounceTime(16), // 60fps animation timing
+    shareReplay(1),
+    takeUntil(this.destroy$)
+  );
 
   constructor(
     private readonly dynamicArtistService: DynamicArtistService,
     private readonly audioService: AudioService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly performanceMonitor: PerformanceMonitorService
   ) {}
 
   ngOnInit(): void {
+    // Start performance monitoring in debug mode
+    if (this.isDebugMode) {
+      this.performanceMonitor.startMonitoring();
+    }
+
     this.setupArtistTracking();
     this.setupAudioTracking();
 
     if (this.isDebugMode) {
-      console.log('[DynamicArtistCardsComponent] Component initialized');
+      console.log('[DynamicArtistCardsComponent] Component initialized with performance monitoring');
+      // Log metrics every 5 seconds in debug mode
+      setInterval(() => this.performanceMonitor.logMetrics(), 5000);
     }
   }
 
   /**
-   * Setup artist tracking based on current playback
+   * Setup optimized artist tracking with reactive patterns
    */
   private setupArtistTracking(): void {
-    // Dynamic filtering mode - always use currentArtists$ now
+    // Primary artist tracking with optimized distinctUntilChanged
     this.dynamicArtistService.currentArtists$
       .pipe(
         takeUntil(this.destroy$),
-        distinctUntilChanged((prev, curr) =>
-          prev.length === curr.length &&
-          prev.every((artist, i) => artist.id === curr[i]?.id)
-        )
+        distinctUntilChanged((prev, curr) => this.compareArtistArrays(prev, curr)),
+        debounceTime(16) // 60fps debounce for smooth animations
       ).subscribe((currentArtists) => {
-        this.updateArtistCards(currentArtists, this.showAllArtists);
+        this.currentArtistsSignal.set(currentArtists);
+        this.updateOptimizedArtistCards(currentArtists);
 
-        // Force change detection for immediate visual updates during track navigation
-        this.cdr.detectChanges();
-      });
-
-    // Track current track for context
-    this.dynamicArtistService.currentTrack$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(track => {
-        this.currentTrack = track;
+        // Only mark for check instead of forcing detection
         this.cdr.markForCheck();
 
-        if (this.isDebugMode && track) {
-          console.log('[DynamicArtistCardsComponent] Current track:', track.title);
+        if (this.isDebugMode && currentArtists.length > 0) {
+          console.log('[DynamicArtistCardsComponent] Artists updated:', currentArtists.length);
         }
       });
-  }
 
-  /**
-   * Setup audio playbook tracking with improved synchronization
-   */
-  private setupAudioTracking(): void {
-    // Listen for audio state changes
-    this.audioService.getCurrentState()
-      .pipe(
-        takeUntil(this.destroy$),
-        distinctUntilChanged((prev, curr) =>
-          prev.isPlaying === curr.isPlaying &&
-          Math.abs((prev as any).currentTime - (curr as any).currentTime) < 0.5
-        )
-      )
-      .subscribe((state: any) => {
-        this.isPlaying = state.isPlaying;
-        this.currentTime = state.currentTime;
-        this.cdr.markForCheck();
-      });
-
-    // Listen for current track changes to ensure immediate updates
+    // Track current track with signal updates
     this.dynamicArtistService.currentTrack$
       .pipe(
         takeUntil(this.destroy$),
         distinctUntilChanged((prev, curr) => prev?.id === curr?.id)
       )
       .subscribe(track => {
-        if (track && track !== this.currentTrack) {
-          if (this.isDebugMode) {
-            console.log('[DynamicArtistCardsComponent] Track changed:', track.title);
-          }
-          this.currentTrack = track;
-          this.cdr.markForCheck();
+        this.currentTrackSignal.set(track);
+        this.cdr.markForCheck();
 
-          // Force change detection to ensure the UI updates immediately when track changes during playback
-          this.cdr.detectChanges();
+        if (this.isDebugMode && track) {
+          console.log('[DynamicArtistCardsComponent] Track changed:', track.title);
         }
       });
   }
 
   /**
-   * Update artist cards with new data and animations with improved filtering
+   * Setup optimized audio tracking with signal-based state management
    */
-  private updateArtistCards(
-    artists: Artist[],
-    showAllMode: boolean = false
-  ): void {
-    // Skip update if no artists (prevents showing all artists when track changes)
-    if (!showAllMode && artists.length === 0) {
-      if (this.isDebugMode) {
-        console.log('[DynamicArtistCardsComponent] No artists for current track, clearing cards');
-      }
-      this.clearArtistCards();
+  private setupAudioTracking(): void {
+    // Optimized audio state tracking with reduced frequency
+    this.audioService.getCurrentState()
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged((prev, curr) =>
+          prev.isPlaying === curr.isPlaying &&
+          Math.abs((prev as any).currentTime - (curr as any).currentTime) < 1.0 // Increased threshold
+        ),
+        debounceTime(100) // Reduce audio state update frequency
+      )
+      .subscribe((state: any) => {
+        this.isPlayingSignal.set(state.isPlaying);
+        this.currentTimeSignal.set(state.currentTime);
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Optimized card update with memory-efficient processing
+   */
+  private updateOptimizedArtistCards(artists: Artist[]): void {
+    const renderTimer = this.performanceMonitor.createRenderTimer();
+    renderTimer.start();
+
+    // Skip update if no artists and not in show-all mode
+    if (!this.showAllArtists && artists.length === 0) {
+      this.clearOptimizedArtistCards();
+      renderTimer.end();
       return;
     }
 
-    const currentCardIds = new Set(this.artistCards.map(card => card.id));
-    const newArtistIds = new Set(artists.map(artist => artist.id));
+    const newCards = this.createOptimizedCardData(artists);
+    this.cardUpdateSubject.next(newCards);
+    this.cardsAnimationTriggerSignal.update(val => val + 1);
 
-    // Create new card data
+    // Schedule cleanup of leaving cards with tracked timeout
+    if (this.enableAnimations) {
+      const timeoutId = window.setTimeout(() => {
+        this.animationTimeouts.delete(timeoutId);
+        const filteredCards = newCards.filter(card => card.animationState !== 'leave');
+        this.cardUpdateSubject.next(filteredCards);
+        this.cdr.markForCheck();
+
+        // Record memory usage periodically
+        this.performanceMonitor.recordMemoryUsage();
+      }, 400);
+
+      this.animationTimeouts.add(timeoutId);
+    }
+
+    this.cdr.markForCheck();
+    renderTimer.end();
+
+    // Update cache size metrics
+    this.performanceMonitor.updateCacheSize(newCards.length);
+  }
+
+  /**
+   * Create optimized card data with minimal object creation
+   */
+  private createOptimizedCardData(artists: Artist[]): ArtistCardData[] {
+    const currentCards = this.cardUpdateSubject.value;
     const newCards: ArtistCardData[] = [];
-    let index = 0;
+    const existingCardMap = new Map(currentCards.map(card => [card.id, card]));
 
-    // Add current/active artists
-    artists.slice(0, this.maxVisibleCards).forEach(artist => {
-      const existingCard = this.artistCards.find(card => card.id === artist.id);
+    // Process active artists
+    artists.slice(0, this.maxVisibleCards).forEach((artist, index) => {
+      const existingCard = existingCardMap.get(artist.id);
 
       newCards.push({
         ...artist,
         isActive: true,
-        animationState: existingCard && existingCard.isActive ? 'visible' : 'enter',
-        index: index++
+        animationState: existingCard?.isActive ? 'visible' : 'enter',
+        index
       });
     });
 
     // Mark leaving cards
-    this.artistCards.forEach(card => {
-      if (!newCards.find(newCard => newCard.id === card.id)) {
-        newCards.push({
-          ...card,
-          animationState: 'leave'
-        });
+    currentCards.forEach(card => {
+      if (!newCards.some(newCard => newCard.id === card.id)) {
+        newCards.push({ ...card, animationState: 'leave' });
       }
     });
 
-    this.artistCards = newCards;
-    this.cardsAnimationTrigger++; // Trigger container animation
-
-    if (this.isDebugMode) {
-      console.log('[DynamicArtistCardsComponent] Updated cards:', {
-        total: newCards.length,
-        active: newCards.filter(c => c.isActive).length,
-        currentTrack: this.currentTrack?.title || 'none'
-      });
-    }
-
-    this.cdr.markForCheck();
-
-    // Remove leaving cards after animation
-    setTimeout(() => {
-      this.artistCards = this.artistCards.filter(card => card.animationState !== 'leave');
-      this.cdr.markForCheck();
-    }, 400); // Match leave animation duration
+    return newCards;
   }
 
   /**
@@ -350,13 +369,32 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get CSS custom properties for artist card
+   * Optimized CSS custom properties with caching
    */
+  private readonly styleCache = new Map<string, any>();
+
   getCardStyle(card: ArtistCardData): any {
-    return {
+    const cacheKey = `${card.id}-${card.isActive}-${card.color}`;
+    const cached = this.styleCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const style = {
       '--artist-color': card.color || '#6c757d',
       '--card-opacity': card.isActive ? '1' : '0.6'
     };
+
+    // Limit cache size
+    if (this.styleCache.size > 50) {
+      const firstKey = this.styleCache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.styleCache.delete(firstKey);
+      }
+    }
+
+    this.styleCache.set(cacheKey, style);
+    return style;
   }
 
   /**
@@ -399,10 +437,25 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get count of active artists
+   * Get performance metrics for external monitoring
    */
-  getActiveArtistCount(): number {
-    return this.artistCards.filter(card => card.isActive).length;
+  getPerformanceMetrics() {
+    return this.performanceMonitor.getPerformanceSummary();
+  }
+
+  /**
+   * Check if performance is optimal
+   */
+  isPerformanceOptimal() {
+    return this.performanceMonitor.isPerformanceOptimal();
+  }
+
+  /**
+   * Enable debug mode for performance monitoring
+   */
+  enableDebugMode(): void {
+    (this as any).isDebugMode = true;
+    this.performanceMonitor.startMonitoring();
   }
 
   /**
@@ -420,34 +473,86 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Track by function for Angular *ngFor optimization
+   * Optimized track by function for Angular *ngFor with state tracking
    */
   trackByArtistId(index: number, card: ArtistCardData): string {
-    return card.id;
+    return `${card.id}-${card.animationState}-${card.isActive}`;
   }
 
   /**
-   * Clear all artist cards with animation
+   * Optimized card clearing with timeout tracking
    */
-  private clearArtistCards(): void {
-    this.artistCards = this.artistCards.map(card => ({
+  private clearOptimizedArtistCards(): void {
+    const currentCards = this.cardUpdateSubject.value;
+    const leavingCards = currentCards.map(card => ({
       ...card,
       animationState: 'leave' as CardAnimationState
     }));
+
+    this.cardUpdateSubject.next(leavingCards);
     this.cdr.markForCheck();
 
-    setTimeout(() => {
-      this.artistCards = [];
-      this.cdr.markForCheck();
-    }, 400);
+    if (this.enableAnimations) {
+      const timeoutId = window.setTimeout(() => {
+        this.animationTimeouts.delete(timeoutId);
+        this.cardUpdateSubject.next([]);
+        this.cdr.markForCheck();
+      }, 400);
+
+      this.animationTimeouts.add(timeoutId);
+    } else {
+      this.cardUpdateSubject.next([]);
+    }
   }
 
   ngOnDestroy(): void {
+    // Stop performance monitoring and log final metrics
+    if (this.isDebugMode) {
+      this.performanceMonitor.stopMonitoring();
+      console.log('[DynamicArtistCardsComponent] Final performance summary:',
+                  this.performanceMonitor.getPerformanceSummary());
+    }
+
+    // Clear all animation timeouts to prevent memory leaks
+    this.animationTimeouts.forEach(timeoutId => {
+      clearTimeout(timeoutId);
+    });
+    this.animationTimeouts.clear();
+
+    // Complete observables
     this.destroy$.next();
     this.destroy$.complete();
+    this.cardUpdateSubject.complete();
 
     if (this.isDebugMode) {
-      console.log('[DynamicArtistCardsComponent] Component destroyed');
+      console.log('[DynamicArtistCardsComponent] Component destroyed, all timeouts cleared');
     }
+  }
+
+  /**
+   * Optimized array comparison for better performance
+   */
+  private compareArtistArrays(prev: Artist[], curr: Artist[]): boolean {
+    if (prev.length !== curr.length) return false;
+
+    // Fast ID-based comparison
+    for (let i = 0; i < prev.length; i++) {
+      if (prev[i].id !== curr[i].id) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Optimized card array comparison
+   */
+  private compareCardArrays(prev: ArtistCardData[], curr: ArtistCardData[]): boolean {
+    if (prev.length !== curr.length) return false;
+
+    for (let i = 0; i < prev.length; i++) {
+      if (prev[i].id !== curr[i].id || prev[i].animationState !== curr[i].animationState) {
+        return false;
+      }
+    }
+    return true;
   }
 }

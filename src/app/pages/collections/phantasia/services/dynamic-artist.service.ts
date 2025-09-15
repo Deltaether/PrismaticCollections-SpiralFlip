@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
-import { map, takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { map, takeUntil, distinctUntilChanged, debounceTime, shareReplay, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { ArtistCreditService, TrackWithCompleteCredits, ArtistContribution } from '../../../../services/artist-credit.service';
 import { CreditVerificationService } from '../../../../services/credit-verification.service';
@@ -86,16 +86,26 @@ export class DynamicArtistService implements OnDestroy {
   public readonly tracks$ = this.tracksSubject.asObservable();
   public readonly currentTrack$ = this.currentTrackSubject.asObservable();
 
-  // Artist cards observable with reduced debounce time for faster updates
+  // Optimized artist cards observable with caching and performance improvements
   public readonly currentArtists$ = combineLatest([
     this.currentTime$,
     this.tracks$
   ]).pipe(
-    debounceTime(50), // Reduced debounce time for faster response during track changes
+    debounceTime(25), // Faster response time for better user experience
     map(([time, tracks]) => this.getCurrentArtists(time, tracks)),
     distinctUntilChanged((prev, curr) => this.arraysEqual(prev, curr)),
+    shareReplay(1), // Cache for multiple subscribers
     takeUntil(this.destroy$)
   );
+
+  // Performance monitoring
+  private performanceMetrics = {
+    artistLookups: 0,
+    cacheHits: 0,
+    lastUpdateTime: 0
+  };
+  private readonly artistCache = new Map<string, ArtistCardData[]>();
+  private readonly maxCacheEntries = 20;
 
   // Track-to-filename mapping for all 20 Phantasia 2 tracks - CORRECTED REAL FILENAMES
   private readonly trackToFilenameMap: Record<number, string> = {
@@ -132,6 +142,43 @@ export class DynamicArtistService implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
+    // Clear caches for memory management
+    this.artistCache.clear();
+    this.artistColorCache.clear();
+
+    console.log('[DynamicArtistService] Performance metrics:', {
+      totalLookups: this.performanceMetrics.artistLookups,
+      cacheHits: this.performanceMetrics.cacheHits,
+      cacheHitRate: this.performanceMetrics.cacheHits / Math.max(1, this.performanceMetrics.artistLookups)
+    });
+  }
+
+  /**
+   * Cache management with LRU eviction
+   */
+  private setCacheWithEviction(key: string, artists: ArtistCardData[]): void {
+    // Evict oldest entries if cache is full
+    if (this.artistCache.size >= this.maxCacheEntries) {
+      const firstKey = this.artistCache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.artistCache.delete(firstKey);
+      }
+    }
+
+    this.artistCache.set(key, artists);
+  }
+
+  /**
+   * Get performance metrics for monitoring
+   */
+  getPerformanceMetrics() {
+    return {
+      ...this.performanceMetrics,
+      cacheSize: this.artistCache.size,
+      colorCacheSize: this.artistColorCache.size,
+      cacheHitRate: this.performanceMetrics.cacheHits / Math.max(1, this.performanceMetrics.artistLookups)
+    };
   }
 
   /**
@@ -206,29 +253,60 @@ export class DynamicArtistService implements OnDestroy {
   }
 
   /**
-   * Get current artists based on time and tracks
+   * Optimized artist retrieval with caching and performance tracking
    */
   private getCurrentArtists(time: number, tracks: TrackWithArtists[]): ArtistCardData[] {
+    this.performanceMetrics.artistLookups++;
+    this.performanceMetrics.lastUpdateTime = Date.now();
+
     const currentTrack = this.findTrackByTime(time, tracks);
     if (!currentTrack) {
       return [];
     }
 
+    // Check cache first
+    const cacheKey = `${currentTrack.id}-${time.toFixed(0)}`;
+    const cachedArtists = this.artistCache.get(cacheKey);
+    if (cachedArtists) {
+      this.performanceMetrics.cacheHits++;
+      return cachedArtists;
+    }
+
+    // Create artists array with minimal allocations
+    const artists: ArtistCardData[] = this.buildArtistArray(currentTrack);
+
+    // Cache with LRU eviction
+    this.setCacheWithEviction(cacheKey, artists);
+
+    return artists;
+  }
+
+  /**
+   * Build artist array with minimal object creation
+   */
+  private buildArtistArray(track: TrackWithArtists): ArtistCardData[] {
     const artists: ArtistCardData[] = [];
 
-    // Add main artist
-    artists.push(this.createArtistCardData(currentTrack.mainArtist, 'Main Artist'));
+    // Pre-allocate array size for better performance
+    const totalArtists = 1 + track.features.length + track.collaborators.length;
+    artists.length = totalArtists;
+    let index = 0;
 
-    // Add feature artists
-    currentTrack.features.forEach(feature => {
-      artists.push(this.createArtistCardData(feature.name, 'Featured Artist', feature.socialLinks));
-    });
+    // Add main artist
+    artists[index++] = this.createArtistCardData(track.mainArtist, 'Main Artist');
+
+    // Add featured artists
+    for (const feature of track.features) {
+      artists[index++] = this.createArtistCardData(feature.name, 'Featured Artist', feature.socialLinks);
+    }
 
     // Add collaborators
-    currentTrack.collaborators.forEach(collaborator => {
-      artists.push(this.createArtistCardData(collaborator.name, 'Collaborator', collaborator.socialLinks));
-    });
+    for (const collaborator of track.collaborators) {
+      artists[index++] = this.createArtistCardData(collaborator.name, 'Collaborator', collaborator.socialLinks);
+    }
 
+    // Trim array to actual size if pre-allocation was too large
+    artists.length = index;
     return artists;
   }
 
@@ -264,28 +342,47 @@ export class DynamicArtistService implements OnDestroy {
     return name.toLowerCase().replace(/[^a-z0-9]/g, '-');
   }
 
+  // Pre-computed color map for better performance
+  private readonly artistColorCache = new Map<string, string>();
+  private readonly artistColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+    '#DDA0DD', '#98D8E8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+  ];
+
   /**
-   * Generate consistent color for artist
+   * Optimized color generation with caching
    */
   private generateColorForArtist(artistName: string): string {
-    const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-      '#DDA0DD', '#98D8E8', '#F7DC6F', '#BB8FCE', '#85C1E9'
-    ];
+    // Check cache first
+    const cachedColor = this.artistColorCache.get(artistName);
+    if (cachedColor) {
+      return cachedColor;
+    }
 
-    const hash = artistName.split('').reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
+    // Fast hash algorithm
+    let hash = 0;
+    for (let i = 0; i < artistName.length; i++) {
+      hash = ((hash << 5) - hash + artistName.charCodeAt(i)) & 0xffffffff;
+    }
 
-    return colors[Math.abs(hash) % colors.length];
+    const color = this.artistColors[Math.abs(hash) % this.artistColors.length];
+
+    // Cache the result
+    this.artistColorCache.set(artistName, color);
+    return color;
   }
 
   /**
-   * Check if two arrays are equal
+   * Optimized array equality check
    */
   private arraysEqual(a: ArtistCardData[], b: ArtistCardData[]): boolean {
     if (a.length !== b.length) return false;
-    return a.every((item, index) => item.id === b[index]?.id);
+
+    // Fast loop without array methods for better performance
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i]?.id) return false;
+    }
+    return true;
   }
 
   /**

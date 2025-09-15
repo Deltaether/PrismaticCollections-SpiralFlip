@@ -5,6 +5,7 @@ import { Subject, takeUntil, combineLatest } from 'rxjs';
 import { ArtistCreditService, ArtistContribution } from '../../services/artist-credit.service';
 import { AudioService, AudioState } from '../../pages/collections/phantasia/services/audio.service';
 import { CurrentlyPlayingArtistsService } from './currently-playing-artists.service';
+import { DynamicArtistService, TrackWithArtists } from '../../pages/collections/phantasia/services/dynamic-artist.service';
 import { ArtistCardComponent } from './artist-card/artist-card.component';
 
 /**
@@ -128,7 +129,8 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   constructor(
     private artistCreditService: ArtistCreditService,
     private audioService: AudioService,
-    private currentlyPlayingService: CurrentlyPlayingArtistsService
+    private currentlyPlayingService: CurrentlyPlayingArtistsService,
+    private dynamicArtistService: DynamicArtistService
   ) {}
 
   ngOnInit(): void {
@@ -170,34 +172,121 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
    * Setup real-time updates based on audio state
    */
   private setupRealtimeUpdates(): void {
-    // Combine audio state and currently playing artists
-    combineLatest([
-      this.audioService.audioState$,
-      this.currentlyPlayingService.currentlyPlayingArtists$
-    ]).pipe(
+    // PRIMARY: Listen to DynamicArtistService for current track changes (Phantasia 2)
+    this.dynamicArtistService.currentTrack$.pipe(
       takeUntil(this.destroy$)
-    ).subscribe(([audioState, playingArtists]) => {
-      this.handleAudioStateChange(audioState, playingArtists);
+    ).subscribe(currentTrack => {
+      console.log('[DynamicArtistCards] Current track changed:', currentTrack?.title, 'by', currentTrack?.mainArtist);
+
+      if (currentTrack) {
+        this.currentTrack.set(currentTrack.id);
+
+        if (this.displayMode === 'currently-playing') {
+          // Update cards immediately based on track change
+          this.updateCardsForCurrentTrack(currentTrack);
+        }
+      } else {
+        this.currentTrack.set(null);
+        if (this.displayMode === 'currently-playing') {
+          // Fall back to showcase mode when no track is playing
+          this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
+        }
+      }
+    });
+
+    // SECONDARY: Listen to CurrentlyPlayingArtistsService for artist updates
+    this.currentlyPlayingService.currentlyPlayingArtists$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(playingArtists => {
+      console.log('[DynamicArtistCards] Currently playing artists changed:', playingArtists.map(a => a.artistDisplayName));
+
+      if (this.displayMode === 'currently-playing' && playingArtists.length > 0) {
+        const playingCards = playingArtists.map(artist => this.createArtistCard(artist, true));
+        this.currentlyPlayingArtists.set(playingCards);
+        this.artistCards.set(playingCards.slice(0, this.maxVisibleCards));
+
+        console.log('[DynamicArtistCards] Updated artist cards for currently playing artists:',
+                    playingCards.map(c => c.artist.artistDisplayName));
+      } else if (this.displayMode === 'currently-playing' && playingArtists.length === 0) {
+        // Fall back to showcase mode when no artists are playing
+        this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
+      }
+    });
+
+    // FALLBACK: Legacy audio service for non-Phantasia 2 pages
+    this.audioService.audioState$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(audioState => {
+      // Only use if DynamicArtistService isn't providing a track
+      if (!this.currentTrack()) {
+        this.currentTrack.set(audioState.currentTrack);
+
+        if (this.displayMode === 'currently-playing') {
+          if (audioState.isPlaying && audioState.currentTrack) {
+            // Use legacy system - will be picked up by CurrentlyPlayingArtistsService
+            console.log('[DynamicArtistCards] Using legacy audio state for track:', audioState.currentTrack);
+          } else {
+            // Fall back to showcase mode
+            this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
+          }
+        }
+      }
     });
   }
 
   /**
-   * Handle audio state changes and update cards accordingly
+   * Update cards specifically for a current track from DynamicArtistService
    */
-  private handleAudioStateChange(audioState: AudioState, playingArtists: ArtistContribution[]): void {
-    this.currentTrack.set(audioState.currentTrack);
+  private updateCardsForCurrentTrack(track: TrackWithArtists): void {
+    const trackArtists: ArtistContribution[] = [];
 
-    if (this.displayMode === 'currently-playing') {
-      if (audioState.isPlaying && audioState.currentTrack && playingArtists.length > 0) {
-        // Show currently playing artists
-        const playingCards = playingArtists.map(artist => this.createArtistCard(artist, true));
-        this.currentlyPlayingArtists.set(playingCards);
-        this.artistCards.set(playingCards.slice(0, this.maxVisibleCards));
-      } else {
-        // Fall back to showcase mode
-        this.artistCards.set(this.showcaseArtists().slice(0, this.maxVisibleCards));
-      }
-    }
+    // Add main artist
+    trackArtists.push({
+      id: `${track.id}-main`,
+      artistName: track.mainArtist,
+      artistDisplayName: track.mainArtist,
+      role: 'Main Artist' as any,
+      participationType: 'primary' as any,
+      percentageContribution: 100,
+      color: '#FF6B6B',
+      socialLinks: {}
+    });
+
+    // Add featured artists
+    track.features.forEach((feature, index) => {
+      trackArtists.push({
+        id: `${track.id}-featured-${index}`,
+        artistName: feature.name,
+        artistDisplayName: feature.name,
+        role: 'Featured Artist' as any,
+        participationType: 'featured' as any,
+        percentageContribution: 50,
+        color: '#4ECDC4',
+        socialLinks: feature.socialLinks
+      });
+    });
+
+    // Add collaborators
+    track.collaborators.forEach((collaborator, index) => {
+      trackArtists.push({
+        id: `${track.id}-collab-${index}`,
+        artistName: collaborator.name,
+        artistDisplayName: collaborator.name,
+        role: collaborator.role as any,
+        participationType: 'collaboration' as any,
+        percentageContribution: 25,
+        color: '#45B7D1',
+        socialLinks: collaborator.socialLinks
+      });
+    });
+
+    // Create artist cards
+    const playingCards = trackArtists.map(artist => this.createArtistCard(artist, true));
+    this.currentlyPlayingArtists.set(playingCards);
+    this.artistCards.set(playingCards.slice(0, this.maxVisibleCards));
+
+    console.log('[DynamicArtistCards] Updated cards for track:', track.title,
+                'Artists:', trackArtists.map(a => a.artistDisplayName));
   }
 
   /**

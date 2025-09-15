@@ -1,0 +1,50 @@
+<!-- Dynamic Artist Cards Container -->
+<div class="dynamic-artist-cards-container" *ngIf="!isLoading()">
+  
+  <!-- Header Section -->
+  <div class="cards-header">
+    <h2 class="cards-title">{{ displayTitle }}</h2>
+    <p class="cards-subtitle">{{ displaySubtitle }}</p>
+  </div>
+
+  <!-- Artist Cards Grid -->
+  <div class="artist-cards-grid" 
+       [@cardsContainer] 
+       *ngIf="artistCards().length > 0">
+    
+    <app-artist-card
+      *ngFor="let cardData of artistCards(); trackBy: trackByCardId"
+      [cardData]="cardData"
+      [enableAnimations]="enableAnimations"
+      [@cardUpdate]
+      class="artist-card">
+    </app-artist-card>
+  </div>
+
+  <!-- No Artists State -->
+  <div class="no-artists-state" *ngIf="artistCards().length === 0">
+    <div class="no-artists-content">
+      <div class="no-artists-icon">♪</div>
+      <h3>No Artists to Display</h3>
+      <p>Play a track to see contributing artists.</p>
+    </div>
+  </div>
+
+  <!-- Info Panel (matches reference design) -->
+  <div class="artist-cards-info-panel" *ngIf="currentTrack()">
+    <div class="info-icon">ℹ</div>
+    <span class="info-text">
+      Artist cards update in real-time as different tracks play. 
+      {{ currentlyPlayingArtists().length }} artists are currently featured.
+    </span>
+  </div>
+
+</div>
+
+<!-- Loading State -->
+<div class="cards-loading-container" *ngIf="isLoading()">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <p>Loading artist cards...</p>
+  </div>
+</div>

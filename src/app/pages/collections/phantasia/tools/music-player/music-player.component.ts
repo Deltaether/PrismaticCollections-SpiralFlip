@@ -132,6 +132,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       });
   }
 
+
   // 【✓】 Load and play track from TrackWithArtists info
   private loadTrackFromInfo(trackInfo: TrackWithArtists): void {
     this.isLoading = true;

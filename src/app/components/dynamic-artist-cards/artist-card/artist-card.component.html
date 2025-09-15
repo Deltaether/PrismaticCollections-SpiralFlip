@@ -1,0 +1,77 @@
+<!-- Artist Card - Matches Reference Design -->
+<div class="artist-card" 
+     [class]="participationLevelClass()"
+     [@cardHover]="hoverState"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()"
+     (click)="onCardClick()"
+     [style.--theme-color]="cardThemeColor()">
+
+  <!-- Artist Avatar Section -->
+  <div class="artist-avatar-section">
+    <!-- Avatar Container -->
+    <div class="avatar-container">
+      <!-- Artist Image -->
+      <img *ngIf="avatarUrl && !avatarError()" 
+           [src]="avatarUrl" 
+           [alt]="artistName + ' avatar'"
+           class="artist-avatar"
+           (error)="onAvatarError()"
+           loading="lazy">
+      
+      <!-- Initials Fallback -->
+      <div *ngIf="!avatarUrl || avatarError()" 
+           class="artist-initials"
+           [style.background]="cardThemeColor()">
+        {{ artistInitials() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Artist Info Section -->
+  <div class="artist-info-section">
+    <!-- Artist Name -->
+    <h3 class="artist-name">{{ artistName }}</h3>
+    
+    <!-- Role Label -->
+    <div class="role-label" [style.color]="cardThemeColor()">
+      {{ roleDisplayText() }}
+    </div>
+    
+    <!-- Currently Playing Indicator -->
+    <div class="playing-status" *ngIf="isCurrentlyPlaying">
+      <div class="playing-indicator" [@playingIndicator]="playingIndicatorState">
+        <span class="playing-dot"></span>
+        <span class="playing-text">Currently Playing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Links Section -->
+  <div class="social-links-section" *ngIf="hasYoutube || hasTwitter">
+    <!-- YouTube Link -->
+    <button *ngIf="hasYoutube" 
+            class="social-link youtube-link"
+            mat-icon-button
+            [attr.aria-label]="artistName + ' YouTube channel'"
+            (click)="onSocialLinkClick('youtube', $event)">
+      <mat-icon>smart_display</mat-icon>
+      <span class="social-label">YouTube</span>
+    </button>
+    
+    <!-- Twitter/X Link -->
+    <button *ngIf="hasTwitter" 
+            class="social-link twitter-link"
+            mat-icon-button
+            [attr.aria-label]="artistName + ' Twitter profile'"
+            (click)="onSocialLinkClick('twitter', $event)">
+      <!-- Using a simple X icon representation -->
+      <span class="twitter-x-icon">𝕏</span>
+      <span class="social-label">Twitter/X</span>
+    </button>
+  </div>
+
+  <!-- Card Accent Border -->
+  <div class="card-accent" [style.background]="cardThemeColor()"></div>
+
+</div>

@@ -9,8 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MusicPlayerComponent } from '../../tools/music-player/music-player.component';
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
-import { DynamicArtistCardsComponent } from '../../components/dynamic-artist-cards/dynamic-artist-cards.component';
-import { DynamicArtistService } from '../../services/dynamic-artist.service';
+import { DynamicArtistCardsComponent } from '../../../../../components/dynamic-artist-cards/dynamic-artist-cards.component';
 import { AudioService } from '../../tools/music-player/audio.service';
 import { Phantasia2Debug } from './phantasia2-debug';
 
@@ -102,6 +101,7 @@ export class Phantasia2Component implements OnInit, OnDestroy {
 
   // Host binding for component-specific styling
   @HostBinding('class.phantasia2-component') componentClass = true;
+  @HostBinding('class.loading-active') get loadingActive() { return this.isLoading; }
   @HostBinding('class.phantasia-album-page') albumPageClass = true;
 
   // Current year for footer
@@ -111,7 +111,6 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
     @Inject(DOCUMENT) private readonly document: Document,
-    private readonly dynamicArtistService: DynamicArtistService,
     private readonly audioService: AudioService
   ) {}
 

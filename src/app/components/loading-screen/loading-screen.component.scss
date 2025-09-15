@@ -2,8 +2,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,9 +11,17 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
-  z-index: 99999;
+  z-index: 2147483647; // Maximum safe z-index value
   isolation: isolate;
-  
+
+  // Force creation of new stacking context at the highest level
+  transform: translateZ(0);
+  will-change: opacity, transform;
+
+  // Ensure it's above everything including browser UI
+  position: fixed !important;
+  z-index: 2147483647 !important;
+
   // Removed overflow constraint for natural scrolling behavior
   contain: layout size style;
 }
@@ -21,6 +29,52 @@
 .loader-container.visible {
   opacity: 1;
   pointer-events: all;
+}
+
+// Global override to ensure loading screen is above everything
+:host {
+  // Ensure this component creates the highest stacking context
+  position: relative;
+  z-index: 2147483647;
+}
+
+// When loading screen is visible, suppress all other high z-index elements
+.loader-container.visible ~ * {
+  z-index: 1 !important;
+}
+
+// TARGETED: Global body override when loading is active - exclude header visibility rule
+:global(body:has(.loader-container.visible)),
+:global(body.loading-screen-active) {
+  .debug-toggle,
+  .debug-panel,
+  .cd-cases-container,
+  .right-side-menu,
+  .mobile-navbar,
+  [class*="z-index"]:not(.site-header):not(app-site-header),
+  [style*="z-index"]:not(.site-header):not(app-site-header) {
+    z-index: 1 !important;
+    visibility: hidden !important;
+  }
+
+  // Keep header visible but with lower z-index during loading
+  .site-header,
+  app-site-header,
+  header {
+    z-index: 1 !important;
+    // DO NOT hide header visibility - it should remain visible
+  }
+
+  // Force all high z-index elements to be hidden during loading, except headers
+  * {
+    &[style*="z-index: 999"]:not(.site-header):not(app-site-header),
+    &[style*="z-index: 1000"]:not(.site-header):not(app-site-header),
+    &[style*="z-index: 9999"]:not(.site-header):not(app-site-header),
+    &[style*="z-index: 10000"]:not(.site-header):not(app-site-header) {
+      z-index: 1 !important;
+      visibility: hidden !important;
+    }
+  }
 }
 
 .logo-container {

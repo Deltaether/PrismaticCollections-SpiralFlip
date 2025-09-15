@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { ArtistSocialLinks, Artist, TrackWithArtists } from '../../pages/collections/phantasia/services/dynamic-artist.service';
+import { GelDbIntegrationService } from './geldb-integration.service';
 
 /**
  * Interface for raw track data parsed from timestamps file
@@ -38,7 +39,10 @@ export class PhantasiaDataService {
   private readonly phantasia1Data$ = new BehaviorSubject<PhantasiaAlbumData | null>(null);
   private readonly phantasia2Data$ = new BehaviorSubject<PhantasiaAlbumData | null>(null);
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private gelDbService: GelDbIntegrationService
+  ) {
     this.initializePhantasiaData();
   }
 
@@ -317,24 +321,39 @@ export class PhantasiaDataService {
   }
 
   /**
-   * Convert raw track to TrackWithArtists format
+   * Convert raw track to TrackWithArtists format with avatar integration
    */
   private convertRawTrackToTrackWithArtists(rawTrack: RawTrackData): TrackWithArtists {
     const features: Artist[] = rawTrack.featuredArtists.map(name => ({
       id: this.generateArtistId(name),
       name,
-      displayName: name,
+      displayName: this.gelDbService.getArtistDisplayName(name),
       role: 'Featured Artist',
-      socialLinks: rawTrack.socialLinks[name] || {}
+      socialLinks: rawTrack.socialLinks[name] || {},
+      avatar: this.gelDbService.getArtistAvatar(name),
+      color: this.gelDbService.getArtistColor(name)
     }));
 
     const collaborators: Artist[] = rawTrack.collaborators.map(name => ({
       id: this.generateArtistId(name),
       name,
-      displayName: name,
+      displayName: this.gelDbService.getArtistDisplayName(name),
       role: 'Collaborator',
-      socialLinks: rawTrack.socialLinks[name] || {}
+      socialLinks: rawTrack.socialLinks[name] || {},
+      avatar: this.gelDbService.getArtistAvatar(name),
+      color: this.gelDbService.getArtistColor(name)
     }));
+
+    // Create main artist with avatar support
+    const mainArtistData: Artist = {
+      id: this.generateArtistId(rawTrack.mainArtist),
+      name: rawTrack.mainArtist,
+      displayName: this.gelDbService.getArtistDisplayName(rawTrack.mainArtist),
+      role: 'Main Artist',
+      socialLinks: rawTrack.socialLinks[rawTrack.mainArtist] || {},
+      avatar: this.gelDbService.getArtistAvatar(rawTrack.mainArtist),
+      color: this.gelDbService.getArtistColor(rawTrack.mainArtist)
+    };
 
     return {
       id: rawTrack.trackNumber.toString(),
@@ -342,7 +361,7 @@ export class PhantasiaDataService {
       mainArtist: rawTrack.mainArtist,
       startTime: rawTrack.startTimeSeconds,
       endTime: rawTrack.endTimeSeconds || rawTrack.startTimeSeconds + 180,
-      artists: [],
+      artists: [mainArtistData],
       features,
       collaborators,
       audioFile: rawTrack.audioFileName

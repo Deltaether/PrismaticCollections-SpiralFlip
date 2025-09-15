@@ -1,0 +1,224 @@
+# Enhanced Artist Crediting Schema for Phantasia 2
+# This schema provides comprehensive role tracking and detailed attribution
+
+module default {
+
+    # ArtistRole enum - All possible roles an artist can have
+    scalar type ArtistRole extending enum<
+        'Main Artist',
+        'Featured Artist',
+        'Collaborator',
+        'Composer',
+        'Lyricist',
+        'Arranger',
+        'Producer',
+        'Vocalist',
+        'Instrumentalist',
+        'Voice Actor',
+        'Synthesizer V Operator',
+        'Sound Designer',
+        'Mixing Engineer',
+        'Mastering Engineer',
+        'Accordion',
+        'Violin',
+        'Viola',
+        'Cello',
+        'Piano',
+        'Keyboard',
+        'Guitar',
+        'Bass',
+        'Drums',
+        'Electronic Producer',
+        'Sample Creator',
+        'Additional Vocals',
+        'Backing Vocals',
+        'Choir'
+    >;
+
+    # ParticipationType enum - Types of participation
+    scalar type ParticipationType extending enum<
+        'Primary',      # Main contributor
+        'Featured',     # Featured/guest contributor
+        'Collaboration', # Equal collaboration
+        'Additional',   # Additional/supporting role
+        'Technical'     # Technical/production role
+    >;
+
+    # ArtistContribution type - Detailed contribution tracking
+    type ArtistContribution {
+        required artist: Artist;
+        required song: Song;
+        required role: ArtistRole;
+        required participation_type: ParticipationType;
+
+        # Detailed attribution info
+        instrument: str;           # Specific instrument if instrumentalist
+        vocal_type: str;          # Type of vocals (lead, backing, choir)
+        synthesizer_voice: str;   # Specific voice if using Synthesizer V
+        technical_role: str;      # Specific technical contribution
+        percentage_contribution: int32; # Percentage of work contributed
+
+        # Timestamps for contribution tracking
+        created_at: datetime {
+            default := datetime_current();
+        };
+
+        # Additional notes about the contribution
+        notes: str;
+    };
+
+    # Enhanced Song type with comprehensive credit tracking
+    type Song {
+        required title: str;
+        required main_artist: Artist;
+        album: Album;
+        track_number: int32;
+        start_time_seconds: int32;
+        end_time_seconds: int32;
+        duration_seconds: int32;
+        genre: str;
+        lyrics: str;
+        audio_file_path: str;
+        audio_file_url: str;
+
+        # Complete credit system - replaces simple multi links
+        multi contributions := .<song[is ArtistContribution];
+
+        # Computed properties for easier querying
+        computed composers := (
+            SELECT .contributions.artist FILTER .contributions.role = ArtistRole.Composer
+        );
+        computed lyricists := (
+            SELECT .contributions.artist FILTER .contributions.role = ArtistRole.Lyricist
+        );
+        computed vocalists := (
+            SELECT .contributions.artist FILTER .contributions.role = ArtistRole.Vocalist
+        );
+        computed instrumentalists := (
+            SELECT .contributions.artist FILTER .contributions.role = ArtistRole.Instrumentalist
+        );
+        computed featured_artists := (
+            SELECT .contributions.artist FILTER .contributions.participation_type = ParticipationType.Featured
+        );
+        computed collaborators := (
+            SELECT .contributions.artist FILTER .contributions.participation_type = ParticipationType.Collaboration
+        );
+
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+    };
+
+    # Enhanced Artist type with comprehensive attribution tracking
+    type Artist {
+        required name: str {
+            constraint exclusive;
+        };
+        display_name: str;
+        bio: str;
+        country: str;
+        primary_genre: str;
+        secondary_genres: array<str>;
+        website: str;
+        avatar: str;
+        color: str;
+        social_links: SocialLinks;
+
+        # Professional information
+        primary_roles: array<ArtistRole>;  # Main roles this artist performs
+        instruments: array<str>;          # Instruments they play
+        vocal_range: str;                 # If vocalist
+
+        # Statistics and metrics
+        total_contributions: int32 {
+            default := 0;
+        };
+        phantasia2_track_count: int32 {
+            default := 0;
+        };
+
+        # Reverse relationships
+        multi albums := .<artist[is Album];
+        multi song_contributions := .<artist[is ArtistContribution];
+
+        # Computed properties for easy access
+        computed main_artist_songs := (
+            SELECT Song FILTER Song.main_artist = Artist
+        );
+        computed all_song_participations := (
+            SELECT Song FILTER Artist IN Song.contributions.artist
+        );
+
+        created_at: datetime {
+            default := datetime_current();
+        };
+        updated_at: datetime {
+            default := datetime_current();
+        };
+    };
+
+    # CreditVerification type - For ensuring 100% accurate attribution
+    type CreditVerification {
+        required verification_id: str {
+            constraint exclusive;
+        };
+        required song: Song;
+        required verified_by: str;
+        verification_date: datetime {
+            default := datetime_current();
+        };
+
+        # Verification checklist
+        all_contributors_identified: bool {
+            default := false;
+        };
+        roles_accurately_assigned: bool {
+            default := false;
+        };
+        social_links_verified: bool {
+            default := false;
+        };
+        avatars_linked: bool {
+            default := false;
+        };
+
+        # Verification notes
+        verification_notes: str;
+        outstanding_issues: array<str>;
+
+        # Overall verification status
+        fully_verified: bool {
+            default := false;
+        };
+    };
+
+    # TrackMetadata type - Additional track information
+    type TrackMetadata {
+        required song: Song;
+
+        # Production information
+        recording_date: cal::local_date;
+        studio: str;
+        producer_notes: str;
+        mixing_notes: str;
+        mastering_notes: str;
+
+        # Attribution metadata
+        original_composition_date: cal::local_date;
+        arrangement_date: cal::local_date;
+        vocal_recording_date: cal::local_date;
+
+        # File information
+        audio_file_size_bytes: int64;
+        audio_format: str;
+        audio_bitrate: int32;
+        audio_sample_rate: int32;
+
+        created_at: datetime {
+            default := datetime_current();
+        };
+    };
+}

@@ -19,6 +19,66 @@
 @use './app/shared/styles/header-styles.scss' as header;
 @use './app/pages/collections-page/collection-header-global.scss' as phantasia;
 
+// Critical Z-Index Fix: Loading Screen Above Everything
+.loader-container.visible {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+}
+
+// Force site header to have lower z-index (aggressive override)
+.site-header {
+  z-index: 100 !important;
+}
+
+// Force debug elements to have lower z-index
+.debug-toggle,
+.debug-panel {
+  z-index: 100 !important;
+}
+
+// Additional overrides for any high z-index elements
+[style*="z-index"]:not(.loader-container) {
+  z-index: 100 !important;
+}
+
+// ULTRA AGGRESSIVE: When loading screen is active, hide ALL interfering elements
+body.loading-screen-active {
+  // Hide all potential interfering elements
+  app-site-header,
+  .site-header,
+  header,
+  .debug-toggle,
+  .debug-panel,
+  .cd-cases-container,
+  .right-side-menu,
+  .mobile-navbar,
+  .scene-loader-container,
+  [class*="z-index"],
+  [style*="z-index"]:not(.loader-container) {
+    visibility: hidden !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+
+  // Force hide any element with high z-index values
+  [style*="z-index: 999"],
+  [style*="z-index: 1000"],
+  [style*="z-index: 9999"],
+  [style*="z-index: 10000"],
+  [style*="z-index: 99999"] {
+    visibility: hidden !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+
+  // Ensure loading screen is always visible and on top
+  .loader-container {
+    visibility: visible !important;
+    z-index: 2147483647 !important;
+    pointer-events: all !important;
+  }
+}
+
 /* Font Definitions */
 @font-face {
   font-family: 'DALFITRA';

@@ -1581,7 +1581,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000;
+  z-index: 1000;
   background: linear-gradient(45deg, #ff4444, #cc1111);
   color: white;
   border: none;
@@ -1613,7 +1613,7 @@
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
   border: 2px solid rgba(255, 68, 68, 0.6);
   border-radius: 15px;
-  z-index: 9999;
+  z-index: 999;
   transform: translateX(120%);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

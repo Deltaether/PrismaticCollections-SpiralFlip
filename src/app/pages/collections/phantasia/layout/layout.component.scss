@@ -17,6 +17,23 @@ $header-height: 90px; // Height of the site-header
   background: linear-gradient(135deg, $dark-bg, $light-bg);
   color: $text-color;
   font-family: 'Montserrat', sans-serif;
+
+  // Critical fix: Ensure loading screen appears above site header
+  // When child components have loading screens, suppress site header z-index
+  &:has(app-loading-screen) app-site-header {
+    z-index: 1 !important;
+  }
+
+  // Alternative approach: detect loading state via CSS selectors
+  app-loading-screen ~ * app-site-header,
+  app-loading-screen + * app-site-header {
+    z-index: 1 !important;
+  }
+
+  // Fallback: Global loading screen detection
+  :global(.loader-container.visible) ~ * & app-site-header {
+    z-index: 1 !important;
+  }
 }
 
 // The old header styles are no longer needed since we're using site-header component

@@ -2,6 +2,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { ArtistCreditService, TrackWithCompleteCredits, ArtistContribution } from '../../../../services/artist-credit.service';
+import { CreditVerificationService } from '../../../../services/credit-verification.service';
 
 /**
  * Interface for artist social media links
@@ -119,7 +121,11 @@ export class DynamicArtistService implements OnDestroy {
     20: '20. Futsuunohito - Beyond the Veil of Light.ogg'
   };
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly artistCreditService: ArtistCreditService,
+    private readonly creditVerificationService: CreditVerificationService
+  ) {
     this.initializeService();
   }
 
@@ -154,7 +160,49 @@ export class DynamicArtistService implements OnDestroy {
     const currentTrack = this.findTrackByTime(timeInSeconds, tracks);
     if (currentTrack !== this.currentTrackSubject.value) {
       this.currentTrackSubject.next(currentTrack);
+
+      // Update comprehensive credit service with current track
+      if (currentTrack) {
+        this.artistCreditService.updateCurrentTrack(currentTrack.id);
+      }
     }
+  }
+
+  /**
+   * Get comprehensive credits for current track
+   */
+  getCurrentTrackCompleteCredits(): Observable<TrackWithCompleteCredits | null> {
+    return this.artistCreditService.currentTrackCredits$;
+  }
+
+  /**
+   * Get all Phantasia 2 artists with complete information
+   */
+  getAllPhantasia2ArtistsComplete(): ArtistContribution[] {
+    return this.artistCreditService.getAllPhantasia2Artists();
+  }
+
+  /**
+   * Get verification status for current implementation
+   */
+  getVerificationStatus(): Observable<any> {
+    return this.creditVerificationService.getDetailedVerificationReport();
+  }
+
+  /**
+   * Check if current track credits are verified
+   */
+  isCurrentTrackVerified(): Observable<boolean> {
+    return combineLatest([
+      this.currentTrack$,
+      this.creditVerificationService.trackVerifications$
+    ]).pipe(
+      map(([currentTrack, verifications]) => {
+        if (!currentTrack) return false;
+        const verification = verifications.find(v => v.trackId === currentTrack.id);
+        return verification?.fullyVerified || false;
+      })
+    );
   }
 
   /**

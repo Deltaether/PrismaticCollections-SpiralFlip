@@ -309,6 +309,88 @@ export class GelDbIntegrationService {
       displayName: 'shishishiena',
       color: '#FFEAA7',
       genre: 'Voice Acting, Vocal'
+    },
+
+    // ====== SPECIAL MENTIONS - PRODUCTION TEAM ======
+    'PliXoR': {
+      avatarPath: '/assets/images/artists/PliXoR.png',
+      displayName: 'PliXoR',
+      color: '#ff6b6b',
+      genre: 'Mastering Engineer'
+    },
+    'NapaL': {
+      avatarPath: '/assets/images/artists/NapaL.png',
+      displayName: '나팔 NapaL',
+      color: '#4ecdc4',
+      genre: 'Cover Illustration'
+    },
+    'yy_artwork': {
+      avatarPath: '/assets/images/artists/yy_artwork.png',
+      displayName: 'yy_artwork',
+      color: '#45b7d1',
+      genre: 'Logo/Jacket Design'
+    },
+    'Elegant Sister': {
+      avatarPath: '/assets/images/artists/Elegant Sister.png',
+      displayName: 'Elegant Sister',
+      color: '#f7b733',
+      genre: 'Album Stream MV'
+    },
+    'Len': {
+      avatarPath: '/assets/images/artists/Len Licht.png',
+      displayName: 'Len',
+      color: '#5f27cd',
+      genre: 'Crossfade MV/Live2D'
+    },
+    'Daph': {
+      avatarPath: '/assets/images/artists/Daph Shoo.png',
+      displayName: 'Daph',
+      color: '#00d2d3',
+      genre: 'Live2D'
+    },
+
+    // ====== PHANTASIA 1 ARTISTS ======
+    'Prower': {
+      avatarPath: '/assets/images/artists/Prower.png',
+      displayName: 'Prower',
+      color: '#9b59b6',
+      genre: 'Electronic Producer'
+    },
+    'Seycara': {
+      avatarPath: '/assets/images/artists/Seycara.png',
+      displayName: 'Seycara',
+      color: '#e74c3c',
+      genre: 'Electronic Producer'
+    },
+    'Qyubey': {
+      avatarPath: '/assets/images/artists/Qyubey.png',
+      displayName: 'Qyubey',
+      color: '#f39c12',
+      genre: 'Electronic Producer'
+    },
+    'Luscinia': {
+      avatarPath: '/assets/images/artists/Luscinia.png',
+      displayName: 'Luscinia',
+      color: '#2ecc71',
+      genre: 'Electronic Producer'
+    },
+    'はがね': {
+      avatarPath: '/assets/images/artists/Hagane.png',
+      displayName: 'はがね',
+      color: '#34495e',
+      genre: 'Electronic Producer'
+    },
+    'satella': {
+      avatarPath: '/assets/images/artists/satella.png',
+      displayName: 'satella',
+      color: '#8e44ad',
+      genre: 'Electronic Producer'
+    },
+    'sleepy': {
+      avatarPath: '/assets/images/artists/Sleepless.png',
+      displayName: 'sleepy',
+      color: '#B0E0E6',
+      genre: 'Electronic Producer'
     }
   };
 
@@ -366,6 +448,46 @@ export class GelDbIntegrationService {
    */
   getArtistAvatarMap(): ArtistAvatarMap {
     return this.artistAvatarMap;
+  }
+
+  /**
+   * Get social media links for an artist
+   */
+  getArtistSocialLinks(artistName: string): GelDbSocialLinks | null {
+    // Social media links mapping - consolidated from services
+    const socialLinksMap: Record<string, Partial<GelDbSocialLinks>> = {
+      'SpiralFlip': { youtube: 'https://www.youtube.com/@SpiralFlip', carrd: 'https://spiralflip.carrd.co/' },
+      'eili': { youtube: 'https://www.youtube.com/@EiliYT', twitter: 'https://x.com/frenlize' },
+      'Ariatec': { youtube: 'https://www.youtube.com/@musicbyariatec', reelcrafter: 'https://play.reelcrafter.com/KLSound/port' },
+      'MB': { youtube: 'https://www.youtube.com/@MBMichael', twitter: 'https://x.com/MBgov1133' },
+      'Iku Hoshifuri': { youtube: 'https://www.youtube.com/@IkuHoshifuri', linktr: 'https://lit.link/en/ikuhoshifuri' },
+      'AZALI': { youtube: 'https://www.youtube.com/@AZALI00013', twitter: 'https://x.com/AZALI00013' },
+      'Aloysius': { youtube: 'https://www.youtube.com/@aloysius3264', twitter: 'https://x.com/Aloysiu04138577' },
+      'Heem': { twitter: 'https://x.com/h_e_e__m', linktr: 'https://linktr.ee/heeem' },
+      'Prower': { twitter: 'https://x.com/prowerrr_' },
+      'Seycara': { twitter: 'https://x.com/Seycara', youtube: 'https://www.youtube.com/@Seycara' },
+      'Qyubey': { twitter: 'https://x.com/QyubeySan', youtube: 'https://www.youtube.com/@qyubey_san' },
+      'Luscinia': { twitter: 'https://x.com/LusciniaSound', youtube: 'https://www.youtube.com/@Luscinia.Nightingale' },
+      'はがね': { twitter: 'https://x.com/STEEL_PLUS', youtube: 'https://www.youtube.com/@steelplus_hagane' },
+      'Hagane': { twitter: 'https://x.com/STEEL_PLUS', youtube: 'https://www.youtube.com/@steelplus_hagane' },
+      'LucaProject': { youtube: 'https://www.youtube.com/@lucaproject6108', twitter: 'https://x.com/LucaProject6108', carrd: 'https://lucaproject.carrd.co/' },
+      'satella': { twitter: 'https://x.com/satella0w0', youtube: 'https://www.youtube.com/@satella0w0' },
+      'sleepy': { twitter: 'https://x.com/sleeplessgamign' },
+      'PliXoR': { twitter: 'https://x.com/plixormusic' },
+      'NapaL': { twitter: 'https://x.com/Ve_Xillum' },
+      'yy_artwork': { twitter: 'https://x.com/yy_artwork' },
+      'Elegant Sister': { twitter: 'https://x.com/ElegantSister' },
+      'Len': { twitter: 'https://x.com/Len_licht' },
+      'Daph': { twitter: 'https://x.com/daphshoo' }
+    };
+
+    const links = socialLinksMap[artistName];
+    if (!links) return null;
+
+    return {
+      id: `social-${artistName.toLowerCase().replace(/\s+/g, '-')}`,
+      ...links
+    } as GelDbSocialLinks;
   }
 
   /**

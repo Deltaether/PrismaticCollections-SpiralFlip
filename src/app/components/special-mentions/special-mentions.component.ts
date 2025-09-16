@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ArtistCreditService } from '../../services/artist-credit.service';
+import { GelDbIntegrationService } from '../../core/services/geldb-integration.service';
 
 interface SpecialMention {
   id: string;
@@ -38,14 +38,14 @@ export class SpecialMentionsComponent implements OnInit {
     }));
   });
 
-  constructor(private artistCreditService: ArtistCreditService) {}
+  constructor(private gelDbService: GelDbIntegrationService) {}
 
   ngOnInit(): void {
     this.loadSpecialMentionsFromDatabase();
   }
 
   private loadSpecialMentionsFromDatabase(): void {
-    // List of special mention artist names from the database
+    // List of special mention artist names from the geldb
     const specialMentionNames = [
       'PliXoR',
       'NapaL',
@@ -57,23 +57,28 @@ export class SpecialMentionsComponent implements OnInit {
 
     const specialMentionsList: SpecialMention[] = specialMentionNames
       .map(artistName => {
-        const artistData = this.artistCreditService.getArtistData(artistName);
-        if (!artistData) return null;
+        const avatar = this.gelDbService.getArtistAvatar(artistName);
+        const displayName = this.gelDbService.getArtistDisplayName(artistName);
+        const color = this.gelDbService.getArtistColor(artistName);
+        const socialLinks = this.gelDbService.getArtistSocialLinks(artistName);
+
+        // Get role from artist avatar map genre field
+        const avatarMap = this.gelDbService.getArtistAvatarMap();
+        const role = avatarMap[artistName]?.genre || 'Production Team';
 
         return {
           id: artistName.toLowerCase().replace(/\s+/g, '-'),
-          name: artistData.displayName,
-          role: artistData.primaryRoles?.[0] || 'Production Team',
-          avatar: artistData.avatar,
-          color: artistData.color,
+          name: displayName,
+          role: role,
+          avatar: avatar,
+          color: color,
           socialLinks: {
-            twitter: artistData.socialLinks?.twitter,
-            youtube: artistData.socialLinks?.youtube,
-            website: artistData.socialLinks?.website
+            twitter: socialLinks?.twitter,
+            youtube: socialLinks?.youtube,
+            website: socialLinks?.website
           }
         };
-      })
-      .filter((mention): mention is SpecialMention => mention !== null);
+      });
 
     this.specialMentions.set(specialMentionsList);
   }

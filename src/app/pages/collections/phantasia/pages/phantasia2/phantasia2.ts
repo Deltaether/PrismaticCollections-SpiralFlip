@@ -44,22 +44,22 @@ export type ScrollIndicatorState = 'visible' | 'hidden';
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Using default ViewEncapsulation.Emulated for proper component isolation
   animations: [
-    // Scroll indicator animation with smooth fade and bounce effects
+    // Scroll indicator animation - only animate opacity to preserve CSS centering
     trigger('scrollIndicator', [
       state('visible', style({
-        opacity: 1,
-        transform: 'translateY(0) translateZ(0)'
+        opacity: 1
+        // REMOVED transform to preserve flexbox centering
       })),
-      
+
       state('hidden', style({
-        opacity: 0,
-        transform: 'translateY(20px) translateZ(0)'
+        opacity: 0
+        // REMOVED transform to preserve flexbox centering
       })),
-      
+
       transition('hidden => visible', [
         animate('600ms cubic-bezier(0.4, 0.0, 0.2, 1)')
       ]),
-      
+
       transition('visible => hidden', [
         animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)')
       ])

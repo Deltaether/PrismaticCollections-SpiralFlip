@@ -15,19 +15,6 @@ import { AuthService } from '../../services/auth.service';
           <p>Client Access Portal</p>
         </div>
         
-        <div class="credentials-info">
-          <div class="credentials-box">
-            <h3>Login Credentials:</h3>
-            <div class="credential-item">
-              <label>Username:</label>
-              <span>{{ authInfo.username }}</span>
-            </div>
-            <div class="credential-item">
-              <label>Password:</label>
-              <span>{{ authInfo.password }}</span>
-            </div>
-          </div>
-        </div>
         
         <form (ngSubmit)="onLogin()" class="login-form">
           <div class="form-group">

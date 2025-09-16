@@ -1,11 +1,11 @@
 // Artist Card Component Styles
 // Uses unified black/white theme with comprehensive design system
 
-@import '../../shared-styles/artist-cards-theme.scss';
+@use '../../shared-styles/artist-cards-theme.scss' as theme;
 
 .artist-card {
-  @extend .artist-card-theme-override;
-  @include artist-card-base;
+  @extend %artist-card-theme-override;
+  @include theme.artist-card-base;
   padding: 1.75rem;
   cursor: pointer;
   min-height: 300px;
@@ -31,7 +31,7 @@
   
   // Enhanced hover effects
   &:hover {
-    @include artist-card-hover;
+    @include theme.artist-card-hover;
 
     &::before {
       opacity: 0.9;
@@ -211,7 +211,7 @@
     display: flex;
     gap: 0.5rem;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 
     .social-link {
       display: flex;

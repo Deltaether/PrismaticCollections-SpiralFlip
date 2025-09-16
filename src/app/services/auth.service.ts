@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   private readonly CORRECT_USERNAME = 'SpiralFlipFlop';
-  private readonly CORRECT_PASSWORD = 'Kx9#mP2$vB8@zN5&yQ7*';
+  private readonly CORRECT_PASSWORD = 'FlippyFloppoTesty##';
   private readonly AUTH_KEY = 'phantasia_authenticated';
   
   // Signal to track authentication status
@@ -41,8 +41,8 @@ export class AuthService {
   
   getAuthInfo(): { username: string; password: string; url: string } {
     return {
-      username: this.CORRECT_USERNAME,
-      password: this.CORRECT_PASSWORD,
+      username: '',
+      password: '',
       url: 'http://212.227.85.148/'
     };
   }

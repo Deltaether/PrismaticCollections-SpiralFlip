@@ -38,15 +38,76 @@ export class AudioService {
   
   /**
    * Initialize tracks for each section
-   * 【✓】
+   * 【✓】 Updated for multi-project support (Phantasia 1 & 2)
    */
   private initializeTracksMap(): void {
-    // Map sections to track URLs
-    this.tracksMap.set('introduction', 'assets/audio/intro.mp3');
-    this.tracksMap.set('disc-1', 'assets/audio/disc1.mp3');
-    this.tracksMap.set('disc-2', 'assets/audio/disc2.mp3');
-    this.tracksMap.set('pv', 'assets/audio/pv.mp3');
-    this.tracksMap.set('information', 'assets/audio/info.mp3');
+    // Map sections to track URLs - Default to Phantasia 1 project
+    this.tracksMap.set('introduction', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+    this.tracksMap.set('disc-1', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+    this.tracksMap.set('disc-2', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+    this.tracksMap.set('pv', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+    this.tracksMap.set('information', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+    this.tracksMap.set('phantasia', 'assets/audio/Phantasia_1/01. SpiralFlip - Phantasia ft. Eili.ogg');
+
+    // Add all 14 Phantasia 1 tracks by track number
+    for (let i = 1; i <= 14; i++) {
+      const trackFilenames: Record<number, string> = {
+        1: '01. SpiralFlip - Phantasia ft. Eili.ogg',
+        2: '02. Bigg Milk - First Steps.ogg',
+        3: '03. Heem - Altar of the Sword.ogg',
+        4: '04. futsuunohito - A Voyage on the Winds of Change.ogg',
+        5: '05. Prower - Rohkeutta Etsiä.ogg',
+        6: '06. AZALI & Seycara  - Ivory Flowers.ogg',
+        7: '07. Qyubey - Outer Bygone Ruins.ogg',
+        8: '08. Luscinia - Spiral Into the Abyss!.ogg',
+        9: '09. Gardens & sleepy - Wandering Breeze.ogg',
+        10: '10. はがね - Mystic Nebula.ogg',
+        11: '11. LucaProject - Iris.ogg',
+        12: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.ogg',
+        13: '13. satella - The Traveller.ogg',
+        14: '14. dystopian tanuki - Childhood memories.ogg'
+      };
+
+      const filename = trackFilenames[i];
+      if (filename) {
+        this.tracksMap.set(i.toString(), `assets/audio/Phantasia_1/${filename}`);
+        this.tracksMap.set(`track-${i}`, `assets/audio/Phantasia_1/${filename}`);
+        this.tracksMap.set(`p1-${i}`, `assets/audio/Phantasia_1/${filename}`);
+      }
+    }
+
+    // Add all 20 Phantasia 2 tracks by track number - CRITICAL FIX FOR 20 TRACK SUPPORT
+    for (let i = 1; i <= 20; i++) {
+      const phantasia2Filenames: Record<number, string> = {
+        1: '1. SpiralFlip - Blinding Dawn feat. eili.ogg',
+        2: '2. Ariatec - Hollow Crown.ogg',
+        3: '3. MB -  暁の姫 feat. Iku Hoshifuri.ogg',
+        4: '4. Azali & Aloysius - Lux Nova.ogg',
+        5: '5. potatoTeto - Hall of Silent Echoes.ogg',
+        6: '6. Artisan - Lirica.ogg',
+        7: '7. Mei Naganowa - To Defy The Beankeeper.ogg',
+        8: "8. Evin a'k - Trench.ogg",
+        9: '9. BilliumMoto - Blooming in the Square.ogg',
+        10: '10. Elliot Hsu - Skies in Abberation.ogg',
+        11: '11. Yuzuki - song of the nymphs.ogg',
+        12: '12. LucaProject - Light Guardian.ogg',
+        13: '13. Koway - Enso Antumbra ft. 伍.ogg',
+        14: '14. Nstryder - You_re In My Way.ogg',
+        15: '15. MoAE. - Remember you.ogg',
+        16: '16. dystopian tanuki - Hidden passage.ogg',
+        17: '17. Heem - Last Dance feat. woojinee (detune version).ogg',
+        18: '18. Bigg Milk - Second Guess.ogg',
+        19: '19. Gardens & Sad Keyboard Guy - Fractured Light ft. eili.ogg',
+        20: '20. Futsuunohito - Beyond the Veil of Light.ogg'
+      };
+
+      const filename = phantasia2Filenames[i];
+      if (filename) {
+        // Add Phantasia 2 track mappings
+        this.tracksMap.set(`p2-${i}`, `assets/audio/Phantasia_2/${filename}`);
+        this.tracksMap.set(`phantasia2-${i}`, `assets/audio/Phantasia_2/${filename}`);
+      }
+    }
   }
   
   /**

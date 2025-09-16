@@ -11,6 +11,7 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
 import { DynamicArtistCardsComponent } from '../../../../../components/dynamic-artist-cards/dynamic-artist-cards.component';
 import { AudioService, AudioState } from '../../../../../pages/collections/phantasia/services/audio.service';
+import { DynamicArtistService } from '../../services/dynamic-artist.service';
 import { Phantasia2Debug } from './phantasia2-debug';
 
 /**
@@ -131,12 +132,19 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
     @Inject(DOCUMENT) private readonly document: Document,
-    private readonly audioService: AudioService
+    private readonly audioService: AudioService,
+    private readonly dynamicArtistService: DynamicArtistService
   ) {}
 
   ngOnInit(): void {
     if (this.isDebugMode) {
       console.log(`[Phantasia2Component] Current URL: ${this.router.url}`);
+    }
+
+    // CRITICAL FIX: Set project to Phantasia 2 to load correct 20 tracks
+    this.dynamicArtistService.setCurrentProject('phantasia2');
+    if (this.isDebugMode) {
+      console.log(`[Phantasia2Component] Set project to phantasia2 - will load 20 tracks`);
     }
 
     // Add phantasia-album-page class to body for global styles

@@ -1,5 +1,5 @@
-@import '../../styles/variables';
-@import '../../styles/mixins';
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mixins;
 
 .relationships-container {
   padding: 2rem;
@@ -7,7 +7,7 @@
   margin: 0 auto;
   color: var(--text-primary);
 
-  @include mobile {
+  @include mixins.mobile {
     padding: 1rem;
   }
 }
@@ -25,7 +25,7 @@
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 
-    @include mobile {
+    @include mixins.mobile {
       font-size: 2rem;
     }
   }
@@ -97,7 +97,7 @@
     }
   }
 
-  @include mobile {
+  @include mixins.mobile {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
 
@@ -164,7 +164,7 @@
     }
   }
 
-  @include mobile {
+  @include mixins.mobile {
     padding: 1.5rem;
   }
 }
@@ -230,7 +230,7 @@
     }
   }
 
-  @include mobile {
+  @include mixins.mobile {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
@@ -255,7 +255,7 @@
   align-items: start;
   margin-bottom: 2rem;
 
-  @include mobile {
+  @include mixins.mobile {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
@@ -342,7 +342,7 @@
   justify-content: center;
   padding: 1rem 0;
 
-  @include mobile {
+  @include mixins.mobile {
     transform: rotate(90deg);
     padding: 0;
   }
@@ -353,7 +353,7 @@
     background: linear-gradient(180deg, #6C5CE7, #A29BFE);
     margin-bottom: 0.5rem;
 
-    @include mobile {
+    @include mixins.mobile {
       width: 40px;
       height: 2px;
       margin-bottom: 0;
@@ -367,7 +367,7 @@
     color: #6C5CE7;
     font-weight: bold;
 
-    @include mobile {
+    @include mixins.mobile {
       transform: rotate(90deg);
     }
   }
@@ -472,7 +472,7 @@
       }
     }
 
-    @include mobile {
+    @include mixins.mobile {
       grid-template-columns: 1fr;
       gap: 1.5rem;
 

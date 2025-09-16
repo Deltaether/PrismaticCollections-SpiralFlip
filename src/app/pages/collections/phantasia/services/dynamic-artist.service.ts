@@ -89,7 +89,7 @@ export class DynamicArtistService implements OnDestroy {
   private readonly currentTrackSubject = new BehaviorSubject<TrackWithArtists | null>(null);
 
   // Multi-project support
-  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia2');
+  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia1');
   private readonly allProjectTracksSubject = new BehaviorSubject<TrackWithArtists[]>([]);
 
   // Public observables
@@ -123,7 +123,7 @@ export class DynamicArtistService implements OnDestroy {
   private readonly maxCacheEntries = 20;
 
   // Track-to-filename mapping for all 20 Phantasia 2 tracks - CORRECTED REAL FILENAMES
-  private readonly trackToFilenameMap: Record<number, string> = {
+  private readonly phantasia2TrackToFilenameMap: Record<number, string> = {
     1: '1. SpiralFlip - Blinding Dawn feat. eili.ogg',
     2: '2. Ariatec - Hollow Crown.ogg',
     3: '3. MB -  暁の姫 feat. Iku Hoshifuri.ogg',
@@ -144,6 +144,24 @@ export class DynamicArtistService implements OnDestroy {
     18: '18. Bigg Milk - Second Guess.ogg',
     19: '19. Gardens & Sad Keyboard Guy - Fractured Light ft. eili.ogg',
     20: '20. Futsuunohito - Beyond the Veil of Light.ogg'
+  };
+
+  // Track-to-filename mapping for all 15 Phantasia 1 tracks - REAL FILENAMES
+  private readonly phantasia1TrackToFilenameMap: Record<number, string> = {
+    1: '01. SpiralFlip - Phantasia ft. Eili.ogg',
+    2: '02. Bigg Milk - First Steps.ogg',
+    3: '03. Heem - Altar of the Sword.ogg',
+    4: '04. futsuunohito - A Voyage on the Winds of Change.ogg',
+    5: '05. Prower - Rohkeutta Etsiä.ogg',
+    6: '06. AZALI & Seycara  - Ivory Flowers.ogg',
+    7: '07. Qyubey - Outer Bygone Ruins.ogg',
+    8: '08. Luscinia - Spiral Into the Abyss!.ogg',
+    9: '09. Gardens & sleepy - Wandering Breeze.ogg',
+    10: '10. はがね - Mystic Nebula.ogg',
+    11: '11. LucaProject - Iris.ogg',
+    12: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.ogg',
+    13: '13. satella - The Traveller.ogg',
+    14: '14. dystopian tanuki - Childhood memories.ogg'
   };
 
   constructor(
@@ -197,10 +215,24 @@ export class DynamicArtistService implements OnDestroy {
   }
 
   /**
+   * Get track filename based on current project
+   */
+  private getTrackFilename(trackNumber: number): string {
+    const currentProject = this.currentProjectSubject.value;
+
+    if (currentProject === 'phantasia1') {
+      return this.phantasia1TrackToFilenameMap[trackNumber] || `${trackNumber.toString().padStart(2, '0')}. Unknown Track.ogg`;
+    } else {
+      return this.phantasia2TrackToFilenameMap[trackNumber] || `${trackNumber}. Unknown Track.ogg`;
+    }
+  }
+
+  /**
    * Initialize the service with track data
    */
   private initializeService(): void {
-    this.loadTrackData();
+    // Load data for the current project (defaults to Phantasia 1)
+    this.loadProjectData(this.currentProjectSubject.value);
   }
 
   /**
@@ -664,7 +696,7 @@ export class DynamicArtistService implements OnDestroy {
           artists: [],
           features,
           collaborators,
-          audioFile: this.trackToFilenameMap[index + 1]
+          audioFile: this.getTrackFilename(index + 1)
         });
       }
     });
@@ -771,6 +803,7 @@ export class DynamicArtistService implements OnDestroy {
       // Track 12: LucaProject - Light Guardian
       'LucaProject': {
         youtube: 'https://www.youtube.com/@lucaproject6108',
+        twitter: 'https://x.com/LucaProject6108',
         carrd: 'https://lucaproject.carrd.co/'
       },
 
@@ -807,10 +840,7 @@ export class DynamicArtistService implements OnDestroy {
         twitter: 'https://x.com/DystopianTanuki'
       },
 
-      // Track 17: Heem - Last Dance (feat. Woojinee)
-      'Heem': {
-        linktr: 'https://linktr.ee/heeem'
-      },
+      // Track 17: Heem - Last Dance (feat. Woojinee) - MOVED TO PHANTASIA 1 SECTION
       'woojinee': {
         instagram: 'https://www.instagram.com/wooj1nee?igsh=czUwcXg3aWh6NmM5&utm_source=qr'
       },
@@ -842,10 +872,114 @@ export class DynamicArtistService implements OnDestroy {
       'shishishiena': {
         youtube: 'https://www.youtube.com/@shishishiena',
         website: 'https://www.shishishiena.com/'
+      },
+
+      // ====== PHANTASIA PROJECT 1 ARTISTS - SOCIAL LINKS ======
+      // Adding complete social links for Phantasia 1 artists
+
+      // Heem - Complete social links (also in Phantasia 2)
+      'Heem': {
+        twitter: 'https://x.com/h_e_e__m',
+        linktr: 'https://linktr.ee/heeem'
+      },
+
+      // Prower - Electronic producer from Phantasia 1
+      'Prower': {
+        twitter: 'https://x.com/prowerrr_'
+      },
+
+      // Seycara - Collaborative producer with AZALI
+      'Seycara': {
+        twitter: 'https://x.com/Seycara',
+        youtube: 'https://www.youtube.com/@Seycara'
+      },
+
+      // Qyubey - Electronic producer from Phantasia 1
+      'Qyubey': {
+        twitter: 'https://x.com/QyubeySan',
+        youtube: 'https://www.youtube.com/@qyubey_san'
+      },
+
+      // Luscinia - Electronic producer from Phantasia 1
+      'Luscinia': {
+        twitter: 'https://x.com/LusciniaSound',
+        youtube: 'https://www.youtube.com/@Luscinia.Nightingale'
+      },
+
+      // はがね (Hagane) - Japanese electronic producer
+      'はがね': {
+        twitter: 'https://x.com/STEEL_PLUS',
+        youtube: 'https://www.youtube.com/@steelplus_hagane'
+      },
+      'Hagane': { // Alternative name mapping
+        twitter: 'https://x.com/STEEL_PLUS',
+        youtube: 'https://www.youtube.com/@steelplus_hagane'
+      },
+
+      // satella - Electronic producer from Phantasia 1
+      'satella': {
+        twitter: 'https://x.com/satella0w0',
+        youtube: 'https://www.youtube.com/@satella0w0'
+      },
+
+      // sleepy - Collaborative producer with Gardens
+      'sleepy': {
+        twitter: 'https://x.com/sleeplessgamign'
+      },
+      'Sleepless': { // Alternative name mapping for sleepy
+        twitter: 'https://x.com/sleeplessgamign'
+      },
+
+      // ====== SPECIAL MENTIONS - PRODUCTION TEAM ======
+      'PliXoR': {
+        twitter: 'https://x.com/plixormusic'
+      },
+      'NapaL': {
+        twitter: 'https://x.com/Ve_Xillum'
+      },
+      '나팔 NapaL': { // Alternative name mapping
+        twitter: 'https://x.com/Ve_Xillum'
+      },
+      'yy_artwork': {
+        twitter: 'https://x.com/yy_artwork'
+      },
+      'Elegant Sister': {
+        twitter: 'https://x.com/ElegantSister'
+      },
+      'Len': {
+        twitter: 'https://x.com/Len_licht'
+      },
+      'Daph': {
+        twitter: 'https://x.com/daphshoo'
       }
     };
 
     return socialLinksMap[artistName] || {};
+  }
+
+  /**
+   * Get correct audio filename for Phantasia 1 tracks
+   */
+  private getPhantasia1AudioFilename(trackNumber: number, artist: string, title: string): string {
+    // Map of actual Phantasia 1 filenames based on the real files in assets/audio/Phantasia_1/
+    const phantasia1FilenameMap: Record<number, string> = {
+      1: '01. SpiralFlip - Phantasia ft. Eili.ogg',
+      2: '02. Bigg Milk - First Steps.ogg',
+      3: '03. Heem - Altar of the Sword.ogg',
+      4: '04. futsuunohito - A Voyage on the Winds of Change.ogg',
+      5: '05. Prower - Rohkeutta Etsiä.ogg',
+      6: '06. AZALI & Seycara  - Ivory Flowers.ogg', // Note: extra space after Seycara
+      7: '07. Qyubey - Outer Bygone Ruins.ogg',
+      8: '08. Luscinia - Spiral Into the Abyss!.ogg',
+      9: '09. Gardens & sleepy - Wandering Breeze.ogg',
+      10: '10. はがね - Mystic Nebula.ogg',
+      11: '11. LucaProject - Iris.ogg',
+      12: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.ogg',
+      13: '13. satella - The Traveller.ogg',
+      14: '14. dystopian tanuki - Childhood memories.ogg'
+    };
+
+    return phantasia1FilenameMap[trackNumber] || `${String(trackNumber).padStart(2, '0')}. ${artist} - ${title}.ogg`;
   }
 
   /**
@@ -861,13 +995,12 @@ export class DynamicArtistService implements OnDestroy {
       { time: '15:00', artist: 'AZALI & Seycara', title: 'Ivory Flowers' },
       { time: '18:00', artist: 'Qyubey', title: 'Outer Bygone Ruins' },
       { time: '21:00', artist: 'Luscinia', title: 'Spiral Into the Abyss!' },
-      { time: '24:00', artist: 'Gardens & sleepless', title: 'Wandering Breeze' },
+      { time: '24:00', artist: 'Gardens & sleepy', title: 'Wandering Breeze' },
       { time: '27:00', artist: 'はがね', title: 'Mystic Nebula' },
       { time: '30:00', artist: 'LucaProject', title: 'Iris' },
       { time: '33:00', artist: 'Mei Naganowa', title: 'Half-Asleep in the Middle of Bumfuck Nowhere' },
       { time: '36:00', artist: 'satella', title: 'The Traveller' },
-      { time: '39:00', artist: 'dystopian tanuki', title: 'Childhood memories' },
-      { time: '42:00', artist: 'Shizu', title: '薄れる ver.Shizu Final' }
+      { time: '39:00', artist: 'dystopian tanuki', title: 'Childhood memories' }
     ];
 
     const tracks: TrackWithArtists[] = [];
@@ -932,7 +1065,7 @@ export class DynamicArtistService implements OnDestroy {
         artists: [],
         features,
         collaborators,
-        audioFile: `${String(index + 1).padStart(2, '0')}. ${trackData.artist} - ${trackData.title}.mp3`
+        audioFile: this.getPhantasia1AudioFilename(index + 1, trackData.artist, trackData.title)
       });
     });
 

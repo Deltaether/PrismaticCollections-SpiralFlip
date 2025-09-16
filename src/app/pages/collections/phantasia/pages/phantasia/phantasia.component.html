@@ -1,122 +1,114 @@
 <!-- Loading Screen -->
-<app-loading-screen 
-  *ngIf="isLoading" 
+<app-loading-screen
+  *ngIf="isLoading"
   [progress]="loadingProgress">
 </app-loading-screen>
 
-<div class="phantasia-album-page" *ngIf="!isLoading">
+<div class="phantasia-container" *ngIf="!isLoading">
   <!-- Site Header - only shown when not inside the phantasia layout -->
   <app-site-header *ngIf="!isInsidePhantasiaLayout"></app-site-header>
 
-  <!-- Dual Video Background System -->
+  <!-- Video Background with Seamless Loop -->
   <div class="video-background">
-    <!-- Base video layer (new intro loop at 100% opacity) -->
-    <video #baseVideo class="base-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onBaseVideoLoaded()" (canplay)="onBaseVideoLoaded()" (loadeddata)="onBaseVideoLoaded()">
+    <video #backgroundVideo class="bg-video" autoplay muted playsinline [loop]="true" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()">
       <source src="assets/videos/phantasia1/intro_loop_vp9_optimized.webm" type="video/webm">
-      <source src="assets/videos/phantasia1/Intro_to_loop_part_two_real.mp4" type="video/mp4">
+      <source src="assets/videos/phantasia1/intro_loop_vp9_optimized.mp4" type="video/mp4">
     </video>
-    
-    <!-- Filter video layer (original video at 20% opacity on top) -->
-    <video #backgroundVideo class="bg-video filter-video" autoplay muted playsinline loop preload="auto" (loadedmetadata)="onVideoLoaded()" (canplay)="onVideoLoaded()" (loadeddata)="onVideoLoaded()">
-      <source src="assets/videos/backgrounds/pregen_bg_optimized.mp4" type="video/mp4">
-    </video>
-    
     <div class="video-overlay"></div>
   </div>
+
+  <!-- Video Title Section - Clean Structure for Perfect Centering -->
+  <section class="video-title-section">
+    <div class="title-container">
+      <video #titleVideo class="title-video" autoplay muted playsinline preload="auto"
+             (loadedmetadata)="onTitleVideoLoaded()"
+             (canplay)="onTitleVideoCanPlay()"
+             (ended)="onTitleVideoEnded()">
+        <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent.webm" type="video/webm">
+        <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent.mp4" type="video/mp4">
+        <!-- Fallback to static image if video fails -->
+        <img src="assets/images/logos/phantasia1_logo_static.png" alt="Phantasia Project" class="title-image-fallback">
+      </video>
+    </div>
+  </section>
+
+  <!-- Scroll Indicator Section - Now completely outside video-title-section -->
+  <section class="scroll-indicator-section">
+    <div class="scroll-indicator-container"
+         *ngIf="showScrollIndicator()"
+         [@scrollIndicator]="scrollIndicatorState"
+         (click)="scrollToContent()">
+      <div class="scroll-text">Scroll for More</div>
+      <div class="triangle-separator">
+        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" class="triangle-icon">
+          <path d="M12 16L0 0H24L12 16Z" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+  </section>
 
   <!-- Main Album Presentation Content -->
   <div class="album-presentation">
 
-    <!-- Enhanced CD Showcase with Prominent Title -->
-    <section class="cd-showcase">
-      <!-- Main Section Title -->
-      <div class="section-title-container">
-        <video #titleVideo class="title-video" autoplay muted loop playsinline (loadedmetadata)="onTitleVideoLoaded()" (canplay)="onTitleVideoCanPlay()">
-          <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent.webm" type="video/webm">
-          <source src="assets/videos/phantasia1/ProjectPhan1_Title_anim_cropped_transparent_improved.mp4" type="video/mp4">
-          <!-- Fallback image if video fails -->
-          <img src="assets/videos/phantasia1/ProjectPhan1_title_white.png" alt="Project Phantasia I" class="title-image-fallback">
-        </video>
-        <p class="title-subtitle">An immersive orchestral journey</p>
-      </div>
+    <!-- Enhanced CD Showcase - Always Visible -->
+    <section class="cd-showcase" #cdShowcase>
 
-      <!-- Modern Showcase Layout -->
-      <div class="showcase-container">
-        <div class="cd-jacket">
-          <div class="jacket-3d-container">
-            <div class="jacket-art">
-              <img src="assets/images/covers/phantasia_1_cover_optimized.webp" alt="Project Phantasia I Album Cover" class="album-cover">
+      <!-- CD Showcase Title -->
+      <h2 class="cd-showcase-title">The original fantasy compilation</h2>
+
+      <!-- Optimized Horizontal Layout for 1920x1080 -->
+      <div class="showcase-main-content">
+        <!-- Left side: Album Cover -->
+        <div class="album-cover-section">
+          <div class="cd-jacket">
+            <div class="jacket-3d-container">
+              <div class="jacket-art">
+                <img src="assets/images/covers/phantasia_1_cover_optimized.webp" alt="Phantasia Project Album Cover" class="album-cover">
+              </div>
             </div>
+            <div class="jacket-reflection"></div>
           </div>
-          <div class="jacket-reflection"></div>
         </div>
-        
-        <div class="album-info">
-          <div class="artist-info">
-            <h3 class="artists">An × Feryquitous</h3>
-            <p class="collaboration-label">Collaborative Masterpiece</p>
+
+        <!-- Right side: Album Info and Music Player -->
+        <div class="album-content-section">
+          <div class="album-info">
+            <div class="artist-info">
+              <h3 class="artists">"Where it all began."</h3>
+              <p class="collaboration-label">{{ projectMetadata?.description || 'The first fantasy compilation album' }}</p>
+            </div>
+            <div class="album-details">
+              <div class="detail-item">
+                <mat-icon>music_note</mat-icon>
+                <span>{{ totalTracks }} Tracks</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ albumDuration }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>style</mat-icon>
+                <span>Ambient Fantasy Orchestral</span>
+              </div>
+            </div>
           </div>
-          <div class="album-details">
-            <div class="detail-item">
-              <mat-icon>music_note</mat-icon>
-              <span>14 Tracks</span>
-            </div>
-            <div class="detail-item">
-              <mat-icon>schedule</mat-icon>
-              <span>47 Minutes</span>
-            </div>
-            <div class="detail-item">
-              <mat-icon>style</mat-icon>
-              <span>Ambient Fantasy Orchestral</span>
-            </div>
+
+          <!-- Music Player positioned below album info -->
+          <div class="music-player-section">
+            <app-music-player></app-music-player>
           </div>
         </div>
       </div>
-      
-      <!-- Music Player directly in CD Showcase -->
-      <app-music-player></app-music-player>
     </section>
 
-    <!-- Artist Social Links -->
-    <section class="artist-section">
-      <h3>Meet the Artists</h3>
-      <div class="artists-grid">
-        <div class="artist-card">
-          <div class="artist-avatar">
-            <span>An</span>
-          </div>
-          <div class="artist-info">
-            <h4>An</h4>
-            <p>Professional Composer</p>
-            <div class="social-links">
-              <a href="#" class="social-link">
-                <mat-icon>music_video</mat-icon>
-              </a>
-              <a href="#" class="social-link">
-                <mat-icon>language</mat-icon>
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="artist-card">
-          <div class="artist-avatar">
-            <span>Fery</span>
-          </div>
-          <div class="artist-info">
-            <h4>Feryquitous</h4>
-            <p>Audio Engineer</p>
-            <div class="social-links">
-              <a href="#" class="social-link">
-                <mat-icon>music_video</mat-icon>
-              </a>
-              <a href="#" class="social-link">
-                <mat-icon>language</mat-icon>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Dynamic Artist Cards Section - Independent section for proper layout -->
+    <section class="artist-cards-section">
+      <app-dynamic-artist-cards
+        [showAllArtists]="false"
+        [maxVisibleCards]="8"
+        [enableAnimations]="true"
+        [displayMode]="artistDisplayMode()">
+      </app-dynamic-artist-cards>
     </section>
 
     <!-- Footer Section -->
@@ -125,7 +117,7 @@
         <div class="footer-logo">
           <img src="assets/images/logos/prismcoll_logox.svg" alt="Prismatic Collections" />
         </div>
-        
+
         <div class="footer-links">
           <div class="link-group">
             <h3>Explore</h3>
@@ -134,7 +126,7 @@
               <li><a routerLink="/phantasia/phantasia">About</a></li>
             </ul>
           </div>
-          
+
           <div class="link-group">
             <h3>Legal</h3>
             <ul>
@@ -143,7 +135,7 @@
             </ul>
           </div>
         </div>
-        
+
         <div class="copyright">
           © {{ currentYear }} Prismatic Collections. All rights reserved.
         </div>

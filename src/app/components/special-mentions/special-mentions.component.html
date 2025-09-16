@@ -1,0 +1,51 @@
+<!-- Special Mentions Section -->
+<div class="special-mentions-container">
+  <div class="section-header">
+    <h3 class="section-title">Special Thanks</h3>
+    <p class="section-subtitle">Production Team</p>
+  </div>
+
+  <div class="compact-cards-grid">
+    @for (mention of displayedMentions(); track mention.id) {
+      <div class="compact-card"
+           (click)="onCardClick(mention)"
+           [style.--accent-color]="mention.color">
+
+        <!-- Avatar Section -->
+        <div class="compact-avatar">
+          <img *ngIf="mention.avatar"
+               [src]="mention.avatar"
+               [alt]="mention.name + ' avatar'"
+               class="avatar-image"
+               loading="lazy">
+
+          <!-- Initials Fallback -->
+          <div *ngIf="!mention.avatar"
+               class="avatar-initials"
+               [style.background]="mention.color">
+            {{ mention.initials }}
+          </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="compact-info">
+          <div class="artist-name">{{ mention.name }}</div>
+          <div class="artist-role">{{ mention.role }}</div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="compact-social" *ngIf="mention.socialLinks.twitter">
+          <button class="social-btn"
+                  mat-icon-button
+                  [attr.aria-label]="mention.name + ' social link'"
+                  (click)="onSocialLinkClick(mention.socialLinks.twitter!, $event)">
+            <span class="twitter-x-icon">𝕏</span>
+          </button>
+        </div>
+
+        <!-- Hover Effect -->
+        <div class="card-accent"></div>
+      </div>
+    }
+  </div>
+</div>

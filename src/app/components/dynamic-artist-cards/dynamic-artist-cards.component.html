@@ -9,6 +9,7 @@
 
   <!-- Artist Cards Grid -->
   <div class="artist-cards-grid"
+       [class.single-card]="artistCards().length === 1"
        [@cardsContainer]
        [@modeTransition]="animationState()"
        *ngIf="artistCards().length > 0">

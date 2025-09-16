@@ -17,7 +17,9 @@
   </div>
 
   <!-- Artist Cards Grid - Optimized with async pipe -->
-  <div class="artist-cards-grid" *ngIf="(optimizedArtistCards$ | async) as cards">
+  <div class="artist-cards-grid"
+       [class.single-card]="(optimizedArtistCards$ | async)?.length === 1"
+       *ngIf="(optimizedArtistCards$ | async) as cards">
     <div class="artist-card"
          *ngFor="let card of cards; trackBy: trackByArtistId"
          [@cardAnimation]="card.animationState"

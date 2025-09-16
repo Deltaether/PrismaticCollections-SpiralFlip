@@ -44,10 +44,13 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   error = '';
   currentSubtitle: string = '';
 
-  // Enhanced state for Phantasia 2
+  // Enhanced state for multi-project support
   currentTrackInfo: TrackWithArtists | null = null;
   allTracks: TrackWithArtists[] = [];
   currentTrackIndex = 0;
+
+  // Project-aware audio path
+  private currentProject: 'phantasia1' | 'phantasia2' = 'phantasia1';
 
   // State persistence flags
   private isMuted = false;
@@ -91,6 +94,11 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     console.groupEnd();
   }
 
+  // 【✓】 Get project-specific audio directory
+  private getAudioDirectory(): string {
+    return this.currentProject === 'phantasia1' ? 'Phantasia_1' : 'Phantasia_2';
+  }
+
   // 【✓】 Initialize component
   ngOnInit(): void {
     this.initializeAudio();
@@ -105,8 +113,17 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 【✓】 Initialize audio player for Phantasia 2
+  // 【✓】 Initialize audio player with multi-project support
   private initializeAudio(): void {
+    // Listen to current project changes
+    this.dynamicArtistService.currentProject$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(project => {
+        this.currentProject = project;
+        console.log(`[MusicPlayer] Project switched to: ${project}`);
+        this.cdr.markForCheck();
+      });
+
     // Load tracks from DynamicArtistService
     this.dynamicArtistService.tracks$
       .pipe(takeUntil(this.destroy$))
@@ -161,11 +178,11 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       // Try multiple encoding strategies for maximum compatibility
       const encodingStrategies = [
         // Strategy 1: Use encodeURIComponent for proper URL encoding
-        () => `assets/audio/Phantasia_2/${encodeURIComponent(processedFilename)}`,
+        () => `assets/audio/${this.getAudioDirectory()}/${encodeURIComponent(processedFilename)}`,
         // Strategy 2: Replace Unicode quotation mark with regular apostrophe first, then encode
         () => {
           const normalized = processedFilename.replace(/'/g, "'");
-          return `assets/audio/Phantasia_2/${encodeURIComponent(normalized)}`;
+          return `assets/audio/${this.getAudioDirectory()}/${encodeURIComponent(normalized)}`;
         },
         // Strategy 3: Manual encoding of problematic characters
         () => {
@@ -174,12 +191,12 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
             .replace(/ /g, "%20")        // Spaces
             .replace(/\(/g, "%28")       // Left parenthesis
             .replace(/\)/g, "%29");      // Right parenthesis
-          return `assets/audio/Phantasia_2/${manualEncoded}`;
+          return `assets/audio/${this.getAudioDirectory()}/${manualEncoded}`;
         },
         // Strategy 4: Try without any encoding (direct path)
-        () => `assets/audio/Phantasia_2/${processedFilename}`,
+        () => `assets/audio/${this.getAudioDirectory()}/${processedFilename}`,
         // Strategy 5: Use different base URL or absolute path
-        () => `/assets/audio/Phantasia_2/${encodeURIComponent(processedFilename)}`
+        () => `/assets/audio/${this.getAudioDirectory()}/${encodeURIComponent(processedFilename)}`
       ];
 
       // Use the first strategy by default, but we'll add fallback logic in the error handler
@@ -197,7 +214,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
 
     } else {
       // Fallback to track ID
-      audioSrc = `assets/audio/Phantasia_2/${trackInfo.id}.ogg`;
+      audioSrc = `assets/audio/${this.getAudioDirectory()}/${trackInfo.id}.ogg`;
       (this as any)._fallbackUrls = [];
     }
 

@@ -157,7 +157,6 @@ html {
 }
 
 /* DEBUG: HTML/BODY BACKGROUND DEBUGGING MARKERS */
-/* FORCE OVERRIDE DARK READER EXTENSION */
 html, body {
   height: 100%;
   width: 100%;
@@ -166,10 +165,9 @@ html, body {
   /* CRITICAL FIX: Allow page-level scrolling - DON'T hide overflow globally */
   overflow: visible; /* Enable default scrolling capability */
   position: relative;
-  
-  /* Force white background even with Dark Reader */
+
+  /* Force white background */
   background-color: #ffffff !important;
-  --darkreader-inline-bgcolor: #ffffff !important;
   
   /* DEBUG: Add data attributes for debugging identification */
   /* These will help identify which CSS rules are being applied */

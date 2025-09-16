@@ -48,9 +48,9 @@
   </div>
 
   <!-- Social Links Section -->
-  <div class="social-links-section" *ngIf="hasYoutube || hasTwitter">
+  <div class="social-links-section" *ngIf="hasYoutube || hasTwitter || hasLinktr">
     <!-- YouTube Link -->
-    <button *ngIf="hasYoutube" 
+    <button *ngIf="hasYoutube"
             class="social-link youtube-link"
             mat-icon-button
             [attr.aria-label]="artistName + ' YouTube channel'"
@@ -58,9 +58,9 @@
       <mat-icon>smart_display</mat-icon>
       <span class="social-label">YouTube</span>
     </button>
-    
+
     <!-- Twitter/X Link -->
-    <button *ngIf="hasTwitter" 
+    <button *ngIf="hasTwitter"
             class="social-link twitter-link"
             mat-icon-button
             [attr.aria-label]="artistName + ' Twitter profile'"
@@ -68,6 +68,16 @@
       <!-- Using a simple X icon representation -->
       <span class="twitter-x-icon">𝕏</span>
       <span class="social-label">Twitter/X</span>
+    </button>
+
+    <!-- Linktr.ee Link -->
+    <button *ngIf="hasLinktr"
+            class="social-link linktr-link"
+            mat-icon-button
+            [attr.aria-label]="artistName + ' Linktr.ee profile'"
+            (click)="onSocialLinkClick('linktr', $event)">
+      <mat-icon>link</mat-icon>
+      <span class="social-label">Links</span>
     </button>
   </div>
 

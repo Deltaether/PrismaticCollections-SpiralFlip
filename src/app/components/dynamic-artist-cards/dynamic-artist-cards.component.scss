@@ -1,7 +1,7 @@
 // Dynamic Artist Cards Component Styles
 // Uses unified black/white theme with enhanced glassmorphism design
 
-@import '../shared-styles/artist-cards-theme.scss';
+@use '../shared-styles/artist-cards-theme.scss' as theme;
 
 .dynamic-artist-cards-container {
   width: 100%;
@@ -44,24 +44,89 @@
     }
   }
   
-  // Artist cards grid layout
+  // Artist cards grid layout - Enhanced for single card centering
   .artist-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
-    
+    justify-content: center; // Center grid items when fewer than fit
+
+    // Single card centering - Browser-compatible fallback using CSS class
+    &.single-card {
+      display: flex;
+      justify-content: center;
+
+      .artist-card {
+        max-width: 400px;
+        width: 100%;
+      }
+    }
+
+    // Modern browser support for :has() selector
+    &:has(.artist-card:only-child) {
+      display: flex;
+      justify-content: center;
+
+      .artist-card {
+        max-width: 400px;
+        width: 100%;
+      }
+    }
+
     // Responsive adjustments
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 1rem;
+
+      // Single card on mobile - already centered by default grid behavior
+      &.single-card {
+        display: grid; // Use grid for better mobile responsiveness
+        justify-content: center;
+
+        .artist-card {
+          max-width: none; // Remove max-width constraint on mobile
+        }
+      }
+
+      &:has(.artist-card:only-child) {
+        display: grid; // Use grid for better mobile responsiveness
+        justify-content: center;
+
+        .artist-card {
+          max-width: none; // Remove max-width constraint on mobile
+        }
+      }
     }
-    
+
     @media (min-width: 1200px) {
       grid-template-columns: repeat(2, 1fr);
       max-width: 800px;
       margin-left: auto;
       margin-right: auto;
+
+      // Single card on desktop - use flexbox for perfect centering
+      &.single-card {
+        display: flex;
+        justify-content: center;
+        max-width: 500px; // Constrain width for single card
+
+        .artist-card {
+          max-width: 400px;
+          width: 100%;
+        }
+      }
+
+      &:has(.artist-card:only-child) {
+        display: flex;
+        justify-content: center;
+        max-width: 500px; // Constrain width for single card
+
+        .artist-card {
+          max-width: 400px;
+          width: 100%;
+        }
+      }
     }
   }
   

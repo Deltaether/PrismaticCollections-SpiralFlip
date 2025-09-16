@@ -1,10 +1,10 @@
 // Artist Contribution Card Component Styles
 // Uses unified black/white theme with consistent glassmorphism design
 
-@import '../shared-styles/artist-cards-theme.scss';
+@use '../shared-styles/artist-cards-theme.scss' as theme;
 
 .artist-contribution-card {
-  @include artist-card-base;
+  @include theme.artist-card-base;
 
   display: flex;
   align-items: flex-start;

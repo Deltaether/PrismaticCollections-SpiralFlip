@@ -36,6 +36,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   overflow-y: auto;   // Allow vertical scrolling
   padding-top: 90px;  // CRITICAL: Space for the fixed header (90px desktop height)
 
+  // Component-specific scrollbar styling (must be before nested rules)
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.9);
+
   // Create a stacking context for video background
   isolation: isolate;
   // REMOVED: transform-style: preserve-3d causes fixed positioning to break
@@ -89,10 +93,6 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   app-loading-screen + * ::ng-deep app-site-header {
     z-index: 1 !important;
   }
-
-  // Component-specific scrollbar styling
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.8) rgba(0, 0, 0, 0.9);
 
   &::-webkit-scrollbar {
     width: clamp(8px, 1.5vw, 16px);
@@ -505,19 +505,18 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     border-radius: clamp(12px, 2.5vw, 20px);
   }
 
-  // Performance optimizations - wrapped to avoid Sass deprecation warning
+  // Performance optimizations and styling - wrapped to avoid Sass deprecation warning
   & {
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.25),
+      0 4px 16px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   &:hover {
     transform: translateY(-4px) translateZ(0);
@@ -1537,19 +1536,18 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     border-radius: 16px;
   }
 
-  // Performance optimizations - wrapped to avoid Sass deprecation warning
+  // Performance optimizations and styling - wrapped to avoid Sass deprecation warning
   & {
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.25),
+      0 4px 16px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   &:hover {
     transform: translateY(-4px) translateZ(0);
@@ -1736,9 +1734,12 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
 
     .footer-logo img {
-      max-width: 150px;
+      max-width: clamp(200px, 20vw, 350px); // Responsive footer logo size - bigger than before
+      width: clamp(180px, 18vw, 320px); // Responsive width with minimum size
       height: auto;
       filter: brightness(0) invert(1);
+      // Additional responsive enhancement
+      min-width: 180px; // Ensure minimum readable size on all devices
     }
 
     .footer-links {

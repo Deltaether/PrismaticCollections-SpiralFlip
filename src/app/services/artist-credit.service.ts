@@ -125,7 +125,7 @@ export class ArtistCreditService {
   private readonly verificationStatusSubject = new BehaviorSubject<CreditVerification[]>([]);
 
   // Multi-project support
-  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia2');
+  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia1');
   private readonly projectMetadataSubject = new BehaviorSubject<ProjectMetadata[]>([]);
   private readonly allProjectTracksSubject = new BehaviorSubject<TrackWithCompleteCreditsMultiProject[]>([]);
 
@@ -150,18 +150,19 @@ export class ArtistCreditService {
   }> = {
     'SpiralFlip': {
       displayName: 'SpiralFlip',
-      avatar: '/assets/images/artists/SpiralFlip.png',
+      avatar: 'assets/images/artists/SpiralFlip.png',
       color: '#FF6B6B',
       primaryRoles: ['Main Artist', 'Producer', 'Composer'],
       socialLinks: {
         youtube: 'https://www.youtube.com/@SpiralFlip',
+        twitter: 'https://x.com/SpiralFlip',
         carrd: 'https://spiralflip.carrd.co/'
       },
       bio: 'Electronic music producer and Phantasia compilation curator'
     },
     'eili': {
       displayName: 'eili',
-      avatar: '/assets/images/artists/Eili.png',
+      avatar: 'assets/images/artists/Eili.png',
       color: '#ffffff',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -172,7 +173,7 @@ export class ArtistCreditService {
     },
     'Ariatec': {
       displayName: 'Ariatec',
-      avatar: '/assets/images/artists/Ariatec.png',
+      avatar: 'assets/images/artists/Ariatec.png',
       color: '#45B7D1',
       primaryRoles: ['Composer', 'Sound Designer'],
       socialLinks: {
@@ -183,7 +184,7 @@ export class ArtistCreditService {
     },
     'MB': {
       displayName: 'MBgov',
-      avatar: '/assets/images/artists/MBgov.png',
+      avatar: 'assets/images/artists/MBgov.png',
       color: '#96CEB4',
       primaryRoles: ['Composer', 'Arranger'],
       socialLinks: {
@@ -194,7 +195,7 @@ export class ArtistCreditService {
     },
     'Iku Hoshifuri': {
       displayName: 'Iku Hoshifuri',
-      avatar: '/assets/images/artists/Iku Hoshifuri.png',
+      avatar: 'assets/images/artists/Iku Hoshifuri.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -205,7 +206,7 @@ export class ArtistCreditService {
     },
     'Justin Thornburgh': {
       displayName: 'Justin Thornburgh',
-      avatar: '/assets/images/artists/Justin Thornburgh.png',
+      avatar: 'assets/images/artists/Justin Thornburgh.png',
       color: '#DDA0DD',
       primaryRoles: ['Accordion', 'Instrumentalist'],
       socialLinks: {
@@ -215,7 +216,7 @@ export class ArtistCreditService {
     },
     'v1ris': {
       displayName: 'v1ris',
-      avatar: '/assets/images/artists/v1ris.png',
+      avatar: 'assets/images/artists/v1ris.png',
       color: '#F8B500',
       primaryRoles: ['Violin', 'Instrumentalist'],
       socialLinks: {
@@ -226,7 +227,7 @@ export class ArtistCreditService {
     },
     'Rita Kamishiro': {
       displayName: 'Rita Kamishiro',
-      avatar: '/assets/images/artists/Rita Kamishiro.png',
+      avatar: 'assets/images/artists/Rita Kamishiro.png',
       color: '#E17055',
       primaryRoles: ['Viola', 'Instrumentalist'],
       socialLinks: {
@@ -237,7 +238,7 @@ export class ArtistCreditService {
     },
     'Marcus Ho': {
       displayName: 'Marcus Ho',
-      avatar: '/assets/images/artists/Marcus Ho.png',
+      avatar: 'assets/images/artists/Marcus Ho.png',
       color: '#6C5CE7',
       primaryRoles: ['Cello', 'Instrumentalist'],
       socialLinks: {
@@ -247,7 +248,7 @@ export class ArtistCreditService {
     },
     'AZALI': {
       displayName: 'AZALI',
-      avatar: '/assets/images/artists/AZALI.png',
+      avatar: 'assets/images/artists/AZALI.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -258,7 +259,7 @@ export class ArtistCreditService {
     },
     'Aloysius': {
       displayName: 'Aloysius',
-      avatar: '/assets/images/artists/Aloysius.png',
+      avatar: 'assets/images/artists/Aloysius.png',
       color: '#FD79A8',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -269,7 +270,7 @@ export class ArtistCreditService {
     },
     'potatoTeto': {
       displayName: 'potatoTeto',
-      avatar: '/assets/images/artists/potatoTeto.png',
+      avatar: 'assets/images/artists/potatoTeto.png',
       color: '#00B894',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -280,7 +281,7 @@ export class ArtistCreditService {
     },
     'Artisan': {
       displayName: 'Artisan',
-      avatar: '/assets/images/artists/Artisan.png',
+      avatar: 'assets/images/artists/Artisan.png',
       color: '#E84393',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -291,7 +292,7 @@ export class ArtistCreditService {
     },
     'Mei Naganowa': {
       displayName: 'Mei Naganowa',
-      avatar: '/assets/images/artists/Mei Naganowa.png',
+      avatar: 'assets/images/artists/Mei Naganowa.png',
       color: '#00CEC9',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -312,7 +313,7 @@ export class ArtistCreditService {
     },
     'BilliumMoto': {
       displayName: 'BilliumMoto',
-      avatar: '/assets/images/artists/BilliumMoto.png',
+      avatar: 'assets/images/artists/BilliumMoto.png',
       color: '#74B9FF',
       primaryRoles: ['Producer', 'Composer'],
       socialLinks: {
@@ -323,7 +324,7 @@ export class ArtistCreditService {
     },
     'Elliot Hsu': {
       displayName: 'Elliot Hsu',
-      avatar: '/assets/images/artists/Elliot Hsu.png',
+      avatar: 'assets/images/artists/Elliot Hsu.png',
       color: '#55A3FF',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -334,7 +335,7 @@ export class ArtistCreditService {
     },
     'Yuzuki': {
       displayName: 'Yuzuki',
-      avatar: '/assets/images/artists/Yuzuki.png',
+      avatar: 'assets/images/artists/Yuzuki.png',
       color: '#FF7675',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -345,10 +346,11 @@ export class ArtistCreditService {
     },
     'LucaProject': {
       displayName: 'LucaProject',
-      avatar: '/assets/images/artists/LucaProject.png',
+      avatar: 'assets/images/artists/LucaProject.png',
       color: '#6C5CE7',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
+        twitter: 'https://x.com/Lucaproject4543',
         youtube: 'https://www.youtube.com/@lucaproject6108',
         carrd: 'https://lucaproject.carrd.co/'
       },
@@ -356,7 +358,7 @@ export class ArtistCreditService {
     },
     'Koway': {
       displayName: 'Koway',
-      avatar: '/assets/images/artists/Koway.png',
+      avatar: 'assets/images/artists/Koway.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -368,7 +370,7 @@ export class ArtistCreditService {
     },
     '伍一': {
       displayName: '伍一',
-      avatar: '/assets/images/artists/Wu-Yi.png',
+      avatar: 'assets/images/artists/Wu-Yi.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -379,7 +381,7 @@ export class ArtistCreditService {
     },
     'Nstryder': {
       displayName: 'Nstryder',
-      avatar: '/assets/images/artists/Nstryder.png',
+      avatar: 'assets/images/artists/Nstryder.png',
       color: '#E17055',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -390,7 +392,7 @@ export class ArtistCreditService {
     },
     'MoAE': {
       displayName: 'MoAE:.',
-      avatar: '/assets/images/artists/MoAE.png',
+      avatar: 'assets/images/artists/MoAE.png',
       color: '#00B894',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -401,7 +403,7 @@ export class ArtistCreditService {
     },
     'dystopian tanuki': {
       displayName: 'dystopian tanuki',
-      avatar: '/assets/images/artists/dystopian tanuki.png',
+      avatar: 'assets/images/artists/dystopian tanuki.png',
       color: '#636E72',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -412,17 +414,18 @@ export class ArtistCreditService {
     },
     'Heem': {
       displayName: 'Heem',
-      avatar: '/assets/images/artists/Heem.png',
+      avatar: 'assets/images/artists/Heem.png',
       color: '#FD79A8',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
+        twitter: 'https://x.com/h_e_e__m',
         linktr: 'https://linktr.ee/heeem'
       },
       bio: 'Melodic electronic producer'
     },
     'Woojinee': {
       displayName: 'Woojinee',
-      avatar: '/assets/images/artists/Woojinee.png',
+      avatar: 'assets/images/artists/Woojinee.png',
       color: '#E84393',
       primaryRoles: ['Violin', 'Instrumentalist'],
       socialLinks: {
@@ -432,7 +435,7 @@ export class ArtistCreditService {
     },
     'Bigg Milk': {
       displayName: 'Bigg Milk',
-      avatar: '/assets/images/artists/Bigg Milk.png',
+      avatar: 'assets/images/artists/Bigg Milk.png',
       color: '#00CEC9',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -443,7 +446,7 @@ export class ArtistCreditService {
     },
     'Gardens': {
       displayName: 'Gardens',
-      avatar: '/assets/images/artists/Gardens.png',
+      avatar: 'assets/images/artists/Gardens.png',
       color: '#00B894',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -454,7 +457,7 @@ export class ArtistCreditService {
     },
     'Sad Keyboard Guy': {
       displayName: 'Sad Keyboard Guy',
-      avatar: '/assets/images/artists/Sad Keyboard Guy.png',
+      avatar: 'assets/images/artists/Sad Keyboard Guy.png',
       color: '#74B9FF',
       primaryRoles: ['Keyboard', 'Composer'],
       socialLinks: {
@@ -465,7 +468,7 @@ export class ArtistCreditService {
     },
     'Futsuunohito': {
       displayName: 'Futsuunohito',
-      avatar: '/assets/images/artists/Futsuunohito.png',
+      avatar: 'assets/images/artists/Futsuunohito.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -476,7 +479,7 @@ export class ArtistCreditService {
     },
     'shishishiena': {
       displayName: 'shishishiena',
-      avatar: '/assets/images/artists/shishishiena.png',
+      avatar: 'assets/images/artists/shishishiena.png',
       color: '#FFEAA7',
       primaryRoles: ['Voice Actor', 'Vocalist'],
       socialLinks: {
@@ -488,7 +491,7 @@ export class ArtistCreditService {
     // Additional Synthesizer V operators and vocal contributors
     'Anri Arcane': {
       displayName: 'Anri Arcane',
-      avatar: '/assets/images/artists/Anri-Arcane.png',
+      avatar: 'assets/images/artists/Anri-Arcane.png',
       color: '#FF9FF3',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -496,7 +499,7 @@ export class ArtistCreditService {
     },
     'HXVOC': {
       displayName: 'HXVOC',
-      avatar: '/assets/images/artists/HXVOC.png',
+      avatar: 'assets/images/artists/HXVOC.png',
       color: '#54C7EC',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -504,7 +507,7 @@ export class ArtistCreditService {
     },
     'Miyamai Moca': {
       displayName: 'Miyamai Moca',
-      avatar: '/assets/images/artists/Miyamai-Moca.png',
+      avatar: 'assets/images/artists/Miyamai-Moca.png',
       color: '#FFB347',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -512,7 +515,7 @@ export class ArtistCreditService {
     },
     'Ninezero': {
       displayName: 'Ninezero',
-      avatar: '/assets/images/artists/Ninezero.png',
+      avatar: 'assets/images/artists/Ninezero.png',
       color: '#98FB98',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -520,7 +523,7 @@ export class ArtistCreditService {
     },
     'Hanakuma Chifuyu': {
       displayName: 'Hanakuma Chifuyu',
-      avatar: '/assets/images/artists/Hanakuma-Chifuyu.png',
+      avatar: 'assets/images/artists/Hanakuma-Chifuyu.png',
       color: '#DDA0FF',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -532,67 +535,140 @@ export class ArtistCreditService {
 
     'Prower': {
       displayName: 'Prower',
-      avatar: '/assets/images/artists/Prower.png',
+      avatar: 'assets/images/artists/Prower.png',
       color: '#FF9500',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/prowerrr_'
+      },
       bio: 'Electronic music producer - Phantasia 1 contributor'
     },
     'Seycara': {
       displayName: 'Seycara',
-      avatar: '/assets/images/artists/Seycara.png',
+      avatar: 'assets/images/artists/Seycara.png',
       color: '#A8E6CF',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/Seycara',
+        youtube: 'https://www.youtube.com/@Seycara'
+      },
       bio: 'Collaborative electronic producer - Phantasia 1'
     },
     'Qyubey': {
       displayName: 'Qyubey',
-      avatar: '/assets/images/artists/Qyubey.png',
+      avatar: 'assets/images/artists/Qyubey.png',
       color: '#FFB3BA',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/QyubeySan',
+        youtube: 'https://www.youtube.com/@qyubey_san'
+      },
       bio: 'Electronic music producer - Phantasia 1 contributor'
     },
     'Luscinia': {
       displayName: 'Luscinia',
-      avatar: '/assets/images/artists/Luscinia.png',
+      avatar: 'assets/images/artists/Luscinia.png',
       color: '#BFEFFF',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/LusciniaSound',
+        youtube: 'https://www.youtube.com/@Luscinia.Nightingale'
+      },
       bio: 'Electronic music producer - Phantasia 1 contributor'
     },
     'はがね': {
       displayName: 'はがね (Hagane)',
-      avatar: '/assets/images/artists/Hagane.png',
+      avatar: 'assets/images/artists/Hagane.png',
       color: '#C0C0C0',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/STEEL_PLUS',
+        youtube: 'https://www.youtube.com/@steelplus_hagane'
+      },
       bio: 'Japanese electronic music producer - Phantasia 1'
     },
     'satella': {
       displayName: 'satella',
-      avatar: '/assets/images/artists/satella.png',
+      avatar: 'assets/images/artists/satella.png',
       color: '#E6E6FA',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/satella_n',
+        youtube: 'https://www.youtube.com/@satella_n'
+      },
       bio: 'Electronic music producer - Phantasia 1 contributor'
     },
-    'sleepless': {
-      displayName: 'sleepless',
-      avatar: '/assets/images/artists/sleepless.png',
+    'sleepy': {
+      displayName: 'sleepy',
+      avatar: 'assets/images/artists/Sleepless.png',
       color: '#B0E0E6',
       primaryRoles: ['Electronic Producer'],
-      socialLinks: {},
+      socialLinks: {
+        twitter: 'https://x.com/sleeplessgamign'
+      },
       bio: 'Collaborative electronic producer - Phantasia 1'
     },
-    'Shizu': {
-      displayName: 'Shizu',
-      avatar: '/assets/images/artists/Shizu.png',
-      color: '#F0E68C',
-      primaryRoles: ['Producer'],
-      socialLinks: {},
-      bio: 'Japanese producer - Phantasia 1 bonus track'
+
+    // ====== SPECIAL MENTIONS - PRODUCTION TEAM ======
+    'PliXoR': {
+      displayName: 'PliXoR',
+      avatar: 'assets/images/artists/PliXoR.png',
+      color: '#ff6b6b',
+      primaryRoles: ['Mastering Engineer'],
+      socialLinks: {
+        twitter: 'https://x.com/plixormusic'
+      },
+      bio: 'Professional mastering engineer for Phantasia projects'
+    },
+    'NapaL': {
+      displayName: '나팔 NapaL',
+      avatar: 'assets/images/artists/NapaL.png',
+      color: '#4ecdc4',
+      primaryRoles: ['Cover Illustration'],
+      socialLinks: {
+        twitter: 'https://x.com/Ve_Xillum'
+      },
+      bio: 'Cover illustration artist for Phantasia albums'
+    },
+    'yy_artwork': {
+      displayName: 'yy_artwork',
+      avatar: 'assets/images/artists/yy_artwork.png',
+      color: '#45b7d1',
+      primaryRoles: ['Logo/Jacket Design'],
+      socialLinks: {
+        twitter: 'https://x.com/yy_artwork'
+      },
+      bio: 'Logo and jacket design specialist'
+    },
+    'Elegant Sister': {
+      displayName: 'Elegant Sister',
+      avatar: 'assets/images/artists/Elegant Sister.png',
+      color: '#f7b733',
+      primaryRoles: ['Album Stream MV'],
+      socialLinks: {
+        twitter: 'https://x.com/ElegantSister'
+      },
+      bio: 'Music video creator for album streams'
+    },
+    'Len': {
+      displayName: 'Len',
+      avatar: 'assets/images/artists/Len Licht.png',
+      color: '#5f27cd',
+      primaryRoles: ['Crossfade MV/Live2D'],
+      socialLinks: {
+        twitter: 'https://x.com/Len_licht'
+      },
+      bio: 'Crossfade MV and additional Live2D specialist'
+    },
+    'Daph': {
+      displayName: 'Daph',
+      avatar: 'assets/images/artists/Daph Shoo.png',
+      color: '#00d2d3',
+      primaryRoles: ['Live2D'],
+      socialLinks: {
+        twitter: 'https://x.com/daphshoo'
+      },
+      bio: 'Live2D animation specialist'
     }
   };
 
@@ -1172,27 +1248,26 @@ export class ArtistCreditService {
         vocalists: [],
         technicalCredits: [this.createArtistContribution('Bigg Milk', 'Producer', 'Primary', 100)]
       },
-      // Track 19: Gardens & Sad Keyboard Guy ft. eili - Fractured Light (54:15)
+      // Track 19: Gardens & Sad Keyboard Guy - Fractured Light (54:15)
       {
         id: '19',
         title: 'Fractured Light',
         trackNumber: 19,
         startTime: 3255,
         endTime: 3424,
-        audioFile: '19. Gardens & Sad Keyboard Guy - Fractured Light ft. eili.ogg',
-        mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 40),
+        audioFile: '19. Gardens & Sad Keyboard Guy - Fractured Light.ogg',
+        mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 60),
         allContributions: [
-          this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 40, 'Ambient electronic production'),
-          this.createArtistContribution('Sad Keyboard Guy', 'Collaborator', 'Collaboration', 35, 'Keyboard composition'),
-          this.createArtistContribution('eili', 'Featured Artist', 'Featured', 25, 'Vocals')
+          this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 60, 'Ambient electronic production'),
+          this.createArtistContribution('Sad Keyboard Guy', 'Collaborator', 'Collaboration', 40, 'Keyboard composition')
         ],
-        featuredArtists: [this.createArtistContribution('eili', 'Featured Artist', 'Featured', 25)],
-        collaborators: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 35)],
-        instrumentalists: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 35)],
-        vocalists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 25)],
+        featuredArtists: [],
+        collaborators: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 40)],
+        instrumentalists: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 40)],
+        vocalists: [],
         technicalCredits: [
-          this.createArtistContribution('Gardens', 'Sound Designer', 'Primary', 50),
-          this.createArtistContribution('Sad Keyboard Guy', 'Composer', 'Collaboration', 50)
+          this.createArtistContribution('Gardens', 'Sound Designer', 'Primary', 60),
+          this.createArtistContribution('Sad Keyboard Guy', 'Composer', 'Collaboration', 40)
         ]
       },
       // Track 20: Futsuunohito - Beyond the Veil of Light (57:04)
@@ -1293,7 +1368,7 @@ export class ArtistCreditService {
       {
         id: 'phantasia1',
         displayName: 'Phantasia Project 1',
-        totalTracks: 15,
+        totalTracks: 14,
         releaseYear: 2022,
         youtubeUrl: 'https://youtu.be/IZtd0ABhhpM?si=SHayVNUQ4LdKs_3O',
         streamingUrl: 'https://srsr.li/various-artists-project-phantasia',
@@ -1497,28 +1572,28 @@ export class ArtistCreditService {
         vocalists: [],
         technicalCredits: [this.createArtistContribution('Luscinia', 'Producer', 'Primary', 100)]
       },
-      // Track 9: Gardens & sleepless - Wandering Breeze
+      // Track 9: Gardens & sleepy - Wandering Breeze
       {
         id: 'p1-9',
         title: 'Wandering Breeze',
         trackNumber: 9,
         startTime: 1440,
         endTime: 1620,
-        audioFile: '09. Gardens & sleepless - Wandering Breeze.ogg',
+        audioFile: '09. Gardens & sleepy - Wandering Breeze.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 50),
         allContributions: [
           this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 50, 'Ambient electronic production'),
-          this.createArtistContribution('sleepless', 'Collaborator', 'Collaboration', 50, 'Electronic production')
+          this.createArtistContribution('sleepy', 'Collaborator', 'Collaboration', 50, 'Electronic production')
         ],
         featuredArtists: [],
-        collaborators: [this.createArtistContribution('sleepless', 'Electronic Producer', 'Collaboration', 50)],
+        collaborators: [this.createArtistContribution('sleepy', 'Electronic Producer', 'Collaboration', 50)],
         instrumentalists: [],
         vocalists: [],
         technicalCredits: [
           this.createArtistContribution('Gardens', 'Producer', 'Primary', 50),
-          this.createArtistContribution('sleepless', 'Producer', 'Collaboration', 50)
+          this.createArtistContribution('sleepy', 'Producer', 'Collaboration', 50)
         ]
       },
       // Track 10: はがね - Mystic Nebula
@@ -1621,26 +1696,6 @@ export class ArtistCreditService {
         vocalists: [],
         technicalCredits: [this.createArtistContribution('dystopian tanuki', 'Sound Designer', 'Primary', 100)]
       },
-      // Track 15: 薄れる ver.Shizu Final (Bonus Track)
-      {
-        id: 'p1-15',
-        title: '薄れる ver.Shizu Final',
-        trackNumber: 15,
-        startTime: 2520,
-        endTime: 2700,
-        audioFile: '15. 薄れる ver.Shizu Final.ogg',
-        projectId: 'phantasia1',
-        projectDisplayName: 'Phantasia Project 1',
-        mainArtist: this.createArtistContribution('Shizu', 'Main Artist', 'Primary', 100),
-        allContributions: [
-          this.createArtistContribution('Shizu', 'Main Artist', 'Primary', 100, 'Japanese bonus track production')
-        ],
-        featuredArtists: [],
-        collaborators: [],
-        instrumentalists: [],
-        vocalists: [],
-        technicalCredits: [this.createArtistContribution('Shizu', 'Producer', 'Primary', 100)]
-      }
     ];
 
     return trackCredits;

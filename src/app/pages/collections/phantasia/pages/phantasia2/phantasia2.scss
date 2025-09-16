@@ -356,7 +356,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   align-items: center;
   justify-content: center;
   padding: 0.5rem 0;
-  margin: 5vh 0 0 0;
+  margin: -20vh 0 0 0;
   z-index: 10;
 
   .scroll-indicator-container {
@@ -579,9 +579,9 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     margin-right: clamp(0rem, 2vw, 3rem);
 
     @media (min-width: 1025px) {
-      // Desktop: Fixed width to accommodate 460px jacket
-      width: 460px;
-      min-width: 460px;
+      // Desktop: Responsive width to accommodate intelligent jacket sizing
+      width: clamp(420px, 32vw, 520px);
+      min-width: clamp(420px, 32vw, 480px);
     }
 
     // Ultra-wide specific spacing improvements
@@ -1068,10 +1068,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     align-items: center;
     justify-content: center;
 
-    // Laptop breakpoint (1025px - 1440px) - keep 460x460px
+    // Laptop breakpoint (1025px - 1440px) - intelligent responsive units
     @media (min-width: 1025px) and (max-width: 1440px) {
-      width: 460px;
-      height: 460px;
+      width: clamp(420px, 32vw, 480px);
+      height: clamp(420px, 32vw, 480px);
     }
 
     // Tablet breakpoint (769px - 1024px) - responsive but centered
@@ -2090,10 +2090,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       align-items: center;
     }
 
-    // FIXED: Enforce exact 460x460px for laptop breakpoint
+    // FIXED: Use intelligent responsive units for laptop breakpoint
     .cd-jacket {
-      width: 460px;
-      height: 460px;
+      width: clamp(420px, 32vw, 480px);
+      height: clamp(420px, 32vw, 480px);
     }
 
     // FIXED: Ensure music player is properly contained on laptops
@@ -2154,10 +2154,10 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       align-items: center;
     }
 
-    // FIXED: Enforce exact 460x460px for desktop breakpoint
+    // FIXED: Use intelligent responsive units for desktop breakpoint
     .cd-jacket {
-      width: 460px;
-      height: 460px;
+      width: clamp(460px, 33vw, 520px);
+      height: clamp(460px, 33vw, 520px);
     }
 
     .album-content-section {
@@ -2398,8 +2398,22 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
   .cd-showcase {
     .cd-jacket {
-      width: 60vw;
-      height: 60vw;
+      // FIXED: Use intelligent responsive units based on viewport width instead of blanket 60vw
+      // This respects the breakpoint-specific sizing while ensuring proper portrait display
+      width: clamp(280px, 32vw, 480px);
+      height: clamp(280px, 32vw, 480px);
+
+      // Smaller devices in portrait need smaller sizing
+      @media (max-width: 768px) {
+        width: clamp(250px, 45vw, 350px);
+        height: clamp(250px, 45vw, 350px);
+      }
+
+      // Very small devices in portrait
+      @media (max-width: 480px) {
+        width: clamp(200px, 50vw, 280px);
+        height: clamp(200px, 50vw, 280px);
+      }
     }
   }
 }

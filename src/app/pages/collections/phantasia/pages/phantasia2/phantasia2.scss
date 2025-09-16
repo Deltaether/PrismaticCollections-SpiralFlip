@@ -2073,7 +2073,6 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 @media (min-width: 1025px) and (max-width: 1440px) {
   // VIEWPORT DISPLACEMENT: Ensure consistent margin-top: 100vh for laptop breakpoint
   .album-presentation {
-    margin-top: 100vh;
   }
 
   .cd-showcase {

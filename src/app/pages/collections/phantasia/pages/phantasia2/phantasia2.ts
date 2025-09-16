@@ -1002,72 +1002,67 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       console.log('[Phantasia2Component] Auto-scrolling to content section');
     }
 
-    if (this.cdShowcase?.nativeElement) {
-      const element = this.cdShowcase.nativeElement;
-      const elementTop = element.offsetTop;
-      // Position CD showcase with some padding from top (account for header)
-      const targetPosition = elementTop - 100;
+    // First try to find the album presentation section (parent of CD showcase)
+    const albumPresentation = document.querySelector('.album-presentation') as HTMLElement;
+    const cdShowcase = this.cdShowcase?.nativeElement;
 
-      // Reset body position before scrolling
-      document.body.style.position = '';
-      document.body.style.top = '';
-      window.scrollTo(0, currentScrollY);
+    let targetPosition = 0;
 
-      // Perform smooth scroll
-      window.scrollTo({
-        top: Math.max(0, targetPosition),
-        behavior: 'smooth'
-      });
-
-      // Hide scroll indicator after scrolling to content
-      this.hideScrollIndicatorAfterUse();
-
-      // Unlock after animation completes
-      setTimeout(() => {
-        this.isAutoScrolling = false;
-        this.scrollLocked = false;
-        this.scrollState = 'content';
-        this.lastScrollY = window.scrollY;
-
-        // Remove scroll lock
-        document.body.style.overflow = '';
-        document.body.style.width = '';
-
-        if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Arrived at content, scroll unlocked');
-        }
-      }, 1200);
-
-    } else {
+    if (albumPresentation) {
+      // Use album presentation's position as it's the proper container
+      targetPosition = albumPresentation.offsetTop - 100; // Account for header
       if (this.isDebugMode) {
-        console.warn('[Phantasia2Component] CD showcase element not found for scrolling');
+        console.log('[Phantasia2Component] Using album presentation position:', albumPresentation.offsetTop);
       }
-
-      // Reset body position before scrolling
-      document.body.style.position = '';
-      document.body.style.top = '';
-      window.scrollTo(0, currentScrollY);
-
-      // Fallback: scroll to approximate position (100vh to get past video section)
-      window.scrollTo({
-        top: window.innerHeight - 90,
-        behavior: 'smooth'
-      });
-
-      this.hideScrollIndicatorAfterUse();
-
-      // Unlock after animation
-      setTimeout(() => {
-        this.isAutoScrolling = false;
-        this.scrollLocked = false;
-        this.scrollState = 'content';
-        this.lastScrollY = window.scrollY;
-
-        // Remove scroll lock
-        document.body.style.overflow = '';
-        document.body.style.width = '';
-      }, 1200);
+    } else if (cdShowcase) {
+      // Fallback: calculate absolute position of CD showcase
+      let element = cdShowcase;
+      let offsetTop = 0;
+      while (element) {
+        offsetTop += element.offsetTop;
+        element = element.offsetParent as HTMLElement;
+      }
+      targetPosition = offsetTop - 100; // Account for header
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Using calculated CD showcase absolute position:', offsetTop);
+      }
+    } else {
+      // Final fallback: use viewport height to get past video section
+      targetPosition = window.innerHeight - 90;
+      if (this.isDebugMode) {
+        console.warn('[Phantasia2Component] Using fallback viewport-based position');
+      }
     }
+
+    // Reset body position before scrolling
+    document.body.style.position = '';
+    document.body.style.top = '';
+    window.scrollTo(0, currentScrollY);
+
+    // Perform smooth scroll
+    window.scrollTo({
+      top: Math.max(0, targetPosition),
+      behavior: 'smooth'
+    });
+
+    // Hide scroll indicator after scrolling to content
+    this.hideScrollIndicatorAfterUse();
+
+    // Unlock after animation completes
+    setTimeout(() => {
+      this.isAutoScrolling = false;
+      this.scrollLocked = false;
+      this.scrollState = 'content';
+      this.lastScrollY = window.scrollY;
+
+      // Remove scroll lock
+      document.body.style.overflow = '';
+      document.body.style.width = '';
+
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Arrived at content, scroll unlocked');
+      }
+    }, 1200);
   }
   
   /**

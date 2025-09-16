@@ -2,7 +2,14 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, distinctUntilChanged, debounceTime, shareReplay, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { ArtistCreditService, TrackWithCompleteCredits, ArtistContribution } from '../../../../services/artist-credit.service';
+import {
+  ArtistCreditService,
+  TrackWithCompleteCredits,
+  ArtistContribution,
+  ProjectType,
+  ProjectMetadata,
+  TrackWithCompleteCreditsMultiProject
+} from '../../../../services/artist-credit.service';
 import { CreditVerificationService } from '../../../../services/credit-verification.service';
 
 /**
@@ -81,10 +88,18 @@ export class DynamicArtistService implements OnDestroy {
   private readonly tracksSubject = new BehaviorSubject<TrackWithArtists[]>([]);
   private readonly currentTrackSubject = new BehaviorSubject<TrackWithArtists | null>(null);
 
+  // Multi-project support
+  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia2');
+  private readonly allProjectTracksSubject = new BehaviorSubject<TrackWithArtists[]>([]);
+
   // Public observables
   public readonly currentTime$ = this.currentTimeSubject.asObservable();
   public readonly tracks$ = this.tracksSubject.asObservable();
   public readonly currentTrack$ = this.currentTrackSubject.asObservable();
+
+  // Multi-project observables
+  public readonly currentProject$ = this.currentProjectSubject.asObservable();
+  public readonly allProjectTracks$ = this.allProjectTracksSubject.asObservable();
 
   // Optimized artist cards observable with caching and performance improvements
   public readonly currentArtists$ = combineLatest([
@@ -197,6 +212,20 @@ export class DynamicArtistService implements OnDestroy {
   }
 
   /**
+   * Load data for specific project
+   */
+  private loadProjectData(projectId: ProjectType): void {
+    if (projectId === 'phantasia2') {
+      // Use existing Phantasia 2 data
+      this.loadTrackData();
+    } else if (projectId === 'phantasia1') {
+      // Load Phantasia 1 data
+      const phantasia1Tracks = this.createPhantasia1TracksFromData();
+      this.tracksSubject.next(phantasia1Tracks);
+    }
+  }
+
+  /**
    * Update current playback time
    */
   updateCurrentTime(timeInSeconds: number): void {
@@ -248,6 +277,97 @@ export class DynamicArtistService implements OnDestroy {
         if (!currentTrack) return false;
         const verification = verifications.find(v => v.trackId === currentTrack.id);
         return verification?.fullyVerified || false;
+      })
+    );
+  }
+
+  // ====== MULTI-PROJECT SUPPORT METHODS ======
+
+  /**
+   * Switch between projects and load corresponding tracks
+   */
+  setCurrentProject(projectId: ProjectType): void {
+    this.currentProjectSubject.next(projectId);
+
+    // Update artist credit service
+    this.artistCreditService.setCurrentProject(projectId);
+
+    // Load tracks for the selected project
+    this.loadProjectData(projectId);
+  }
+
+  /**
+   * Get current project metadata
+   */
+  getCurrentProjectMetadata(): Observable<ProjectMetadata | null> {
+    return combineLatest([
+      this.currentProject$,
+      this.artistCreditService.projectMetadata$
+    ]).pipe(
+      map(([currentProject, projects]) =>
+        projects.find(p => p.id === currentProject) || null
+      )
+    );
+  }
+
+  /**
+   * Get all artists across all projects
+   */
+  getAllArtistsAllProjects(): ArtistContribution[] {
+    return this.artistCreditService.getAllArtistsAllProjects();
+  }
+
+  /**
+   * Get artists that appear in both projects
+   */
+  getCrossProjectArtists(): ArtistContribution[] {
+    return this.artistCreditService.getCrossProjectArtists();
+  }
+
+  /**
+   * Get artists for specific project
+   */
+  getProjectArtists(projectId: ProjectType): ArtistContribution[] {
+    return this.artistCreditService.getProjectArtists(projectId);
+  }
+
+  /**
+   * Get project comparison data
+   */
+  getProjectComparison(): Observable<{
+    phantasia1: { artists: number; tracks: number; metadata: ProjectMetadata | null };
+    phantasia2: { artists: number; tracks: number; metadata: ProjectMetadata | null };
+    crossProjectArtists: number;
+    totalUniqueArtists: number;
+  }> {
+    return this.artistCreditService.projectMetadata$.pipe(
+      map(projects => {
+        const phantasia1Artists = this.getProjectArtists('phantasia1');
+        const phantasia2Artists = this.getProjectArtists('phantasia2');
+        const crossProjectArtists = this.getCrossProjectArtists();
+
+        const phantasia1Metadata = projects.find(p => p.id === 'phantasia1') || null;
+        const phantasia2Metadata = projects.find(p => p.id === 'phantasia2') || null;
+
+        const allUniqueArtists = new Set([
+          ...phantasia1Artists.map(a => a.artistName),
+          ...phantasia2Artists.map(a => a.artistName)
+        ]);
+
+        return {
+          phantasia1: {
+            artists: phantasia1Artists.length,
+            tracks: phantasia1Metadata?.totalTracks || 0,
+            metadata: phantasia1Metadata
+          },
+          phantasia2: {
+            artists: phantasia2Artists.length,
+            tracks: phantasia2Metadata?.totalTracks || 0,
+            metadata: phantasia2Metadata
+          },
+          crossProjectArtists: crossProjectArtists.length,
+          totalUniqueArtists: allUniqueArtists.size
+        };
       })
     );
   }
@@ -726,5 +846,96 @@ export class DynamicArtistService implements OnDestroy {
     };
 
     return socialLinksMap[artistName] || {};
+  }
+
+  /**
+   * Create tracks from Phantasia 1 data
+   */
+  private createPhantasia1TracksFromData(): TrackWithArtists[] {
+    const phantasia1TracksData = [
+      { time: '0:00', artist: 'SpiralFlip feat. eili', title: 'Phantasia' },
+      { time: '3:00', artist: 'Bigg Milk', title: 'First Steps' },
+      { time: '6:00', artist: 'Heem', title: 'Altar of the Sword' },
+      { time: '9:00', artist: 'futsuunohito', title: 'A Voyage on the Winds of Change' },
+      { time: '12:00', artist: 'Prower', title: 'Rohkeutta Etsiä' },
+      { time: '15:00', artist: 'AZALI & Seycara', title: 'Ivory Flowers' },
+      { time: '18:00', artist: 'Qyubey', title: 'Outer Bygone Ruins' },
+      { time: '21:00', artist: 'Luscinia', title: 'Spiral Into the Abyss!' },
+      { time: '24:00', artist: 'Gardens & sleepless', title: 'Wandering Breeze' },
+      { time: '27:00', artist: 'はがね', title: 'Mystic Nebula' },
+      { time: '30:00', artist: 'LucaProject', title: 'Iris' },
+      { time: '33:00', artist: 'Mei Naganowa', title: 'Half-Asleep in the Middle of Bumfuck Nowhere' },
+      { time: '36:00', artist: 'satella', title: 'The Traveller' },
+      { time: '39:00', artist: 'dystopian tanuki', title: 'Childhood memories' },
+      { time: '42:00', artist: 'Shizu', title: '薄れる ver.Shizu Final' }
+    ];
+
+    const tracks: TrackWithArtists[] = [];
+
+    phantasia1TracksData.forEach((trackData, index) => {
+      const [minutes, seconds] = trackData.time.split(':').map(Number);
+      const startTime = minutes * 60 + seconds;
+      const nextTrack = phantasia1TracksData[index + 1];
+      let endTime = 45 * 60; // Default 45 minutes total
+
+      if (nextTrack) {
+        const [nextMinutes, nextSeconds] = nextTrack.time.split(':').map(Number);
+        endTime = nextMinutes * 60 + nextSeconds;
+      }
+
+      // Parse features and collaborators
+      const features: Artist[] = [];
+      const collaborators: Artist[] = [];
+
+      // Handle different featured artist patterns
+      const featPattern = /(.+?)\s+(?:feat\.|ft\.)\s+(.+)/;
+      const featMatch = trackData.artist.match(featPattern);
+
+      if (featMatch) {
+        const [, mainArtist, featuredArtist] = featMatch;
+        features.push({
+          id: this.generateArtistId(featuredArtist),
+          name: featuredArtist,
+          displayName: featuredArtist,
+          role: 'Featured Artist',
+          socialLinks: this.getSocialLinksForArtist(featuredArtist)
+        });
+      }
+
+      // Handle collaborations with & symbol
+      const collabPattern = /(.+?)\s+&\s+(.+)/;
+      const collabMatch = trackData.artist.match(collabPattern);
+
+      if (collabMatch && !featMatch) {
+        const [, artist1, artist2] = collabMatch;
+        collaborators.push({
+          id: this.generateArtistId(artist2),
+          name: artist2,
+          displayName: artist2,
+          role: 'Collaborator',
+          socialLinks: this.getSocialLinksForArtist(artist2)
+        });
+      }
+
+      // Clean main artist name
+      let cleanMainArtist = trackData.artist.replace(/\s+(?:feat\.|ft\.)\s+.+/, '');
+      if (collabMatch && !featMatch) {
+        cleanMainArtist = collabMatch[1];
+      }
+
+      tracks.push({
+        id: `p1-${index + 1}`,
+        title: trackData.title,
+        mainArtist: cleanMainArtist,
+        startTime,
+        endTime,
+        artists: [],
+        features,
+        collaborators,
+        audioFile: `${String(index + 1).padStart(2, '0')}. ${trackData.artist} - ${trackData.title}.mp3`
+      });
+    });
+
+    return tracks;
   }
 }

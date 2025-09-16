@@ -155,6 +155,7 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   @Input() showAllArtists = false;
   @Input() maxVisibleCards = 8;
   @Input() enableAnimations = true;
+  @Input() displayMode: 'showcase' | 'currently-playing' | 'all' = 'showcase';
 
   // Reactive component state using signals for optimal performance
   private readonly currentArtistsSignal = signal<Artist[]>([]);
@@ -554,5 +555,50 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
       }
     }
     return true;
+  }
+
+  /**
+   * Handle current track change for dynamic artist updates
+   */
+  handleCurrentTrackChange(track: TrackWithArtists | null): void {
+    this.currentTrackSignal.set(track);
+    this.cdr.markForCheck();
+
+    if (this.isDebugMode && track) {
+      console.log('[DynamicArtistCardsComponent] Track changed via handler:', track.title);
+    }
+  }
+
+  /**
+   * Handle currently playing artists change
+   */
+  handleCurrentlyPlayingArtistsChange(artists: Artist[]): void {
+    this.currentArtistsSignal.set(artists);
+    this.updateOptimizedArtistCards(artists);
+    this.cdr.markForCheck();
+
+    if (this.isDebugMode) {
+      console.log('[DynamicArtistCardsComponent] Currently playing artists changed via handler:', artists.length);
+    }
+  }
+
+  /**
+   * Handle legacy audio state changes for backward compatibility
+   */
+  handleLegacyAudioState(audioState: any): void {
+    if (audioState) {
+      this.isPlayingSignal.set(audioState.isPlaying || false);
+      this.currentTimeSignal.set(audioState.currentTime || 0);
+
+      if (audioState.currentTrack) {
+        this.currentTrackSignal.set(audioState.currentTrack);
+      }
+
+      this.cdr.markForCheck();
+
+      if (this.isDebugMode) {
+        console.log('[DynamicArtistCardsComponent] Legacy audio state updated via handler');
+      }
+    }
   }
 }

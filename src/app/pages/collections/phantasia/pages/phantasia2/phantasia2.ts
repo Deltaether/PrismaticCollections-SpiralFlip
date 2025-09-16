@@ -122,11 +122,12 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       console.log(`[Phantasia2Component] Current URL: ${this.router.url}`);
     }
 
-    // Component-level initialization - no global DOM manipulation
-    // Styling is handled through host bindings and component SCSS
-
-    if (this.isDebugMode) {
-      console.log(`[Phantasia2Component] Added phantasia-album-page class to body`);
+    // Add phantasia-album-page class to body for global styles
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('phantasia-album-page');
+      if (this.isDebugMode) {
+        console.log(`[Phantasia2Component] Added phantasia-album-page class to body`);
+      }
     }
 
     // Set up user interaction detection
@@ -815,8 +816,13 @@ export class Phantasia2Component implements OnInit, OnDestroy {
       this.debugSystem = null;
     }
 
-    // Component cleanup - no global DOM manipulation needed
-    // Host bindings are automatically removed when component is destroyed
+    // Remove phantasia-album-page class from body
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('phantasia-album-page');
+      if (this.isDebugMode) {
+        console.log(`[Phantasia2Component] Removed phantasia-album-page class from body`);
+      }
+    }
     
     // Clean up video elements
     if (this.videoElement) {

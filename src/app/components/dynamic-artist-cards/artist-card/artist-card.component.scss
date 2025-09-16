@@ -15,6 +15,11 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  // Prevent theme CSS variables from bleeding in
+  --mdc-theme-primary: transparent;
+  --mat-primary-color: transparent;
+  --theme-primary: transparent;
   
   // Hover effects
   &:hover {
@@ -81,20 +86,59 @@
     margin-bottom: 1rem;
     
     .artist-name {
-      color: #ffffff;
+      color: #ffffff !important; // Force white color for artist name
       font-size: 1.1rem;
       font-weight: 600;
       margin: 0 0 0.5rem 0;
       line-height: 1.3;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); // Add shadow for better contrast
     }
     
     .role-label {
       font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      color: var(--theme-color, #4ECDC4);
+      font-weight: 600; // Increased weight for better readability
+      letter-spacing: 0.8px; // Enhanced letter spacing for elegance
+      color: #ffffff !important; // Pure white for maximum contrast and readability
       margin-bottom: 0.75rem;
-      opacity: 0.9;
+      opacity: 1; // Full opacity for perfect readability
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); // Enhanced shadow for better contrast
+      text-transform: uppercase; // Consistent uppercase presentation
+
+      // Professional badge-like styling for enhanced readability
+      background: rgba(0, 0, 0, 0.4); // Semi-transparent dark background
+      padding: 0.3rem 0.6rem; // Comfortable padding
+      border-radius: 6px; // Rounded corners for modern aesthetic
+      backdrop-filter: blur(6px); // Enhanced blur effect
+      border: 1px solid rgba(255, 255, 255, 0.15); // Subtle border for definition
+      display: inline-block; // Proper block formatting for padding
+
+      // Theme integration with Phantasia2 color system
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); // Subtle depth
+      transition: all 0.2s ease; // Smooth transitions
+
+      // CRITICAL FIX: Override theme colors with maximum specificity
+      --color: #ffffff !important;
+      --mdc-theme-primary: #ffffff !important;
+      --mat-primary: #ffffff !important;
+
+      // Force override inline styles from theme system
+      &[style*="color"] {
+        color: #ffffff !important;
+      }
+
+      // Override any theme class applications
+      &.mat-primary,
+      &.theme-primary,
+      &[color="primary"] {
+        color: #ffffff !important;
+      }
+
+      // Hover enhancement for interactive feel
+      &:hover {
+        background: rgba(0, 0, 0, 0.5);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-1px);
+      }
     }
     
     .playing-status {
@@ -255,6 +299,8 @@
       
       .role-label {
         font-size: 0.7rem;
+        padding: 0.25rem 0.5rem; // Adjusted padding for mobile
+        letter-spacing: 0.6px; // Slightly reduced letter spacing for mobile
       }
     }
     

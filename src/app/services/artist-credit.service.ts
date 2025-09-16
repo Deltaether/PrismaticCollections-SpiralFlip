@@ -87,8 +87,34 @@ export interface CreditVerification {
 }
 
 /**
+ * Project enumeration for multi-project support
+ */
+export type ProjectType = 'phantasia1' | 'phantasia2';
+
+/**
+ * Interface for project metadata
+ */
+export interface ProjectMetadata {
+  readonly id: ProjectType;
+  readonly displayName: string;
+  readonly totalTracks: number;
+  readonly releaseYear: number;
+  readonly streamingUrl?: string;
+  readonly youtubeUrl?: string;
+  readonly description: string;
+}
+
+/**
+ * Enhanced track interface with project support
+ */
+export interface TrackWithCompleteCreditsMultiProject extends TrackWithCompleteCredits {
+  readonly projectId: ProjectType;
+  readonly projectDisplayName: string;
+}
+
+/**
  * Comprehensive Artist Credit Service
- * Provides 100% accurate artist attribution for Phantasia 2
+ * Provides 100% accurate artist attribution for Phantasia 1 & 2
  */
 @Injectable({
   providedIn: 'root'
@@ -98,10 +124,20 @@ export class ArtistCreditService {
   private readonly currentTrackCreditsSubject = new BehaviorSubject<TrackWithCompleteCredits | null>(null);
   private readonly verificationStatusSubject = new BehaviorSubject<CreditVerification[]>([]);
 
+  // Multi-project support
+  private readonly currentProjectSubject = new BehaviorSubject<ProjectType>('phantasia2');
+  private readonly projectMetadataSubject = new BehaviorSubject<ProjectMetadata[]>([]);
+  private readonly allProjectTracksSubject = new BehaviorSubject<TrackWithCompleteCreditsMultiProject[]>([]);
+
   // Public observables
   public readonly tracksWithCredits$ = this.tracksWithCreditsSubject.asObservable();
   public readonly currentTrackCredits$ = this.currentTrackCreditsSubject.asObservable();
   public readonly verificationStatus$ = this.verificationStatusSubject.asObservable();
+
+  // Multi-project observables
+  public readonly currentProject$ = this.currentProjectSubject.asObservable();
+  public readonly projectMetadata$ = this.projectMetadataSubject.asObservable();
+  public readonly allProjectTracks$ = this.allProjectTracksSubject.asObservable();
 
   // Complete artist database with all 31 Phantasia 2 contributors
   private readonly completeArtistDatabase: Record<string, {
@@ -158,7 +194,7 @@ export class ArtistCreditService {
     },
     'Iku Hoshifuri': {
       displayName: 'Iku Hoshifuri',
-      avatar: '/assets/images/artists/Iku-Hoshifuri.png',
+      avatar: '/assets/images/artists/Iku Hoshifuri.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -169,7 +205,7 @@ export class ArtistCreditService {
     },
     'Justin Thornburgh': {
       displayName: 'Justin Thornburgh',
-      avatar: '/assets/images/artists/Justin-Thornburgh.png',
+      avatar: '/assets/images/artists/Justin Thornburgh.png',
       color: '#DDA0DD',
       primaryRoles: ['Accordion', 'Instrumentalist'],
       socialLinks: {
@@ -190,7 +226,7 @@ export class ArtistCreditService {
     },
     'Rita Kamishiro': {
       displayName: 'Rita Kamishiro',
-      avatar: '/assets/images/artists/Rita-Kamishiro.png',
+      avatar: '/assets/images/artists/Rita Kamishiro.png',
       color: '#E17055',
       primaryRoles: ['Viola', 'Instrumentalist'],
       socialLinks: {
@@ -201,7 +237,7 @@ export class ArtistCreditService {
     },
     'Marcus Ho': {
       displayName: 'Marcus Ho',
-      avatar: '/assets/images/artists/Marcus-Ho.png',
+      avatar: '/assets/images/artists/Marcus Ho.png',
       color: '#6C5CE7',
       primaryRoles: ['Cello', 'Instrumentalist'],
       socialLinks: {
@@ -255,7 +291,7 @@ export class ArtistCreditService {
     },
     'Mei Naganowa': {
       displayName: 'Mei Naganowa',
-      avatar: '/assets/images/artists/Mei-Naganowa.png',
+      avatar: '/assets/images/artists/Mei Naganowa.png',
       color: '#00CEC9',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -287,7 +323,7 @@ export class ArtistCreditService {
     },
     'Elliot Hsu': {
       displayName: 'Elliot Hsu',
-      avatar: '/assets/images/artists/Elliot-Hsu.png',
+      avatar: '/assets/images/artists/Elliot Hsu.png',
       color: '#55A3FF',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -365,7 +401,7 @@ export class ArtistCreditService {
     },
     'dystopian tanuki': {
       displayName: 'dystopian tanuki',
-      avatar: '/assets/images/artists/dystopian-tanuki.png',
+      avatar: '/assets/images/artists/dystopian tanuki.png',
       color: '#636E72',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -396,7 +432,7 @@ export class ArtistCreditService {
     },
     'Bigg Milk': {
       displayName: 'Bigg Milk',
-      avatar: '/assets/images/artists/Bigg-Milk.png',
+      avatar: '/assets/images/artists/Bigg Milk.png',
       color: '#00CEC9',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -418,7 +454,7 @@ export class ArtistCreditService {
     },
     'Sad Keyboard Guy': {
       displayName: 'Sad Keyboard Guy',
-      avatar: '/assets/images/artists/Sad-Keyboard-Guy.png',
+      avatar: '/assets/images/artists/Sad Keyboard Guy.png',
       color: '#74B9FF',
       primaryRoles: ['Keyboard', 'Composer'],
       socialLinks: {
@@ -489,11 +525,81 @@ export class ArtistCreditService {
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
       bio: 'Synthesizer V vocal operator'
+    },
+
+    // ====== PHANTASIA PROJECT 1 ARTISTS ======
+    // Artists unique to Phantasia 1 or with different roles
+
+    'Prower': {
+      displayName: 'Prower',
+      avatar: '/assets/images/artists/Prower.png',
+      color: '#FF9500',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Electronic music producer - Phantasia 1 contributor'
+    },
+    'Seycara': {
+      displayName: 'Seycara',
+      avatar: '/assets/images/artists/Seycara.png',
+      color: '#A8E6CF',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Collaborative electronic producer - Phantasia 1'
+    },
+    'Qyubey': {
+      displayName: 'Qyubey',
+      avatar: '/assets/images/artists/Qyubey.png',
+      color: '#FFB3BA',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Electronic music producer - Phantasia 1 contributor'
+    },
+    'Luscinia': {
+      displayName: 'Luscinia',
+      avatar: '/assets/images/artists/Luscinia.png',
+      color: '#BFEFFF',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Electronic music producer - Phantasia 1 contributor'
+    },
+    'はがね': {
+      displayName: 'はがね (Hagane)',
+      avatar: '/assets/images/artists/Hagane.png',
+      color: '#C0C0C0',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Japanese electronic music producer - Phantasia 1'
+    },
+    'satella': {
+      displayName: 'satella',
+      avatar: '/assets/images/artists/satella.png',
+      color: '#E6E6FA',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Electronic music producer - Phantasia 1 contributor'
+    },
+    'sleepless': {
+      displayName: 'sleepless',
+      avatar: '/assets/images/artists/sleepless.png',
+      color: '#B0E0E6',
+      primaryRoles: ['Electronic Producer'],
+      socialLinks: {},
+      bio: 'Collaborative electronic producer - Phantasia 1'
+    },
+    'Shizu': {
+      displayName: 'Shizu',
+      avatar: '/assets/images/artists/Shizu.png',
+      color: '#F0E68C',
+      primaryRoles: ['Producer'],
+      socialLinks: {},
+      bio: 'Japanese producer - Phantasia 1 bonus track'
     }
   };
 
   constructor(private http: HttpClient) {
     this.initializeCompleteCredits();
+    this.initializeProjectMetadata();
+    this.initializeAllProjectTracks();
   }
 
   /**
@@ -588,6 +694,100 @@ export class ArtistCreditService {
         };
       })
     );
+  }
+
+  // ====== MULTI-PROJECT SUPPORT METHODS ======
+
+  /**
+   * Switch between projects
+   */
+  setCurrentProject(projectId: ProjectType): void {
+    this.currentProjectSubject.next(projectId);
+
+    // Update current tracks based on selected project
+    const allTracks = this.allProjectTracksSubject.value;
+    const projectTracks = allTracks.filter(track => track.projectId === projectId);
+    this.tracksWithCreditsSubject.next(projectTracks);
+  }
+
+  /**
+   * Get all artists across all projects
+   */
+  getAllArtistsAllProjects(): ArtistContribution[] {
+    const allTracks = this.allProjectTracksSubject.value;
+    const allArtists = new Map<string, ArtistContribution>();
+
+    allTracks.forEach(track => {
+      track.allContributions.forEach(contribution => {
+        const key = `${contribution.artistName}-${track.projectId}`;
+        if (!allArtists.has(key)) {
+          allArtists.set(key, {
+            ...contribution,
+            id: key
+          });
+        }
+      });
+    });
+
+    return Array.from(allArtists.values()).sort((a, b) =>
+      a.artistDisplayName.localeCompare(b.artistDisplayName)
+    );
+  }
+
+  /**
+   * Get artists that appear in both projects
+   */
+  getCrossProjectArtists(): ArtistContribution[] {
+    const phantasia1Artists = this.getProjectArtists('phantasia1');
+    const phantasia2Artists = this.getProjectArtists('phantasia2');
+
+    const phantasia1Names = new Set(phantasia1Artists.map(a => a.artistName));
+    const phantasia2Names = new Set(phantasia2Artists.map(a => a.artistName));
+
+    const crossProjectNames = Array.from(phantasia1Names).filter(name =>
+      phantasia2Names.has(name)
+    );
+
+    return phantasia2Artists.filter(artist =>
+      crossProjectNames.includes(artist.artistName)
+    );
+  }
+
+  /**
+   * Get artists for specific project
+   */
+  getProjectArtists(projectId: ProjectType): ArtistContribution[] {
+    const allTracks = this.allProjectTracksSubject.value;
+    const projectTracks = allTracks.filter(track => track.projectId === projectId);
+    const allArtists = new Map<string, ArtistContribution>();
+
+    projectTracks.forEach(track => {
+      track.allContributions.forEach(contribution => {
+        if (!allArtists.has(contribution.artistName)) {
+          allArtists.set(contribution.artistName, contribution);
+        }
+      });
+    });
+
+    return Array.from(allArtists.values()).sort((a, b) =>
+      a.artistDisplayName.localeCompare(b.artistDisplayName)
+    );
+  }
+
+  /**
+   * Get project metadata
+   */
+  getProjectMetadata(projectId: ProjectType): ProjectMetadata | null {
+    const projects = this.projectMetadataSubject.value;
+    return projects.find(p => p.id === projectId) || null;
+  }
+
+  /**
+   * Get tracks for specific project
+   */
+  getProjectTracks(projectId: ProjectType): TrackWithCompleteCreditsMultiProject[] {
+    const allTracks = this.allProjectTracksSubject.value;
+    return allTracks.filter(track => track.projectId === projectId);
   }
 
   /**
@@ -1063,5 +1263,366 @@ export class ArtistCreditService {
     }
 
     return verifications;
+  }
+
+  /**
+   * Initialize project metadata for both Phantasia projects
+   */
+  private initializeProjectMetadata(): void {
+    const projects: ProjectMetadata[] = [
+      {
+        id: 'phantasia1',
+        displayName: 'Phantasia Project 1',
+        totalTracks: 15,
+        releaseYear: 2022,
+        youtubeUrl: 'https://youtu.be/IZtd0ABhhpM?si=SHayVNUQ4LdKs_3O',
+        streamingUrl: 'https://srsr.li/various-artists-project-phantasia',
+        description: 'The original Phantasia compilation featuring 15 tracks from 16+ amazing electronic artists, showcasing diverse styles and collaborative creativity.'
+      },
+      {
+        id: 'phantasia2',
+        displayName: 'Phantasia Project 2',
+        totalTracks: 20,
+        releaseYear: 2024,
+        description: 'The highly anticipated sequel to the original Phantasia project, featuring 20 tracks with expanded orchestral and electronic collaborations.'
+      }
+    ];
+
+    this.projectMetadataSubject.next(projects);
+  }
+
+  /**
+   * Initialize combined tracks from both projects
+   */
+  private initializeAllProjectTracks(): void {
+    const phantasia2Tracks = this.createCompleteTrackCredits().map(track => ({
+      ...track,
+      projectId: 'phantasia2' as ProjectType,
+      projectDisplayName: 'Phantasia Project 2'
+    }));
+
+    const phantasia1Tracks = this.createPhantasia1TrackCredits();
+
+    const allTracks = [...phantasia1Tracks, ...phantasia2Tracks];
+    this.allProjectTracksSubject.next(allTracks);
+  }
+
+  /**
+   * Create complete track credits for Phantasia Project 1
+   */
+  private createPhantasia1TrackCredits(): TrackWithCompleteCreditsMultiProject[] {
+    const trackCredits: TrackWithCompleteCreditsMultiProject[] = [
+      // Track 1: SpiralFlip - Phantasia ft. Eili
+      {
+        id: 'p1-1',
+        title: 'Phantasia',
+        trackNumber: 1,
+        startTime: 0,
+        endTime: 180, // Estimated
+        audioFile: '01. SpiralFlip - Phantasia ft. Eili.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 70),
+        allContributions: [
+          this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 70, 'Original composition and production'),
+          this.createArtistContribution('eili', 'Featured Artist', 'Featured', 30, 'Lead vocals')
+        ],
+        featuredArtists: [this.createArtistContribution('eili', 'Featured Artist', 'Featured', 30)],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 30)],
+        technicalCredits: [this.createArtistContribution('SpiralFlip', 'Producer', 'Primary', 100)]
+      },
+      // Track 2: Bigg Milk - First Steps
+      {
+        id: 'p1-2',
+        title: 'First Steps',
+        trackNumber: 2,
+        startTime: 180,
+        endTime: 360,
+        audioFile: '02. Bigg Milk - First Steps.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Bigg Milk', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Bigg Milk', 'Main Artist', 'Primary', 100, 'Chill electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Bigg Milk', 'Producer', 'Primary', 100)]
+      },
+      // Track 3: Heem - Altar of the Sword
+      {
+        id: 'p1-3',
+        title: 'Altar of the Sword',
+        trackNumber: 3,
+        startTime: 360,
+        endTime: 540,
+        audioFile: '03. Heem - Altar of the Sword.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Heem', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Heem', 'Main Artist', 'Primary', 100, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Heem', 'Producer', 'Primary', 100)]
+      },
+      // Track 4: futsuunohito - A Voyage on the Winds of Change
+      {
+        id: 'p1-4',
+        title: 'A Voyage on the Winds of Change',
+        trackNumber: 4,
+        startTime: 540,
+        endTime: 720,
+        audioFile: '04. futsuunohito - A Voyage on the Winds of Change.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Futsuunohito', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Futsuunohito', 'Main Artist', 'Primary', 100, 'Cinematic electronic composition')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Futsuunohito', 'Producer', 'Primary', 100)]
+      },
+      // Track 5: Prower - Rohkeutta Etsiä
+      {
+        id: 'p1-5',
+        title: 'Rohkeutta Etsiä',
+        trackNumber: 5,
+        startTime: 720,
+        endTime: 900,
+        audioFile: '05. Prower - Rohkeutta Etsiä.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Prower', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Prower', 'Main Artist', 'Primary', 100, 'Electronic production - Finnish title')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Prower', 'Producer', 'Primary', 100)]
+      },
+      // Track 6: AZALI & Seycara - Ivory Flowers
+      {
+        id: 'p1-6',
+        title: 'Ivory Flowers',
+        trackNumber: 6,
+        startTime: 900,
+        endTime: 1080,
+        audioFile: '06. AZALI & Seycara - Ivory Flowers.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('AZALI', 'Main Artist', 'Primary', 50),
+        allContributions: [
+          this.createArtistContribution('AZALI', 'Main Artist', 'Primary', 50, 'Experimental electronic production'),
+          this.createArtistContribution('Seycara', 'Collaborator', 'Collaboration', 50, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [this.createArtistContribution('Seycara', 'Electronic Producer', 'Collaboration', 50)],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [
+          this.createArtistContribution('AZALI', 'Producer', 'Primary', 50),
+          this.createArtistContribution('Seycara', 'Producer', 'Collaboration', 50)
+        ]
+      },
+      // Track 7: Qyubey - Outer Bygone Ruins
+      {
+        id: 'p1-7',
+        title: 'Outer Bygone Ruins',
+        trackNumber: 7,
+        startTime: 1080,
+        endTime: 1260,
+        audioFile: '07. Qyubey - Outer Bygone Ruins.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Qyubey', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Qyubey', 'Main Artist', 'Primary', 100, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Qyubey', 'Producer', 'Primary', 100)]
+      },
+      // Track 8: Luscinia - Spiral Into the Abyss!
+      {
+        id: 'p1-8',
+        title: 'Spiral Into the Abyss!',
+        trackNumber: 8,
+        startTime: 1260,
+        endTime: 1440,
+        audioFile: '08. Luscinia - Spiral Into the Abyss!.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Luscinia', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Luscinia', 'Main Artist', 'Primary', 100, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Luscinia', 'Producer', 'Primary', 100)]
+      },
+      // Track 9: Gardens & sleepless - Wandering Breeze
+      {
+        id: 'p1-9',
+        title: 'Wandering Breeze',
+        trackNumber: 9,
+        startTime: 1440,
+        endTime: 1620,
+        audioFile: '09. Gardens & sleepless - Wandering Breeze.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 50),
+        allContributions: [
+          this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 50, 'Ambient electronic production'),
+          this.createArtistContribution('sleepless', 'Collaborator', 'Collaboration', 50, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [this.createArtistContribution('sleepless', 'Electronic Producer', 'Collaboration', 50)],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [
+          this.createArtistContribution('Gardens', 'Producer', 'Primary', 50),
+          this.createArtistContribution('sleepless', 'Producer', 'Collaboration', 50)
+        ]
+      },
+      // Track 10: はがね - Mystic Nebula
+      {
+        id: 'p1-10',
+        title: 'Mystic Nebula',
+        trackNumber: 10,
+        startTime: 1620,
+        endTime: 1800,
+        audioFile: '10. はがね - Mystic Nebula.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('はがね', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('はがね', 'Main Artist', 'Primary', 100, 'Japanese electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('はがね', 'Producer', 'Primary', 100)]
+      },
+      // Track 11: LucaProject - Iris
+      {
+        id: 'p1-11',
+        title: 'Iris',
+        trackNumber: 11,
+        startTime: 1800,
+        endTime: 1980,
+        audioFile: '11. LucaProject - Iris.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('LucaProject', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('LucaProject', 'Main Artist', 'Primary', 100, 'Melodic electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('LucaProject', 'Producer', 'Primary', 100)]
+      },
+      // Track 12: Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere
+      {
+        id: 'p1-12',
+        title: 'Half-Asleep in the Middle of Bumfuck Nowhere',
+        trackNumber: 12,
+        startTime: 1980,
+        endTime: 2160,
+        audioFile: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Mei Naganowa', 'Producer', 'Primary', 100)]
+      },
+      // Track 13: satella - The Traveller
+      {
+        id: 'p1-13',
+        title: 'The Traveller',
+        trackNumber: 13,
+        startTime: 2160,
+        endTime: 2340,
+        audioFile: '13. satella - The Traveller.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('satella', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('satella', 'Main Artist', 'Primary', 100, 'Electronic production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('satella', 'Producer', 'Primary', 100)]
+      },
+      // Track 14: dystopian tanuki - Childhood memories
+      {
+        id: 'p1-14',
+        title: 'Childhood memories',
+        trackNumber: 14,
+        startTime: 2340,
+        endTime: 2520,
+        audioFile: '14. dystopian tanuki - Childhood memories.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('dystopian tanuki', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('dystopian tanuki', 'Main Artist', 'Primary', 100, 'Experimental ambient composition')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('dystopian tanuki', 'Sound Designer', 'Primary', 100)]
+      },
+      // Track 15: 薄れる ver.Shizu Final (Bonus Track)
+      {
+        id: 'p1-15',
+        title: '薄れる ver.Shizu Final',
+        trackNumber: 15,
+        startTime: 2520,
+        endTime: 2700,
+        audioFile: '15. 薄れる ver.Shizu Final.mp3',
+        projectId: 'phantasia1',
+        projectDisplayName: 'Phantasia Project 1',
+        mainArtist: this.createArtistContribution('Shizu', 'Main Artist', 'Primary', 100),
+        allContributions: [
+          this.createArtistContribution('Shizu', 'Main Artist', 'Primary', 100, 'Japanese bonus track production')
+        ],
+        featuredArtists: [],
+        collaborators: [],
+        instrumentalists: [],
+        vocalists: [],
+        technicalCredits: [this.createArtistContribution('Shizu', 'Producer', 'Primary', 100)]
+      }
+    ];
+
+    return trackCredits;
   }
 }

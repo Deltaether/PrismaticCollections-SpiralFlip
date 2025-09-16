@@ -450,11 +450,11 @@ body.collections-page {
   }
 }
 
-/* Body and HTML styling for phantasia-album-page - prevent all scrolling except container */
+/* Body and HTML styling for phantasia-album-page - allow natural scrolling for video background testing */
 html.phantasia-album-page,
 body.phantasia-album-page {
-  overflow: hidden !important; /* CRITICAL FIX: Prevent body and html scrolling, let .phantasia-album-page container handle it */
-  height: 100vh !important; /* Ensure fixed height */
+  overflow: visible !important; /* FIXED: Allow natural scrolling so video background viewport-following can be tested */
+  min-height: 100vh !important; /* FIXED: Allow content to expand beyond viewport for proper scrolling */
   position: relative !important;
 }
 

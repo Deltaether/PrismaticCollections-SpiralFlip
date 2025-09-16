@@ -63,7 +63,7 @@ export class RightSideMenuComponent implements OnInit, OnDestroy {
     { title: 'Ivory Flowers', artist: 'AZALI & Seycara' },
     { title: 'Outer Bygone Ruins', artist: 'Qrubey' },
     { title: 'Spiral Into the Abyss', artist: 'Luscinia' },
-    { title: 'Wandering Breeze', artist: 'Gardens & sleepy' },
+    { title: 'Wandering Breeze', artist: 'Gardens & sleepless' },
     { title: 'Mystic Nebula', artist: 'はがね' },
     { title: 'Iris', artist: 'LucaProject' },
     { title: 'Half-Asleep in the Middle of Bumfuck Nowhere', artist: 'Mei Naganowa' },

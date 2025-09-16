@@ -69,3 +69,6 @@ fixed_*
 responsive_*
 test_*
 image copy*
+
+# Large audio files
+*.wav

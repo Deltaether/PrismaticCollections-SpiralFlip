@@ -538,6 +538,91 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       max-width: 100%;
       box-sizing: border-box;
     }
+
+    // CRITICAL FIX: Override theme colors for artist card role labels
+    ::ng-deep .artist-card {
+      .role-label {
+        color: #ffffff !important; // Force white text
+        background: rgba(0, 0, 0, 0.5) !important; // Dark background for contrast
+        padding: 0.3rem 0.6rem !important;
+        border-radius: 6px !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+        // Override any inline styles
+        &[style*="color"] {
+          color: #ffffff !important;
+        }
+
+        // Override theme variables
+        --color: #ffffff !important;
+        --mdc-theme-primary: #ffffff !important;
+        --mat-primary: #ffffff !important;
+      }
+
+      // Fix all text colors in artist cards
+      .artist-name,
+      h3,
+      h4 {
+        color: #ffffff !important;
+      }
+
+      // Fix all playing status text including "Currently Playing"
+      .playing-text,
+      .playing-indicator .playing-text,
+      .playing-status .playing-text,
+      .artist-info-section .playing-text {
+        color: #ffffff !important; // Change from cyan to white
+        background: rgba(0, 0, 0, 0.4) !important;
+        padding: 0.2rem 0.4rem !important;
+        border-radius: 4px !important;
+        font-size: 0.75rem !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
+      }
+
+      // Override any cyan/blue colored text with maximum specificity
+      * {
+        &[style*="color: rgb(78, 205, 196)"],
+        &[style*="color: #4ECDC4"],
+        &[style*="color: cyan"] {
+          color: #ffffff !important;
+          background: rgba(0, 0, 0, 0.3) !important;
+          padding: 0.15rem 0.3rem !important;
+          border-radius: 3px !important;
+        }
+      }
+
+      // Fix the playing dot to be white instead of cyan
+      .playing-dot {
+        background: #ffffff !important;
+      }
+
+      // Additional bulletproof overrides for currently playing text
+      .playing-text {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+      }
+
+      // Override all potential theme color applications
+      [class*="theme-"],
+      [class*="primary"],
+      .mat-primary {
+        color: #ffffff !important;
+      }
+
+      // Force override any runtime style injection
+      *[style],
+      *[class] {
+        color: inherit !important;
+      }
+
+      // Specific override for artist name and role elements
+      .artist-name,
+      .role-label {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+      }
+    }
   }
 
   app-music-player {

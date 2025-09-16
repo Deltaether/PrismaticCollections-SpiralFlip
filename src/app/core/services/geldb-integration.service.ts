@@ -133,7 +133,7 @@ export class GelDbIntegrationService {
     'eili': {
       avatarPath: '/assets/images/artists/Eili.png',
       displayName: 'eili',
-      color: '#4ECDC4',
+      color: '#ffffff', // Changed from cyan to white for better readability
       genre: 'Vocal, Electronic'
     },
     'Ariatec': {

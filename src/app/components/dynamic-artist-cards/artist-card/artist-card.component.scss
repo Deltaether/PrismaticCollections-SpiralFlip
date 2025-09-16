@@ -34,12 +34,12 @@
   
   // Participation level styling
   &.participation-main {
-    border-color: var(--theme-color, #4ECDC4);
-    box-shadow: 0 4px 20px rgba(var(--theme-color-rgb, 78, 205, 196), 0.2);
+    border-color: var(--theme-color, #ffffff);
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
   }
-  
+
   &.participation-featured {
-    border-color: rgba(var(--theme-color-rgb, 78, 205, 196), 0.6);
+    border-color: rgba(255, 255, 255, 0.6);
   }
   
   // Avatar section
@@ -67,7 +67,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--theme-color, #4ECDC4);
+        background: var(--theme-color, #666666); // Dark fallback for initials
         color: #ffffff;
         font-size: 1.5rem;
         font-weight: 700;
@@ -152,14 +152,15 @@
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #4ECDC4;
+          background: #ffffff !important; // Force white color
           animation: pulse 2s infinite;
         }
         
         .playing-text {
           font-size: 0.8rem;
-          color: #4ECDC4;
+          color: #ffffff !important; // Force white color
           font-weight: 500;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); // Add shadow for better contrast
         }
       }
     }

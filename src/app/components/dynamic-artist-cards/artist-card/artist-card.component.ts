@@ -113,7 +113,7 @@ export class ArtistCardComponent {
   });
 
   readonly cardThemeColor = computed(() => {
-    return this.cardData?.artist?.color || '#4ECDC4';
+    return this.cardData?.artist?.color || '#ffffff'; // White fallback instead of cyan
   });
 
   // Social links helpers

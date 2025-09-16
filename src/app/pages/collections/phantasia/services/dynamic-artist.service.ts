@@ -465,8 +465,8 @@ export class DynamicArtistService implements OnDestroy {
   // Pre-computed color map for better performance
   private readonly artistColorCache = new Map<string, string>();
   private readonly artistColors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#98D8E8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+    '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff',
+    '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'
   ];
 
   /**

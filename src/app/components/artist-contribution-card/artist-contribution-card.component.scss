@@ -1,18 +1,16 @@
 // Artist Contribution Card Component Styles
-// Individual artist contribution display with role-specific styling
+// Uses unified black/white theme with consistent glassmorphism design
+
+@import '../shared-styles/artist-cards-theme.scss';
 
 .artist-contribution-card {
+  @include artist-card-base;
+
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  gap: var(--artist-card-spacing-lg);
+  padding: var(--artist-card-spacing-xl);
   border-left: 4px solid transparent;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
 
   &::before {
     content: '';
@@ -21,48 +19,54 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    background: var(--artist-card-bg-overlay);
     pointer-events: none;
     z-index: -1;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    @include artist-card-hover;
+
+    &::before {
+      opacity: 0.8;
+    }
   }
 
-  // Role-specific styling
+  // Role-specific styling with unified theme
   &.main-artist {
     border-left-width: 6px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 255, 255, 0.1));
-    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2);
+    border-left-color: var(--artist-card-text-primary);
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 8px 32px rgba(255, 255, 255, 0.15);
 
     .artist-name {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #ffd700;
+      font-size: var(--artist-card-font-size-xxl);
+      font-weight: var(--artist-card-font-weight-bold);
+      color: var(--artist-card-text-primary);
+      @include artist-card-text-shadow(0.6);
     }
   }
 
   &.featured {
-    border-left-color: #ff6b6b;
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 255, 255, 0.05));
+    border-left-color: var(--artist-card-text-secondary);
+    background: var(--artist-card-bg-secondary);
   }
 
   &.collaboration {
-    border-left-color: #4ecdc4;
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(255, 255, 255, 0.05));
+    border-left-color: var(--artist-card-text-tertiary);
+    background: var(--artist-card-bg-primary);
   }
 
   &.additional {
-    border-left-color: #45b7d1;
-    background: linear-gradient(135deg, rgba(69, 183, 209, 0.1), rgba(255, 255, 255, 0.05));
+    border-left-color: var(--artist-card-text-quaternary);
+    background: rgba(0, 0, 0, 0.6);
   }
 
   &.technical {
-    border-left-color: #96ceb4;
-    background: linear-gradient(135deg, rgba(150, 206, 180, 0.1), rgba(255, 255, 255, 0.05));
+    border-left-color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.55);
   }
 
   &.compact {
@@ -84,41 +88,30 @@
   }
 }
 
-// Artist Avatar
+// Artist Avatar - Using Theme Mixins
 .artist-avatar {
   position: relative;
   flex-shrink: 0;
 
   img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+    @include artist-card-avatar(60px);
     object-fit: cover;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.6);
-      transform: scale(1.05);
-    }
   }
 
   .avatar-fallback {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    @include artist-card-avatar(60px);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #ffffff;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    font-weight: var(--artist-card-font-weight-bold);
+    font-size: var(--artist-card-font-size-xl);
+    color: var(--artist-card-text-primary);
+    @include artist-card-text-shadow(0.8);
   }
 }
 
-// Artist Information
+// Artist Information - Enhanced Typography
 .artist-info {
   flex: 1;
   min-width: 0;
@@ -126,13 +119,15 @@
   .artist-name {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.025em;
+    line-height: 1.3;
   }
 }
 
-// Role Information
+// Role Information - Professional Badge System
 .role-info {
   display: flex;
   align-items: center;
@@ -146,8 +141,19 @@
     font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.6px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: var(--text-primary);
+      transform: translateY(-1px);
+    }
   }
 
   .instrument,
@@ -155,16 +161,28 @@
   .synth-voice,
   .technical-role {
     padding: 0.2rem 0.6rem;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #ffffff;
+    color: var(--text-primary);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: var(--text-secondary);
+    }
   }
 
   .synth-voice {
-    background: rgba(138, 43, 226, 0.3);
-    border: 1px solid rgba(138, 43, 226, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    &:hover {
+      border-color: var(--text-primary);
+    }
   }
 }
 
@@ -212,7 +230,7 @@
   }
 }
 
-// Contribution Percentage
+// Contribution Percentage - Modern Progress Design
 .contribution-percentage {
   display: flex;
   align-items: center;
@@ -222,16 +240,20 @@
   .percentage-bar {
     flex: 1;
     height: 8px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
     border-radius: 4px;
     overflow: hidden;
     position: relative;
+    backdrop-filter: blur(4px);
 
     .percentage-fill {
       height: 100%;
-      transition: width 0.8s ease;
+      background: linear-gradient(90deg, var(--text-primary), rgba(255, 255, 255, 0.8));
+      transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
       border-radius: 4px;
       position: relative;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 
       &::after {
         content: '';
@@ -240,7 +262,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
         animation: shimmer 2s infinite;
       }
     }
@@ -248,10 +270,11 @@
 
   .percentage-text {
     font-weight: 700;
-    color: #ffd700;
+    color: var(--text-primary);
     font-size: 0.9rem;
     min-width: 40px;
     text-align: right;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -260,20 +283,24 @@
   100% { transform: translateX(100%); }
 }
 
-// Contribution Notes
+// Contribution Notes - Enhanced Typography
 .contribution-notes {
   margin-bottom: 0.75rem;
 
   .notes-text {
     font-style: italic;
-    opacity: 0.8;
     font-size: 0.85rem;
-    line-height: 1.4;
-    color: #f0f8ff;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
   }
 }
 
-// Social Links
+// Social Links - Refined Design
 .social-links {
   display: flex;
   gap: 0.5rem;
@@ -286,16 +313,21 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--card-border);
     border-radius: 50%;
     text-decoration: none;
-    color: #ffffff;
-    transition: all 0.3s ease;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     font-size: 0.9rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px) scale(1.1);
+      background: rgba(0, 0, 0, 0.8);
+      border-color: var(--text-primary);
+      transform: translateY(-2px) scale(1.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
     // Platform-specific colors
@@ -333,7 +365,7 @@
   }
 }
 
-// Quick Actions
+// Quick Actions - Enhanced Interactive Elements
 .quick-actions {
   display: flex;
   flex-direction: column;
@@ -343,19 +375,23 @@
   .action-button {
     width: 36px;
     height: 36px;
-    border: none;
-    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 50%;
-    color: #ffffff;
+    color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
+      background: rgba(0, 0, 0, 0.8);
+      border-color: var(--text-primary);
+      transform: scale(1.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
     .action-icon {

@@ -1,33 +1,46 @@
 // Dynamic Artist Cards Component Styles
-// Matches reference design with proper responsive layout
+// Uses unified black/white theme with enhanced glassmorphism design
+
+@import '../shared-styles/artist-cards-theme.scss';
 
 .dynamic-artist-cards-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: var(--artist-card-spacing-xxl) var(--artist-card-spacing-lg);
+  background: var(--artist-card-container-bg);
+  border: 1px solid var(--artist-card-border-secondary);
+  border-radius: var(--artist-card-radius-large);
+  backdrop-filter: var(--artist-card-glass-blur);
+  -webkit-backdrop-filter: var(--artist-card-glass-blur);
+  box-shadow: var(--artist-card-shadow-container);
   
-  // Header section styling
+  // Header section - Enhanced typography and spacing
   .cards-header {
     text-align: center;
-    margin-bottom: 2rem;
-    
+    margin-bottom: 2.5rem;
+    padding: 1rem 0;
+
     .cards-title {
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-size: clamp(1.6rem, 3vw, 2.8rem);
       font-weight: 700;
-      color: #ffffff;
-      margin: 0 0 0.5rem 0;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      color: var(--text-primary);
+      margin: 0 0 0.75rem 0;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
-    
+
     .cards-subtitle {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+      color: var(--text-secondary);
       margin: 0;
-      max-width: 600px;
+      max-width: 640px;
       margin-left: auto;
       margin-right: auto;
-      line-height: 1.5;
+      line-height: 1.6;
+      font-weight: 400;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
   }
   
@@ -52,62 +65,87 @@
     }
   }
   
-  // No artists state
+  // No artists state - Enhanced empty state design
   .no-artists-state {
     text-align: center;
-    padding: 3rem 1rem;
-    
+    padding: 4rem 1rem;
+
     .no-artists-content {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 2rem;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      
+      background: var(--card-bg-primary);
+      border-radius: 16px;
+      padding: 2.5rem;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-elevated);
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: var(--card-bg-hover);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
       .no-artists-icon {
-        font-size: 3rem;
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 1rem;
+        font-size: 3.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
         display: block;
+        opacity: 0.8;
       }
-      
+
       h3 {
-        color: #ffffff;
-        margin: 0 0 0.5rem 0;
-        font-size: 1.25rem;
+        color: var(--text-primary);
+        margin: 0 0 0.75rem 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
       }
-      
+
       p {
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--text-tertiary);
         margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
       }
     }
   }
   
-  // Info panel (matches reference design)
+  // Info panel - Professional information display
   .artist-cards-info-panel {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
-    padding: 1rem 1.5rem;
-    backdrop-filter: blur(10px);
-    margin-top: 1.5rem;
-    
-    .info-icon {
-      color: #4ECDC4;
-      font-size: 1.25rem;
-      flex-shrink: 0;
+    gap: 1rem;
+    background: var(--card-bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1.25rem 1.75rem;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    margin-top: 2rem;
+    box-shadow: var(--shadow-elevated);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: var(--card-bg-hover);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
     }
-    
+
+    .info-icon {
+      color: var(--text-primary);
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+
     .info-text {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 0.9rem;
-      line-height: 1.4;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
       text-align: center;
+      font-weight: 400;
     }
     
     @media (max-width: 768px) {
@@ -120,31 +158,37 @@
   }
 }
 
-// Loading state
+// Loading state - Enhanced loading experience
 .cards-loading-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
-  padding: 2rem;
-  
+  min-height: 240px;
+  padding: 3rem;
+  background: var(--container-bg);
+  border-radius: 12px;
+
   .loading-content {
     text-align: center;
-    color: rgba(255, 255, 255, 0.8);
-    
+    color: var(--text-secondary);
+
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      border-top: 3px solid #4ECDC4;
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top: 3px solid var(--text-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem auto;
+      margin: 0 auto 1.5rem auto;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
     }
-    
+
     p {
       margin: 0;
-      font-size: 0.9rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
   }
 }
@@ -155,11 +199,22 @@
   100% { transform: rotate(360deg); }
 }
 
-// Animation support
+// Animation support - Enhanced hover effects
 .artist-card {
-  transition: all 0.3s ease;
-  
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-elevated);
   }
+
+  // Staggered animation for card entrance
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+  &:nth-child(5) { animation-delay: 0.5s; }
+  &:nth-child(6) { animation-delay: 0.6s; }
+  &:nth-child(7) { animation-delay: 0.7s; }
+  &:nth-child(8) { animation-delay: 0.8s; }
 }

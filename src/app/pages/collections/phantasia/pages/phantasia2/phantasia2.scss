@@ -542,29 +542,33 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     // CRITICAL FIX: Override theme colors for artist card role labels
     ::ng-deep .artist-card {
       .role-label {
-        color: #ffffff !important; // Force white text
-        background: rgba(0, 0, 0, 0.5) !important; // Dark background for contrast
+        color: #000000 !important; // Force black text for readability
+        background: rgba(255, 255, 255, 0.9) !important; // Light background for contrast
         padding: 0.3rem 0.6rem !important;
         border-radius: 6px !important;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        text-shadow: none !important; // Remove shadow for clean black text
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
 
         // Override any inline styles
         &[style*="color"] {
-          color: #ffffff !important;
+          color: #000000 !important;
         }
 
         // Override theme variables
-        --color: #ffffff !important;
-        --mdc-theme-primary: #ffffff !important;
-        --mat-primary: #ffffff !important;
+        --color: #000000 !important;
+        --mdc-theme-primary: #000000 !important;
+        --mat-primary: #000000 !important;
       }
 
-      // Fix all text colors in artist cards
+      // Fix all text colors in artist cards to black
       .artist-name,
       h3,
       h4 {
-        color: #ffffff !important;
+        color: #000000 !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+        padding: 0.2rem 0.4rem !important;
+        border-radius: 4px !important;
+        text-shadow: none !important;
       }
 
       // Fix all playing status text including "Currently Playing"
@@ -572,12 +576,13 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       .playing-indicator .playing-text,
       .playing-status .playing-text,
       .artist-info-section .playing-text {
-        color: #ffffff !important; // Change from cyan to white
-        background: rgba(0, 0, 0, 0.4) !important;
+        color: #ffffff !important; // White text for dark theme
+        background: rgba(0, 0, 0, 0.6) !important; // Dark background consistent with theme
         padding: 0.2rem 0.4rem !important;
         border-radius: 4px !important;
         font-size: 0.75rem !important;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
       }
 
       // Override any cyan/blue colored text with maximum specificity
@@ -586,15 +591,16 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
         &[style*="color: #4ECDC4"],
         &[style*="color: cyan"] {
           color: #ffffff !important;
-          background: rgba(0, 0, 0, 0.3) !important;
+          background: rgba(0, 0, 0, 0.6) !important;
           padding: 0.15rem 0.3rem !important;
           border-radius: 3px !important;
+          border: 1px solid rgba(255, 255, 255, 0.15) !important;
         }
       }
 
-      // Fix the playing dot to be white instead of cyan
+      // Fix the playing dot to be red for visibility
       .playing-dot {
-        background: #ffffff !important;
+        background: #d40808 !important;
       }
 
       // Additional bulletproof overrides for currently playing text

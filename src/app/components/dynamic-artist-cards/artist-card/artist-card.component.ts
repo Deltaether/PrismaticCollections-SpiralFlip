@@ -43,15 +43,15 @@ import { ArtistCardData } from '../dynamic-artist-cards.component';
       transition('default <=> hovered', animate('200ms ease-out'))
     ]),
     trigger('playingIndicator', [
-      state('playing', style({ 
-        opacity: 1, 
+      state('playing', style({
+        opacity: 1,
         transform: 'scale(1)',
-        background: '#4ECDC4'
+        background: 'transparent'
       })),
-      state('not-playing', style({ 
-        opacity: 0.3, 
+      state('not-playing', style({
+        opacity: 0.3,
         transform: 'scale(0.8)',
-        background: '#666'
+        background: 'transparent'
       })),
       transition('playing <=> not-playing', animate('300ms ease-out'))
     ])

@@ -1,0 +1,90 @@
+// Artist Cards Unified Theme System
+// Black and White Professional Design
+// ===================================
+
+// Design Tokens - Black & White Theme
+:root {
+  // Primary Colors
+  --artist-card-bg-primary: rgba(0, 0, 0, 0.85);
+  --artist-card-bg-secondary: rgba(20, 20, 20, 0.8);
+  --artist-card-text-primary: #ffffff;
+  --artist-card-text-secondary: rgba(255, 255, 255, 0.8);
+  --artist-card-text-muted: rgba(255, 255, 255, 0.6);
+
+  // Border Colors
+  --artist-card-border-primary: rgba(255, 255, 255, 0.15);
+  --artist-card-border-hover: rgba(255, 255, 255, 0.25);
+
+  // Shadow Colors
+  --artist-card-shadow-base: rgba(0, 0, 0, 0.4);
+  --artist-card-shadow-elevated: rgba(0, 0, 0, 0.6);
+
+  // Interactive States
+  --artist-card-hover-bg: rgba(40, 40, 40, 0.9);
+  --artist-card-active-bg: rgba(60, 60, 60, 0.9);
+}
+
+// Base Mixins
+@mixin artist-card-base {
+  background: linear-gradient(135deg, var(--artist-card-bg-primary) 0%, var(--artist-card-bg-secondary) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--artist-card-border-primary);
+  border-radius: 12px;
+  color: var(--artist-card-text-primary);
+  box-shadow: 0 4px 16px var(--artist-card-shadow-base);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@mixin artist-card-hover {
+  &:hover {
+    background: linear-gradient(135deg, var(--artist-card-hover-bg) 0%, var(--artist-card-bg-secondary) 100%);
+    border-color: var(--artist-card-border-hover);
+    box-shadow: 0 8px 24px var(--artist-card-shadow-elevated);
+    transform: translateY(-2px);
+  }
+}
+
+@mixin artist-card-text {
+  color: var(--artist-card-text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+// Utility Classes
+.artist-card-theme-override {
+  // Material Design Override Protection
+  --mdc-theme-primary: var(--artist-card-text-primary) !important;
+  --mat-primary-color: var(--artist-card-text-primary) !important;
+  --theme-color: var(--artist-card-text-primary) !important;
+  --color: var(--artist-card-text-primary) !important;
+
+  * {
+    color: var(--artist-card-text-primary) !important;
+  }
+}
+
+// Role Label Styling
+@mixin role-label-style {
+  background: var(--artist-card-bg-primary);
+  color: var(--artist-card-text-primary);
+  border: 1px solid var(--artist-card-border-primary);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: none;
+}
+
+// Playing Status Styling
+@mixin playing-status-style {
+  background: linear-gradient(135deg, var(--artist-card-bg-primary) 0%, var(--artist-card-bg-secondary) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--artist-card-border-primary);
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px var(--artist-card-shadow-base);
+}

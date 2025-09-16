@@ -162,7 +162,7 @@ export class ArtistCreditService {
     'eili': {
       displayName: 'eili',
       avatar: '/assets/images/artists/Eili.png',
-      color: '#4ECDC4',
+      color: '#ffffff',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
         youtube: 'https://www.youtube.com/@EiliYT',

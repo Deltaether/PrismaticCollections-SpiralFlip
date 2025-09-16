@@ -20,9 +20,45 @@
   }
 }
 
+// CRITICAL FIX: Complete mat-icon-button styling override for black/white theme
 .mat-icon-button {
+  // Default state - transparent background
+  background-color: transparent !important;
+  background: transparent !important;
+
+  // Hover state - subtle dark background
   &:hover {
-    background-color: rgba(108, 117, 125, 0.1) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  // Active/pressed state
+  &:active {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    background: rgba(0, 0, 0, 0.15) !important;
+  }
+
+  // Focus state
+  &:focus {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  // Disabled state
+  &:disabled {
+    background-color: transparent !important;
+    background: transparent !important;
+    opacity: 0.3;
+  }
+
+  // Override any Material ripple effects
+  .mat-button-ripple {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  // Override Material focus overlay
+  .mat-button-focus-overlay {
+    background-color: rgba(0, 0, 0, 0.1) !important;
   }
 }
 
@@ -123,4 +159,77 @@ mat-icon {
 .mat-progress-spinner circle,
 .mat-spinner circle {
   stroke: #6c757d !important;
+}
+
+// CRITICAL FIX: Artist Card Specific Material Button Overrides
+// Ensure artist cards maintain black/white theme for all Material buttons
+.artist-card {
+  .mat-icon-button,
+  button[mat-icon-button] {
+    // Force transparent background and proper theme colors
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+
+    // Override all Material button internal components
+    .mat-button-wrapper,
+    .mat-button-ripple,
+    .mat-button-focus-overlay {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    // Ensure icons are white
+    mat-icon,
+    .mat-icon {
+      color: #ffffff !important;
+    }
+
+    // Hover state
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-color: rgba(255, 255, 255, 0.3) !important;
+      color: #ffffff !important;
+
+      mat-icon,
+      .mat-icon {
+        color: #ffffff !important;
+      }
+    }
+
+    // Active/pressed state
+    &:active {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    // Disabled state
+    &:disabled {
+      background-color: transparent !important;
+      background: transparent !important;
+      opacity: 0.3;
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    // Remove any Material ripple color overrides
+    .mat-ripple-element {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+
+  // Ensure all text elements in artist cards are white
+  * {
+    color: #ffffff !important;
+  }
+
+  // Override any remaining Material theme applications
+  &.mat-primary,
+  &[color="primary"],
+  .mat-primary,
+  [color="primary"] {
+    color: #ffffff !important;
+    background-color: transparent !important;
+  }
 }

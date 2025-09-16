@@ -345,7 +345,7 @@ export class MusicStateManagerService implements OnDestroy {
         role: 'Featured Artist' as any,
         participationType: 'featured' as any,
         percentageContribution: 50,
-        color: '#4ECDC4',
+        color: '#ffffff',
         socialLinks: feature.socialLinks
       });
     });

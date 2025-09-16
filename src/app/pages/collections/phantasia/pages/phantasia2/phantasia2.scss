@@ -45,6 +45,13 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     background-attachment: initial;
   }
 
+  // Lock scrolling when auto-scrolling is active
+  &.scroll-locked {
+    overflow-y: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+  }
+
   // Mobile responsive header spacing
   @media (max-width: 767px) {
     padding-top: 70px; // Mobile header height
@@ -214,7 +221,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
 /* ===== ALBUM PRESENTATION =====
  * Main content area for the album showcase
- * Displaced by exactly one viewport height for clean presentation flow
+ * CRITICAL: Positioned exactly 1 viewport below for universal scroll requirement
  * ========================== */
 .album-presentation {
   position: relative;
@@ -225,18 +232,19 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   background: transparent;
   scroll-behavior: smooth;
 
-  // PRESENTATION FLOW: Displace all content by exactly one viewport height
-  // This creates a clean first viewport with only video-title and scroll indicator
+  // CRITICAL: Position cd-showcase exactly 1 viewport below current viewport
+  // This ensures users ALWAYS need to scroll down to see the cd-showcase section
+  // regardless of screen size, device resolution, or content height variations
+  margin-top: 100vh;
 
   @media (max-width: 768px) {
-    padding-top: clamp(0.5rem, 2vh, 1rem);
     max-width: 100vw;
-    // Maintain viewport displacement on tablets
+    // margin-top: 100vh ensures perfect 1 viewport displacement on tablets
   }
 
   @media (max-width: 480px) {
-    padding-top: 0.5rem;
-    // Maintain viewport displacement on mobile
+    // margin-top: 100vh ensures perfect 1 viewport displacement on mobile
+    // No additional padding needed - 100vh handles universal positioning
   }
 }
 
@@ -251,8 +259,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   justify-content: center;
   width: 100%;
   max-width: 100vw;
-  height: 70vh; // CRITICAL: Define explicit height for proper layout flow
-  margin-top: clamp(5.5rem, 12vh, 8rem); // Responsive header margin
+  height: calc(100vh - 90px); // Full viewport minus header - ensures cd-showcase is below fold
+  margin-top: 0; // No additional margin needed
   text-align: center;
   z-index: 2;
   contain: layout style;

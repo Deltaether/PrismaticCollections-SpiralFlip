@@ -88,9 +88,26 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   // Scroll indicator state management
   scrollIndicatorState: ScrollIndicatorState = 'hidden';
   showScrollIndicator = signal(true);
-  
-  // Scroll management and section snapping
+
+  // Two-state scroll system management
+  private scrollState: 'top' | 'content' = 'top';
+  private isAutoScrolling = false;
+  private scrollLocked = false;
+  private scrollThreshold = 50; // Pixels from top to trigger auto-scroll
+  private contentScrollThreshold = 200; // Pixels from cd-showcase to trigger return to top
+
+  // Scroll event management
   private scrollTimeoutId: number | null = null;
+  private wheelTimeoutId: number | null = null;
+  private lastScrollY = 0;
+  private lastWheelTime = 0;
+  private scrollDirection: 'up' | 'down' | null = null;
+
+  // Touch gesture tracking
+  private touchStartY = 0;
+  private touchEndY = 0;
+
+  // Scroll management and section snapping (DEPRECATED - keeping for compatibility)
   private isScrollSnapping = false;
   private lastScrollTime = 0;
   private scrollSections: HTMLElement[] = [];
@@ -145,10 +162,11 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     // Set up smooth scroll behavior
     this.setupSmoothScrolling();
 
-    // Set up section snapping after a delay to ensure DOM is ready
-    setTimeout(() => {
-      this.setupSectionSnapping();
-    }, 1000);
+    // Initialize two-state scroll system
+    this.initializeTwoStateScroll();
+
+    // Ensure we start at the top on page load
+    this.resetToTop();
 
     // Initialize dynamic artist system
     this.initializeDynamicArtistSystem();
@@ -458,20 +476,306 @@ export class Phantasia2Component implements OnInit, OnDestroy {
    * Set up smooth scrolling behavior for the page
    */
   private setupSmoothScrolling(): void {
-    // Enable smooth scrolling on the main phantasia album page container
+    // Enable smooth scrolling on the html element for consistent behavior
     if (typeof document !== 'undefined') {
-      const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
-      if (albumPage) {
-        albumPage.style.scrollBehavior = 'smooth';
-        if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Smooth scrolling enabled on main container');
+      document.documentElement.style.scrollBehavior = 'smooth';
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Smooth scrolling enabled globally');
+      }
+    }
+  }
+
+  /**
+   * Initialize the two-state scroll system
+   */
+  private initializeTwoStateScroll(): void {
+    if (typeof window === 'undefined') return;
+
+    // Bind event handlers to preserve context
+    this.handleScroll = this.handleScroll.bind(this);
+    this.handleWheel = this.handleWheel.bind(this);
+    this.handleKeyboard = this.handleKeyboard.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+
+    // Add scroll event listeners
+    window.addEventListener('scroll', this.handleScroll, { passive: false });
+    window.addEventListener('wheel', this.handleWheel, { passive: false });
+    window.addEventListener('keydown', this.handleKeyboard, { passive: false });
+    window.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+    window.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+
+    // Initialize scroll position tracking
+    this.lastScrollY = window.scrollY;
+    this.updateScrollState();
+
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Two-state scroll system initialized');
+      console.log('[Phantasia2Component] Initial scroll state:', this.scrollState);
+    }
+  }
+
+  /**
+   * Handle scroll events for two-state system
+   */
+  private handleScroll(event: Event): void {
+    if (this.isAutoScrolling || this.scrollLocked) return;
+
+    const currentScrollY = window.scrollY;
+    const scrollDelta = currentScrollY - this.lastScrollY;
+
+    // Determine scroll direction
+    if (Math.abs(scrollDelta) > 5) {
+      this.scrollDirection = scrollDelta > 0 ? 'down' : 'up';
+    }
+
+    // Check if we need to trigger auto-scroll
+    this.checkScrollTriggers(currentScrollY);
+
+    this.lastScrollY = currentScrollY;
+  }
+
+  /**
+   * Handle wheel events for immediate response
+   */
+  private handleWheel(event: WheelEvent): void {
+    if (this.isAutoScrolling || this.scrollLocked) {
+      event.preventDefault();
+      return;
+    }
+
+    const now = Date.now();
+
+    // Throttle wheel events
+    if (now - this.lastWheelTime < 50) return;
+    this.lastWheelTime = now;
+
+    const scrollingDown = event.deltaY > 0;
+    const currentScrollY = window.scrollY;
+
+    // If at top and scrolling down, trigger scroll to content
+    if (this.scrollState === 'top' && scrollingDown && Math.abs(event.deltaY) > 10) {
+      event.preventDefault();
+      this.scrollToContent();
+      return;
+    }
+
+    // If in content area and scrolling up past threshold
+    if (this.scrollState === 'content' && !scrollingDown) {
+      const cdShowcase = this.cdShowcase?.nativeElement;
+      if (cdShowcase) {
+        const showcaseRect = cdShowcase.getBoundingClientRect();
+        if (showcaseRect.top > this.contentScrollThreshold) {
+          event.preventDefault();
+          this.scrollToTop();
+          return;
         }
       }
     }
   }
-  
+
   /**
-   * Set up section snapping functionality
+   * Handle keyboard navigation
+   */
+  private handleKeyboard(event: KeyboardEvent): void {
+    if (this.isAutoScrolling || this.scrollLocked) {
+      // Block navigation keys during auto-scroll
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) {
+        event.preventDefault();
+      }
+      return;
+    }
+
+    const currentScrollY = window.scrollY;
+
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'PageDown':
+      case ' ': // Spacebar
+        if (this.scrollState === 'top') {
+          event.preventDefault();
+          this.scrollToContent();
+        }
+        break;
+
+      case 'ArrowUp':
+      case 'PageUp':
+        if (this.scrollState === 'content') {
+          const cdShowcase = this.cdShowcase?.nativeElement;
+          if (cdShowcase) {
+            const showcaseRect = cdShowcase.getBoundingClientRect();
+            if (showcaseRect.top > this.contentScrollThreshold) {
+              event.preventDefault();
+              this.scrollToTop();
+            }
+          }
+        }
+        break;
+
+      case 'Home':
+        event.preventDefault();
+        this.scrollToTop();
+        break;
+
+      case 'End':
+        if (this.scrollState === 'top') {
+          event.preventDefault();
+          this.scrollToContent();
+        }
+        break;
+    }
+  }
+
+  /**
+   * Handle touch start for mobile gestures
+   */
+  private handleTouchStart(event: TouchEvent): void {
+    this.touchStartY = event.touches[0].clientY;
+  }
+
+  /**
+   * Handle touch end for mobile gestures
+   */
+  private handleTouchEnd(event: TouchEvent): void {
+    if (this.isAutoScrolling || this.scrollLocked) {
+      event.preventDefault();
+      return;
+    }
+
+    this.touchEndY = event.changedTouches[0].clientY;
+    const swipeDistance = this.touchStartY - this.touchEndY;
+    const swipeThreshold = 50; // Minimum swipe distance
+
+    // Swipe up (scroll down)
+    if (swipeDistance > swipeThreshold && this.scrollState === 'top') {
+      event.preventDefault();
+      this.scrollToContent();
+    }
+
+    // Swipe down (scroll up)
+    if (swipeDistance < -swipeThreshold && this.scrollState === 'content') {
+      const cdShowcase = this.cdShowcase?.nativeElement;
+      if (cdShowcase) {
+        const showcaseRect = cdShowcase.getBoundingClientRect();
+        if (showcaseRect.top > this.contentScrollThreshold) {
+          event.preventDefault();
+          this.scrollToTop();
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if auto-scroll should be triggered based on current position
+   */
+  private checkScrollTriggers(currentScrollY: number): void {
+    // Update scroll state
+    this.updateScrollState();
+
+    // If user is in the "dead zone" between sections, auto-scroll to nearest
+    if (currentScrollY > this.scrollThreshold && this.scrollState === 'top') {
+      // User started scrolling from top, go to content
+      this.scrollToContent();
+    } else if (this.scrollState === 'content') {
+      // Check if user is scrolling up from content area
+      const cdShowcase = this.cdShowcase?.nativeElement;
+      if (cdShowcase && this.scrollDirection === 'up') {
+        const showcaseRect = cdShowcase.getBoundingClientRect();
+        if (showcaseRect.top > this.contentScrollThreshold) {
+          // User is scrolling up and content is moving down, return to top
+          this.scrollToTop();
+        }
+      }
+    }
+  }
+
+  /**
+   * Update the current scroll state based on position
+   */
+  private updateScrollState(): void {
+    const currentScrollY = window.scrollY;
+    const cdShowcase = this.cdShowcase?.nativeElement;
+
+    if (currentScrollY <= this.scrollThreshold) {
+      this.scrollState = 'top';
+    } else if (cdShowcase) {
+      const showcaseRect = cdShowcase.getBoundingClientRect();
+      // We're in content state if cd-showcase is at or above the threshold
+      if (showcaseRect.top <= this.contentScrollThreshold) {
+        this.scrollState = 'content';
+      }
+    }
+
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Scroll state updated:', this.scrollState, 'at position:', currentScrollY);
+    }
+  }
+
+  /**
+   * Auto-scroll to the top of the page
+   */
+  private scrollToTop(): void {
+    if (this.isAutoScrolling) return;
+
+    this.isAutoScrolling = true;
+    this.scrollLocked = true;
+
+    // Apply scroll lock to prevent interference
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+
+    if (this.isDebugMode) {
+      console.log('[Phantasia2Component] Auto-scrolling to top');
+    }
+
+    // Perform smooth scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+    // Show scroll indicator when back at top
+    this.showScrollIndicator.set(true);
+    this.scrollIndicatorState = 'visible';
+    this.cdr.markForCheck();
+
+    // Unlock after animation completes
+    setTimeout(() => {
+      this.isAutoScrolling = false;
+      this.scrollLocked = false;
+      this.scrollState = 'top';
+      this.lastScrollY = 0;
+
+      // Remove scroll lock
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Arrived at top, scroll unlocked');
+      }
+    }, 1000);
+  }
+
+  /**
+   * Reset scroll position to top on initial load
+   */
+  private resetToTop(): void {
+    if (typeof window !== 'undefined') {
+      // Immediate jump to top without animation
+      window.scrollTo(0, 0);
+      this.scrollState = 'top';
+      this.lastScrollY = 0;
+
+      if (this.isDebugMode) {
+        console.log('[Phantasia2Component] Reset to top position');
+      }
+    }
+  }
+
+  /**
+   * Set up section snapping functionality (DEPRECATED - replaced by two-state system)
    */
   private setupSectionSnapping(): void {
     if (typeof document === 'undefined') return;
@@ -679,77 +983,90 @@ export class Phantasia2Component implements OnInit, OnDestroy {
   }
   
   /**
-   * Smooth scroll to CD showcase section with improved functionality
+   * Smooth scroll to CD showcase section with two-state system
    */
   scrollToContent(): void {
+    if (this.isAutoScrolling) return;
+
+    this.isAutoScrolling = true;
+    this.scrollLocked = true;
+
+    // Apply scroll lock to prevent interference
+    const currentScrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${currentScrollY}px`;
+
     if (this.isDebugMode) {
-      console.log('[Phantasia2Component] scrollToContent() triggered');
+      console.log('[Phantasia2Component] Auto-scrolling to content section');
     }
 
     if (this.cdShowcase?.nativeElement) {
       const element = this.cdShowcase.nativeElement;
+      const elementTop = element.offsetTop;
+      // Position CD showcase with some padding from top (account for header)
+      const targetPosition = elementTop - 100;
 
-      // First, try scrolling within the album page container
-      const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
-      if (albumPage) {
-        // Calculate scroll position to show CD showcase at the top of viewport
-        const elementRect = element.getBoundingClientRect();
-        const containerRect = albumPage.getBoundingClientRect();
+      // Reset body position before scrolling
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, currentScrollY);
 
-        // Position CD showcase at top of viewport (with larger offset for header and spacing)
-        const targetScrollTop = elementRect.top - containerRect.top + albumPage.scrollTop - 100; // 100px offset from top to account for header
+      // Perform smooth scroll
+      window.scrollTo({
+        top: Math.max(0, targetPosition),
+        behavior: 'smooth'
+      });
 
-        if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Container scroll - Target position:', targetScrollTop);
-          console.log('[Phantasia2Component] Current scroll position:', albumPage.scrollTop);
-          console.log('[Phantasia2Component] Element rect:', elementRect);
-          console.log('[Phantasia2Component] Container rect:', containerRect);
-        }
-
-        // Perform smooth scroll within the container
-        albumPage.scrollTo({
-          top: Math.max(0, targetScrollTop), // Ensure non-negative scroll
-          behavior: 'smooth'
-        });
-
-      } else {
-        if (this.isDebugMode) {
-          console.log('[Phantasia2Component] Album page container not found, using window scroll');
-        }
-
-        // Fallback to window scrolling
-        const elementTop = element.offsetTop;
-        const targetPosition = elementTop - 100; // 100px from top to account for header
-
-        window.scrollTo({
-          top: Math.max(0, targetPosition),
-          behavior: 'smooth'
-        });
-      }
-
-      // Hide scroll indicator after first use
+      // Hide scroll indicator after scrolling to content
       this.hideScrollIndicatorAfterUse();
+
+      // Unlock after animation completes
+      setTimeout(() => {
+        this.isAutoScrolling = false;
+        this.scrollLocked = false;
+        this.scrollState = 'content';
+        this.lastScrollY = window.scrollY;
+
+        // Remove scroll lock
+        document.body.style.overflow = '';
+        document.body.style.width = '';
+
+        if (this.isDebugMode) {
+          console.log('[Phantasia2Component] Arrived at content, scroll unlocked');
+        }
+      }, 1200);
 
     } else {
       if (this.isDebugMode) {
         console.warn('[Phantasia2Component] CD showcase element not found for scrolling');
       }
 
+      // Reset body position before scrolling
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, currentScrollY);
+
       // Fallback: scroll to approximate position (100vh to get past video section)
-      const albumPage = document.querySelector('.phantasia-album-page') as HTMLElement;
-      if (albumPage) {
-        albumPage.scrollTo({
-          top: window.innerHeight - 90, // Full viewport height minus header
-          behavior: 'smooth'
-        });
-      } else {
-        window.scrollTo({
-          top: window.innerHeight - 90,
-          behavior: 'smooth'
-        });
-      }
+      window.scrollTo({
+        top: window.innerHeight - 90,
+        behavior: 'smooth'
+      });
 
       this.hideScrollIndicatorAfterUse();
+
+      // Unlock after animation
+      setTimeout(() => {
+        this.isAutoScrolling = false;
+        this.scrollLocked = false;
+        this.scrollState = 'content';
+        this.lastScrollY = window.scrollY;
+
+        // Remove scroll lock
+        document.body.style.overflow = '';
+        document.body.style.width = '';
+      }, 1200);
     }
   }
   
@@ -809,6 +1126,20 @@ export class Phantasia2Component implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    // Clean up two-state scroll event listeners
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.handleScroll);
+      window.removeEventListener('wheel', this.handleWheel);
+      window.removeEventListener('keydown', this.handleKeyboard);
+      window.removeEventListener('touchstart', this.handleTouchStart);
+      window.removeEventListener('touchend', this.handleTouchEnd);
+    }
+
+    // Clear any pending timeouts
+    if (this.wheelTimeoutId) {
+      clearTimeout(this.wheelTimeoutId);
+      this.wheelTimeoutId = null;
+    }
     // Save final debug log and cleanup debug system
     if (this.debugSystem) {
       this.debugSystem.saveDebugLogToFile();

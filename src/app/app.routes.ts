@@ -52,6 +52,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/collections-page/new-collections.component').then(m => m.NewCollectionsComponent)
       },
       {
+        path: 'phantasia1',
+        loadComponent: () => import('./pages/collections/phantasia/pages/phantasia1/phantasia1').then(m => m.Phantasia1Component)
+      },
+      {
         path: 'phantasia2',
         loadComponent: () => import('./pages/collections/phantasia/pages/phantasia2/phantasia2').then(m => m.Phantasia2Component)
       }

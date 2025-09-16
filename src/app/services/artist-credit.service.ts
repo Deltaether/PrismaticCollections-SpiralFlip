@@ -631,6 +631,26 @@ export class ArtistCreditService {
   }
 
   /**
+   * Get all artists who contributed to Phantasia 1
+   */
+  getAllPhantasia1Artists(): ArtistContribution[] {
+    const allTracks = this.allProjectTracksSubject.value.filter(track => track.projectId === 'phantasia1');
+    const allArtists = new Map<string, ArtistContribution>();
+
+    allTracks.forEach(track => {
+      track.allContributions.forEach(contribution => {
+        if (!allArtists.has(contribution.artistName)) {
+          allArtists.set(contribution.artistName, contribution);
+        }
+      });
+    });
+
+    return Array.from(allArtists.values()).sort((a, b) =>
+      a.artistDisplayName.localeCompare(b.artistDisplayName)
+    );
+  }
+
+  /**
    * Get all artists who contributed to Phantasia 2
    */
   getAllPhantasia2Artists(): ArtistContribution[] {
@@ -1319,7 +1339,7 @@ export class ArtistCreditService {
         trackNumber: 1,
         startTime: 0,
         endTime: 180, // Estimated
-        audioFile: '01. SpiralFlip - Phantasia ft. Eili.mp3',
+        audioFile: '01. SpiralFlip - Phantasia ft. Eili.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 70),
@@ -1340,7 +1360,7 @@ export class ArtistCreditService {
         trackNumber: 2,
         startTime: 180,
         endTime: 360,
-        audioFile: '02. Bigg Milk - First Steps.mp3',
+        audioFile: '02. Bigg Milk - First Steps.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Bigg Milk', 'Main Artist', 'Primary', 100),
@@ -1360,7 +1380,7 @@ export class ArtistCreditService {
         trackNumber: 3,
         startTime: 360,
         endTime: 540,
-        audioFile: '03. Heem - Altar of the Sword.mp3',
+        audioFile: '03. Heem - Altar of the Sword.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Heem', 'Main Artist', 'Primary', 100),
@@ -1380,7 +1400,7 @@ export class ArtistCreditService {
         trackNumber: 4,
         startTime: 540,
         endTime: 720,
-        audioFile: '04. futsuunohito - A Voyage on the Winds of Change.mp3',
+        audioFile: '04. futsuunohito - A Voyage on the Winds of Change.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Futsuunohito', 'Main Artist', 'Primary', 100),
@@ -1400,7 +1420,7 @@ export class ArtistCreditService {
         trackNumber: 5,
         startTime: 720,
         endTime: 900,
-        audioFile: '05. Prower - Rohkeutta Etsiä.mp3',
+        audioFile: '05. Prower - Rohkeutta Etsiä.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Prower', 'Main Artist', 'Primary', 100),
@@ -1420,7 +1440,7 @@ export class ArtistCreditService {
         trackNumber: 6,
         startTime: 900,
         endTime: 1080,
-        audioFile: '06. AZALI & Seycara - Ivory Flowers.mp3',
+        audioFile: '06. AZALI & Seycara - Ivory Flowers.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('AZALI', 'Main Artist', 'Primary', 50),
@@ -1444,7 +1464,7 @@ export class ArtistCreditService {
         trackNumber: 7,
         startTime: 1080,
         endTime: 1260,
-        audioFile: '07. Qyubey - Outer Bygone Ruins.mp3',
+        audioFile: '07. Qyubey - Outer Bygone Ruins.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Qyubey', 'Main Artist', 'Primary', 100),
@@ -1464,7 +1484,7 @@ export class ArtistCreditService {
         trackNumber: 8,
         startTime: 1260,
         endTime: 1440,
-        audioFile: '08. Luscinia - Spiral Into the Abyss!.mp3',
+        audioFile: '08. Luscinia - Spiral Into the Abyss!.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Luscinia', 'Main Artist', 'Primary', 100),
@@ -1484,7 +1504,7 @@ export class ArtistCreditService {
         trackNumber: 9,
         startTime: 1440,
         endTime: 1620,
-        audioFile: '09. Gardens & sleepless - Wandering Breeze.mp3',
+        audioFile: '09. Gardens & sleepless - Wandering Breeze.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 50),
@@ -1508,7 +1528,7 @@ export class ArtistCreditService {
         trackNumber: 10,
         startTime: 1620,
         endTime: 1800,
-        audioFile: '10. はがね - Mystic Nebula.mp3',
+        audioFile: '10. はがね - Mystic Nebula.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('はがね', 'Main Artist', 'Primary', 100),
@@ -1528,7 +1548,7 @@ export class ArtistCreditService {
         trackNumber: 11,
         startTime: 1800,
         endTime: 1980,
-        audioFile: '11. LucaProject - Iris.mp3',
+        audioFile: '11. LucaProject - Iris.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('LucaProject', 'Main Artist', 'Primary', 100),
@@ -1548,7 +1568,7 @@ export class ArtistCreditService {
         trackNumber: 12,
         startTime: 1980,
         endTime: 2160,
-        audioFile: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.mp3',
+        audioFile: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100),
@@ -1568,7 +1588,7 @@ export class ArtistCreditService {
         trackNumber: 13,
         startTime: 2160,
         endTime: 2340,
-        audioFile: '13. satella - The Traveller.mp3',
+        audioFile: '13. satella - The Traveller.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('satella', 'Main Artist', 'Primary', 100),
@@ -1588,7 +1608,7 @@ export class ArtistCreditService {
         trackNumber: 14,
         startTime: 2340,
         endTime: 2520,
-        audioFile: '14. dystopian tanuki - Childhood memories.mp3',
+        audioFile: '14. dystopian tanuki - Childhood memories.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('dystopian tanuki', 'Main Artist', 'Primary', 100),
@@ -1608,7 +1628,7 @@ export class ArtistCreditService {
         trackNumber: 15,
         startTime: 2520,
         endTime: 2700,
-        audioFile: '15. 薄れる ver.Shizu Final.mp3',
+        audioFile: '15. 薄れる ver.Shizu Final.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Shizu', 'Main Artist', 'Primary', 100),

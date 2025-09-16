@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate, stagger, query } from '@angular/animations';
 import { Subject, takeUntil, combineLatest } from 'rxjs';
-import { ArtistCreditService, ArtistContribution } from '../../services/artist-credit.service';
+import { ArtistCreditService, ArtistContribution, ProjectType } from '../../services/artist-credit.service';
 import { AudioService, AudioState } from '../../pages/collections/phantasia/services/audio.service';
 import { CurrentlyPlayingArtistsService } from './currently-playing-artists.service';
 import { DynamicArtistService, TrackWithArtists } from '../../pages/collections/phantasia/services/dynamic-artist.service';
@@ -151,15 +152,20 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
+  // Project detection
+  private currentProject = signal<ProjectType>('phantasia2');
+
   constructor(
     private artistCreditService: ArtistCreditService,
     private audioService: AudioService,
     private currentlyPlayingService: CurrentlyPlayingArtistsService,
     private dynamicArtistService: DynamicArtistService,
-    private musicStateManager: MusicStateManagerService
+    private musicStateManager: MusicStateManagerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.detectCurrentProject();
     this.initializeArtistCards();
     this.setupRealtimeUpdates();
   }
@@ -170,11 +176,38 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Detect current project based on URL
+   */
+  private detectCurrentProject(): void {
+    const url = this.router.url;
+    if (url.includes('phantasia1')) {
+      this.currentProject.set('phantasia1');
+    } else if (url.includes('phantasia2')) {
+      this.currentProject.set('phantasia2');
+    } else {
+      // Default to phantasia2 for backwards compatibility
+      this.currentProject.set('phantasia2');
+    }
+  }
+
+  /**
+   * Get all artists for current project
+   */
+  private getCurrentProjectArtists(): ArtistContribution[] {
+    const project = this.currentProject();
+    if (project === 'phantasia1') {
+      return this.artistCreditService.getAllPhantasia1Artists();
+    } else {
+      return this.artistCreditService.getAllPhantasia2Artists();
+    }
+  }
+
+  /**
    * Initialize all artist cards with proper identifiers using centralized state manager
    */
   private initializeArtistCards(): void {
     try {
-      const allArtists = this.artistCreditService.getAllPhantasia2Artists();
+      const allArtists = this.getCurrentProjectArtists();
       this.totalArtistsCount.set(allArtists.length);
 
       // Create showcase artists (featured selection when not playing)
@@ -397,7 +430,7 @@ export class DynamicArtistCardsComponent implements OnInit, OnDestroy {
     } else if (newMode === 'all') {
       // Show all artists
       this.animationState.set('showcase'); // Use showcase animation for 'all' mode
-      const allArtists = this.artistCreditService.getAllPhantasia2Artists();
+      const allArtists = this.getCurrentProjectArtists();
       this.artistCards.set(this.createAllArtistCards(allArtists));
     }
   }

@@ -16,7 +16,7 @@ section {
   }
 
   @media (min-width: 1920px) {
-    max-width: min(90vw, 1800px);
+
     margin: clamp(1rem, 2vh, 2rem) auto;
   }
 }

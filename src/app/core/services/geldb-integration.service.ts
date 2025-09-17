@@ -403,6 +403,18 @@ export class GelDbIntegrationService {
       displayName: 'sleepy',
       color: '#B0E0E6',
       genre: 'Electronic Producer'
+    },
+    'tikaal': {
+      avatarPath: '/assets/images/artists/tikaal.png',
+      displayName: 'tikaal',
+      color: '#FF9F40',
+      genre: 'Bass Guitarist'
+    },
+    'Miyamai Moca': {
+      avatarPath: '/assets/images/artists/Miyamai-Moca.png',
+      displayName: 'Miyamai Moca',
+      color: '#FFB347',
+      genre: 'Synthesizer V Operator'
     }
   };
 
@@ -493,7 +505,9 @@ export class GelDbIntegrationService {
       'Daph': { twitter: 'https://x.com/daphshoo' },
       'honabai': { twitter: 'https://x.com/honabai' },
       'shironill': { twitter: 'https://x.com/shironill' },
-      'Woojinee': { instagram: 'https://www.instagram.com/wooj1nee/?igsh=czUwcXg3aWh6NmM5&utm_source=qr#' }
+      'Woojinee': { instagram: 'https://www.instagram.com/wooj1nee/?igsh=czUwcXg3aWh6NmM5&utm_source=qr#' },
+      'tikaal': { twitter: 'https://x.com/tikaal' },
+      'Miyamai Moca': { twitter: 'https://x.com/ReeKDoesDTM' }
     };
 
     const links = socialLinksMap[artistName];

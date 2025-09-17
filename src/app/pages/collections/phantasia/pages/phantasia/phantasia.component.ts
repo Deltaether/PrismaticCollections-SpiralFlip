@@ -10,6 +10,7 @@ import { MusicPlayerComponent } from '../../tools/music-player/music-player.comp
 import { SiteHeaderComponent } from '../../../../../shared/components/site-header/site-header.component';
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
 import { DynamicArtistCardsComponent } from '../../../../../components/dynamic-artist-cards/dynamic-artist-cards.component';
+import { SpecialMentionsComponent } from '../../../../../components/special-mentions/special-mentions.component';
 import { AudioService, AudioState } from '../../../../../pages/collections/phantasia/services/audio.service';
 import { DynamicArtistService } from '../../services/dynamic-artist.service';
 import { ArtistCreditService, ProjectMetadata } from '../../../../../services/artist-credit.service';
@@ -37,7 +38,8 @@ export type ScrollIndicatorState = 'visible' | 'hidden';
     MusicPlayerComponent,
     SiteHeaderComponent,
     LoadingScreenComponent,
-    DynamicArtistCardsComponent
+    DynamicArtistCardsComponent,
+    SpecialMentionsComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss'],

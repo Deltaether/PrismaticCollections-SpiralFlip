@@ -673,6 +673,16 @@ export class ArtistCreditService {
         twitter: 'https://x.com/daphshoo'
       },
       bio: 'Live2D animation specialist'
+    },
+    'tikaal': {
+      displayName: 'tikaal',
+      avatar: 'assets/images/artists/tikaal.png',
+      color: '#FF9F40',
+      primaryRoles: ['Bass', 'Instrumentalist'],
+      socialLinks: {
+        twitter: 'https://x.com/tikaal'
+      },
+      bio: 'Bass guitarist and electronic music producer'
     }
   };
 
@@ -1422,14 +1432,15 @@ export class ArtistCreditService {
         audioFile: '01. SpiralFlip - Phantasia ft. Eili.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
-        mainArtist: this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 70),
+        mainArtist: this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 60),
         allContributions: [
-          this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 70, 'Original composition and production'),
-          this.createArtistContribution('eili', 'Featured Artist', 'Featured', 30, 'Lead vocals')
+          this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 60, 'Original composition and production'),
+          this.createArtistContribution('eili', 'Featured Artist', 'Featured', 30, 'Lead vocals'),
+          this.createArtistContribution('tikaal', 'Bass', 'Additional', 10, 'Bass guitar')
         ],
         featuredArtists: [this.createArtistContribution('eili', 'Featured Artist', 'Featured', 30)],
         collaborators: [],
-        instrumentalists: [],
+        instrumentalists: [this.createArtistContribution('tikaal', 'Bass', 'Additional', 10)],
         vocalists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 30)],
         technicalCredits: [this.createArtistContribution('SpiralFlip', 'Producer', 'Primary', 100)]
       },
@@ -1641,7 +1652,7 @@ export class ArtistCreditService {
         vocalists: [],
         technicalCredits: [this.createArtistContribution('LucaProject', 'Producer', 'Primary', 100)]
       },
-      // Track 12: Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere
+      // Track 12: Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere (feat. Miyamai Moca)
       {
         id: 'p1-12',
         title: 'Half-Asleep in the Middle of Bumfuck Nowhere',
@@ -1651,14 +1662,15 @@ export class ArtistCreditService {
         audioFile: '12. Mei Naganowa - Half-Asleep in the Middle of Bumfuck Nowhere.ogg',
         projectId: 'phantasia1',
         projectDisplayName: 'Phantasia Project 1',
-        mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100),
+        mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80),
         allContributions: [
-          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100, 'Electronic production')
+          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80, 'Electronic production and lyrics'),
+          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20, 'Vocals (Synthesizer V)')
         ],
-        featuredArtists: [],
+        featuredArtists: [this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20)],
         collaborators: [],
         instrumentalists: [],
-        vocalists: [],
+        vocalists: [this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20)],
         technicalCredits: [this.createArtistContribution('Mei Naganowa', 'Producer', 'Primary', 100)]
       },
       // Track 13: satella - The Traveller

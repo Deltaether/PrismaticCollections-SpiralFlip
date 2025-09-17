@@ -13,7 +13,9 @@ export type ArtistRole =
   | 'Mastering Engineer' | 'Accordion' | 'Violin' | 'Viola' | 'Cello'
   | 'Piano' | 'Keyboard' | 'Guitar' | 'Bass' | 'Drums' | 'Electronic Producer'
   | 'Cover Illustration' | 'Logo/Jacket Design' | 'Album Stream MV'
-  | 'Crossfade MV/Live2D' | 'Live2D';
+  | 'Crossfade MV/Live2D' | 'Live2D'
+  // Specific production roles for Phantasia 2
+  | 'Vocalist, Lyricist' | 'Accordionist' | 'Violinist' | 'Violist' | 'Cellist';
 
 export type ParticipationType = 'Primary' | 'Featured' | 'Collaboration' | 'Additional' | 'Technical';
 
@@ -905,12 +907,12 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 60),
         allContributions: [
           this.createArtistContribution('SpiralFlip', 'Main Artist', 'Primary', 60, 'Original composition and production'),
-          this.createArtistContribution('eili', 'Featured Artist', 'Featured', 40, 'Lead vocals and melody')
+          this.createArtistContribution('eili', 'Vocalist, Lyricist', 'Featured', 40, 'Vocal/Lyrics/Voice Actor')
         ],
-        featuredArtists: [this.createArtistContribution('eili', 'Featured Artist', 'Featured', 40)],
+        featuredArtists: [this.createArtistContribution('eili', 'Vocalist, Lyricist', 'Featured', 40)],
         collaborators: [],
         instrumentalists: [],
-        vocalists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 40)],
+        vocalists: [this.createArtistContribution('eili', 'Vocalist, Lyricist', 'Featured', 40)],
         technicalCredits: [this.createArtistContribution('SpiralFlip', 'Producer', 'Primary', 100)]
       },
       // Track 2: Ariatec - Hollow Crown (2:48)
@@ -942,21 +944,21 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('MB', 'Main Artist', 'Primary', 40),
         allContributions: [
           this.createArtistContribution('MB', 'Main Artist', 'Primary', 40, 'Orchestral composition and arrangement'),
-          this.createArtistContribution('Iku Hoshifuri', 'Featured Artist', 'Featured', 30, 'Japanese vocals'),
-          this.createArtistContribution('Justin Thornburgh', 'Accordion', 'Additional', 10, 'Accordion performance'),
-          this.createArtistContribution('v1ris', 'Violin', 'Additional', 8, 'Violin performance'),
-          this.createArtistContribution('Rita Kamishiro', 'Viola', 'Additional', 7, 'Viola performance'),
-          this.createArtistContribution('Marcus Ho', 'Cello', 'Additional', 5, 'Cello performance')
+          this.createArtistContribution('Iku Hoshifuri', 'Vocalist, Lyricist', 'Featured', 30, 'Vocals/Lyrics'),
+          this.createArtistContribution('Justin Thornburgh', 'Accordionist', 'Additional', 10, 'Accordion performance'),
+          this.createArtistContribution('v1ris', 'Violinist', 'Additional', 8, 'Violin performance'),
+          this.createArtistContribution('Rita Kamishiro', 'Violist', 'Additional', 7, 'Viola performance'),
+          this.createArtistContribution('Marcus Ho', 'Cellist', 'Additional', 5, 'Cello performance')
         ],
-        featuredArtists: [this.createArtistContribution('Iku Hoshifuri', 'Featured Artist', 'Featured', 30)],
+        featuredArtists: [this.createArtistContribution('Iku Hoshifuri', 'Vocalist, Lyricist', 'Featured', 30)],
         collaborators: [],
         instrumentalists: [
-          this.createArtistContribution('Justin Thornburgh', 'Accordion', 'Additional', 10),
-          this.createArtistContribution('v1ris', 'Violin', 'Additional', 8),
-          this.createArtistContribution('Rita Kamishiro', 'Viola', 'Additional', 7),
-          this.createArtistContribution('Marcus Ho', 'Cello', 'Additional', 5)
+          this.createArtistContribution('Justin Thornburgh', 'Accordionist', 'Additional', 10),
+          this.createArtistContribution('v1ris', 'Violinist', 'Additional', 8),
+          this.createArtistContribution('Rita Kamishiro', 'Violist', 'Additional', 7),
+          this.createArtistContribution('Marcus Ho', 'Cellist', 'Additional', 5)
         ],
-        vocalists: [this.createArtistContribution('Iku Hoshifuri', 'Vocalist', 'Featured', 30)],
+        vocalists: [this.createArtistContribution('Iku Hoshifuri', 'Vocalist, Lyricist', 'Featured', 30)],
         technicalCredits: [this.createArtistContribution('MB', 'Arranger', 'Primary', 100)]
       },
       // Track 4: AZALI & Aloysius - Lux Nova (8:38)
@@ -1028,24 +1030,24 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80),
         allContributions: [
           this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80, 'Synthesizer V composition and production'),
-          this.createArtistContribution('Anri Arcane', 'Synthesizer V Operator', 'Additional', 5, 'Synthesizer V vocals'),
-          this.createArtistContribution('HXVOC', 'Synthesizer V Operator', 'Additional', 5, 'Synthesizer V vocals'),
-          this.createArtistContribution('Miyamai Moca', 'Synthesizer V Operator', 'Additional', 5, 'Synthesizer V vocals'),
-          this.createArtistContribution('Ninezero', 'Synthesizer V Operator', 'Additional', 5, 'Synthesizer V vocals')
+          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
+          this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
+          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
+          this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)')
         ],
         featuredArtists: [],
         collaborators: [
-          this.createArtistContribution('Anri Arcane', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('HXVOC', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('Miyamai Moca', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('Ninezero', 'Synthesizer V Operator', 'Additional', 5)
+          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5)
         ],
         instrumentalists: [],
         vocalists: [
-          this.createArtistContribution('Anri Arcane', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('HXVOC', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('Miyamai Moca', 'Synthesizer V Operator', 'Additional', 5),
-          this.createArtistContribution('Ninezero', 'Synthesizer V Operator', 'Additional', 5)
+          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5),
+          this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5)
         ],
         technicalCredits: [this.createArtistContribution('Mei Naganowa', 'Producer', 'Primary', 100)]
       },
@@ -1114,12 +1116,12 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Yuzuki', 'Main Artist', 'Primary', 90),
         allContributions: [
           this.createArtistContribution('Yuzuki', 'Main Artist', 'Primary', 90, 'Synthesizer V composition and production'),
-          this.createArtistContribution('Hanakuma Chifuyu', 'Synthesizer V Operator', 'Additional', 10, 'Synthesizer V vocals')
+          this.createArtistContribution('Hanakuma Chifuyu', 'Vocalist', 'Additional', 10, 'Vocals (Synthesizer V)')
         ],
         featuredArtists: [],
-        collaborators: [this.createArtistContribution('Hanakuma Chifuyu', 'Synthesizer V Operator', 'Additional', 10)],
+        collaborators: [this.createArtistContribution('Hanakuma Chifuyu', 'Vocalist', 'Additional', 10)],
         instrumentalists: [],
-        vocalists: [this.createArtistContribution('Hanakuma Chifuyu', 'Synthesizer V Operator', 'Additional', 10)],
+        vocalists: [this.createArtistContribution('Hanakuma Chifuyu', 'Vocalist', 'Additional', 10)],
         technicalCredits: [this.createArtistContribution('Yuzuki', 'Producer', 'Primary', 100)]
       },
       // Track 12: LucaProject - Light Guardian (32:42)
@@ -1151,9 +1153,9 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Koway', 'Main Artist', 'Primary', 70),
         allContributions: [
           this.createArtistContribution('Koway', 'Main Artist', 'Primary', 70, 'Experimental electronic composition'),
-          this.createArtistContribution('伍一', 'Featured Artist', 'Featured', 30, 'Chinese vocals')
+          this.createArtistContribution('伍一', 'Vocalist', 'Featured', 30, 'Vocals')
         ],
-        featuredArtists: [this.createArtistContribution('伍一', 'Featured Artist', 'Featured', 30)],
+        featuredArtists: [this.createArtistContribution('伍一', 'Vocalist', 'Featured', 30)],
         collaborators: [],
         instrumentalists: [],
         vocalists: [this.createArtistContribution('伍一', 'Vocalist', 'Featured', 30)],
@@ -1224,11 +1226,11 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Heem', 'Main Artist', 'Primary', 70),
         allContributions: [
           this.createArtistContribution('Heem', 'Main Artist', 'Primary', 70, 'Melodic electronic production'),
-          this.createArtistContribution('Woojinee', 'Featured Artist', 'Featured', 30, 'Violin performance')
+          this.createArtistContribution('Woojinee', 'Violinist', 'Featured', 30, 'Violin')
         ],
-        featuredArtists: [this.createArtistContribution('Woojinee', 'Featured Artist', 'Featured', 30)],
+        featuredArtists: [this.createArtistContribution('Woojinee', 'Violinist', 'Featured', 30)],
         collaborators: [],
-        instrumentalists: [this.createArtistContribution('Woojinee', 'Violin', 'Featured', 30)],
+        instrumentalists: [this.createArtistContribution('Woojinee', 'Violinist', 'Featured', 30)],
         vocalists: [],
         technicalCredits: [this.createArtistContribution('Heem', 'Producer', 'Primary', 100)]
       },
@@ -1261,12 +1263,13 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 60),
         allContributions: [
           this.createArtistContribution('Gardens', 'Main Artist', 'Primary', 60, 'Ambient electronic production'),
-          this.createArtistContribution('Sad Keyboard Guy', 'Collaborator', 'Collaboration', 40, 'Keyboard composition')
+          this.createArtistContribution('Sad Keyboard Guy', 'Collaborator', 'Collaboration', 40, 'Keyboard composition'),
+          this.createArtistContribution('eili', 'Vocalist', 'Featured', 20, 'Vocals')
         ],
-        featuredArtists: [],
+        featuredArtists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 20)],
         collaborators: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 40)],
         instrumentalists: [this.createArtistContribution('Sad Keyboard Guy', 'Keyboard', 'Collaboration', 40)],
-        vocalists: [],
+        vocalists: [this.createArtistContribution('eili', 'Vocalist', 'Featured', 20)],
         technicalCredits: [
           this.createArtistContribution('Gardens', 'Sound Designer', 'Primary', 60),
           this.createArtistContribution('Sad Keyboard Guy', 'Composer', 'Collaboration', 40)
@@ -1283,7 +1286,7 @@ export class ArtistCreditService {
         mainArtist: this.createArtistContribution('Futsuunohito', 'Main Artist', 'Primary', 80),
         allContributions: [
           this.createArtistContribution('Futsuunohito', 'Main Artist', 'Primary', 80, 'Cinematic electronic composition'),
-          this.createArtistContribution('shishishiena', 'Voice Actor', 'Featured', 20, 'Narrative vocals')
+          this.createArtistContribution('shishishiena', 'Voice Actor', 'Featured', 20, 'Voice Actor')
         ],
         featuredArtists: [this.createArtistContribution('shishishiena', 'Voice Actor', 'Featured', 20)],
         collaborators: [],

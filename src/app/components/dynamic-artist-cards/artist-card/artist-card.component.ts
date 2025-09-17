@@ -79,9 +79,9 @@ export class ArtistCardComponent {
 
   readonly roleDisplayText = computed(() => {
     if (!this.cardData?.artist?.role) return '';
-    
+
     const role = this.cardData.artist.role;
-    
+
     // Convert role to display format matching reference design
     switch (role) {
       case 'Main Artist': return 'MAIN ARTIST';
@@ -104,6 +104,12 @@ export class ArtistCardComponent {
       case 'Sound Designer': return 'SOUND DESIGNER';
       case 'Synthesizer V Operator': return 'SYNTHESIZER V';
       case 'Voice Actor': return 'VOICE ACTOR';
+      // New specific production roles for Phantasia 2
+      case 'Vocalist, Lyricist': return 'VOCALIST, LYRICIST';
+      case 'Accordionist': return 'ACCORDIONIST';
+      case 'Violinist': return 'VIOLINIST';
+      case 'Violist': return 'VIOLIST';
+      case 'Cellist': return 'CELLIST';
       default: return role.toUpperCase();
     }
   });

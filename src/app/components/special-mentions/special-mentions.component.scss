@@ -32,7 +32,7 @@
   }
 }
 
-// Three-Column Layout Container
+// Three-Column Layout Container - Enhanced for vertical content expansion
 .three-column-layout {
   display: grid;
   grid-template-columns: 250px 1fr 250px;
@@ -43,18 +43,35 @@
   min-height: 80vh;
   align-items: start;
 
-  // Desktop optimized layout
+  // Ensure the center column can expand vertically without constraints
+  grid-template-rows: auto; // Let content determine row height
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  // Desktop optimized layout - ensure adequate center column width
   @media (min-width: 1200px) {
     grid-template-columns: 280px 1fr 280px;
     gap: 3rem;
     max-width: 1600px;
+
+    // Ensure center column gets adequate width for 3+ cards
+    // At 1600px total - 280px left - 280px right - 6rem gaps = ~1040px center
+    .main-content-column {
+      min-width: 800px; // Ensure minimum width for horizontal card stacking
+    }
   }
 
-  // Large desktop layout
+  // Large desktop layout - optimize for maximum card horizontal stacking
   @media (min-width: 1600px) {
     grid-template-columns: 320px 1fr 320px;
     gap: 4rem;
     max-width: 1800px;
+
+    // At 1800px total - 320px left - 320px right - 8rem gaps = ~1160px center
+    .main-content-column {
+      min-width: 1000px; // Generous width for 4+ cards horizontally
+    }
   }
 }
 
@@ -82,27 +99,41 @@
   padding: 0.5rem;
 }
 
-// Main Content Column
+// Main Content Column - Optimized for grid content
 .main-content-column {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: stretch; // Changed from center to stretch for better grid expansion
   min-height: 60vh;
   padding: 2rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+
+  // Ensure child grid components can expand properly
+  > * {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .content-placeholder {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   min-height: 400px;
   background: rgba(30, 30, 40, 0.3);
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   backdrop-filter: blur(10px);
+  max-width: 100%;
+  overflow: visible;
+  box-sizing: border-box;
+
+  // Optimize for grid content expansion
+  container-type: inline-size;
 
   &:empty::before {
     content: "Main Content Area";
@@ -110,6 +141,26 @@
     font-size: 1.2rem;
     font-weight: 500;
     text-align: center;
+    margin: auto;
+  }
+
+  // Ensure projected grid content has proper width calculation
+  > * {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    box-sizing: border-box;
+
+    // Specific handling for artist cards grid
+    &.dynamic-artist-cards-container {
+      width: 100%;
+      max-width: none;
+
+      .artist-cards-grid {
+        width: 100%;
+        max-width: none;
+      }
+    }
   }
 }
 

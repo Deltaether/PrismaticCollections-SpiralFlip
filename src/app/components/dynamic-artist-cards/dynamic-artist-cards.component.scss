@@ -14,6 +14,18 @@
   backdrop-filter: var(--artist-card-glass-blur);
   -webkit-backdrop-filter: var(--artist-card-glass-blur);
   box-shadow: var(--artist-card-shadow-container);
+
+  // When inside special mentions layout, adapt styling
+  .special-mentions-container & {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    max-width: 100%;
+    padding: 1rem;
+  }
   
   // Header section - Enhanced typography and spacing
   .cards-header {
@@ -44,44 +56,104 @@
     }
   }
   
-  // Artist cards grid layout - Enhanced for single card centering
+  // Artist cards grid layout - Fixed for proper horizontal stacking priority
   .artist-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
-    justify-content: center; // Center grid items when fewer than fit
+    margin: 0 1rem 2rem 1rem; // Added left and right margins
+    justify-content: start; // Changed from center to start for better horizontal filling
+    width: calc(100% - 2rem); // Adjust width to account for margins
+    max-width: calc(100% - 2rem);
+    box-sizing: border-box;
 
-    // Single card centering - Browser-compatible fallback using CSS class
+    // When inside special mentions, prioritize horizontal stacking
+    .special-mentions-container & {
+      // Reduce minmax minimum to allow more cards per row
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      justify-content: start; // Start alignment for horizontal priority
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+
+      // Force grid to calculate available width properly
+      container-type: inline-size;
+
+      // Desktop/laptop optimization - prioritize horizontal stacking
+      @media (min-width: 1024px) {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.2rem;
+        justify-content: start;
+        width: 100%;
+        max-width: none; // Remove max-width constraints
+        margin: 0 0 2rem 0;
+      }
+
+      // Large desktop - optimize for 4+ cards per row
+      @media (min-width: 1200px) {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        justify-content: start;
+        width: 100%;
+        max-width: none;
+        margin: 0 0 2rem 0;
+      }
+    }
+
+    // Single card centering - Only apply when truly needed
     &.single-card {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr;
       justify-content: center;
+      max-width: 400px;
+      margin: 0 auto;
 
       .artist-card {
-        max-width: 400px;
         width: 100%;
+      }
+
+      // Override single card centering when inside special mentions for consistency
+      .special-mentions-container & {
+        justify-content: start;
+        max-width: none;
+        margin: 0 0 2rem 0;
       }
     }
 
     // Modern browser support for :has() selector
     &:has(.artist-card:only-child) {
-      display: flex;
+      display: grid;
       justify-content: center;
+      margin: 0 auto;
 
       .artist-card {
-        max-width: 400px;
         width: 100%;
+      }
+
+      // Override single card centering when inside special mentions
+      .special-mentions-container & {
+        justify-content: start;
+        max-width: none;
+        margin: 0 0 2rem 0;
       }
     }
 
-    // Responsive adjustments
+    // Tablet optimization - 2-3 cards per row
+    @media (min-width: 769px) and (max-width: 1199px) {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    // Mobile - single column
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 1rem;
 
       // Single card on mobile - already centered by default grid behavior
       &.single-card {
-        display: grid; // Use grid for better mobile responsiveness
+        display: grid;
+        grid-template-columns: 1fr;
         justify-content: center;
 
         .artist-card {
@@ -90,43 +162,75 @@
       }
 
       &:has(.artist-card:only-child) {
-        display: grid; // Use grid for better mobile responsiveness
+        display: grid;
+        grid-template-columns: 1fr;
         justify-content: center;
 
         .artist-card {
           max-width: none; // Remove max-width constraint on mobile
+        }
+      }
+
+      // Special handling when inside special mentions on mobile
+      .special-mentions-container & {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        max-width: 100%;
+      }
+    }
+
+    // Desktop breakpoint - prioritize horizontal stacking
+    @media (min-width: 1200px) {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+      justify-content: start; // Ensure horizontal priority
+      box-sizing: border-box;
+
+      // Single card on desktop - maintain responsiveness
+      &.single-card {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-content: center;
+        max-width: 400px;
+        margin: 0 auto;
+
+        .artist-card {
+          width: 100%;
+        }
+      }
+
+      &:has(.artist-card:only-child) {
+        display: grid;
+
+        justify-content: center;
+
+        margin: 0 auto;
+
+        .artist-card {
+          width: 100%;
         }
       }
     }
 
-    @media (min-width: 1200px) {
-      grid-template-columns: repeat(2, 1fr);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
+    // Ultra-wide screens - optimize for 4+ cards per row
+    @media (min-width: 1440px) {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      justify-content: start;
+    }
 
-      // Single card on desktop - use flexbox for perfect centering
-      &.single-card {
-        display: flex;
-        justify-content: center;
-        max-width: 500px; // Constrain width for single card
+    // Container query support for dynamic width-based layout
+    @container (min-width: 800px) {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      justify-content: start;
+    }
 
-        .artist-card {
-          max-width: 400px;
-          width: 100%;
-        }
-      }
-
-      &:has(.artist-card:only-child) {
-        display: flex;
-        justify-content: center;
-        max-width: 500px; // Constrain width for single card
-
-        .artist-card {
-          max-width: 400px;
-          width: 100%;
-        }
-      }
+    @container (min-width: 1000px) {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      justify-content: start;
     }
   }
   

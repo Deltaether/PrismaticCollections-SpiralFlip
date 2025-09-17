@@ -58,7 +58,6 @@
     // Ensure center column gets adequate width for 3+ cards
     // At 1600px total - 280px left - 280px right - 6rem gaps = ~1040px center
     .main-content-column {
-      min-width: 800px; // Ensure minimum width for horizontal card stacking
     }
   }
 
@@ -96,7 +95,6 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 0.5rem;
 }
 
 // Main Content Column - Optimized for grid content
@@ -351,7 +349,6 @@
 // Tablet Layout (768px - 1199px)
 @media (max-width: 1199px) {
   .three-column-layout {
-    grid-template-columns: 220px 1fr 220px;
     gap: 1.5rem;
     padding: 0 1.5rem;
   }

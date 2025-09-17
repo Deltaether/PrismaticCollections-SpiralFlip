@@ -126,13 +126,19 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); // Smaller min width
     gap: 1rem; // Reduced from 2rem
-    margin-bottom: 1rem; // Reduced from 2rem
+    margin: 0 1rem 1rem 1rem; // Added left and right margins
+    width: calc(100% - 2rem); // Adjust width to account for margins
+    max-width: calc(100% - 2rem);
+    box-sizing: border-box;
     justify-content: center; // Center grid items when fewer than fit
 
     // Single card centering - Browser-compatible fallback using CSS class
     &.single-card {
       display: flex;
       justify-content: center;
+      margin: 0 1rem 1rem 1rem; // Maintain margins for single card
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
 
       .artist-card {
         max-width: 320px; // Optimal width for single compact card
@@ -144,6 +150,9 @@
     &:has(.artist-card:only-child) {
       display: flex;
       justify-content: center;
+      margin: 0 1rem 1rem 1rem; // Maintain margins for single card
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
 
       .artist-card {
         max-width: 320px; // Optimal width for single compact card
@@ -154,11 +163,17 @@
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 0.75rem; // Reduced mobile gap
+      margin: 0 0.5rem 1rem 0.5rem; // Smaller margins on mobile
+      width: calc(100% - 1rem);
+      max-width: calc(100% - 1rem);
 
       // Single card on mobile - use grid for consistency
       &.single-card {
         display: grid;
         justify-content: center;
+        margin: 0 0.5rem 1rem 0.5rem; // Consistent mobile margins
+        width: calc(100% - 1rem);
+        max-width: calc(100% - 1rem);
 
         .artist-card {
           max-width: none; // Remove width constraint on mobile
@@ -168,6 +183,9 @@
       &:has(.artist-card:only-child) {
         display: grid;
         justify-content: center;
+        margin: 0 0.5rem 1rem 0.5rem; // Consistent mobile margins
+        width: calc(100% - 1rem);
+        max-width: calc(100% - 1rem);
 
         .artist-card {
           max-width: none; // Remove width constraint on mobile
@@ -486,11 +504,17 @@
     .artist-cards-grid {
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       justify-content: center; // Center grid items in show-all mode
+      margin: 0 1rem 1rem 1rem; // Maintain margins in show-all mode
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
 
       // Single card centering in show-all mode - Browser-compatible fallback
       &.single-card {
         display: flex;
         justify-content: center;
+        margin: 0 1rem 1rem 1rem; // Maintain margins for single card
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
 
         .artist-card {
           max-width: 350px; // Slightly larger for show-all mode
@@ -502,6 +526,9 @@
       &:has(.artist-card:only-child) {
         display: flex;
         justify-content: center;
+        margin: 0 1rem 1rem 1rem; // Maintain margins for single card
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
 
         .artist-card {
           max-width: 350px; // Slightly larger for show-all mode

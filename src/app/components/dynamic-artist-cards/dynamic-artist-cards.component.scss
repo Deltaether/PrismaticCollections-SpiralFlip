@@ -73,8 +73,9 @@
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1rem;
       justify-content: start; // Start alignment for horizontal priority
-      max-width: 100%;
-      width: 100%;
+      margin: 0 1rem 2rem 1rem; // Consistent left/right margins
+      width: calc(100% - 2rem); // Adjust width to account for margins
+      max-width: calc(100% - 2rem);
       box-sizing: border-box;
 
       // Force grid to calculate available width properly
@@ -85,9 +86,9 @@
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1.2rem;
         justify-content: start;
-        width: 100%;
-        max-width: none; // Remove max-width constraints
-        margin: 0 0 2rem 0;
+        margin: 0 1rem 2rem 1rem; // Maintain margins on desktop
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
       }
 
       // Large desktop - optimize for 4+ cards per row
@@ -95,47 +96,69 @@
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 1.5rem;
         justify-content: start;
-        width: 100%;
-        max-width: none;
-        margin: 0 0 2rem 0;
+        margin: 0 1rem 2rem 1rem; // Maintain margins on large desktop
+        width: calc(100% - 2rem);
+        max-width: calc(100% - 2rem);
       }
     }
 
-    // Single card centering - Only apply when truly needed
+    // Single card centering - Enhanced with proper specificity and context handling
     &.single-card {
-      display: grid;
-      grid-template-columns: 1fr;
-      justify-content: center;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      justify-content: center !important;
+      justify-items: center;
       max-width: 400px;
-      margin: 0 auto;
+      margin: 0 auto 2rem auto !important;
+      width: auto !important;
 
       .artist-card {
         width: 100%;
+        max-width: 350px;
+        justify-self: center;
       }
 
-      // Override single card centering when inside special mentions for consistency
+      // Special mentions context - still center but respect container width
       .special-mentions-container & {
-        justify-content: start;
-        max-width: none;
-        margin: 0 0 2rem 0;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        max-width: 400px;
+        width: auto !important;
+
+        .artist-card {
+          max-width: 320px;
+        }
       }
     }
 
-    // Modern browser support for :has() selector
+    // Modern browser support for :has() selector with enhanced specificity
     &:has(.artist-card:only-child) {
-      display: grid;
-      justify-content: center;
-      margin: 0 auto;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      justify-content: center !important;
+      justify-items: center;
+      max-width: 400px;
+      margin: 0 auto 2rem auto !important;
+      width: auto !important;
 
       .artist-card {
         width: 100%;
+        max-width: 350px;
+        justify-self: center;
       }
 
-      // Override single card centering when inside special mentions
+      // Special mentions context with proper centering
       .special-mentions-container & {
-        justify-content: start;
-        max-width: none;
-        margin: 0 0 2rem 0;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        max-width: 400px;
+        width: auto !important;
+
+        .artist-card {
+          max-width: 320px;
+        }
       }
     }
 
@@ -143,31 +166,47 @@
     @media (min-width: 769px) and (max-width: 1199px) {
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.25rem;
+      margin: 0 1rem 2rem 1rem; // Maintain margins on tablet
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
     }
 
     // Mobile - single column
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 1rem;
+      margin: 0 0.5rem 2rem 0.5rem; // Smaller margins on mobile
+      width: calc(100% - 1rem);
+      max-width: calc(100% - 1rem);
 
-      // Single card on mobile - already centered by default grid behavior
+      // Single card on mobile - enhanced centering with proper specificity
       &.single-card {
-        display: grid;
-        grid-template-columns: 1fr;
-        justify-content: center;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        width: auto !important;
+        max-width: calc(100% - 1rem);
 
         .artist-card {
-          max-width: none; // Remove max-width constraint on mobile
+          max-width: calc(100% - 2rem);
+          justify-self: center;
         }
       }
 
       &:has(.artist-card:only-child) {
-        display: grid;
-        grid-template-columns: 1fr;
-        justify-content: center;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        width: auto !important;
+        max-width: calc(100% - 1rem);
 
         .artist-card {
-          max-width: none; // Remove max-width constraint on mobile
+          max-width: calc(100% - 2rem);
+          justify-self: center;
         }
       }
 
@@ -175,42 +214,51 @@
       .special-mentions-container & {
         grid-template-columns: 1fr;
         gap: 0.75rem;
-        max-width: 100%;
+        margin: 0 0.5rem 2rem 0.5rem; // Consistent mobile margins
+        width: calc(100% - 1rem);
+        max-width: calc(100% - 1rem);
       }
     }
 
     // Desktop breakpoint - prioritize horizontal stacking
     @media (min-width: 1200px) {
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      max-width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-      width: 100%;
+      margin: 0 1rem 2rem 1rem; // Consistent desktop margins
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
       justify-content: start; // Ensure horizontal priority
       box-sizing: border-box;
 
-      // Single card on desktop - maintain responsiveness
+      // Single card on desktop - enhanced centering with proper specificity
       &.single-card {
-        display: grid;
-        grid-template-columns: 1fr;
-        justify-content: center;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        width: auto !important;
         max-width: 400px;
-        margin: 0 auto;
 
         .artist-card {
           width: 100%;
+          max-width: 380px;
+          justify-self: center;
         }
       }
 
       &:has(.artist-card:only-child) {
-        display: grid;
-
-        justify-content: center;
-
-        margin: 0 auto;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        justify-content: center !important;
+        justify-items: center;
+        margin: 0 auto 2rem auto !important;
+        width: auto !important;
+        max-width: 400px;
 
         .artist-card {
           width: 100%;
+          max-width: 380px;
+          justify-self: center;
         }
       }
     }
@@ -220,17 +268,26 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.25rem;
       justify-content: start;
+      margin: 0 1rem 2rem 1rem; // Maintain margins on ultra-wide
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
     }
 
     // Container query support for dynamic width-based layout
     @container (min-width: 800px) {
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       justify-content: start;
+      margin: 0 1rem 2rem 1rem; // Maintain margins in container queries
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
     }
 
     @container (min-width: 1000px) {
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       justify-content: start;
+      margin: 0 1rem 2rem 1rem; // Maintain margins in container queries
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
     }
   }
   

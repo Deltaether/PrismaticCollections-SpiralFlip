@@ -965,6 +965,13 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get display volume for UI (0 when muted, actual volume when not muted)
+   */
+  get displayVolume(): number {
+    return this._isMuted ? 0 : this.volume;
+  }
+
+  /**
    * Get saved volume before mute (public accessor)
    */
   get savedVolumeBeforeMute(): number {

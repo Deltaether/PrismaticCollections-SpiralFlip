@@ -68,22 +68,22 @@
       <!-- Volume Control -->
       <div class="volume-section">
         <div class="volume-icon-container" (click)="toggleMute()">
-          <img 
-            class="volume-icon" 
-            [src]="volume === 0 ? 'assets/icons/music-player/volume-mute.svg' : 'assets/icons/music-player/volume.svg'" 
+          <img
+            class="volume-icon"
+            [src]="isMuted ? 'assets/icons/music-player/volume-mute.svg' : 'assets/icons/music-player/volume.svg'"
             alt="Volume"
-            [class.muted]="volume === 0"
+            [class.muted]="isMuted"
           >
         </div>
         <div class="volume-control">
           <div class="volume-track">
-            <div class="volume-fill" [style.width.%]="volume * 100"></div>
+            <div class="volume-fill" [style.width.%]="displayVolume * 100"></div>
             <input 
               type="range" 
               [min]="0" 
               [max]="1" 
               [step]="0.01"
-              [value]="volume"
+              [value]="displayVolume"
               (input)="setVolume($any($event.target).value)"
               class="volume-slider"
               [disabled]="isLoading"

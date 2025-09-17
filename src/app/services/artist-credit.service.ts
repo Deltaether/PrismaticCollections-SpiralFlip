@@ -11,7 +11,9 @@ export type ArtistRole =
   | 'Arranger' | 'Producer' | 'Vocalist' | 'Instrumentalist' | 'Voice Actor'
   | 'Synthesizer V Operator' | 'Sound Designer' | 'Mixing Engineer'
   | 'Mastering Engineer' | 'Accordion' | 'Violin' | 'Viola' | 'Cello'
-  | 'Piano' | 'Keyboard' | 'Guitar' | 'Bass' | 'Drums' | 'Electronic Producer';
+  | 'Piano' | 'Keyboard' | 'Guitar' | 'Bass' | 'Drums' | 'Electronic Producer'
+  | 'Cover Illustration' | 'Logo/Jacket Design' | 'Album Stream MV'
+  | 'Crossfade MV/Live2D' | 'Live2D';
 
 export type ParticipationType = 'Primary' | 'Featured' | 'Collaboration' | 'Additional' | 'Technical';
 

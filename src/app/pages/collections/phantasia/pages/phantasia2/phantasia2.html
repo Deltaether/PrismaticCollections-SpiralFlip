@@ -101,14 +101,17 @@
       </div>
     </section>
 
-    <!-- Dynamic Artist Cards Section - Independent section for proper layout -->
+    <!-- Dynamic Artist Cards Section with Special Mentions - Three-column layout -->
     <section class="artist-cards-section">
-      <app-dynamic-artist-cards
-        [showAllArtists]="false"
-        [maxVisibleCards]="8"
-        [enableAnimations]="true"
-        [displayMode]="artistDisplayMode()">
-      </app-dynamic-artist-cards>
+      <app-special-mentions>
+        <!-- Main content (artist cards) will be projected into the center column -->
+        <app-dynamic-artist-cards
+          [showAllArtists]="false"
+          [maxVisibleCards]="8"
+          [enableAnimations]="true"
+          [displayMode]="artistDisplayMode()">
+        </app-dynamic-artist-cards>
+      </app-special-mentions>
     </section>
 
     <!-- Footer Section -->

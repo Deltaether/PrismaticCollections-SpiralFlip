@@ -48,7 +48,7 @@
   </div>
 
   <!-- Social Links Section -->
-  <div class="social-links-section" *ngIf="hasYoutube || hasTwitter || hasLinktr">
+  <div class="social-links-section" *ngIf="hasYoutube || hasTwitter || hasLinktr || hasInstagram">
     <!-- YouTube Link -->
     <button *ngIf="hasYoutube"
             class="social-link youtube-link"
@@ -78,6 +78,16 @@
             (click)="onSocialLinkClick('linktr', $event)">
       <mat-icon>link</mat-icon>
       <span class="social-label">Links</span>
+    </button>
+
+    <!-- Instagram Link -->
+    <button *ngIf="hasInstagram"
+            class="social-link instagram-link"
+            mat-icon-button
+            [attr.aria-label]="artistName + ' Instagram profile'"
+            (click)="onSocialLinkClick('instagram', $event)">
+      <span class="instagram-icon">📷</span>
+      <span class="social-label">Instagram</span>
     </button>
   </div>
 

@@ -129,6 +129,10 @@ export class ArtistCardComponent {
     return !!this.cardData?.artist?.socialLinks?.linktr;
   }
 
+  get hasInstagram(): boolean {
+    return !!this.cardData?.artist?.socialLinks?.instagram;
+  }
+
   get youtubeUrl(): string {
     return this.cardData?.artist?.socialLinks?.youtube || '';
   }
@@ -139,6 +143,10 @@ export class ArtistCardComponent {
 
   get linktrUrl(): string {
     return this.cardData?.artist?.socialLinks?.linktr || '';
+  }
+
+  get instagramUrl(): string {
+    return this.cardData?.artist?.socialLinks?.instagram || '';
   }
 
   get artistName(): string {
@@ -170,7 +178,7 @@ export class ArtistCardComponent {
     this.avatarError.set(true);
   }
 
-  onSocialLinkClick(platform: 'youtube' | 'twitter' | 'linktr', event: Event): void {
+  onSocialLinkClick(platform: 'youtube' | 'twitter' | 'linktr' | 'instagram', event: Event): void {
     event.stopPropagation();
 
     let url = '';
@@ -180,6 +188,8 @@ export class ArtistCardComponent {
       url = this.twitterUrl;
     } else if (platform === 'linktr') {
       url = this.linktrUrl;
+    } else if (platform === 'instagram') {
+      url = this.instagramUrl;
     }
 
     if (url) {

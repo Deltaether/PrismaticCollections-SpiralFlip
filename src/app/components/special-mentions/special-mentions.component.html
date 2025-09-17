@@ -1,51 +1,117 @@
-<!-- Special Mentions Section -->
+<!-- Special Mentions Three-Column Layout -->
 <div class="special-mentions-container">
+  <!-- Section Header -->
   <div class="section-header">
     <h3 class="section-title">Special Thanks</h3>
     <p class="section-subtitle">Production Team</p>
   </div>
 
-  <div class="compact-cards-grid">
-    @for (mention of displayedMentions(); track mention.id) {
-      <div class="compact-card"
-           (click)="onCardClick(mention)"
-           [style.--accent-color]="mention.color">
+  <!-- Three-Column Layout: Left Cards | Main Content | Right Cards -->
+  <div class="three-column-layout">
 
-        <!-- Avatar Section -->
-        <div class="compact-avatar">
-          <img *ngIf="mention.avatar"
-               [src]="mention.avatar"
-               [alt]="mention.name + ' avatar'"
-               class="avatar-image"
-               loading="lazy">
+    <!-- Left Side Cards Column -->
+    <div class="cards-column left-column">
+      <div class="column-cards">
+        @for (mention of leftSideCards(); track mention.id) {
+          <div class="compact-card vertical-card"
+               (click)="onCardClick(mention)"
+               [style.--accent-color]="mention.color">
 
-          <!-- Initials Fallback -->
-          <div *ngIf="!mention.avatar"
-               class="avatar-initials"
-               [style.background]="mention.color">
-            {{ mention.initials }}
+            <!-- Avatar Section -->
+            <div class="compact-avatar">
+              <img *ngIf="mention.avatar"
+                   [src]="mention.avatar"
+                   [alt]="mention.name + ' avatar'"
+                   class="avatar-image"
+                   loading="lazy">
+
+              <!-- Initials Fallback -->
+              <div *ngIf="!mention.avatar"
+                   class="avatar-initials"
+                   [style.background]="mention.color">
+                {{ mention.initials }}
+              </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="compact-info">
+              <div class="artist-name">{{ mention.name }}</div>
+              <div class="artist-role">{{ mention.role }}</div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram">
+              <button class="social-btn"
+                      mat-icon-button
+                      [attr.aria-label]="mention.name + ' social link'"
+                      (click)="mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) : onSocialLinkClick(mention.socialLinks.instagram!, $event)">
+                <span *ngIf="mention.socialLinks.twitter" class="twitter-x-icon">𝕏</span>
+                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter" class="instagram-icon">📷</span>
+              </button>
+            </div>
+
+            <!-- Hover Effect -->
+            <div class="card-accent"></div>
           </div>
-        </div>
-
-        <!-- Info Section -->
-        <div class="compact-info">
-          <div class="artist-name">{{ mention.name }}</div>
-          <div class="artist-role">{{ mention.role }}</div>
-        </div>
-
-        <!-- Social Links -->
-        <div class="compact-social" *ngIf="mention.socialLinks.twitter">
-          <button class="social-btn"
-                  mat-icon-button
-                  [attr.aria-label]="mention.name + ' social link'"
-                  (click)="onSocialLinkClick(mention.socialLinks.twitter!, $event)">
-            <span class="twitter-x-icon">𝕏</span>
-          </button>
-        </div>
-
-        <!-- Hover Effect -->
-        <div class="card-accent"></div>
+        }
       </div>
-    }
+    </div>
+
+    <!-- Main Content Area (for external content) -->
+    <div class="main-content-column">
+      <div class="content-placeholder">
+        <!-- This slot is intended for main content like artist cards -->
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- Right Side Cards Column -->
+    <div class="cards-column right-column">
+      <div class="column-cards">
+        @for (mention of rightSideCards(); track mention.id) {
+          <div class="compact-card vertical-card"
+               (click)="onCardClick(mention)"
+               [style.--accent-color]="mention.color">
+
+            <!-- Avatar Section -->
+            <div class="compact-avatar">
+              <img *ngIf="mention.avatar"
+                   [src]="mention.avatar"
+                   [alt]="mention.name + ' avatar'"
+                   class="avatar-image"
+                   loading="lazy">
+
+              <!-- Initials Fallback -->
+              <div *ngIf="!mention.avatar"
+                   class="avatar-initials"
+                   [style.background]="mention.color">
+                {{ mention.initials }}
+              </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="compact-info">
+              <div class="artist-name">{{ mention.name }}</div>
+              <div class="artist-role">{{ mention.role }}</div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram">
+              <button class="social-btn"
+                      mat-icon-button
+                      [attr.aria-label]="mention.name + ' social link'"
+                      (click)="mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) : onSocialLinkClick(mention.socialLinks.instagram!, $event)">
+                <span *ngIf="mention.socialLinks.twitter" class="twitter-x-icon">𝕏</span>
+                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter" class="instagram-icon">📷</span>
+              </button>
+            </div>
+
+            <!-- Hover Effect -->
+            <div class="card-accent"></div>
+          </div>
+        }
+      </div>
+    </div>
+
   </div>
 </div>

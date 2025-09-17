@@ -13,6 +13,7 @@ interface SpecialMention {
   socialLinks: {
     twitter?: string;
     youtube?: string;
+    instagram?: string;
     website?: string;
   };
 }
@@ -38,6 +39,19 @@ export class SpecialMentionsComponent implements OnInit {
     }));
   });
 
+  // Split cards for left and right side display
+  readonly leftSideCards = computed(() => {
+    const mentions = this.displayedMentions();
+    const halfPoint = Math.ceil(mentions.length / 2);
+    return mentions.slice(0, halfPoint);
+  });
+
+  readonly rightSideCards = computed(() => {
+    const mentions = this.displayedMentions();
+    const halfPoint = Math.ceil(mentions.length / 2);
+    return mentions.slice(halfPoint);
+  });
+
   constructor(private gelDbService: GelDbIntegrationService) {}
 
   ngOnInit(): void {
@@ -45,14 +59,17 @@ export class SpecialMentionsComponent implements OnInit {
   }
 
   private loadSpecialMentionsFromDatabase(): void {
-    // List of special mention artist names from the geldb
+    // List of special mention artist names from the geldb (specialized collaborators)
     const specialMentionNames = [
-      'PliXoR',
-      'NapaL',
-      'yy_artwork',
-      'Elegant Sister',
-      'Len',
-      'Daph'
+      'SpiralFlip',     // Organiser
+      'PliXoR',         // Mastering Engineer
+      'NapaL',          // Cover Illustration
+      'yy_artwork',     // Logo/Jacket Design
+      'Elegant Sister', // Album Stream MV
+      'Len',            // Crossfade MV/Live2D
+      'Daph',           // Live2D
+      'honabai',        // Special Thanks
+      'shironill'       // Special Thanks
     ];
 
     const specialMentionsList: SpecialMention[] = specialMentionNames
@@ -75,6 +92,7 @@ export class SpecialMentionsComponent implements OnInit {
           socialLinks: {
             twitter: socialLinks?.twitter,
             youtube: socialLinks?.youtube,
+            instagram: socialLinks?.instagram,
             website: socialLinks?.website
           }
         };
@@ -93,6 +111,8 @@ export class SpecialMentionsComponent implements OnInit {
   onCardClick(mention: SpecialMention): void {
     if (mention.socialLinks.twitter) {
       window.open(mention.socialLinks.twitter, '_blank', 'noopener,noreferrer');
+    } else if (mention.socialLinks.instagram) {
+      window.open(mention.socialLinks.instagram, '_blank', 'noopener,noreferrer');
     } else if (mention.socialLinks.youtube) {
       window.open(mention.socialLinks.youtube, '_blank', 'noopener,noreferrer');
     } else if (mention.socialLinks.website) {

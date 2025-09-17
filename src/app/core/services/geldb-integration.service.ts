@@ -128,7 +128,7 @@ export class GelDbIntegrationService {
       avatarPath: '/assets/images/artists/SpiralFlip.png',
       displayName: 'SpiralFlip',
       color: '#FF6B6B',
-      genre: 'Electronic, Synthwave'
+      genre: 'Organiser'
     },
     'eili': {
       avatarPath: '/assets/images/artists/Eili.png',
@@ -278,7 +278,7 @@ export class GelDbIntegrationService {
       avatarPath: '/assets/images/artists/Woojinee.png',
       displayName: 'Woojinee',
       color: '#E84393',
-      genre: 'Classical, Violin'
+      genre: 'Violinist'
     },
     'Bigg Milk': {
       avatarPath: '/assets/images/artists/Bigg Milk.png',
@@ -347,6 +347,18 @@ export class GelDbIntegrationService {
       displayName: 'Daph',
       color: '#00d2d3',
       genre: 'Live2D'
+    },
+    'honabai': {
+      avatarPath: '/assets/images/artists/honabai.png',
+      displayName: 'honabai',
+      color: '#ff9ff3',
+      genre: 'Special Thanks'
+    },
+    'shironill': {
+      avatarPath: '/assets/images/artists/shironill.png',
+      displayName: 'shironill',
+      color: '#f368e0',
+      genre: 'Special Thanks'
     },
 
     // ====== PHANTASIA 1 ARTISTS ======
@@ -478,7 +490,10 @@ export class GelDbIntegrationService {
       'yy_artwork': { twitter: 'https://x.com/yy_artwork' },
       'Elegant Sister': { twitter: 'https://x.com/ElegantSister' },
       'Len': { twitter: 'https://x.com/Len_licht' },
-      'Daph': { twitter: 'https://x.com/daphshoo' }
+      'Daph': { twitter: 'https://x.com/daphshoo' },
+      'honabai': { twitter: 'https://x.com/honabai' },
+      'shironill': { twitter: 'https://x.com/shironill' },
+      'Woojinee': { instagram: 'https://www.instagram.com/wooj1nee/?igsh=czUwcXg3aWh6NmM5&utm_source=qr#' }
     };
 
     const links = socialLinksMap[artistName];

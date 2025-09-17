@@ -173,18 +173,34 @@ export class DynamicArtistService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    try {
+      console.log('[DynamicArtistService] Starting cleanup...');
 
-    // Clear caches for memory management
-    this.artistCache.clear();
-    this.artistColorCache.clear();
+      // 【✓】 Signal destruction to all subscriptions first
+      this.destroy$.next();
+      this.destroy$.complete();
 
-    console.log('[DynamicArtistService] Performance metrics:', {
-      totalLookups: this.performanceMetrics.artistLookups,
-      cacheHits: this.performanceMetrics.cacheHits,
-      cacheHitRate: this.performanceMetrics.cacheHits / Math.max(1, this.performanceMetrics.artistLookups)
-    });
+      // 【✓】 Clear caches for memory management
+      this.artistCache.clear();
+      this.artistColorCache.clear();
+
+      // 【✓】 Complete subjects to prevent memory leaks
+      this.currentTimeSubject.complete();
+      this.tracksSubject.complete();
+      this.currentTrackSubject.complete();
+      this.currentProjectSubject.complete();
+      this.allProjectTracksSubject.complete();
+
+      console.log('[DynamicArtistService] Performance metrics:', {
+        totalLookups: this.performanceMetrics.artistLookups,
+        cacheHits: this.performanceMetrics.cacheHits,
+        cacheHitRate: this.performanceMetrics.cacheHits / Math.max(1, this.performanceMetrics.artistLookups)
+      });
+
+      console.log('[DynamicArtistService] Cleanup completed successfully');
+    } catch (error) {
+      console.error('[DynamicArtistService] Error during cleanup:', error);
+    }
   }
 
   /**
@@ -258,21 +274,52 @@ export class DynamicArtistService implements OnDestroy {
   }
 
   /**
-   * Update current playback time
+   * 【✓】 Enhanced time update with error handling and validation
    */
   updateCurrentTime(timeInSeconds: number): void {
-    this.currentTimeSubject.next(timeInSeconds);
-
-    // Update current track based on time
-    const tracks = this.tracksSubject.value;
-    const currentTrack = this.findTrackByTime(timeInSeconds, tracks);
-    if (currentTrack !== this.currentTrackSubject.value) {
-      this.currentTrackSubject.next(currentTrack);
-
-      // Update comprehensive credit service with current track
-      if (currentTrack) {
-        this.artistCreditService.updateCurrentTrack(currentTrack.id);
+    try {
+      // 【✓】 Validate input
+      if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
+        console.warn('[DynamicArtistService] Invalid time value:', timeInSeconds);
+        return;
       }
+
+      // 【✓】 Check if subject is still active
+      if (this.currentTimeSubject.closed) {
+        console.warn('[DynamicArtistService] Attempted to update time on closed subject');
+        return;
+      }
+
+      this.currentTimeSubject.next(timeInSeconds);
+
+      // 【✓】 Update current track based on time with error handling
+      const tracks = this.tracksSubject.value;
+      if (!tracks || tracks.length === 0) {
+        return;
+      }
+
+      const currentTrack = this.findTrackByTime(timeInSeconds, tracks);
+      const previousTrack = this.currentTrackSubject.value;
+
+      if (currentTrack !== previousTrack) {
+        // 【✓】 Check if track subject is still active
+        if (!this.currentTrackSubject.closed) {
+          this.currentTrackSubject.next(currentTrack);
+        }
+
+        // 【✓】 Update comprehensive credit service with error handling
+        if (currentTrack) {
+          try {
+            this.artistCreditService.updateCurrentTrack(currentTrack.id);
+          } catch (error) {
+            console.error('[DynamicArtistService] Error updating artist credits:', error);
+          }
+        }
+
+        console.log(`[DynamicArtistService] Track changed from ${previousTrack?.id || 'none'} to ${currentTrack?.id || 'none'}`);
+      }
+    } catch (error) {
+      console.error('[DynamicArtistService] Error updating current time:', error);
     }
   }
 
@@ -316,16 +363,48 @@ export class DynamicArtistService implements OnDestroy {
   // ====== MULTI-PROJECT SUPPORT METHODS ======
 
   /**
-   * Switch between projects and load corresponding tracks
+   * 【✓】 Enhanced project switching with error handling
    */
   setCurrentProject(projectId: ProjectType): void {
-    this.currentProjectSubject.next(projectId);
+    try {
+      // 【✓】 Validate input
+      if (!projectId || !['phantasia1', 'phantasia2'].includes(projectId)) {
+        console.error('[DynamicArtistService] Invalid project ID:', projectId);
+        return;
+      }
 
-    // Update artist credit service
-    this.artistCreditService.setCurrentProject(projectId);
+      // 【✓】 Check if subject is still active
+      if (this.currentProjectSubject.closed) {
+        console.warn('[DynamicArtistService] Attempted to update project on closed subject');
+        return;
+      }
 
-    // Load tracks for the selected project
-    this.loadProjectData(projectId);
+      const currentProject = this.currentProjectSubject.value;
+      if (currentProject === projectId) {
+        console.log(`[DynamicArtistService] Project ${projectId} already active`);
+        return;
+      }
+
+      this.currentProjectSubject.next(projectId);
+
+      // 【✓】 Update artist credit service with error handling
+      try {
+        this.artistCreditService.setCurrentProject(projectId);
+      } catch (error) {
+        console.error('[DynamicArtistService] Error updating artist credit service:', error);
+      }
+
+      // 【✓】 Load tracks for the selected project with error handling
+      try {
+        this.loadProjectData(projectId);
+      } catch (error) {
+        console.error('[DynamicArtistService] Error loading project data:', error);
+      }
+
+      console.log(`[DynamicArtistService] Successfully switched to project: ${projectId}`);
+    } catch (error) {
+      console.error('[DynamicArtistService] Error setting current project:', error);
+    }
   }
 
   /**

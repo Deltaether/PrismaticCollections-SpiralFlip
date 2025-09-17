@@ -101,6 +101,11 @@ export class MusicStateManagerService implements OnDestroy {
     takeUntil(this.destroy$)
   );
 
+  // 【✓】 Enhanced subscription management to prevent leaks
+  private readonly subscriptions: { [key: string]: any } = {};
+  private readonly stateUpdateQueue: Array<() => void> = [];
+  private isProcessingQueue = false;
+
   constructor(
     private dynamicArtistService: DynamicArtistService,
     private audioService: AudioService,
@@ -110,91 +115,159 @@ export class MusicStateManagerService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    try {
+      // 【✓】 Enhanced cleanup with subscription tracking
+      console.log('[MusicStateManager] Starting cleanup...');
+
+      // Cancel any pending state updates
+      this.stateUpdateQueue.length = 0;
+      this.isProcessingQueue = false;
+
+      // Explicitly unsubscribe from tracked subscriptions
+      Object.keys(this.subscriptions).forEach(key => {
+        try {
+          if (this.subscriptions[key] && typeof this.subscriptions[key].unsubscribe === 'function') {
+            this.subscriptions[key].unsubscribe();
+          }
+        } catch (error) {
+          console.error(`[MusicStateManager] Error unsubscribing from ${key}:`, error);
+        }
+      });
+
+      // Signal destruction to all subscriptions
+      this.destroy$.next();
+      this.destroy$.complete();
+
+      console.log('[MusicStateManager] Cleanup completed');
+    } catch (error) {
+      console.error('[MusicStateManager] Error during cleanup:', error);
+    }
   }
 
   /**
-   * Initialize the service and setup state synchronization
+   * 【✓】 Enhanced service initialization with proper subscription management
    */
   private initializeService(): void {
-    // Initialize with all artists for showcase mode
-    this.loadAllArtistsForShowcase();
+    try {
+      console.log('[MusicStateManager] Initializing service...');
 
-    // Primary: Monitor DynamicArtistService for Phantasia 2 track changes
-    this.dynamicArtistService.currentTrack$.pipe(
-      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-      takeUntil(this.destroy$)
-    ).subscribe(currentTrack => {
-      this.handleTrackChange(currentTrack, 'phantasia2');
-    });
+      // Initialize with all artists for showcase mode
+      this.loadAllArtistsForShowcase();
 
-    // Monitor current time updates from DynamicArtistService
-    this.dynamicArtistService.currentTime$.pipe(
-      debounceTime(100), // Throttle for performance
-      takeUntil(this.destroy$)
-    ).subscribe(currentTime => {
-      this.updateCurrentTime(currentTime);
-    });
+      // 【✓】 Primary: Monitor DynamicArtistService for Phantasia 2 track changes with error handling
+      this.subscriptions['currentTrack'] = this.dynamicArtistService.currentTrack$.pipe(
+        distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (currentTrack) => this.queueStateUpdate(() => this.handleTrackChange(currentTrack, 'phantasia2')),
+        error: (error) => console.error('[MusicStateManager] Error in currentTrack subscription:', error)
+      });
 
-    // Fallback: Monitor legacy AudioService
-    this.audioService.audioState$.pipe(
-      distinctUntilChanged((prev, curr) =>
-        prev.currentTrack === curr.currentTrack &&
-        prev.isPlaying === curr.isPlaying
-      ),
-      takeUntil(this.destroy$)
-    ).subscribe(audioState => {
-      // Only use if no Phantasia 2 track is active
-      const currentMusicState = this.musicStateSubject.value;
-      if (!currentMusicState.currentTrack || currentMusicState.playbackMode !== 'phantasia2') {
-        this.handleAudioStateChange(audioState);
-      }
-    });
+      // 【✓】 Monitor current time updates with throttling and error handling
+      this.subscriptions['currentTime'] = this.dynamicArtistService.currentTime$.pipe(
+        debounceTime(50), // Faster response, better throttling
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (currentTime) => this.queueStateUpdate(() => this.updateCurrentTime(currentTime)),
+        error: (error) => console.error('[MusicStateManager] Error in currentTime subscription:', error)
+      });
 
-    // Monitor artist credits for complete track information
-    this.artistCreditService.currentTrackCredits$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(trackCredits => {
-      this.updateTrackCredits(trackCredits);
-    });
+      // 【✓】 Fallback: Monitor legacy AudioService with enhanced error handling
+      this.subscriptions['audioState'] = this.audioService.audioState$.pipe(
+        distinctUntilChanged((prev, curr) =>
+          prev.currentTrack === curr.currentTrack &&
+          prev.isPlaying === curr.isPlaying
+        ),
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (audioState) => {
+          // Only use if no Phantasia 2 track is active
+          const currentMusicState = this.musicStateSubject.value;
+          if (!currentMusicState.currentTrack || currentMusicState.playbackMode !== 'phantasia2') {
+            this.queueStateUpdate(() => this.handleAudioStateChange(audioState));
+          }
+        },
+        error: (error) => console.error('[MusicStateManager] Error in audioState subscription:', error)
+      });
+
+      // 【✓】 Monitor artist credits with error handling
+      this.subscriptions['trackCredits'] = this.artistCreditService.currentTrackCredits$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (trackCredits) => this.queueStateUpdate(() => this.updateTrackCredits(trackCredits)),
+        error: (error) => console.error('[MusicStateManager] Error in trackCredits subscription:', error)
+      });
+
+      console.log('[MusicStateManager] Service initialized with enhanced error handling');
+    } catch (error) {
+      console.error('[MusicStateManager] Error during initialization:', error);
+    }
   }
 
   /**
-   * Handle track changes from DynamicArtistService
+   * 【✓】 Enhanced track change handling with error recovery
    */
   private handleTrackChange(track: TrackWithArtists | null, mode: 'phantasia2' | 'legacy'): void {
-    const currentState = this.musicStateSubject.value;
+    try {
+      const currentState = this.musicStateSubject.value;
 
-    if (track) {
-      // Get complete credits for the track
-      const trackCredits = this.artistCreditService.getTrackCredits(track.id);
+      // 【✓】 Prevent unnecessary updates if track hasn't actually changed
+      if (track && currentState.currentTrack?.id === track.id) {
+        console.log(`[MusicStateManager] Track ${track.id} already active, skipping update`);
+        return;
+      }
 
-      // Extract artists from track
-      const trackArtists = this.extractArtistsFromTrack(track, trackCredits);
+      if (track) {
+        // Get complete credits for the track with error handling
+        let trackCredits: any = null;
+        try {
+          trackCredits = this.artistCreditService.getTrackCredits(track.id);
+        } catch (error) {
+          console.warn(`[MusicStateManager] Could not get credits for track ${track.id}:`, error);
+        }
 
-      // Update music state
-      const newMusicState: MusicState = {
-        ...currentState,
-        currentTrack: track,
-        currentTrackCredits: trackCredits,
-        playbackMode: mode
-      };
-      this.musicStateSubject.next(newMusicState);
+        // Extract artists from track with fallback
+        const trackArtists = this.extractArtistsFromTrack(track, trackCredits);
 
-      // Update artist filtering state to music-playing mode
-      const newFilteringState: ArtistFilteringState = {
-        mode: 'music-playing',
-        currentArtists: trackArtists,
-        allArtists: this.artistFilteringStateSubject.value.allArtists,
-        displayTitle: 'Currently Playing Artists',
-        displaySubtitle: `Artists for "${track.title}" - ${trackArtists.length} artists are currently featured`
-      };
-      this.artistFilteringStateSubject.next(newFilteringState);
+        // 【✓】 Update music state with validation
+        const newMusicState: MusicState = {
+          ...currentState,
+          currentTrack: track,
+          currentTrackCredits: trackCredits,
+          playbackMode: mode
+        };
 
-      console.log(`[MusicStateManager] Track changed to: "${track.title}" with ${trackArtists.length} artists`);
-    } else {
-      // No track playing - switch to no-music mode
+        // Validate state before updating
+        if (this.validateMusicState(newMusicState)) {
+          this.musicStateSubject.next(newMusicState);
+        } else {
+          console.error('[MusicStateManager] Invalid music state, skipping update');
+          return;
+        }
+
+        // 【✓】 Update artist filtering state with validation
+        const allArtists = this.artistFilteringStateSubject.value.allArtists;
+        const newFilteringState: ArtistFilteringState = {
+          mode: 'music-playing',
+          currentArtists: trackArtists,
+          allArtists,
+          displayTitle: 'Currently Playing Artists',
+          displaySubtitle: `Artists for "${track.title}" - ${trackArtists.length} artists are currently featured`
+        };
+
+        if (this.validateArtistFilteringState(newFilteringState)) {
+          this.artistFilteringStateSubject.next(newFilteringState);
+        }
+
+        console.log(`[MusicStateManager] Track changed to: "${track.title}" with ${trackArtists.length} artists`);
+      } else {
+        // No track playing - switch to no-music mode
+        this.switchToNoMusicMode();
+      }
+    } catch (error) {
+      console.error('[MusicStateManager] Error handling track change:', error);
+      // Attempt recovery by switching to no-music mode
       this.switchToNoMusicMode();
     }
   }
@@ -456,7 +529,7 @@ export class MusicStateManagerService implements OnDestroy {
   }
 
   /**
-   * Get debug information for troubleshooting
+   * 【✓】 Enhanced debug information with comprehensive state tracking
    */
   public getDebugInfo(): any {
     const musicState = this.musicStateSubject.value;
@@ -469,14 +542,147 @@ export class MusicStateManagerService implements OnDestroy {
         currentTrackId: musicState.currentTrack?.id,
         currentTrackTitle: musicState.currentTrack?.title,
         currentTime: musicState.currentTime,
-        duration: musicState.duration
+        duration: musicState.duration,
+        volume: musicState.volume,
+        trackProgress: musicState.trackProgress
       },
       filteringState: {
         mode: filteringState.mode,
         currentArtistsCount: filteringState.currentArtists.length,
         allArtistsCount: filteringState.allArtists.length,
-        displayTitle: filteringState.displayTitle
+        displayTitle: filteringState.displayTitle,
+        displaySubtitle: filteringState.displaySubtitle
+      },
+      subscriptions: {
+        activeSubscriptions: Object.keys(this.subscriptions).length,
+        subscriptionKeys: Object.keys(this.subscriptions)
+      },
+      stateQueue: {
+        queueLength: this.stateUpdateQueue.length,
+        isProcessing: this.isProcessingQueue
       }
     };
+  }
+
+  // 【✓】 Enhanced helper methods for state management
+
+  /**
+   * Queue state updates to prevent race conditions
+   */
+  private queueStateUpdate(updateFn: () => void): void {
+    this.stateUpdateQueue.push(updateFn);
+    this.processStateQueue();
+  }
+
+  /**
+   * Process queued state updates sequentially
+   */
+  private async processStateQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.stateUpdateQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    try {
+      while (this.stateUpdateQueue.length > 0) {
+        const updateFn = this.stateUpdateQueue.shift();
+        if (updateFn) {
+          try {
+            updateFn();
+          } catch (error) {
+            console.error('[MusicStateManager] Error processing state update:', error);
+          }
+          // Small delay to prevent overwhelming the system
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+      }
+    } finally {
+      this.isProcessingQueue = false;
+    }
+  }
+
+  /**
+   * Validate music state before updating
+   */
+  private validateMusicState(state: MusicState): boolean {
+    try {
+      return (
+        typeof state.isPlaying === 'boolean' &&
+        typeof state.currentTime === 'number' &&
+        typeof state.duration === 'number' &&
+        typeof state.volume === 'number' &&
+        typeof state.trackProgress === 'number' &&
+        state.volume >= 0 &&
+        state.volume <= 1 &&
+        state.trackProgress >= 0 &&
+        state.trackProgress <= 1 &&
+        state.currentTime >= 0 &&
+        state.duration >= 0
+      );
+    } catch (error) {
+      console.error('[MusicStateManager] Error validating music state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Validate artist filtering state before updating
+   */
+  private validateArtistFilteringState(state: ArtistFilteringState): boolean {
+    try {
+      return (
+        ['no-music', 'music-playing'].includes(state.mode) &&
+        Array.isArray(state.currentArtists) &&
+        Array.isArray(state.allArtists) &&
+        typeof state.displayTitle === 'string' &&
+        typeof state.displaySubtitle === 'string'
+      );
+    } catch (error) {
+      console.error('[MusicStateManager] Error validating artist filtering state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Emergency reset method for state corruption
+   */
+  public emergencyReset(): void {
+    console.warn('[MusicStateManager] Performing emergency reset');
+
+    try {
+      // Reset to safe default states
+      const safeArtists = this.artistCreditService.getAllPhantasia2Artists();
+
+      const safeMusicState: MusicState = {
+        isPlaying: false,
+        currentTrack: null,
+        currentTrackCredits: null,
+        currentTime: 0,
+        duration: 0,
+        volume: 0.5,
+        trackProgress: 0,
+        playbackMode: 'idle'
+      };
+
+      const safeFilteringState: ArtistFilteringState = {
+        mode: 'no-music',
+        currentArtists: [],
+        allArtists: safeArtists,
+        displayTitle: 'All Phantasia 2 Artists',
+        displaySubtitle: `Showcasing ${safeArtists.length} of 31 artists from the album`
+      };
+
+      this.musicStateSubject.next(safeMusicState);
+      this.artistFilteringStateSubject.next(safeFilteringState);
+
+      // Clear state queue
+      this.stateUpdateQueue.length = 0;
+      this.isProcessingQueue = false;
+
+      console.log('[MusicStateManager] Emergency reset completed');
+    } catch (error) {
+      console.error('[MusicStateManager] Error during emergency reset:', error);
+    }
   }
 }

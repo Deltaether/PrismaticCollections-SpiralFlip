@@ -32,15 +32,26 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   
   private audio: Howl | null = null;
   private readonly destroy$ = new Subject<void>();
-  
-  // 【✓】 Add proper typing for state
+
+  // 【✓】 Enhanced state management with proper locks and error handling
+  private readonly trackLoadingMutex = new Subject<void>();
+  private isTrackLoading = false;
+  private audioInstances: Howl[] = []; // Track all instances for proper cleanup
+  private lastLoadedTrackId: string | null = null;
+
+  // 【✓】 Add proper typing for state with separation of concerns
   isPlaying = false;
   isLoading = true;
   currentTrack = '';
   currentTime = 0;
   duration = 0;
   volume = 0.5;
-  previousVolume = 0.5;
+
+  // 【✓】 Separate mute state management to prevent conflicts
+  private _isMuted = false;
+  private _savedVolumeBeforeMute = 0.5;
+  private _muteStateInitialized = false;
+
   error = '';
   currentSubtitle: string = '';
 
@@ -52,9 +63,16 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   // Project-aware audio path
   private currentProject: 'phantasia1' | 'phantasia2' = 'phantasia1';
 
-  // State persistence flags
-  private isMuted = false;
+  // 【✓】 Enhanced state persistence with better error recovery
   private hasUserInteracted = false;
+  private lastSuccessfulVolume = 0.5;
+  private retryCount = 0;
+  private maxRetries = 3;
+
+  // 【✓】 Audio context management and event listener tracking
+  private audioContext: AudioContext | null = null;
+  private eventListeners: Array<{ element: any; event: string; handler: any }> = [];
+  private isAudioContextInitialized = false;
 
   constructor(
     private readonly audioService: AudioService,
@@ -64,6 +82,12 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   ) {
     // Enhanced debugging for Track 8 loading issues
     this.diagnoseEnvironment();
+
+    // 【✓】 Initialize audio context management
+    this.initializeAudioContext();
+
+    // 【✓】 Setup global event listeners for audio context resume
+    this.setupGlobalEventListeners();
   }
 
   // 【✓】 Comprehensive environment diagnosis for debugging
@@ -104,12 +128,27 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     this.initializeAudio();
   }
 
-  // 【✓】 Cleanup resources
+  // 【✓】 Enhanced cleanup with comprehensive resource management
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    if (this.audio) {
-      this.audio.unload();
+    try {
+      // Signal destruction to all subscriptions
+      this.destroy$.next();
+      this.destroy$.complete();
+
+      // 【✓】 Clean up all audio instances to prevent memory leaks
+      this.cleanupAllAudioInstances();
+
+      // 【✓】 Clear any pending track loading operations
+      this.isTrackLoading = false;
+      this.lastLoadedTrackId = null;
+
+      // 【✓】 Clean up audio context and event listeners
+      this.cleanupAudioContext();
+      this.cleanupEventListeners();
+
+      console.log('[MusicPlayer] Component destroyed and resources cleaned up');
+    } catch (error) {
+      console.error('[MusicPlayer] Error during cleanup:', error);
     }
   }
 
@@ -152,16 +191,39 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   }
 
 
-  // 【✓】 Load and play track from TrackWithArtists info
-  private loadTrackFromInfo(trackInfo: TrackWithArtists): void {
-    this.isLoading = true;
-    this.currentTime = 0;
-    this.isPlaying = false;
-    this.error = '';
-    this.cdr.markForCheck();
+  // 【✓】 Enhanced track loading with mutex protection and proper cleanup
+  private async loadTrackFromInfo(trackInfo: TrackWithArtists): Promise<void> {
+    // 【✓】 Implement mutex to prevent race conditions
+    if (this.isTrackLoading) {
+      console.log('[MusicPlayer] Track loading already in progress, waiting...');
+      return;
+    }
 
-    if (this.audio) {
-      this.audio.unload();
+    // Check if we're trying to load the same track
+    if (this.lastLoadedTrackId === trackInfo.id && !this.error) {
+      console.log(`[MusicPlayer] Track ${trackInfo.id} already loaded, skipping`);
+      return;
+    }
+
+    this.isTrackLoading = true;
+    this.lastLoadedTrackId = trackInfo.id;
+    this.retryCount = 0;
+
+    try {
+      this.isLoading = true;
+      this.currentTime = 0;
+      this.isPlaying = false;
+      this.error = '';
+      this.cdr.markForCheck();
+
+      // 【✓】 Clean up previous audio instance properly
+      await this.cleanupCurrentAudio();
+
+      console.log(`[MusicPlayer] Starting track load: ${trackInfo.title} (${trackInfo.id})`);
+    } catch (error) {
+      console.error('[MusicPlayer] Error during track loading preparation:', error);
+      this.handleTrackLoadError(trackInfo, error);
+      return;
     }
 
     // Construct audio source with enhanced Unicode handling
@@ -240,9 +302,11 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       onload: () => {
         this.isLoading = false;
         this.duration = this.audio?.duration() || 0;
-        // Restore mute state if user had muted
-        if (this.isMuted && this.audio) {
+        // 【✓】 Restore volume and mute state properly
+        if (this._isMuted && this.audio) {
           this.audio.volume(0);
+        } else if (this.audio) {
+          this.audio.volume(this.volume);
         }
         this.updateDynamicArtistTime();
         // Notify centralized state manager
@@ -299,11 +363,18 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
             onload: () => {
               console.log('[MusicPlayer] Fallback strategy successful!');
               this.isLoading = false;
+              this.isTrackLoading = false;
               this.duration = this.audio?.duration() || 0;
-              if (this.isMuted && this.audio) {
+
+              // 【✓】 Restore volume state properly
+              if (this._isMuted && this.audio) {
                 this.audio.volume(0);
+              } else if (this.audio) {
+                this.audio.volume(this.volume);
               }
+
               this.updateDynamicArtistTime();
+              this.musicStateManager.updateDuration(this.duration);
               this.cdr.markForCheck();
             },
             onplay: () => {
@@ -328,6 +399,8 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
               if (currentIndex >= fallbackUrls.length - 1) {
                 this.error = `Failed to load track "${trackInfo.title}" by ${trackInfo.mainArtist}. Tried ${fallbackUrls.length + 1} different URL encodings. Last error: ${fallbackError}`;
                 this.isLoading = false;
+                this.isTrackLoading = false;
+                this.lastLoadedTrackId = null;
                 this.cdr.markForCheck();
               } else {
                 // Continue with next fallback - increment index and try next strategy
@@ -344,16 +417,27 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
           // All strategies failed
           this.error = `Failed to load track "${trackInfo.title}" by ${trackInfo.mainArtist}. All ${fallbackUrls.length + 1} encoding strategies failed. Final error: ${error}`;
           this.isLoading = false;
+          this.isTrackLoading = false;
+          this.lastLoadedTrackId = null;
           this.cdr.markForCheck();
         }
       }
     });
+
+    // 【✓】 Track the audio instance for cleanup
+    if (this.audio) {
+      this.audioInstances.push(this.audio);
+      this.isTrackLoading = false;
+    }
   }
 
-  // Helper method for fallback URL loading
-  private tryLoadWithUrl(url: string, trackInfo: TrackWithArtists): void {
-    if (this.audio) {
-      this.audio.unload();
+  // 【✓】 Enhanced helper method for fallback URL loading with proper cleanup
+  private async tryLoadWithUrl(url: string, trackInfo: TrackWithArtists): Promise<void> {
+    try {
+      // Clean up current audio before trying fallback
+      await this.cleanupCurrentAudio();
+    } catch (error) {
+      console.error('[MusicPlayer] Error cleaning up before fallback:', error);
     }
 
     this.audio = new Howl({
@@ -364,11 +448,18 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       onload: () => {
         console.log('[MusicPlayer] Fallback strategy successful!');
         this.isLoading = false;
+        this.isTrackLoading = false;
         this.duration = this.audio?.duration() || 0;
-        if (this.isMuted && this.audio) {
+
+        // 【✓】 Restore volume state properly
+        if (this._isMuted && this.audio) {
           this.audio.volume(0);
+        } else if (this.audio) {
+          this.audio.volume(this.volume);
         }
+
         this.updateDynamicArtistTime();
+        this.musicStateManager.updateDuration(this.duration);
         this.cdr.markForCheck();
       },
       onplay: () => {
@@ -401,10 +492,17 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         } else {
           this.error = `Failed to load track "${trackInfo.title}" by ${trackInfo.mainArtist}. All ${fallbackUrls.length + 1} encoding strategies failed. Final error: ${error}`;
           this.isLoading = false;
+          this.isTrackLoading = false;
+          this.lastLoadedTrackId = null;
           this.cdr.markForCheck();
         }
       }
     });
+
+    // 【✓】 Track the audio instance for cleanup
+    if (this.audio) {
+      this.audioInstances.push(this.audio);
+    }
   }
 
   // 【✓】 Load and play track (legacy method for backwards compatibility)
@@ -449,58 +547,120 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // 【✓】 Play/pause track
-  togglePlay(): void {
-    if (!this.audio) return;
-
-    if (this.isPlaying) {
-      this.audio.pause();
-    } else {
-      this.audio.play();
-    }
-    this.isPlaying = !this.isPlaying;
-    // Notify centralized state manager
-    this.musicStateManager.setPlayingState(this.isPlaying);
-    this.cdr.markForCheck();
-  }
-
-  // 【✓】 Update volume with mute state tracking
-  setVolume(value: number): void {
-    if (!this.audio) return;
-
-    this.volume = value;
-
-    // Update mute state based on volume
-    if (value === 0 && this.hasUserInteracted) {
-      this.isMuted = true;
-    } else if (value > 0) {
-      this.isMuted = false;
-      this.previousVolume = value;
+  // 【✓】 Enhanced play/pause with audio context management
+  async togglePlay(): Promise<void> {
+    if (!this.audio) {
+      console.warn('[MusicPlayer] No audio instance available for playback');
+      return;
     }
 
-    this.audio.volume(value);
-    // Notify centralized state manager
-    this.musicStateManager.updateVolume(value);
-    this.cdr.markForCheck();
-  }
+    try {
+      // 【✓】 Ensure audio context is ready before playback
+      await this.ensureAudioContextReady();
 
-  // 【✓】 Toggle mute/unmute with persistent state
-  toggleMute(): void {
-    if (!this.audio) return;
+      if (this.isPlaying) {
+        this.audio.pause();
+        this.isPlaying = false;
+      } else {
+        // Mark user interaction for audio context policies
+        this.hasUserInteracted = true;
 
-    this.hasUserInteracted = true;
-
-    if (this.isMuted) {
-      // Unmute: restore previous volume
-      this.isMuted = false;
-      this.setVolume(this.previousVolume);
-    } else {
-      // Mute: save current volume and set to 0
-      this.isMuted = true;
-      if (this.volume > 0) {
-        this.previousVolume = this.volume;
+        this.audio.play();
+        this.isPlaying = true;
       }
-      this.setVolume(0);
+
+      // Notify centralized state manager
+      this.musicStateManager.setPlayingState(this.isPlaying);
+      this.cdr.markForCheck();
+
+      console.log(`[MusicPlayer] Playback ${this.isPlaying ? 'started' : 'paused'}`);
+    } catch (error) {
+      console.error('[MusicPlayer] Error toggling playback:', error);
+      this.error = 'Playback error occurred';
+      this.cdr.markForCheck();
+    }
+  }
+
+  // 【✓】 Enhanced volume management with proper mute state separation
+  setVolume(value: number): void {
+    if (!this.audio) {
+      // Store volume for when audio becomes available
+      this.volume = Math.max(0, Math.min(1, value));
+      this.lastSuccessfulVolume = this.volume;
+      return;
+    }
+
+    try {
+      // Validate and clamp volume
+      const clampedValue = Math.max(0, Math.min(1, value));
+      this.volume = clampedValue;
+
+      // 【✓】 Only update saved volume if not currently muted and value > 0
+      if (!this._isMuted && clampedValue > 0) {
+        this._savedVolumeBeforeMute = clampedValue;
+        this.lastSuccessfulVolume = clampedValue;
+      }
+
+      // 【✓】 Apply volume to audio instance with error handling
+      this.audio.volume(clampedValue);
+
+      // Notify centralized state manager
+      this.musicStateManager.updateVolume(clampedValue);
+      this.cdr.markForCheck();
+
+      console.log(`[MusicPlayer] Volume set to ${clampedValue}, muted: ${this._isMuted}`);
+    } catch (error) {
+      console.error('[MusicPlayer] Error setting volume:', error);
+      this.handleVolumeError(value);
+    }
+  }
+
+  // 【✓】 Enhanced mute toggle with proper state isolation
+  toggleMute(): void {
+    if (!this.audio) {
+      console.warn('[MusicPlayer] Cannot toggle mute: no audio instance available');
+      return;
+    }
+
+    try {
+      this.hasUserInteracted = true;
+
+      if (!this._muteStateInitialized) {
+        this._savedVolumeBeforeMute = this.volume > 0 ? this.volume : 0.5;
+        this._muteStateInitialized = true;
+      }
+
+      if (this._isMuted) {
+        // 【✓】 Unmute: restore saved volume without calling setVolume to avoid conflicts
+        this._isMuted = false;
+        const volumeToRestore = this._savedVolumeBeforeMute > 0 ? this._savedVolumeBeforeMute : 0.5;
+        this.volume = volumeToRestore;
+        this.audio.volume(volumeToRestore);
+
+        // Notify state manager
+        this.musicStateManager.updateVolume(volumeToRestore);
+
+        console.log(`[MusicPlayer] Unmuted, restored volume to ${volumeToRestore}`);
+      } else {
+        // 【✓】 Mute: save current volume and set audio to 0
+        this._isMuted = true;
+        if (this.volume > 0) {
+          this._savedVolumeBeforeMute = this.volume;
+        }
+
+        // Only change audio volume, keep this.volume for UI display
+        this.audio.volume(0);
+
+        // Notify state manager with 0 volume
+        this.musicStateManager.updateVolume(0);
+
+        console.log(`[MusicPlayer] Muted, saved volume ${this._savedVolumeBeforeMute}`);
+      }
+
+      this.cdr.markForCheck();
+    } catch (error) {
+      console.error('[MusicPlayer] Error toggling mute:', error);
+      this.handleMuteError();
     }
   }
 
@@ -671,5 +831,305 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
 
     return this.currentSubtitle || 'Unknown Artist';
+  }
+
+  // 【✓】 Enhanced cleanup methods for proper resource management
+
+  /**
+   * Clean up current audio instance
+   */
+  private async cleanupCurrentAudio(): Promise<void> {
+    if (this.audio) {
+      try {
+        // Stop playback if playing
+        if (this.isPlaying) {
+          this.audio.pause();
+        }
+
+        // Unload the audio
+        this.audio.unload();
+
+        // Remove from tracking array
+        const index = this.audioInstances.indexOf(this.audio);
+        if (index > -1) {
+          this.audioInstances.splice(index, 1);
+        }
+
+        this.audio = null;
+        console.log('[MusicPlayer] Current audio instance cleaned up');
+      } catch (error) {
+        console.error('[MusicPlayer] Error during audio cleanup:', error);
+      }
+    }
+  }
+
+  /**
+   * Clean up all audio instances
+   */
+  private cleanupAllAudioInstances(): void {
+    try {
+      // Clean up current audio
+      if (this.audio) {
+        this.audio.unload();
+        this.audio = null;
+      }
+
+      // Clean up any tracked instances
+      this.audioInstances.forEach(instance => {
+        try {
+          instance.unload();
+        } catch (error) {
+          console.error('[MusicPlayer] Error unloading audio instance:', error);
+        }
+      });
+
+      this.audioInstances = [];
+      console.log('[MusicPlayer] All audio instances cleaned up');
+    } catch (error) {
+      console.error('[MusicPlayer] Error during comprehensive cleanup:', error);
+    }
+  }
+
+  /**
+   * Handle volume setting errors with recovery
+   */
+  private handleVolumeError(attemptedValue: number): void {
+    console.warn(`[MusicPlayer] Volume error, attempting recovery with value ${attemptedValue}`);
+
+    if (this.retryCount < this.maxRetries) {
+      this.retryCount++;
+
+      // Try to restore last known good volume
+      setTimeout(() => {
+        if (this.audio) {
+          try {
+            this.audio.volume(this.lastSuccessfulVolume);
+            this.volume = this.lastSuccessfulVolume;
+            this.cdr.markForCheck();
+          } catch (retryError) {
+            console.error('[MusicPlayer] Volume recovery failed:', retryError);
+          }
+        }
+      }, 100);
+    } else {
+      this.error = 'Volume control temporarily unavailable';
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Handle mute toggle errors with recovery
+   */
+  private handleMuteError(): void {
+    console.warn('[MusicPlayer] Mute toggle error, attempting recovery');
+
+    // Reset mute state to known good state
+    this._isMuted = false;
+    this._muteStateInitialized = false;
+
+    if (this.audio) {
+      try {
+        this.audio.volume(this.lastSuccessfulVolume);
+        this.volume = this.lastSuccessfulVolume;
+      } catch (recoveryError) {
+        console.error('[MusicPlayer] Mute recovery failed:', recoveryError);
+        this.error = 'Mute control temporarily unavailable';
+      }
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle track loading errors with detailed logging
+   */
+  private handleTrackLoadError(trackInfo: TrackWithArtists, error: any): void {
+    console.error(`[MusicPlayer] Track loading error for ${trackInfo.title}:`, error);
+
+    this.error = `Failed to load "${trackInfo.title}" - ${error.message || error}`;
+    this.isLoading = false;
+    this.isTrackLoading = false;
+    this.lastLoadedTrackId = null;
+
+    // Clean up any partial audio instances
+    this.cleanupCurrentAudio();
+
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Get current mute state (public accessor)
+   */
+  get isMuted(): boolean {
+    return this._isMuted;
+  }
+
+  /**
+   * Get saved volume before mute (public accessor)
+   */
+  get savedVolumeBeforeMute(): number {
+    return this._savedVolumeBeforeMute;
+  }
+
+  /**
+   * Debug method to get current state
+   */
+  getDebugState(): any {
+    return {
+      isPlaying: this.isPlaying,
+      isLoading: this.isLoading,
+      isTrackLoading: this.isTrackLoading,
+      isMuted: this._isMuted,
+      volume: this.volume,
+      savedVolumeBeforeMute: this._savedVolumeBeforeMute,
+      currentTrackId: this.currentTrackInfo?.id,
+      audioInstancesCount: this.audioInstances.length,
+      lastLoadedTrackId: this.lastLoadedTrackId,
+      error: this.error,
+      audioContextState: this.audioContext?.state,
+      eventListenersCount: this.eventListeners.length
+    };
+  }
+
+  // 【✓】 Audio context management methods
+
+  /**
+   * Initialize audio context for better audio handling
+   */
+  private initializeAudioContext(): void {
+    try {
+      if (typeof window !== 'undefined' && 'AudioContext' in window) {
+        this.audioContext = new AudioContext();
+        this.isAudioContextInitialized = true;
+        console.log('[MusicPlayer] AudioContext initialized');
+      } else if (typeof window !== 'undefined' && 'webkitAudioContext' in window) {
+        this.audioContext = new (window as any).webkitAudioContext();
+        this.isAudioContextInitialized = true;
+        console.log('[MusicPlayer] WebKit AudioContext initialized');
+      } else {
+        console.warn('[MusicPlayer] AudioContext not supported');
+      }
+    } catch (error) {
+      console.error('[MusicPlayer] Error initializing AudioContext:', error);
+    }
+  }
+
+  /**
+   * Setup global event listeners for audio context management
+   */
+  private setupGlobalEventListeners(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      // 【✓】 Resume audio context on user interaction
+      const resumeAudioContext = async () => {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+          try {
+            await this.audioContext.resume();
+            console.log('[MusicPlayer] AudioContext resumed');
+          } catch (error) {
+            console.error('[MusicPlayer] Error resuming AudioContext:', error);
+          }
+        }
+      };
+
+      // 【✓】 Handle visibility changes to manage audio context
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          // Page is hidden, suspend audio context to save resources
+          if (this.audioContext && this.audioContext.state === 'running') {
+            this.audioContext.suspend().catch(error => {
+              console.error('[MusicPlayer] Error suspending AudioContext:', error);
+            });
+          }
+        } else {
+          // Page is visible, resume audio context
+          resumeAudioContext();
+        }
+      };
+
+      // 【✓】 Add event listeners with tracking
+      this.addTrackedEventListener(document, 'click', resumeAudioContext, { passive: true });
+      this.addTrackedEventListener(document, 'keydown', resumeAudioContext, { passive: true });
+      this.addTrackedEventListener(document, 'visibilitychange', handleVisibilityChange, { passive: true });
+
+      console.log('[MusicPlayer] Global event listeners setup completed');
+    } catch (error) {
+      console.error('[MusicPlayer] Error setting up global event listeners:', error);
+    }
+  }
+
+  /**
+   * Add event listener with tracking for cleanup
+   */
+  private addTrackedEventListener(
+    element: any,
+    event: string,
+    handler: EventListener,
+    options?: AddEventListenerOptions
+  ): void {
+    try {
+      element.addEventListener(event, handler, options);
+      this.eventListeners.push({ element, event, handler });
+    } catch (error) {
+      console.error(`[MusicPlayer] Error adding event listener for ${event}:`, error);
+    }
+  }
+
+  /**
+   * Clean up audio context
+   */
+  private cleanupAudioContext(): void {
+    try {
+      if (this.audioContext) {
+        if (this.audioContext.state !== 'closed') {
+          this.audioContext.close().catch(error => {
+            console.error('[MusicPlayer] Error closing AudioContext:', error);
+          });
+        }
+        this.audioContext = null;
+        this.isAudioContextInitialized = false;
+        console.log('[MusicPlayer] AudioContext cleaned up');
+      }
+    } catch (error) {
+      console.error('[MusicPlayer] Error during AudioContext cleanup:', error);
+    }
+  }
+
+  /**
+   * Clean up all event listeners
+   */
+  private cleanupEventListeners(): void {
+    try {
+      this.eventListeners.forEach(({ element, event, handler }) => {
+        try {
+          element.removeEventListener(event, handler);
+        } catch (error) {
+          console.error(`[MusicPlayer] Error removing event listener for ${event}:`, error);
+        }
+      });
+      this.eventListeners = [];
+      console.log('[MusicPlayer] Event listeners cleaned up');
+    } catch (error) {
+      console.error('[MusicPlayer] Error during event listener cleanup:', error);
+    }
+  }
+
+  /**
+   * Ensure audio context is ready for playback
+   */
+  private async ensureAudioContextReady(): Promise<void> {
+    if (!this.audioContext) {
+      this.initializeAudioContext();
+    }
+
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+        console.log('[MusicPlayer] AudioContext resumed for playback');
+      } catch (error) {
+        console.error('[MusicPlayer] Error resuming AudioContext for playback:', error);
+      }
+    }
   }
 } 

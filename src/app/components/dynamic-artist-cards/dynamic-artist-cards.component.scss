@@ -105,10 +105,8 @@
     // Single card centering - Enhanced with proper specificity and context handling
     &.single-card {
       display: grid !important;
-      grid-template-columns: 1fr !important;
       justify-content: center !important;
       justify-items: center;
-      max-width: 400px;
       margin: 0 auto 2rem auto !important;
       width: auto !important;
 
@@ -123,7 +121,6 @@
         justify-content: center !important;
         justify-items: center;
         margin: 0 auto 2rem auto !important;
-        max-width: 400px;
         width: auto !important;
 
         .artist-card {
@@ -135,10 +132,8 @@
     // Modern browser support for :has() selector with enhanced specificity
     &:has(.artist-card:only-child) {
       display: grid !important;
-      grid-template-columns: 1fr !important;
       justify-content: center !important;
       justify-items: center;
-      max-width: 400px;
       margin: 0 auto 2rem auto !important;
       width: auto !important;
 
@@ -153,7 +148,6 @@
         justify-content: center !important;
         justify-items: center;
         margin: 0 auto 2rem auto !important;
-        max-width: 400px;
         width: auto !important;
 
         .artist-card {
@@ -232,12 +226,10 @@
       // Single card on desktop - enhanced centering with proper specificity
       &.single-card {
         display: grid !important;
-        grid-template-columns: 1fr !important;
         justify-content: center !important;
         justify-items: center;
         margin: 0 auto 2rem auto !important;
         width: auto !important;
-        max-width: 400px;
 
         .artist-card {
           width: 100%;
@@ -248,12 +240,10 @@
 
       &:has(.artist-card:only-child) {
         display: grid !important;
-        grid-template-columns: 1fr !important;
         justify-content: center !important;
         justify-items: center;
         margin: 0 auto 2rem auto !important;
         width: auto !important;
-        max-width: 400px;
 
         .artist-card {
           width: 100%;

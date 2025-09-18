@@ -3,6 +3,16 @@ import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular
 import { Observable, throwError, BehaviorSubject, timer, EMPTY } from 'rxjs';
 import { catchError, map, tap, retry, delayWhen, switchMap, finalize } from 'rxjs/operators';
 
+import {
+  XApiUser,
+  XApiTweet,
+  XApiMedia,
+  XApiResponse,
+  RateLimitInfo,
+  XApiServiceState,
+  UserTweetsResponse
+} from './interfaces/x-api.interfaces';
+
 /**
  * X API V2 Core Service
  *
@@ -27,210 +37,6 @@ import { catchError, map, tap, retry, delayWhen, switchMap, finalize } from 'rxj
  * @see https://docs.x.com/x-api/authentication/overview
  */
 
-// Official X API V2 Response Interfaces
-export interface XApiUser {
-  id: string;
-  name: string;
-  username: string;
-  description?: string;
-  profile_image_url?: string;
-  protected?: boolean;
-  verified?: boolean;
-  verified_type?: 'blue' | 'business' | 'government';
-  url?: string;
-  location?: string;
-  created_at?: string;
-  public_metrics?: {
-    followers_count: number;
-    following_count: number;
-    tweet_count: number;
-    listed_count: number;
-    like_count: number;
-  };
-  withheld?: {
-    country_codes: string[];
-    scope: 'tweet' | 'user';
-  };
-}
-
-export interface XApiTweet {
-  id: string;
-  text: string;
-  created_at?: string;
-  author_id?: string;
-  conversation_id?: string;
-  in_reply_to_user_id?: string;
-  referenced_tweets?: Array<{
-    type: 'retweeted' | 'quoted' | 'replied_to';
-    id: string;
-  }>;
-  attachments?: {
-    media_keys?: string[];
-    poll_ids?: string[];
-  };
-  geo?: {
-    coordinates?: {
-      type: string;
-      coordinates: number[];
-    };
-    place_id?: string;
-  };
-  context_annotations?: Array<{
-    domain: {
-      id: string;
-      name: string;
-      description?: string;
-    };
-    entity: {
-      id: string;
-      name: string;
-      description?: string;
-    };
-  }>;
-  entities?: {
-    urls?: Array<{
-      start: number;
-      end: number;
-      url: string;
-      expanded_url?: string;
-      display_url?: string;
-      unwound_url?: string;
-    }>;
-    hashtags?: Array<{
-      start: number;
-      end: number;
-      tag: string;
-    }>;
-    mentions?: Array<{
-      start: number;
-      end: number;
-      username: string;
-      id?: string;
-    }>;
-    cashtags?: Array<{
-      start: number;
-      end: number;
-      tag: string;
-    }>;
-  };
-  public_metrics?: {
-    retweet_count: number;
-    like_count: number;
-    reply_count: number;
-    quote_count: number;
-    bookmark_count: number;
-    impression_count: number;
-  };
-  non_public_metrics?: {
-    impression_count: number;
-    url_link_clicks: number;
-    user_profile_clicks: number;
-  };
-  organic_metrics?: {
-    impression_count: number;
-    like_count: number;
-    reply_count: number;
-    retweet_count: number;
-    url_link_clicks: number;
-    user_profile_clicks: number;
-  };
-  promoted_metrics?: {
-    impression_count: number;
-    like_count: number;
-    reply_count: number;
-    retweet_count: number;
-    url_link_clicks: number;
-    user_profile_clicks: number;
-  };
-  withheld?: {
-    copyright: boolean;
-    country_codes: string[];
-    scope: 'tweet' | 'user';
-  };
-}
-
-export interface XApiMedia {
-  media_key: string;
-  type: 'photo' | 'video' | 'animated_gif';
-  height?: number;
-  width?: number;
-  duration_ms?: number;
-  preview_image_url?: string;
-  public_metrics?: {
-    view_count: number;
-  };
-  non_public_metrics?: {
-    playback_0_count: number;
-    playback_25_count: number;
-    playback_50_count: number;
-    playback_75_count: number;
-    playback_100_count: number;
-  };
-  organic_metrics?: {
-    playback_0_count: number;
-    playback_25_count: number;
-    playback_50_count: number;
-    playback_75_count: number;
-    playback_100_count: number;
-    view_count: number;
-  };
-  promoted_metrics?: {
-    playback_0_count: number;
-    playback_25_count: number;
-    playback_50_count: number;
-    playback_75_count: number;
-    playback_100_count: number;
-    view_count: number;
-  };
-  alt_text?: string;
-  url?: string;
-}
-
-export interface XApiResponse<T> {
-  data?: T;
-  includes?: {
-    tweets?: XApiTweet[];
-    users?: XApiUser[];
-    media?: XApiMedia[];
-    polls?: any[];
-    places?: any[];
-  };
-  meta?: {
-    result_count?: number;
-    next_token?: string;
-    previous_token?: string;
-    newest_id?: string;
-    oldest_id?: string;
-  };
-  errors?: Array<{
-    detail: string;
-    title: string;
-    resource_type: string;
-    parameter: string;
-    resource_id?: string;
-    value?: string;
-    section?: string;
-    type: string;
-  }>;
-}
-
-export interface RateLimitInfo {
-  limit: number;
-  remaining: number;
-  reset: number; // Unix timestamp
-  resetDate: Date;
-  windowStart: Date;
-}
-
-export interface XApiServiceState {
-  initialized: boolean;
-  authenticated: boolean;
-  loading: boolean;
-  error: string | null;
-  lastRequest: Date | null;
-  requestCount: number;
-  rateLimits: Map<string, RateLimitInfo>;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -403,11 +209,7 @@ export class XApiCoreService {
       paginationToken?: string;
       exclude?: string[];
     } = {}
-  ): Observable<{
-    tweets: XApiTweet[];
-    includes?: XApiResponse<XApiTweet[]>['includes'];
-    meta?: XApiResponse<XApiTweet[]>['meta'];
-  }> {
+  ): Observable<UserTweetsResponse> {
     if (!this.isAuthenticated()) {
       return throwError(() => new Error('Service not authenticated. Call initialize() with Bearer Token first.'));
     }
@@ -573,7 +375,8 @@ export class XApiCoreService {
         remaining: parseInt(remaining),
         reset: parseInt(reset),
         resetDate: new Date(resetTimestamp),
-        windowStart: new Date(resetTimestamp - (15 * 60 * 1000)) // 15 minutes before reset
+        windowStart: new Date(resetTimestamp - (15 * 60 * 1000)), // 15 minutes before reset
+        endpoint: endpoint
       };
 
       const currentState = this.state();

@@ -25,59 +25,168 @@
       </div>
     </section>
 
-    <!-- Optimized Twitter Integration Section -->
+    <!-- X API V2 Integration - Live Data -->
     <section class="filters">
-      <div class="filter-container twitter-integration">
+      <div class="filter-container x-api-integration">
 
         <!-- Section Header -->
         <div class="section-header">
           <div class="section-title">
             <mat-icon class="section-icon">alternate_email</mat-icon>
             <h3>Latest from Prismatic Collections</h3>
-            <span class="twitter-handle">@{{ getTwitterUsername() }}</span>
+            <span class="x-handle">@{{ getXApiUsername() }}</span>
           </div>
           <div class="section-subtitle">
-            Stay updated with our latest announcements and behind-the-scenes content
+            <span [ngSwitch]="xApiStatus()">
+              <span *ngSwitchCase="'loading'">Loading X API data...</span>
+              <span *ngSwitchCase="'success'">Live updates from X API V2</span>
+              <span *ngSwitchCase="'error'">X API temporarily unavailable</span>
+              <span *ngSwitchDefault>Connecting to X API V2...</span>
+            </span>
+            <span class="last-update">• Last updated: {{ getLastUpdateTime() }}</span>
           </div>
         </div>
 
-        <!-- Optimized Twitter Component -->
-        <app-twitter-optimized
-          [config]="{
-            showHeader: true,
-            showFollowButton: true,
-            showRefreshButton: true,
-            showStats: false,
-            maxHeight: 600,
-            autoRefresh: false,
-            refreshInterval: 300000,
-            enableVirtualScrolling: true,
-            loadThreshold: 5
-          }"
-          (followClick)="onFollowClick()"
-          (refreshComplete)="onTwitterRefreshComplete($event)">
-        </app-twitter-optimized>
+        <!-- Loading State -->
+        <div class="x-api-loading" *ngIf="xApiStatus() === 'loading'">
+          <div class="loading-content">
+            <mat-icon class="loading-icon">sync</mat-icon>
+            <h4 class="loading-title">Loading X API V2 Data</h4>
+            <p class="loading-text">Fetching user profile and latest tweets from @{{ environment.xApi.username }}...</p>
+          </div>
+        </div>
 
-        <!-- Performance Stats (Development Only) -->
-        <div class="performance-stats" *ngIf="showPerformanceStats()">
-          <div class="stats-grid">
-            <div class="stat-item">
-              <span class="stat-label">Cache Hit Rate:</span>
-              <span class="stat-value">{{ getPerformanceMetrics().cacheHitRate.toFixed(1) }}%</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Memory Usage:</span>
-              <span class="stat-value">{{ formatBytes(getPerformanceMetrics().memoryUsage) }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">API Efficiency:</span>
-              <span class="stat-value">{{ getPerformanceMetrics().apiEfficiency.toFixed(1) }}%</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Load Time:</span>
-              <span class="stat-value">{{ getPerformanceMetrics().loadTime }}ms</span>
+        <!-- Error State -->
+        <div class="x-api-error" *ngIf="xApiStatus() === 'error'">
+          <div class="error-content">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h4 class="error-title">X API Unavailable</h4>
+            <p class="error-text">{{ xApiError() }}</p>
+            <div class="error-buttons">
+              <button class="button secondary" (click)="retryXApiLoad()">
+                <mat-icon class="button-icon">refresh</mat-icon>
+                Retry
+              </button>
+              <button class="button primary" (click)="onFollowClick()">
+                <mat-icon class="button-icon">open_in_new</mat-icon>
+                Visit X Profile
+              </button>
             </div>
           </div>
+        </div>
+
+        <!-- Success State - User Profile and Tweets -->
+        <div class="x-api-content" *ngIf="xApiStatus() === 'success' && hasXApiData()">
+
+          <!-- User Profile Card -->
+          <div class="x-user-profile" *ngIf="xApiUser() as user">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <img [src]="user.profile_image_url"
+                     [alt]="user.name"
+                     (error)="$event.target.src='/assets/images/default-avatar.svg'">
+                <div class="verified-badge" *ngIf="user.verified">
+                  <mat-icon>verified</mat-icon>
+                </div>
+              </div>
+              <div class="profile-info">
+                <h4 class="profile-name">{{ user.name }}</h4>
+                <span class="profile-username">@{{ user.username }}</span>
+                <p class="profile-description" *ngIf="user.description">{{ user.description }}</p>
+              </div>
+              <div class="profile-actions">
+                <button class="button primary" (click)="onFollowClick()">
+                  <mat-icon class="button-icon">person_add</mat-icon>
+                  Follow
+                </button>
+                <button class="button secondary" (click)="refreshXApiFeed()">
+                  <mat-icon class="button-icon">refresh</mat-icon>
+                  Refresh
+                </button>
+              </div>
+            </div>
+
+            <!-- User Metrics -->
+            <div class="profile-metrics" *ngIf="user.public_metrics">
+              <div class="metric">
+                <span class="metric-value">{{ getUserMetrics().followers | number }}</span>
+                <span class="metric-label">Followers</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value">{{ getUserMetrics().following | number }}</span>
+                <span class="metric-label">Following</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value">{{ getUserMetrics().tweets | number }}</span>
+                <span class="metric-label">Posts</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest Tweets -->
+          <div class="x-tweets-section" *ngIf="xApiTweets().length > 0">
+            <h4 class="tweets-title">
+              <mat-icon>chat_bubble_outline</mat-icon>
+              Latest Posts
+            </h4>
+
+            <div class="tweets-container">
+              <div class="tweet-card"
+                   *ngFor="let tweet of xApiTweets(); trackBy: trackByTweetId; let i = index"
+                   [class.highlighted]="i === 0">
+
+                <!-- Tweet Header -->
+                <div class="tweet-header">
+                  <div class="tweet-meta">
+                    <span class="tweet-date" *ngIf="tweet.created_at">
+                      {{ formatTweetDate(tweet.created_at) }}
+                    </span>
+                    <span class="tweet-separator">•</span>
+                    <a [href]="'https://x.com/' + getXApiUsername() + '/status/' + tweet.id"
+                       target="_blank"
+                       rel="noopener"
+                       class="tweet-link">
+                      View on X
+                      <mat-icon>open_in_new</mat-icon>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Tweet Content -->
+                <div class="tweet-content">
+                  <p class="tweet-text" [innerHTML]="formatTweetText(tweet)"></p>
+                </div>
+
+                <!-- Tweet Metrics -->
+                <div class="tweet-metrics" *ngIf="tweet.public_metrics">
+                  <div class="metric-item">
+                    <mat-icon>favorite_border</mat-icon>
+                    <span>{{ getTweetMetrics(tweet).likes | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <mat-icon>repeat</mat-icon>
+                    <span>{{ getTweetMetrics(tweet).retweets | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <mat-icon>chat_bubble_outline</mat-icon>
+                    <span>{{ getTweetMetrics(tweet).replies | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <mat-icon>format_quote</mat-icon>
+                    <span>{{ getTweetMetrics(tweet).quotes | number }}</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- No Tweets Message -->
+          <div class="no-tweets" *ngIf="xApiTweets().length === 0">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <p>No recent posts available</p>
+          </div>
+
         </div>
 
       </div>

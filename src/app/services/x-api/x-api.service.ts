@@ -102,7 +102,7 @@ export class XApiService {
   });
 
   readonly status = this.statusSignal.asReadonly();
-  readonly isReady = computed(() =>
+  readonly serviceReady = computed(() =>
     this.status().initialized && this.status().authenticated && !this.status().error
   );
 

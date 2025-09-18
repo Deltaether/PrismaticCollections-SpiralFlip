@@ -68,12 +68,17 @@ export const environment = {
   // X API V2 Configuration (Official Implementation)
   xApi: {
     // OAuth 2.0 Bearer Token for X API V2
-    bearerToken: 'YOUR_BEARER_TOKEN_HERE', // Replace with actual Bearer Token
+    // IMPORTANT: Replace with your actual Bearer Token from X Developer Portal
+    // Get Bearer Token: https://developer.x.com/en/portal/dashboard
+    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAS/bfXUno6dIrCKYAnt98XEnXmS8=zvCZuOjMkf04fxuTl31G29fCIr1lSszDNRiYS3PAVqcv6a0est',
 
     // API Configuration
     baseUrl: 'https://api.x.com/2',
     enabled: true,
     enableLogging: true, // Set to false in production
+
+    // Target username for profile and tweets
+    username: 'prismcollect_',
 
     // Cache settings
     cacheDuration: 5 * 60 * 1000, // 5 minutes

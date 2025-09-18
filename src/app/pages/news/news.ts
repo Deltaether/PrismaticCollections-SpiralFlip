@@ -5,10 +5,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
-import { TwitterOptimizedComponent } from '../../components/twitter-optimized/twitter-optimized.component';
-import { TwitterUnifiedOptimizedService } from '../../services/twitter-unified-optimized.service';
+// X API V2 Integration
+import { XApiService } from '../../services/x-api/x-api.service';
+import { XApiUser, XApiTweet } from '../../services/x-api/interfaces/x-api.interfaces';
 import { environment } from '../../../environments/environment';
 
 interface NewsArticle {
@@ -50,7 +53,7 @@ interface NewsFilter {
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, HttpClientModule, SiteHeaderComponent, SquaresAnimationComponent, TwitterOptimizedComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, HttpClientModule, SiteHeaderComponent, SquaresAnimationComponent],
   templateUrl: './news.html',
   styleUrl: './news.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -150,16 +153,28 @@ export class News implements OnInit, OnDestroy {
     }
   ];
   
-  // Optimized Twitter Integration Service
-  private twitterService = inject(TwitterUnifiedOptimizedService);
+  // X API V2 Service Integration
+  private readonly xApiService = inject(XApiService);
   private subscriptions = new Set<Subscription>();
 
-  // Twitter state computed from optimized service
-  readonly twitterLoading = computed(() => this.twitterService.loading());
-  readonly twitterError = computed(() => this.twitterService.error());
-  readonly twitterTweets = computed(() => this.twitterService.tweets());
-  readonly twitterUser = computed(() => this.twitterService.user());
-  readonly embedLoaded = computed(() => this.twitterService.embedLoaded());
+  // X API V2 reactive state
+  readonly xApiLoading = signal(false);
+  readonly xApiError = signal<string | null>(null);
+  readonly xApiTweets = signal<XApiTweet[]>([]);
+  readonly xApiUser = signal<XApiUser | null>(null);
+  readonly xApiInitialized = signal(false);
+
+  // Computed properties for X API data
+  readonly hasXApiData = computed(() =>
+    this.xApiUser() !== null && this.xApiTweets().length > 0
+  );
+
+  readonly xApiStatus = computed(() => {
+    if (this.xApiLoading()) return 'loading';
+    if (this.xApiError()) return 'error';
+    if (this.hasXApiData()) return 'success';
+    return 'idle';
+  });
 
   constructor(public router: Router) {}
   
@@ -169,7 +184,8 @@ export class News implements OnInit, OnDestroy {
     document.body.classList.add('news-page-active');
 
     this.loadNewsArticles();
-    this.initializeTwitterIntegration();
+    // Initialize X API V2 integration
+    this.initializeXApi();
   }
 
   ngOnDestroy(): void {
@@ -271,78 +287,211 @@ export class News implements OnInit, OnDestroy {
     this.allNewsArticles.set(mockArticles);
   }
   
-  // Optimized Twitter Integration Methods
-  private initializeTwitterIntegration(): void {
-    console.log('🚀 Initializing optimized Twitter integration...');
+  /**
+   * Initialize X API V2 integration with official endpoints
+   */
+  private initializeXApi(): void {
+    console.log('🚀 Initializing X API V2 integration...');
 
-    // Load initial data with the optimized service
-    // Embed creation is now handled by TwitterOptimizedComponent
-    const refreshSub = this.twitterService.refreshAll().subscribe({
-      next: (data) => {
-        console.log(`✅ Loaded ${data.tweets.length} tweets successfully with optimized service`);
-      },
-      error: (error) => {
-        console.warn('⚠️ Using cached/fallback data:', error.message);
-      }
-    });
+    // Check if X API is enabled and configured
+    if (!environment.xApi.enabled || !environment.xApi.bearerToken) {
+      console.warn('⚠️ X API V2 not properly configured');
+      this.xApiError.set('X API V2 not configured. Check environment settings.');
+      return;
+    }
 
-    this.subscriptions.add(refreshSub);
+    // Initialize the X API service
+    try {
+      this.xApiService.initialize(environment.xApi.bearerToken, {
+        enableLogging: environment.xApi.enableLogging,
+        environment: 'development'
+      });
+
+      this.xApiInitialized.set(true);
+      console.log('✅ X API V2 service initialized');
+
+      // Load user profile and tweets
+      this.loadXApiData();
+
+    } catch (error: any) {
+      console.error('❌ Failed to initialize X API V2:', error);
+      this.xApiError.set(`Initialization failed: ${error.message}`);
+    }
   }
 
-  private createEmbedWithDelay(): void {
-    // Note: Embed creation is now handled by TwitterOptimizedComponent
-    // This method is kept for backward compatibility but delegates to the component
-    console.log('📝 Twitter embed creation delegated to TwitterOptimizedComponent');
+  /**
+   * Load user profile and tweets using official X API V2 endpoints
+   */
+  private loadXApiData(): void {
+    if (!this.xApiInitialized()) {
+      console.warn('⚠️ X API not initialized');
+      return;
+    }
+
+    this.xApiLoading.set(true);
+    this.xApiError.set(null);
+
+    const username = environment.xApi.username;
+    console.log(`📡 Loading X API data for @${username}`);
+
+    // Load user profile using /2/users/by/username/{username}
+    const userProfileSub = this.xApiService.getUserProfile(username, {
+      includeMetrics: true,
+      includeVerification: true
+    }).pipe(
+      tap(user => {
+        if (user) {
+          this.xApiUser.set(user);
+          console.log(`👤 Loaded user profile for @${user.username}:`, user);
+        }
+      }),
+      catchError(error => {
+        console.error(`❌ Failed to load user profile for @${username}:`, error);
+        this.xApiError.set(`Failed to load user profile: ${error.message}`);
+        return of(null);
+      })
+    ).subscribe();
+
+    // Load user tweets using /2/users/{id}/tweets
+    const tweetsSub = this.xApiService.getUserTweets(username, {
+      maxResults: 10,
+      includeMetrics: true,
+      includeMedia: true,
+      exclude: ['retweets'] // Get original content only
+    }).pipe(
+      tap(result => {
+        this.xApiTweets.set(result.tweets);
+        this.xApiLoading.set(false);
+        console.log(`📋 Loaded ${result.tweets.length} tweets for @${username}:`, result);
+      }),
+      catchError(error => {
+        console.error(`❌ Failed to load tweets for @${username}:`, error);
+        this.xApiError.set(`Failed to load tweets: ${error.message}`);
+        this.xApiLoading.set(false);
+        return of({ tweets: [], includes: undefined, meta: undefined });
+      })
+    ).subscribe();
+
+    this.subscriptions.add(userProfileSub);
+    this.subscriptions.add(tweetsSub);
   }
-  
-  // Optimized Twitter interaction methods
+
+  // X API V2 interaction methods
   onFollowClick(): void {
-    console.log('📱 Follow button clicked - using optimized service');
-    window.open(this.twitterService.getTwitterUrl(), '_blank', 'noopener,noreferrer');
+    const username = this.getXApiUsername();
+    const url = this.getXApiUrl();
+    console.log(`📱 Opening X profile: ${url}`);
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  retryTwitterLoad(): void {
-    console.log('🔄 Retrying Twitter load with optimized service...');
-    this.initializeTwitterIntegration();
+  retryXApiLoad(): void {
+    console.log('🔄 Retrying X API data load...');
+    this.xApiError.set(null);
+    this.loadXApiData();
   }
 
-  refreshTwitterFeed(): void {
-    console.log('🔄 Refreshing Twitter feed with optimized service...');
-    const refreshSub = this.twitterService.refreshAll().subscribe({
-      next: (data) => {
-        console.log(`✅ Refreshed: ${data.tweets.length} tweets, cache hit rate: ${this.twitterService.getPerformanceMetrics().cacheHitRate}%`);
-      },
-      error: (error) => {
-        console.warn('⚠️ Refresh failed, using cached data:', error.message);
-      }
-    });
-    this.subscriptions.add(refreshSub);
+  refreshXApiFeed(): void {
+    console.log('🔄 Refreshing X API feed...');
+    // Clear cache and reload
+    this.xApiService.clearCache();
+    this.loadXApiData();
   }
 
-  // Utility methods for Twitter integration
-  getTwitterUsername(): string {
-    return this.twitterService.getUsername();
+  getXApiUsername(): string {
+    return this.xApiUser()?.username || environment.xApi.username;
   }
 
-  getTwitterUrl(): string {
-    return this.twitterService.getTwitterUrl();
+  getXApiUrl(): string {
+    const username = this.getXApiUsername();
+    return `https://x.com/${username}`;
   }
 
   getLastUpdateTime(): string {
-    const lastUpdate = this.twitterService.state().lastUpdate;
-    if (!lastUpdate) return 'Never';
+    const user = this.xApiUser();
+    if (!user) return 'No data loaded';
 
-    const now = new Date();
-    const diffMinutes = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
+    // Use the most recent tweet's created_at or user's account creation
+    const tweets = this.xApiTweets();
+    if (tweets.length > 0 && tweets[0].created_at) {
+      const lastTweetDate = new Date(tweets[0].created_at);
+      return this.formatDate(lastTweetDate);
+    }
 
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (user.created_at) {
+      const userCreatedDate = new Date(user.created_at);
+      return `Account created: ${this.formatDate(userCreatedDate)}`;
+    }
 
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    return 'Unknown';
+  }
 
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+  /**
+   * Format X API tweet text with entity parsing
+   */
+  formatTweetText(tweet: XApiTweet): string {
+    let text = tweet.text;
+
+    // Process URLs
+    if (tweet.entities?.urls) {
+      tweet.entities.urls.forEach(url => {
+        if (url.display_url) {
+          text = text.replace(url.url, `<a href="${url.expanded_url || url.url}" target="_blank" rel="noopener">${url.display_url}</a>`);
+        }
+      });
+    }
+
+    // Process hashtags
+    if (tweet.entities?.hashtags) {
+      tweet.entities.hashtags.forEach(hashtag => {
+        const hashtagRegex = new RegExp(`#${hashtag.tag}`, 'gi');
+        text = text.replace(hashtagRegex, `<a href="https://x.com/hashtag/${hashtag.tag}" target="_blank" rel="noopener">#${hashtag.tag}</a>`);
+      });
+    }
+
+    // Process mentions
+    if (tweet.entities?.mentions) {
+      tweet.entities.mentions.forEach(mention => {
+        const mentionRegex = new RegExp(`@${mention.username}`, 'gi');
+        text = text.replace(mentionRegex, `<a href="https://x.com/${mention.username}" target="_blank" rel="noopener">@${mention.username}</a>`);
+      });
+    }
+
+    return text;
+  }
+
+  /**
+   * Get tweet engagement metrics
+   */
+  getTweetMetrics(tweet: XApiTweet): {
+    likes: number;
+    retweets: number;
+    replies: number;
+    quotes: number;
+  } {
+    const metrics = tweet.public_metrics;
+    return {
+      likes: metrics?.like_count || 0,
+      retweets: metrics?.retweet_count || 0,
+      replies: metrics?.reply_count || 0,
+      quotes: metrics?.quote_count || 0
+    };
+  }
+
+  /**
+   * Get user metrics for profile display
+   */
+  getUserMetrics(): {
+    followers: number;
+    following: number;
+    tweets: number;
+  } {
+    const user = this.xApiUser();
+    const metrics = user?.public_metrics;
+    return {
+      followers: metrics?.followers_count || 0,
+      following: metrics?.following_count || 0,
+      tweets: metrics?.tweet_count || 0
+    };
   }
   
   formatDate(date: Date): string {
@@ -397,21 +546,24 @@ export class News implements OnInit, OnDestroy {
     return article.id;
   }
 
-  // Optimized Twitter integration event handlers
-  onTwitterRefreshComplete(data: any): void {
-    console.log('🎉 Twitter refresh completed:', data);
-    const metrics = this.twitterService.getPerformanceMetrics();
-    console.log('📊 Performance metrics:', metrics);
+  // Placeholder event handlers for X API V2
+  onXApiRefreshComplete(data: any): void {
+    console.log('🎉 X API refresh completed:', data);
+    // TODO: Implement performance metrics for X API V2
   }
 
   // Performance monitoring methods
   showPerformanceStats(): boolean {
-    // Only show in development or when explicitly enabled
-    return !environment.production || (window as any).enableTwitterStats;
+    return false; // Disabled until X API V2 implementation
   }
 
   getPerformanceMetrics() {
-    return this.twitterService.getPerformanceMetrics();
+    return {
+      cacheHitRate: 0,
+      requestCount: 0,
+      errorCount: 0,
+      averageResponseTime: 0
+    }; // Placeholder metrics
   }
 
   formatBytes(bytes: number): string {
@@ -420,5 +572,47 @@ export class News implements OnInit, OnDestroy {
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  // Additional helper methods for template
+
+  /**
+   * Track by function for tweet list
+   */
+  trackByTweetId(index: number, tweet: XApiTweet): string {
+    return tweet.id;
+  }
+
+  /**
+   * Format tweet date for display
+   */
+  formatTweetDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diff / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) {
+      const diffMinutes = Math.floor(diff / (1000 * 60));
+      return `${diffMinutes}m`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h`;
+    } else if (diffDays < 7) {
+      return `${diffDays}d`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+      });
+    }
+  }
+
+  /**
+   * Expose environment for template access
+   */
+  get environment() {
+    return environment;
   }
 }

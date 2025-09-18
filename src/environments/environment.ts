@@ -58,18 +58,51 @@ export const environment = {
     },
 
     // Unified service configuration
-    enableEmbed: true,
-    enableApi: true, // Enable for testing with real credentials
+    enableEmbed: true, // ✅ PRIMARY: Use Twitter embed widgets
+    enableApi: false, // ❌ DISABLED: CORS policy prevents browser API access
     conservativeMode: true, // Use conservative rate limiting
     maxTweets: 5,
     cacheHours: 24
   },
 
+  // X API V2 Configuration (Official Implementation)
+  xApi: {
+    // OAuth 2.0 Bearer Token for X API V2
+    bearerToken: 'YOUR_BEARER_TOKEN_HERE', // Replace with actual Bearer Token
+
+    // API Configuration
+    baseUrl: 'https://api.x.com/2',
+    enabled: true,
+    enableLogging: true, // Set to false in production
+
+    // Cache settings
+    cacheDuration: 5 * 60 * 1000, // 5 minutes
+
+    // Rate limiting configuration
+    rateLimiting: {
+      enabled: true,
+      warningThreshold: 0.2, // Warning at 20% remaining
+      criticalThreshold: 0.1  // Critical at 10% remaining
+    },
+
+    // Retry configuration
+    retry: {
+      maxRetries: 3,
+      baseDelay: 1000,   // 1 second
+      maxDelay: 30000    // 30 seconds
+    }
+  },
+
   // Feature flags
   features: {
-    twitterIntegration: true,
-    twitterApiEnabled: false, // Disabled due to CORS limitations in browser
-    twitterEmbedEnabled: true, // Primary solution - no CORS issues
+    // Legacy Twitter integration (deprecated)
+    twitterIntegration: false, // ❌ DEPRECATED: Use xApi instead
+    twitterApiEnabled: false, // ❌ DEPRECATED: Replaced by official X API V2
+    twitterEmbedEnabled: false, // ❌ DEPRECATED: Use official X API V2
+
+    // New X API V2 integration
+    xApiEnabled: true, // ✅ NEW: Official X API V2 implementation
+
     analytics: false,
     debugMode: true
   },

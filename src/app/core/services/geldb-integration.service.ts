@@ -101,6 +101,57 @@ export interface GelDbPrism {
 }
 
 /**
+ * Interface for storing Twitter user data in GelDB
+ */
+export interface GelDbTwitterUser {
+  id: string;
+  twitter_id: string;
+  username: string;
+  display_name: string;
+  profile_image_url?: string;
+  verified?: boolean;
+  followers_count?: number;
+  following_count?: number;
+  tweet_count?: number;
+  cached_at: string;
+  updated_at: string;
+}
+
+/**
+ * Interface for storing Twitter tweets in GelDB
+ */
+export interface GelDbTwitterTweet {
+  id: string;
+  tweet_id: string;
+  user_id: string;
+  text: string;
+  created_at: string;
+  retweet_count?: number;
+  like_count?: number;
+  reply_count?: number;
+  quote_count?: number;
+  hashtags: string[];
+  mentions: string[];
+  urls: string[];
+  cached_at: string;
+  updated_at: string;
+}
+
+/**
+ * Interface for Twitter API usage tracking
+ */
+export interface GelDbTwitterApiUsage {
+  id: string;
+  endpoint: string;
+  method: string;
+  timestamp: string;
+  success: boolean;
+  rate_limit_remaining?: number;
+  error_message?: string;
+  monthly_calls_used: number;
+}
+
+/**
  * Artist avatar data structure with organized paths
  */
 export interface ArtistAvatarMap {
@@ -119,6 +170,11 @@ export class GelDbIntegrationService {
   private readonly phantasia2Artists$ = new BehaviorSubject<GelDbArtist[]>([]);
   private readonly phantasia2Album$ = new BehaviorSubject<GelDbAlbum | null>(null);
   private readonly prismaticCollection$ = new BehaviorSubject<GelDbPrism | null>(null);
+
+  // Twitter data streams
+  private readonly twitterUsers$ = new BehaviorSubject<GelDbTwitterUser[]>([]);
+  private readonly twitterTweets$ = new BehaviorSubject<GelDbTwitterTweet[]>([]);
+  private readonly twitterApiUsage$ = new BehaviorSubject<GelDbTwitterApiUsage[]>([]);
 
   /**
    * Pre-organized artist avatar mapping based on file system analysis
@@ -420,6 +476,7 @@ export class GelDbIntegrationService {
 
   constructor(private http: HttpClient) {
     this.initializeGelDbData();
+    this.loadTwitterDataFromLocalStorage();
   }
 
   /**
@@ -604,5 +661,285 @@ export class GelDbIntegrationService {
     // For now, just re-initialize the mock data
     this.initializeGelDbData();
     return of(true);
+  }
+
+  // ====== TWITTER DATA MANAGEMENT METHODS ======
+
+  /**
+   * Get cached Twitter users
+   */
+  getTwitterUsers(): Observable<GelDbTwitterUser[]> {
+    return this.twitterUsers$.asObservable();
+  }
+
+  /**
+   * Get cached Twitter tweets
+   */
+  getTwitterTweets(): Observable<GelDbTwitterTweet[]> {
+    return this.twitterTweets$.asObservable();
+  }
+
+  /**
+   * Get Twitter API usage history
+   */
+  getTwitterApiUsage(): Observable<GelDbTwitterApiUsage[]> {
+    return this.twitterApiUsage$.asObservable();
+  }
+
+  /**
+   * Cache Twitter user data
+   */
+  cacheTwitterUser(userData: Partial<GelDbTwitterUser> & { twitter_id: string; username: string; display_name: string }): void {
+    const currentUsers = this.twitterUsers$.value;
+    const existingIndex = currentUsers.findIndex(user => user.twitter_id === userData.twitter_id);
+
+    const now = new Date().toISOString();
+    const user: GelDbTwitterUser = {
+      id: userData.id || `twitter_user_${userData.twitter_id}`,
+      twitter_id: userData.twitter_id,
+      username: userData.username,
+      display_name: userData.display_name,
+      profile_image_url: userData.profile_image_url,
+      verified: userData.verified,
+      followers_count: userData.followers_count,
+      following_count: userData.following_count,
+      tweet_count: userData.tweet_count,
+      cached_at: now,
+      updated_at: now
+    };
+
+    if (existingIndex >= 0) {
+      // Update existing user
+      currentUsers[existingIndex] = user;
+    } else {
+      // Add new user
+      currentUsers.push(user);
+    }
+
+    this.twitterUsers$.next([...currentUsers]);
+    this.saveTwitterDataToLocalStorage();
+
+    console.log(`📋 Cached Twitter user: @${user.username}`);
+  }
+
+  /**
+   * Cache Twitter tweets
+   */
+  cacheTwitterTweets(tweets: Array<Partial<GelDbTwitterTweet> & { tweet_id: string; user_id: string; text: string; created_at: string }>): void {
+    const currentTweets = this.twitterTweets$.value;
+    const now = new Date().toISOString();
+
+    tweets.forEach(tweetData => {
+      const existingIndex = currentTweets.findIndex(tweet => tweet.tweet_id === tweetData.tweet_id);
+
+      // Extract hashtags, mentions, and URLs from text
+      const hashtags = (tweetData.text.match(/#\w+/g) || []).map(tag => tag.substring(1));
+      const mentions = (tweetData.text.match(/@\w+/g) || []).map(mention => mention.substring(1));
+      const urls = (tweetData.text.match(/https?:\/\/[^\s]+/g) || []);
+
+      const tweet: GelDbTwitterTweet = {
+        id: tweetData.id || `twitter_tweet_${tweetData.tweet_id}`,
+        tweet_id: tweetData.tweet_id,
+        user_id: tweetData.user_id,
+        text: tweetData.text,
+        created_at: tweetData.created_at,
+        retweet_count: tweetData.retweet_count,
+        like_count: tweetData.like_count,
+        reply_count: tweetData.reply_count,
+        quote_count: tweetData.quote_count,
+        hashtags,
+        mentions,
+        urls,
+        cached_at: now,
+        updated_at: now
+      };
+
+      if (existingIndex >= 0) {
+        // Update existing tweet
+        currentTweets[existingIndex] = tweet;
+      } else {
+        // Add new tweet
+        currentTweets.push(tweet);
+      }
+    });
+
+    // Sort tweets by created_at (newest first)
+    currentTweets.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    this.twitterTweets$.next([...currentTweets]);
+    this.saveTwitterDataToLocalStorage();
+
+    console.log(`📋 Cached ${tweets.length} Twitter tweets`);
+  }
+
+  /**
+   * Log Twitter API usage
+   */
+  logTwitterApiUsage(apiCall: Partial<GelDbTwitterApiUsage> & { endpoint: string; method: string; success: boolean }): void {
+    const currentUsage = this.twitterApiUsage$.value;
+    const now = new Date().toISOString();
+
+    // Calculate monthly calls used
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthlyCallsUsed = currentUsage.filter(call => {
+      const callDate = new Date(call.timestamp);
+      return callDate.getMonth() === currentMonth && callDate.getFullYear() === currentYear;
+    }).length + 1;
+
+    const usage: GelDbTwitterApiUsage = {
+      id: apiCall.id || `api_call_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      endpoint: apiCall.endpoint,
+      method: apiCall.method,
+      timestamp: now,
+      success: apiCall.success,
+      rate_limit_remaining: apiCall.rate_limit_remaining,
+      error_message: apiCall.error_message,
+      monthly_calls_used: monthlyCallsUsed
+    };
+
+    currentUsage.push(usage);
+
+    // Keep only the last 1000 API call logs to prevent excessive memory usage
+    if (currentUsage.length > 1000) {
+      currentUsage.splice(0, currentUsage.length - 1000);
+    }
+
+    this.twitterApiUsage$.next([...currentUsage]);
+    this.saveTwitterDataToLocalStorage();
+
+    console.log(`📊 Logged Twitter API call: ${usage.method} ${usage.endpoint} (${usage.success ? 'Success' : 'Failed'})`);
+  }
+
+  /**
+   * Get cached Twitter user by username
+   */
+  getCachedTwitterUser(username: string): Observable<GelDbTwitterUser | null> {
+    return this.twitterUsers$.pipe(
+      map(users => users.find(user => user.username.toLowerCase() === username.toLowerCase()) || null)
+    );
+  }
+
+  /**
+   * Get cached tweets for a specific user
+   */
+  getCachedTwitterTweetsForUser(userId: string): Observable<GelDbTwitterTweet[]> {
+    return this.twitterTweets$.pipe(
+      map(tweets => tweets.filter(tweet => tweet.user_id === userId))
+    );
+  }
+
+  /**
+   * Get monthly Twitter API usage statistics
+   */
+  getMonthlyApiUsageStats(): Observable<{
+    totalCalls: number;
+    successfulCalls: number;
+    failedCalls: number;
+    successRate: number;
+    remainingCalls: number;
+    lastCallTimestamp: string | null;
+  }> {
+    return this.twitterApiUsage$.pipe(
+      map(usage => {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const monthlyUsage = usage.filter(call => {
+          const callDate = new Date(call.timestamp);
+          return callDate.getMonth() === currentMonth && callDate.getFullYear() === currentYear;
+        });
+
+        const totalCalls = monthlyUsage.length;
+        const successfulCalls = monthlyUsage.filter(call => call.success).length;
+        const failedCalls = totalCalls - successfulCalls;
+        const successRate = totalCalls > 0 ? (successfulCalls / totalCalls) * 100 : 0;
+        const remainingCalls = Math.max(0, 100 - totalCalls); // 100 calls per month limit
+        const lastCallTimestamp = monthlyUsage.length > 0 ? monthlyUsage[monthlyUsage.length - 1].timestamp : null;
+
+        return {
+          totalCalls,
+          successfulCalls,
+          failedCalls,
+          successRate,
+          remainingCalls,
+          lastCallTimestamp
+        };
+      })
+    );
+  }
+
+  /**
+   * Check if Twitter data is cached and recent
+   */
+  isTwitterDataFresh(username: string, maxAgeHours: number = 24): Observable<boolean> {
+    return this.getCachedTwitterUser(username).pipe(
+      map(user => {
+        if (!user) return false;
+
+        const cacheAge = Date.now() - new Date(user.cached_at).getTime();
+        const maxAge = maxAgeHours * 60 * 60 * 1000; // Convert hours to milliseconds
+
+        return cacheAge < maxAge;
+      })
+    );
+  }
+
+  /**
+   * Clear Twitter cache
+   */
+  clearTwitterCache(): void {
+    this.twitterUsers$.next([]);
+    this.twitterTweets$.next([]);
+    this.twitterApiUsage$.next([]);
+    localStorage.removeItem('geldb_twitter_cache');
+    console.log('🗑️ Twitter cache cleared');
+  }
+
+  /**
+   * Save Twitter data to localStorage
+   */
+  private saveTwitterDataToLocalStorage(): void {
+    try {
+      const twitterData = {
+        users: this.twitterUsers$.value,
+        tweets: this.twitterTweets$.value,
+        usage: this.twitterApiUsage$.value,
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('geldb_twitter_cache', JSON.stringify(twitterData));
+    } catch (error) {
+      console.warn('Failed to save Twitter data to localStorage:', error);
+    }
+  }
+
+  /**
+   * Load Twitter data from localStorage
+   */
+  private loadTwitterDataFromLocalStorage(): void {
+    try {
+      const cached = localStorage.getItem('geldb_twitter_cache');
+      if (!cached) return;
+
+      const twitterData = JSON.parse(cached);
+      const age = Date.now() - twitterData.timestamp;
+
+      // Keep cache for 7 days
+      if (age > 7 * 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('geldb_twitter_cache');
+        return;
+      }
+
+      this.twitterUsers$.next(twitterData.users || []);
+      this.twitterTweets$.next(twitterData.tweets || []);
+      this.twitterApiUsage$.next(twitterData.usage || []);
+
+      console.log(`📋 Loaded Twitter cache: ${twitterData.users?.length || 0} users, ${twitterData.tweets?.length || 0} tweets, ${twitterData.usage?.length || 0} API calls`);
+
+    } catch (error) {
+      console.warn('Failed to load Twitter data from localStorage:', error);
+      localStorage.removeItem('geldb_twitter_cache');
+    }
   }
 }

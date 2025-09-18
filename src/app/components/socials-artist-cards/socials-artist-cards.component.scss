@@ -8,13 +8,13 @@
   margin: 0 auto;
   padding: 2rem;
 
-  // Enhanced background with glassmorphism
+  // Enhanced background with glassmorphism - darker tones
   background: linear-gradient(135deg,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(52, 58, 64, 0.4) 25%,
-    rgba(108, 117, 125, 0.2) 50%,
-    rgba(52, 58, 64, 0.4) 75%,
-    rgba(0, 0, 0, 0.6) 100%);
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(32, 38, 44, 0.6) 25%,
+    rgba(48, 52, 58, 0.4) 50%,
+    rgba(32, 38, 44, 0.6) 75%,
+    rgba(0, 0, 0, 0.8) 100%);
   backdrop-filter: blur(20px);
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -194,11 +194,11 @@
       position: relative;
       padding: 2rem;
       background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.06) 100%);
+        rgba(20, 20, 20, 0.9) 0%,
+        rgba(30, 30, 30, 0.8) 50%,
+        rgba(15, 15, 15, 0.85) 100%);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(60, 60, 60, 0.4);
       border-radius: 24px;
       box-shadow:
         0 10px 30px rgba(0, 0, 0, 0.2),
@@ -215,7 +215,7 @@
           0 20px 40px rgba(0, 0, 0, 0.25),
           0 8px 20px rgba(0, 0, 0, 0.15),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.25);
+        border-color: rgba(80, 80, 80, 0.6);
 
         .avatar-glow {
           opacity: 0.6;
@@ -232,9 +232,9 @@
       &.main-artist {
         border-color: rgba(255, 107, 107, 0.4);
         background: linear-gradient(135deg,
-          rgba(255, 107, 107, 0.15) 0%,
-          rgba(255, 255, 255, 0.1) 50%,
-          rgba(255, 255, 255, 0.08) 100%);
+          rgba(255, 107, 107, 0.2) 0%,
+          rgba(40, 40, 40, 0.9) 50%,
+          rgba(25, 25, 25, 0.95) 100%);
 
         &:hover {
           border-color: rgba(255, 107, 107, 0.6);
@@ -249,9 +249,9 @@
       &.featured-artist {
         border-color: rgba(108, 92, 231, 0.4);
         background: linear-gradient(135deg,
-          rgba(108, 92, 231, 0.15) 0%,
-          rgba(255, 255, 255, 0.1) 50%,
-          rgba(255, 255, 255, 0.08) 100%);
+          rgba(108, 92, 231, 0.2) 0%,
+          rgba(40, 40, 40, 0.9) 50%,
+          rgba(25, 25, 25, 0.95) 100%);
 
         &:hover {
           border-color: rgba(108, 92, 231, 0.6);
@@ -421,8 +421,8 @@
             align-items: center;
             gap: 0.75rem;
             padding: 0.75rem 1rem;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+            border: 1px solid rgba(60, 60, 60, 0.4);
             border-radius: 12px;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
@@ -452,8 +452,8 @@
             }
 
             &:hover {
-              background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-              border-color: rgba(255, 255, 255, 0.3);
+              background: linear-gradient(135deg, rgba(60, 60, 60, 0.8) 0%, rgba(40, 40, 40, 0.9) 100%);
+              border-color: rgba(80, 80, 80, 0.6);
               color: white;
               transform: translateX(8px);
 

@@ -7,17 +7,24 @@ import { environment } from '../../environments/environment';
 /**
  * Twitter Integration Service for Prismatic Collections
  *
- * Provides multiple integration strategies:
- * 1. Twitter Embed Widget (primary, no API keys needed)
- * 2. Twitter API v2 (secondary, requires bearer token)
- * 3. Fallback static tweets (tertiary, always available)
+ * IMPORTANT: Due to Twitter API v2 CORS limitations, browser-based API calls are blocked.
+ * This service provides integration strategies that work in browsers:
+ *
+ * 1. Twitter Embed Widget (primary, no CORS issues, no API keys needed)
+ * 2. Fallback static tweets (secondary, always available)
+ * 3. Twitter API v2 (disabled, for server-side use only due to CORS)
  *
  * Features:
  * - Reactive state management with Angular signals
+ * - Twitter embed widget integration
  * - Comprehensive error handling and retry logic
- * - Caching mechanisms to reduce API calls
- * - Rate limiting awareness
- * - Real-time tweet fetching from @prismcollect_
+ * - Fallback content for offline/error scenarios
+ * - Real-time embed updates from @prismcollect_
+ *
+ * CORS Issue Resolution:
+ * - Twitter API v2 deliberately blocks CORS to prevent credential theft
+ * - Browser requests to api.twitter.com are blocked by CORS policy
+ * - Solution: Use Twitter's official embed widgets which don't have CORS restrictions
  */
 
 export interface Tweet {
@@ -180,16 +187,23 @@ export class TwitterIntegrationService {
 
   /**
    * Check if Twitter API is available (credentials present)
+   * Note: Even with valid credentials, API is disabled due to CORS limitations
    */
   private checkApiAvailability(): void {
     const hasApiKey = Boolean(environment.features.twitterApiEnabled &&
                              environment.twitter.bearerToken &&
                              environment.twitter.bearerToken.length > 0);
 
-    this.updateState({ apiAvailable: hasApiKey });
+    // Always set to false due to CORS limitations in browser environment
+    this.updateState({ apiAvailable: false });
 
-    if (!hasApiKey && environment.debug.enableLogging) {
-      console.warn('Twitter API credentials not available. Using embed and fallback modes.');
+    if (environment.debug.enableLogging) {
+      if (!hasApiKey) {
+        console.warn('Twitter API credentials not available.');
+      } else {
+        console.warn('Twitter API disabled due to CORS limitations in browser. Using embed widget.');
+      }
+      console.info('Primary integration: Twitter Embed Widget (CORS-free)');
     }
   }
 
@@ -242,58 +256,32 @@ export class TwitterIntegrationService {
 
   /**
    * Fetch tweets using Twitter API v2
-   * Requires bearer token authentication
+   * DISABLED: Due to CORS limitations in browser environment
+   *
+   * Browser requests to Twitter API v2 are blocked by CORS policy.
+   * This method is kept for potential server-side implementation.
    */
   fetchTweetsFromApi(): Observable<Tweet[]> {
-    if (!this.state().apiAvailable) {
-      return throwError(() => new Error('Twitter API not available'));
-    }
-
-    if (this.isRateLimited()) {
-      return throwError(() => new Error('Rate limit exceeded'));
-    }
-
-    const cacheKey = `tweets_${this.TWITTER_USERNAME}`;
-    const cached = this.getFromCache(cacheKey);
-
-    if (cached) {
-      return of(cached as Tweet[]);
-    }
-
-    this.updateState({ loading: true, error: null });
-
-    // Get user ID first
-    return this.getUserByUsername(this.TWITTER_USERNAME).pipe(
-      switchMap(user => {
-        if (!user) throw new Error('User not found');
-
-        // Update user info
-        this.updateState({ user });
-
-        // Fetch user tweets
-        return this.getUserTweets(user.id);
-      }),
-      map(response => this.processTweetsResponse(response)),
-      tap(tweets => {
-        this.setCache(cacheKey, tweets);
-        this.updateState({
-          loading: false,
-          error: null,
-          tweets,
-          lastUpdate: new Date()
-        });
-      }),
-      catchError(error => {
-        console.error('Twitter API error:', error);
-        this.updateState({
-          loading: false,
-          error: this.getErrorMessage(error),
-          tweets: this.getFallbackTweets()
-        });
-        return of(this.getFallbackTweets());
-      }),
-      shareReplay(1)
+    const corsError = new Error(
+      'Twitter API v2 blocked by CORS policy. Use Twitter embed widget instead.'
     );
+
+    if (environment.debug.enableLogging) {
+      console.error('❌ Twitter API v2 CORS Limitation:', {
+        issue: 'Browser requests to api.twitter.com are blocked by CORS',
+        solution: 'Use Twitter embed widget (createEmbedTimeline)',
+        documentation: 'https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/overview'
+      });
+    }
+
+    this.updateState({
+      loading: false,
+      error: 'Twitter API blocked by CORS. Using embed widget only.',
+      tweets: [], // No fake tweets
+      lastUpdate: new Date()
+    });
+
+    return throwError(() => corsError);
   }
 
   /**
@@ -374,80 +362,39 @@ export class TwitterIntegrationService {
   }
 
   /**
-   * Get fallback tweets when API fails
-   * These are manually curated tweets that represent the account
+   * Get fallback tweets - now returns empty array since we use real Twitter embed only
+   * No more fake/hardcoded tweets
    */
   getFallbackTweets(): Tweet[] {
-    const now = new Date();
-
-    return [
-      {
-        id: 'fallback_1',
-        text: '🚀 Just launched Project Phantasia 2.0! Experience the future of interactive 3D environments with enhanced performance and stunning visuals. Dive into the immersive world at our website. #Phantasia #3D #Launch #Interactive',
-        created_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-        formatted_date: this.formatDate(new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000)),
-        url: `https://x.com/${this.TWITTER_USERNAME}/status/fallback_1`,
-        public_metrics: { retweet_count: 12, like_count: 45, reply_count: 8 }
-      },
-      {
-        id: 'fallback_2',
-        text: '🎵 New music release alert! "Ethereal Echoes" is now live on all streaming platforms. Dive into the ethereal soundscapes that inspired our latest collection. Link in bio! #Music #EtherealEchoes #Release #NewMusic',
-        created_at: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-        formatted_date: this.formatDate(new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000)),
-        url: `https://x.com/${this.TWITTER_USERNAME}/status/fallback_2`,
-        public_metrics: { retweet_count: 8, like_count: 67, reply_count: 15 }
-      },
-      {
-        id: 'fallback_3',
-        text: '📱 Mobile users, rejoice! Our new touch-optimized interface is rolling out across all Prismatic Collections experiences. Smoother, faster, and more intuitive than ever. #Mobile #UI #Update #UX',
-        created_at: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week ago
-        formatted_date: this.formatDate(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)),
-        url: `https://x.com/${this.TWITTER_USERNAME}/status/fallback_3`,
-        public_metrics: { retweet_count: 5, like_count: 34, reply_count: 6 }
-      },
-      {
-        id: 'fallback_4',
-        text: '⚡ Performance update: We\'ve reduced loading times by 40% and enhanced animation smoothness across all platforms. Better experiences for everyone! #Performance #Optimization #TechnicalUpdate #WebDev',
-        created_at: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-        formatted_date: this.formatDate(new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000)),
-        url: `https://x.com/${this.TWITTER_USERNAME}/status/fallback_4`,
-        public_metrics: { retweet_count: 18, like_count: 92, reply_count: 23 }
-      },
-      {
-        id: 'fallback_5',
-        text: '🌟 Community spotlight! Amazing creations from our talented community members continue to inspire us. Keep sharing your incredible work and tag us! #Community #Creativity #Showcase #Art',
-        created_at: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks ago
-        formatted_date: this.formatDate(new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)),
-        url: `https://x.com/${this.TWITTER_USERNAME}/status/fallback_5`,
-        public_metrics: { retweet_count: 7, like_count: 56, reply_count: 11 }
-      }
-    ];
+    // Return empty array - rely on Twitter embed widget for real content
+    return [];
   }
 
   /**
-   * Refresh tweets - tries API first, falls back to embed/static
+   * Refresh tweets - uses only embed widget for real Twitter content
+   * No fallback tweets, only real Twitter embed
    */
   refreshTweets(): Observable<Tweet[]> {
     if (environment.debug.enableLogging) {
-      console.log('Refreshing Twitter feed...');
+      console.log('🔄 Refreshing Twitter feed via embed widget only...');
     }
 
     // Clear cache
     this.clearCache();
 
-    if (this.state().apiAvailable && environment.features.twitterApiEnabled) {
-      return this.fetchTweetsFromApi();
-    } else {
-      // Use fallback tweets and try to refresh embed
-      this.updateState({
-        loading: false,
-        tweets: this.getFallbackTweets(),
-        lastUpdate: new Date(),
-        error: null
-      });
+    // Update state to show we're using only embed widget
+    this.updateState({
+      loading: false,
+      tweets: [], // No fake tweets
+      lastUpdate: new Date(),
+      error: null
+    });
 
-      return of(this.getFallbackTweets());
+    if (environment.debug.enableLogging) {
+      console.info('✅ Using only Twitter embed widget for real tweets from @prismcollect_');
     }
+
+    return of([]);
   }
 
   /**

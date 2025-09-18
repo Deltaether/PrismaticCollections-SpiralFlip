@@ -17,29 +17,35 @@ export const environment = {
 
   // Twitter API Configuration
   twitter: {
-    // Twitter API Bearer Token (for Twitter API v2)
-    // To get this:
-    // 1. Go to https://developer.twitter.com/
-    // 2. Create a developer account and project
-    // 3. Generate Bearer Token for your app
-    // 4. Add it here (keep it secure!)
-    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAS%2FbfXUno6dIrCKYAnt98XEnXmS8%3DzvCZuOjMkf04fxuTl31G29fCIr1lSszDNRiYS3PAVqcv6a0est', // Twitter API Bearer Token for development
+    // OAuth 1.0a Credentials (provided by user)
+    // IMPORTANT: These are real credentials for testing - keep secure!
+    oauth: {
+      apiKey: 'OmR8bRNMB7x0KicX8xEFPDy8h',
+      apiSecret: 'YgfnBAxgXOnHCiwFSA0z2f10hQ7kANL4WyG5p1whojz9KlvjW3',
+      accessToken: '1778792494559350784-BWL7i22YEKgh5jsvJcH9gCrrwUbS9O',
+      accessTokenSecret: 'giS3XRlGO5VIVCYQcuqehWGNJk6jCGN32zNxPrUddrgoq'
+    },
+
+    // Legacy Bearer Token (kept for backward compatibility)
+    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAS/bfXUno6dIrCKYAnt98XEnXmS8=zvCZuOjMkf04fxuTl31G29fCIr1lSszDNRiYS3PAVqcv6a0est',
 
     // Twitter account to monitor
     username: 'prismcollect_',
 
     // API endpoints
-    apiBaseUrl: 'https://api.twitter.com/2',
+    apiBaseUrl: 'https://api.x.com/2',
 
-    // Rate limiting settings (Twitter API v2 limits)
+    // Rate limiting settings (Free Tier OAuth 1.0a limits)
     rateLimit: {
-      requestsPerWindow: 75,
+      requestsPerWindow: 900, // OAuth 1.0a user context limit
       windowDurationMs: 15 * 60 * 1000, // 15 minutes
+      monthlyLimit: 100 // Free tier monthly limit
     },
 
-    // Cache settings
+    // Cache settings (conservative for API preservation)
     cache: {
-      durationMs: 5 * 60 * 1000, // 5 minutes
+      durationMs: 24 * 60 * 60 * 1000, // 24 hours for users
+      tweetDurationMs: 12 * 60 * 60 * 1000, // 12 hours for tweets
     },
 
     // Widget configuration for embeds
@@ -49,14 +55,21 @@ export const environment = {
       tweetLimit: 10,
       linkColor: '#1da1f2',
       borderColor: '#333333'
-    }
+    },
+
+    // Unified service configuration
+    enableEmbed: true,
+    enableApi: true, // Enable for testing with real credentials
+    conservativeMode: true, // Use conservative rate limiting
+    maxTweets: 5,
+    cacheHours: 24
   },
 
   // Feature flags
   features: {
     twitterIntegration: true,
-    twitterApiEnabled: true, // Enabled with Bearer Token authentication
-    twitterEmbedEnabled: true,
+    twitterApiEnabled: false, // Disabled due to CORS limitations in browser
+    twitterEmbedEnabled: true, // Primary solution - no CORS issues
     analytics: false,
     debugMode: true
   },

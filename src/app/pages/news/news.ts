@@ -7,7 +7,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
-import { TwitterIntegrationService, Tweet } from '../../services/twitter-integration.service';
+import { TwitterOptimizedComponent } from '../../components/twitter-optimized/twitter-optimized.component';
+import { TwitterUnifiedOptimizedService } from '../../services/twitter-unified-optimized.service';
+import { environment } from '../../../environments/environment';
 
 interface NewsArticle {
   id: string;
@@ -48,7 +50,7 @@ interface NewsFilter {
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, HttpClientModule, SiteHeaderComponent, SquaresAnimationComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, HttpClientModule, SiteHeaderComponent, SquaresAnimationComponent, TwitterOptimizedComponent],
   templateUrl: './news.html',
   styleUrl: './news.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -148,11 +150,11 @@ export class News implements OnInit, OnDestroy {
     }
   ];
   
-  // Twitter Integration Service
-  private twitterService = inject(TwitterIntegrationService);
+  // Optimized Twitter Integration Service
+  private twitterService = inject(TwitterUnifiedOptimizedService);
   private subscriptions = new Set<Subscription>();
 
-  // Twitter state computed from service
+  // Twitter state computed from optimized service
   readonly twitterLoading = computed(() => this.twitterService.loading());
   readonly twitterError = computed(() => this.twitterService.error());
   readonly twitterTweets = computed(() => this.twitterService.tweets());
@@ -269,91 +271,57 @@ export class News implements OnInit, OnDestroy {
     this.allNewsArticles.set(mockArticles);
   }
   
-  // Twitter Integration Methods
+  // Optimized Twitter Integration Methods
   private initializeTwitterIntegration(): void {
-    console.log('Initializing Twitter integration...');
+    console.log('🚀 Initializing optimized Twitter integration...');
 
-    // Try to create embed timeline first (no API key needed)
-    setTimeout(() => {
-      this.twitterService.createEmbedTimeline('twitter-embed-container');
-    }, 1000);
-
-    // Also try to fetch via API if available, or use fallback
-    const tweetsSub = this.twitterService.refreshTweets().subscribe({
-      next: (tweets) => {
-        console.log(`Loaded ${tweets.length} tweets successfully`);
+    // Load initial data with the optimized service
+    // Embed creation is now handled by TwitterOptimizedComponent
+    const refreshSub = this.twitterService.refreshAll().subscribe({
+      next: (data) => {
+        console.log(`✅ Loaded ${data.tweets.length} tweets successfully with optimized service`);
       },
       error: (error) => {
-        console.warn('Twitter API fallback used:', error.message);
+        console.warn('⚠️ Using cached/fallback data:', error.message);
       }
     });
 
-    this.subscriptions.add(tweetsSub);
+    this.subscriptions.add(refreshSub);
+  }
+
+  private createEmbedWithDelay(): void {
+    // Note: Embed creation is now handled by TwitterOptimizedComponent
+    // This method is kept for backward compatibility but delegates to the component
+    console.log('📝 Twitter embed creation delegated to TwitterOptimizedComponent');
   }
   
-  // Twitter interaction methods (delegated to service)
+  // Optimized Twitter interaction methods
   onFollowClick(): void {
-    console.log('Follow button clicked - Twitter');
+    console.log('📱 Follow button clicked - using optimized service');
     window.open(this.twitterService.getTwitterUrl(), '_blank', 'noopener,noreferrer');
   }
 
   retryTwitterLoad(): void {
-    console.log('Retrying Twitter load...');
+    console.log('🔄 Retrying Twitter load with optimized service...');
     this.initializeTwitterIntegration();
   }
 
   refreshTwitterFeed(): void {
-    console.log('Refreshing Twitter feed...');
-    const refreshSub = this.twitterService.refreshTweets().subscribe({
-      next: (tweets) => {
-        console.log(`Refreshed ${tweets.length} tweets`);
+    console.log('🔄 Refreshing Twitter feed with optimized service...');
+    const refreshSub = this.twitterService.refreshAll().subscribe({
+      next: (data) => {
+        console.log(`✅ Refreshed: ${data.tweets.length} tweets, cache hit rate: ${this.twitterService.getPerformanceMetrics().cacheHitRate}%`);
       },
       error: (error) => {
-        console.warn('Refresh failed, using fallback:', error.message);
+        console.warn('⚠️ Refresh failed, using cached data:', error.message);
       }
     });
     this.subscriptions.add(refreshSub);
   }
 
-  openTweetUrl(tweetId: string): void {
-    this.twitterService.openTweetUrl(tweetId);
-  }
-
-  shareTweet(tweet: Tweet): void {
-    this.twitterService.shareTweet(tweet);
-  }
-
-  formatTweetDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-      const diffMinutes = Math.floor(diffTime / (1000 * 60));
-
-      if (diffHours > 0) return `${diffHours}h`;
-      if (diffMinutes > 0) return `${diffMinutes}m`;
-      return 'now';
-    } else if (diffDays < 7) {
-      return `${diffDays}d`;
-    } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-  }
-
-  formatTweetContent(content: string): string {
-    return this.twitterService.formatTweetContent(content);
-  }
-
-  trackByTweetId(index: number, tweet: Tweet): string {
-    return tweet.id;
-  }
-
   // Utility methods for Twitter integration
   getTwitterUsername(): string {
-    return this.twitterService.getTwitterUsername();
+    return this.twitterService.getUsername();
   }
 
   getTwitterUrl(): string {
@@ -361,7 +329,20 @@ export class News implements OnInit, OnDestroy {
   }
 
   getLastUpdateTime(): string {
-    return this.twitterService.getLastUpdateTime();
+    const lastUpdate = this.twitterService.state().lastUpdate;
+    if (!lastUpdate) return 'Never';
+
+    const now = new Date();
+    const diffMinutes = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
+
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
   }
   
   formatDate(date: Date): string {
@@ -414,5 +395,30 @@ export class News implements OnInit, OnDestroy {
   
   trackByArticleId(index: number, article: NewsArticle): string {
     return article.id;
+  }
+
+  // Optimized Twitter integration event handlers
+  onTwitterRefreshComplete(data: any): void {
+    console.log('🎉 Twitter refresh completed:', data);
+    const metrics = this.twitterService.getPerformanceMetrics();
+    console.log('📊 Performance metrics:', metrics);
+  }
+
+  // Performance monitoring methods
+  showPerformanceStats(): boolean {
+    // Only show in development or when explicitly enabled
+    return !environment.production || (window as any).enableTwitterStats;
+  }
+
+  getPerformanceMetrics() {
+    return this.twitterService.getPerformanceMetrics();
+  }
+
+  formatBytes(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 }

@@ -1,0 +1,243 @@
+<!-- Twitter Demo Page -->
+<div class="twitter-demo-page">
+
+  <!-- Header -->
+  <app-site-header></app-site-header>
+
+  <!-- Main Content -->
+  <main class="demo-content">
+
+    <!-- Introduction Section -->
+    <section class="intro-section">
+      <div class="intro-content">
+        <h1 class="demo-title">
+          <mat-icon class="title-icon">integration_instructions</mat-icon>
+          Twitter Integration Demo
+        </h1>
+
+        <p class="demo-description">
+          Demonstrating proper Twitter integration with CORS-compliant solutions.
+          This implementation resolves the "user not found" error by using Twitter's
+          official embed widgets alongside fallback content.
+        </p>
+
+        <div class="solution-highlights">
+          <div class="highlight">
+            <mat-icon class="highlight-icon success">check_circle</mat-icon>
+            <span>✅ CORS-compliant implementation</span>
+          </div>
+          <div class="highlight">
+            <mat-icon class="highlight-icon success">widget</mat-icon>
+            <span>✅ Twitter Embed Widget integration</span>
+          </div>
+          <div class="highlight">
+            <mat-icon class="highlight-icon success">backup</mat-icon>
+            <span>✅ Fallback content system</span>
+          </div>
+          <div class="highlight">
+            <mat-icon class="highlight-icon success">error_outline</mat-icon>
+            <span>✅ Comprehensive error handling</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button mat-raised-button
+                  class="primary-btn"
+                  (click)="openTwitterProfile()">
+            <mat-icon>open_in_new</mat-icon>
+            Visit @prismcollect_
+          </button>
+
+          <button mat-button
+                  class="secondary-btn"
+                  (click)="navigateToNews()">
+            <mat-icon>arrow_back</mat-icon>
+            Back to News
+          </button>
+
+          <button mat-button
+                  class="tertiary-btn"
+                  (click)="copyDemoLink()">
+            <mat-icon>link</mat-icon>
+            Copy Demo Link
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Twitter Feed Demonstrations -->
+    <section class="demo-section">
+
+      <!-- Primary Twitter Feed -->
+      <div class="demo-container">
+        <h2 class="demo-subtitle">
+          <mat-icon class="subtitle-icon">feed</mat-icon>
+          Live Twitter Feed
+        </h2>
+
+        <p class="demo-explanation">
+          This component uses Twitter's official embed widget to display real tweets
+          from @prismcollect_. No API keys required, no CORS issues.
+        </p>
+
+        <app-twitter-feed
+          [showHeader]="true"
+          [maxTweets]="6"
+          [embedHeight]="500"
+          theme="dark">
+        </app-twitter-feed>
+      </div>
+
+      <!-- Technical Details -->
+      <div class="demo-container">
+        <h2 class="demo-subtitle">
+          <mat-icon class="subtitle-icon">code</mat-icon>
+          Technical Implementation
+        </h2>
+
+        <div class="technical-cards">
+
+          <mat-card class="tech-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="card-icon cors">block</mat-icon>
+              <mat-card-title>CORS Issue Resolution</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Problem:</strong> Twitter API v2 blocks browser requests with CORS policy</p>
+              <p><strong>Solution:</strong> Use Twitter embed widgets (no CORS restrictions)</p>
+              <code>this.twitterService.createEmbedTimeline(containerId)</code>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="tech-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="card-icon auth">key</mat-icon>
+              <mat-card-title>Authentication Fix</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Issue:</strong> Bearer Token was URL-encoded</p>
+              <p><strong>Fix:</strong> Decoded token for proper API headers</p>
+              <code>Authorization: Bearer &lt;decoded-token&gt;</code>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="tech-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="card-icon fallback">backup</mat-icon>
+              <mat-card-title>Fallback Strategy</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Purpose:</strong> Provide content when embed fails</p>
+              <p><strong>Content:</strong> Curated tweets representing @prismcollect_</p>
+              <code>getFallbackTweets(): Tweet[]</code>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="tech-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="card-icon error">error_outline</mat-icon>
+              <mat-card-title>Error Handling</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Approach:</strong> Graceful degradation with user feedback</p>
+              <p><strong>Features:</strong> Retry mechanisms, status indicators, debug info</p>
+              <code>comprehensive error states</code>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+      </div>
+
+      <!-- Alternative Layouts -->
+      <div class="demo-container">
+        <h2 class="demo-subtitle">
+          <mat-icon class="subtitle-icon">view_module</mat-icon>
+          Alternative Layouts
+        </h2>
+
+        <div class="layout-demos">
+
+          <!-- Compact Version -->
+          <div class="layout-demo">
+            <h3>Compact Layout</h3>
+            <app-twitter-feed
+              [showHeader]="false"
+              [maxTweets]="3"
+              [embedHeight]="350"
+              theme="dark">
+            </app-twitter-feed>
+          </div>
+
+          <!-- Light Theme -->
+          <div class="layout-demo">
+            <h3>Light Theme</h3>
+            <app-twitter-feed
+              [showHeader]="true"
+              [maxTweets]="4"
+              [embedHeight]="400"
+              theme="light">
+            </app-twitter-feed>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Summary -->
+    <section class="summary-section">
+      <div class="summary-content">
+        <h2 class="summary-title">
+          <mat-icon class="summary-icon">task_alt</mat-icon>
+          Implementation Summary
+        </h2>
+
+        <div class="summary-points">
+          <div class="summary-point">
+            <mat-icon class="point-icon">analytics</mat-icon>
+            <div class="point-content">
+              <h4>Root Cause Identified</h4>
+              <p>Twitter API v2 CORS policy blocks browser requests as a security measure</p>
+            </div>
+          </div>
+
+          <div class="summary-point">
+            <mat-icon class="point-icon">integration_instructions</mat-icon>
+            <div class="point-content">
+              <h4>Solution Implemented</h4>
+              <p>Twitter embed widgets provide CORS-free access to real tweets</p>
+            </div>
+          </div>
+
+          <div class="summary-point">
+            <mat-icon class="point-icon">shield</mat-icon>
+            <div class="point-content">
+              <h4>Robust Fallbacks</h4>
+              <p>Comprehensive error handling with curated fallback content</p>
+            </div>
+          </div>
+
+          <div class="summary-point">
+            <mat-icon class="point-icon">devices</mat-icon>
+            <div class="point-content">
+              <h4>Responsive Design</h4>
+              <p>Optimized for all screen sizes with theme support</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-steps">
+          <h3>Next Steps</h3>
+          <ul>
+            <li>Integrate TwitterFeedComponent into existing news page</li>
+            <li>Consider server-side proxy for full API access (optional)</li>
+            <li>Monitor embed widget performance and user engagement</li>
+            <li>Implement analytics for social media integration effectiveness</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</div>

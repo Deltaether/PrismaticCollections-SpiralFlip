@@ -1,0 +1,155 @@
+<!-- Twitter Feed Component -->
+<div class="twitter-feed-container" [attr.data-theme]="theme">
+
+  <!-- Header Section -->
+  <div *ngIf="showHeader" class="twitter-feed-header">
+    <div class="header-content">
+      <div class="twitter-info">
+        <mat-icon class="twitter-icon">alternate_email</mat-icon>
+        <div class="twitter-details">
+          <h3 class="twitter-handle">@{{ getTwitterUsername() }}</h3>
+          <p class="twitter-subtitle">Latest Updates</p>
+        </div>
+      </div>
+
+      <div class="twitter-actions">
+        <button
+          mat-button
+          class="refresh-btn"
+          (click)="refreshFeed()"
+          [disabled]="loading()"
+          matTooltip="Refresh feed">
+          <mat-icon>refresh</mat-icon>
+        </button>
+
+        <button
+          mat-button
+          class="follow-btn"
+          (click)="openTwitterProfile()"
+          matTooltip="Visit Twitter profile">
+          <mat-icon>open_in_new</mat-icon>
+          Follow
+        </button>
+      </div>
+    </div>
+
+    <!-- Status indicator -->
+    <div class="status-bar" *ngIf="!loading() && !error()">
+      <span class="status-indicator">
+        <mat-icon class="status-icon">check_circle</mat-icon>
+        Last updated: {{ lastUpdate() }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="twitter-content">
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="loading-spinner">
+        <mat-icon class="spinning">sync</mat-icon>
+      </div>
+      <p>Loading Twitter feed...</p>
+    </div>
+
+    <!-- Error State with Retry -->
+    <div *ngIf="error() && !loading()" class="error-state">
+      <div class="error-content">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <h4>Twitter Integration Notice</h4>
+        <p class="error-message">{{ error() }}</p>
+        <p class="error-explanation">
+          Twitter API requires server-side implementation. Using embed widget for real tweets.
+        </p>
+        <button mat-button class="retry-btn" (click)="retryTwitter()">
+          <mat-icon>refresh</mat-icon>
+          Retry
+        </button>
+      </div>
+    </div>
+
+    <!-- Twitter Embed Widget (Primary) -->
+    <div class="embed-container"
+         [style.height.px]="embedHeight"
+         [class.hidden]="showEmbedFallback() || loading()">
+      <div [id]="embedContainerId()" class="twitter-timeline-container">
+        <!-- Twitter embed widget loads here -->
+      </div>
+
+      <!-- Embed loading message -->
+      <div class="embed-loading" *ngIf="!embedLoaded()">
+        <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+        <p>Loading Twitter timeline...</p>
+      </div>
+    </div>
+
+    <!-- Fallback Tweet Display -->
+    <div *ngIf="showEmbedFallback() || (!embedLoaded() && tweets().length > 0)"
+         class="fallback-tweets">
+      <div class="fallback-header">
+        <mat-icon>info</mat-icon>
+        <span>Showing recent content (fallback)</span>
+      </div>
+
+      <div class="tweet-list">
+        <article *ngFor="let tweet of tweets(); trackBy: trackByTweetId"
+                 class="tweet-card"
+                 (click)="openTweet(tweet)">
+
+          <div class="tweet-header">
+            <div class="tweet-author">
+              <strong>@{{ getTwitterUsername() }}</strong>
+              <span class="tweet-date">{{ tweet.formatted_date }}</span>
+            </div>
+
+            <button mat-icon-button
+                    class="tweet-share"
+                    (click)="shareTweet(tweet); $event.stopPropagation()"
+                    matTooltip="Share tweet">
+              <mat-icon>share</mat-icon>
+            </button>
+          </div>
+
+          <div class="tweet-content"
+               [innerHTML]="formatTweetContent(tweet.text)">
+          </div>
+
+          <div class="tweet-metrics" *ngIf="tweet.public_metrics">
+            <div class="metric">
+              <mat-icon class="metric-icon">favorite_border</mat-icon>
+              <span>{{ formatNumber(tweet.public_metrics.like_count) }}</span>
+            </div>
+            <div class="metric">
+              <mat-icon class="metric-icon">repeat</mat-icon>
+              <span>{{ formatNumber(tweet.public_metrics.retweet_count) }}</span>
+            </div>
+            <div class="metric">
+              <mat-icon class="metric-icon">chat_bubble_outline</mat-icon>
+              <span>{{ formatNumber(tweet.public_metrics.reply_count) }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- No Content State -->
+    <div *ngIf="!loading() && !embedLoaded() && tweets().length === 0 && !showEmbedFallback()"
+         class="no-content-state">
+      <mat-icon class="no-content-icon">twitter</mat-icon>
+      <h4>No tweets available</h4>
+      <p>Unable to load Twitter content at this time.</p>
+      <button mat-button class="retry-btn" (click)="retryTwitter()">
+        <mat-icon>refresh</mat-icon>
+        Try Again
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Debug Info (Development Only) -->
+  <div class="debug-info" *ngIf="showHeader">
+    <small>Status: {{ getStatusInfo() }}</small>
+  </div>
+
+</div>

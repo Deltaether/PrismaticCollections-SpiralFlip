@@ -46,6 +46,14 @@ export const environment = {
       tweetLimit: 10,
       linkColor: '#1da1f2',
       borderColor: '#333333'
+    },
+
+    // OAuth 1.0a Configuration for Twitter API v2
+    oauth: {
+      apiKey: 'OmR8bRNMB7x0KicX8xEFPDy8h',
+      apiSecret: 'YgfnBAxgXOnHCiwFSA0z2f10hQ7kANL4WyG5p1whojz9KlvjW3',
+      accessToken: '1778792494559350784-BWL7i22YEKgh5jsvJcH9gCrrwUbS9O',
+      accessTokenSecret: 'giS3XRlGO5VIVCYQcuqehWGNJk6jCGN32zNxPrUddrgoq'
     }
   },
 

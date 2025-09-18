@@ -32,6 +32,10 @@ export const routes: Routes = [
     path: 'test-home',
     loadComponent: () => import('./pages/test-home/test-home.component').then(m => m.TestHomeComponent)
   },
+  {
+    path: 'twitter-test',
+    loadComponent: () => import('./components/twitter-test/twitter-test.component').then(m => m.TwitterTestComponent)
+  },
   
   // Phantasia Layout routes
   {

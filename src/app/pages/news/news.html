@@ -34,11 +34,11 @@
           <div class="twitter-title">
             <mat-icon class="twitter-icon">alternate_email</mat-icon>
             <h3>Latest from Prismatic Collections</h3>
-            <span class="twitter-handle">@prismcollect_</span>
+            <span class="twitter-handle">@{{ getTwitterUsername() }}</span>
           </div>
-          <a 
-            href="https://x.com/prismcollect_" 
-            target="_blank" 
+          <a
+            [href]="getTwitterUrl()"
+            target="_blank"
             rel="noopener noreferrer"
             class="follow-button"
             (click)="onFollowClick()">
@@ -49,55 +49,74 @@
         
         <!-- Twitter Timeline Embed -->
         <div class="twitter-timeline-container">
-          <div 
+          <div
             class="twitter-timeline-wrapper"
             [class.loading]="twitterLoading()"
             [class.error]="twitterError()">
-            
+
             <!-- Loading State -->
             <div class="twitter-loading" *ngIf="twitterLoading()">
               <div class="loading-spinner"></div>
               <p class="loading-text">Loading latest tweets...</p>
             </div>
-            
+
             <!-- Error State -->
             <div class="twitter-error" *ngIf="twitterError()">
               <mat-icon class="error-icon">warning</mat-icon>
-              <p class="error-text">Unable to load tweets</p>
+              <p class="error-text">{{ twitterError() }}</p>
               <button class="retry-button" (click)="retryTwitterLoad()">
                 <mat-icon class="retry-icon">refresh</mat-icon>
                 Try Again
               </button>
             </div>
-            
-            <!-- Twitter Timeline (when loaded) -->
-            <div 
-              class="twitter-embed" 
-              *ngIf="!twitterLoading() && !twitterError()"
-              [innerHTML]="twitterEmbedHtml()">
+
+            <!-- Twitter Embed Container (Primary Method) -->
+            <div
+              id="twitter-embed-container"
+              class="twitter-embed"
+              *ngIf="embedLoaded() && !twitterLoading() && !twitterError()">
+              <!-- Twitter widget will be injected here -->
             </div>
-            
-            <!-- Fallback Manual Tweets -->
-            <div class="manual-tweets" *ngIf="!twitterLoading() && !twitterError() && !twitterEmbedHtml()">
-              <div class="tweet-card" *ngFor="let tweet of fallbackTweets(); trackBy: trackByTweetId">
+
+            <!-- Fallback Manual Tweets (When embed unavailable or API fails) -->
+            <div class="manual-tweets" *ngIf="!twitterLoading() && twitterTweets().length > 0">
+              <div class="tweet-card" *ngFor="let tweet of twitterTweets(); trackBy: trackByTweetId">
                 <div class="tweet-header">
                   <div class="tweet-avatar">
                     <img src="/assets/images/artists/deltaether-avatar.svg" alt="Prismatic Collections" />
                   </div>
                   <div class="tweet-info">
-                    <span class="tweet-name">Prismatic Collections</span>
-                    <span class="tweet-handle">@prismcollect_</span>
-                    <span class="tweet-date">{{ formatTweetDate(tweet.date) }}</span>
+                    <span class="tweet-name">{{ twitterUser()?.name || 'Prismatic Collections' }}</span>
+                    <span class="tweet-handle">@{{ getTwitterUsername() }}</span>
+                    <span class="tweet-date">{{ tweet.formatted_date || formatTweetDate(tweet.created_at) }}</span>
                   </div>
                 </div>
                 <div class="tweet-content">
-                  <p [innerHTML]="formatTweetContent(tweet.content)"></p>
-                  <div class="tweet-media" *ngIf="tweet.media">
-                    <img [src]="tweet.media" [alt]="tweet.content" loading="lazy" />
+                  <p [innerHTML]="formatTweetContent(tweet.text)"></p>
+                  <div class="tweet-media" *ngIf="tweet.media && tweet.media.length > 0">
+                    <img
+                      [src]="tweet.media[0].url || tweet.media[0].preview_image_url"
+                      [alt]="tweet.media[0].alt_text || 'Tweet media'"
+                      loading="lazy" />
+                  </div>
+                  <!-- Tweet metrics if available -->
+                  <div class="tweet-metrics" *ngIf="tweet.public_metrics">
+                    <span class="metric">
+                      <span class="metric-icon">💬</span>
+                      {{ tweet.public_metrics.reply_count }}
+                    </span>
+                    <span class="metric">
+                      <span class="metric-icon">🔄</span>
+                      {{ tweet.public_metrics.retweet_count }}
+                    </span>
+                    <span class="metric">
+                      <span class="metric-icon">❤️</span>
+                      {{ tweet.public_metrics.like_count }}
+                    </span>
                   </div>
                 </div>
                 <div class="tweet-actions">
-                  <button class="tweet-action" (click)="openTweetUrl(tweet.url)">
+                  <button class="tweet-action" (click)="openTweetUrl(tweet.id)">
                     <span class="action-icon">🔗</span>
                     <span class="action-text">View on X</span>
                   </button>
@@ -108,7 +127,7 @@
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
         
@@ -116,21 +135,25 @@
         <div class="twitter-footer">
           <p class="twitter-footer-text">
             Stay updated with our latest announcements, releases, and behind-the-scenes content.
+            <span *ngIf="getLastUpdateTime() !== 'Never'" class="last-update">
+              Last updated: {{ getLastUpdateTime() }}
+            </span>
           </p>
           <div class="twitter-footer-actions">
-            <a 
-              href="https://x.com/prismcollect_" 
-              target="_blank" 
+            <a
+              [href]="getTwitterUrl()"
+              target="_blank"
               rel="noopener noreferrer"
               class="footer-link primary">
               <mat-icon class="link-icon">star</mat-icon>
               View Full Timeline
             </a>
-            <button 
-              class="footer-link secondary" 
-              (click)="refreshTwitterFeed()">
+            <button
+              class="footer-link secondary"
+              (click)="refreshTwitterFeed()"
+              [disabled]="twitterLoading()">
               <mat-icon class="link-icon">refresh</mat-icon>
-              Refresh Feed
+              {{ twitterLoading() ? 'Loading...' : 'Refresh Feed' }}
             </button>
           </div>
         </div>

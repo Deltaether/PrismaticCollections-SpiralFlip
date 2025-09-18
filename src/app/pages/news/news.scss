@@ -1080,10 +1080,33 @@ $transition-slow: all 0.5s ease;
   }
 }
 
+/* Tweet metrics for API data */
+.tweet-metrics {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  .metric {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    .metric-icon {
+      font-size: 0.7rem;
+    }
+  }
+}
+
 .tweet-actions {
   display: flex;
   gap: 1rem;
-  
+  margin-top: 1rem;
+
   .tweet-action {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1097,13 +1120,13 @@ $transition-slow: all 0.5s ease;
     gap: 0.5rem;
     font-size: 0.8rem;
     font-weight: 500;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.05);
       border-color: rgba(29, 161, 242, 0.5);
       color: #1da1f2;
     }
-    
+
     .action-icon {
       font-size: 0.7rem;
     }
@@ -1124,6 +1147,14 @@ $transition-slow: all 0.5s ease;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+
+    .last-update {
+      display: block;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
   }
   
   .twitter-footer-actions {
@@ -1159,11 +1190,17 @@ $transition-slow: all 0.5s ease;
         background: rgba(255, 255, 255, 0.05);
         color: rgba(255, 255, 255, 0.8);
         border: 2px solid rgba(255, 255, 255, 0.1);
-        
-        &:hover {
+
+        &:hover:not(:disabled) {
           background: rgba(255, 255, 255, 0.1);
           border-color: rgba(255, 255, 255, 0.3);
           color: $light-text;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          color: rgba(255, 255, 255, 0.4);
         }
       }
       

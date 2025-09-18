@@ -1,0 +1,797 @@
+// Socials Artist Cards Styling
+// Professional card system with Phantasia-inspired design and advanced animations
+
+.socials-artist-cards {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  // Enhanced background with glassmorphism
+  background: linear-gradient(135deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(52, 58, 64, 0.4) 25%,
+    rgba(108, 117, 125, 0.2) 50%,
+    rgba(52, 58, 64, 0.4) 75%,
+    rgba(0, 0, 0, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.3),
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  // Prevent overflow from glow effects
+  overflow: hidden;
+  contain: layout style;
+
+  // Subtle texture overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
+      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
+  }
+
+  // Compact mode adjustments
+  &.compact-mode {
+    padding: 1.5rem;
+    border-radius: 24px;
+
+    .artist-card {
+      padding: 1.5rem;
+    }
+  }
+
+  // Section Header
+  .section-header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    margin-bottom: 3rem;
+
+    .header-content {
+      margin-bottom: 2rem;
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin: 0 0 1rem 0;
+        line-height: 1.2;
+
+        .title-icon {
+          font-size: 3rem;
+          color: #6c757d;
+          transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+      }
+
+      .section-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        font-weight: 400;
+      }
+    }
+
+    // Display Mode Selector
+    .display-modes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+
+      .mode-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        backdrop-filter: blur(10px);
+
+        mat-icon {
+          font-size: 1.2rem;
+          width: 1.2rem;
+          height: 1.2rem;
+        }
+
+        &:hover {
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+          border-color: rgba(255, 255, 255, 0.3);
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+          border-color: #6c757d;
+          color: white;
+          box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+      }
+    }
+  }
+
+  // Statistics Bar
+  .statistics-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+
+    .stat-item {
+      text-align: center;
+
+      .stat-number {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  // Artist Cards Grid
+  .artist-cards-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+
+    // Artist Card
+    .artist-card {
+      position: relative;
+      padding: 2rem;
+      background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.06) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        0 4px 15px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      overflow: hidden;
+      contain: layout style;
+
+      // Hover effects
+      &:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.25),
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.25);
+
+        .avatar-glow {
+          opacity: 0.6;
+          transform: scale(1.2);
+        }
+
+        .card-glow {
+          opacity: 0.8;
+          transform: scale(1.1);
+        }
+      }
+
+      // Special styling for main artists
+      &.main-artist {
+        border-color: rgba(255, 107, 107, 0.4);
+        background: linear-gradient(135deg,
+          rgba(255, 107, 107, 0.15) 0%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.08) 100%);
+
+        &:hover {
+          border-color: rgba(255, 107, 107, 0.6);
+          box-shadow:
+            0 20px 40px rgba(255, 107, 107, 0.2),
+            0 8px 20px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+      }
+
+      // Special styling for featured artists
+      &.featured-artist {
+        border-color: rgba(108, 92, 231, 0.4);
+        background: linear-gradient(135deg,
+          rgba(108, 92, 231, 0.15) 0%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.08) 100%);
+
+        &:hover {
+          border-color: rgba(108, 92, 231, 0.6);
+          box-shadow:
+            0 20px 40px rgba(108, 92, 231, 0.2),
+            0 8px 20px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+      }
+
+      // Artist Avatar
+      .artist-avatar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+
+        .avatar-container {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 3px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+
+          .avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+          }
+
+          .avatar-initials {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            background: var(--artist-color, #6c757d);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+
+            // Show initials when image fails to load
+            .avatar-container.avatar-fallback & {
+              opacity: 1;
+            }
+          }
+
+          // Hide image when fallback is active
+          .avatar-container.avatar-fallback .avatar-image {
+            opacity: 0;
+          }
+        }
+
+        // Project Badges
+        .project-badges {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          display: flex;
+          gap: 0.25rem;
+
+          .project-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+          }
+        }
+
+        // Avatar Glow Effect
+        .avatar-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 120px;
+          height: 120px;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          opacity: 0.3;
+          transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+          pointer-events: none;
+          z-index: -1;
+        }
+      }
+
+      // Artist Information
+      .artist-info {
+        text-align: center;
+        margin-bottom: 1.5rem;
+
+        .artist-name {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 0.5rem 0;
+          line-height: 1.3;
+        }
+
+        .artist-role {
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0 0 0.75rem 0;
+          font-weight: 500;
+        }
+
+        .artist-description {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0 1rem 0;
+          line-height: 1.5;
+        }
+
+        // Artist Meta Information
+        .artist-meta {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+
+          .track-count,
+          .projects-info {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+
+            .meta-icon {
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+            }
+          }
+        }
+      }
+
+      // Social Links
+      .social-links {
+        .links-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0 0 1rem 0;
+          text-align: center;
+        }
+
+        .social-links-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+
+          .social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            backdrop-filter: blur(10px);
+
+            .social-icon {
+              font-size: 1.2rem;
+              width: 1.2rem;
+              height: 1.2rem;
+              color: rgba(255, 255, 255, 0.7);
+              transition: color 0.3s ease;
+            }
+
+            .social-platform-name {
+              flex: 1;
+            }
+
+            .social-arrow {
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+              opacity: 0.6;
+              transition: all 0.3s ease;
+            }
+
+            &:hover {
+              background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+              border-color: rgba(255, 255, 255, 0.3);
+              color: white;
+              transform: translateX(8px);
+
+              .social-icon {
+                color: white;
+              }
+
+              .social-arrow {
+                opacity: 1;
+                transform: translateX(4px);
+              }
+            }
+          }
+        }
+      }
+
+      // Card Glow Effect
+      .card-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        border-radius: inherit;
+        opacity: 0.2;
+        transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        pointer-events: none;
+        z-index: -1;
+      }
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 4rem 2rem;
+
+    .empty-content {
+      .empty-icon {
+        font-size: 4rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 1rem;
+      }
+
+      .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0 0 1rem 0;
+      }
+
+      .empty-message {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0 2rem 0;
+        line-height: 1.5;
+      }
+
+      .reset-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+
+        &:hover {
+          background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
+  }
+
+  // Loading State
+  .loading-state {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 4rem 2rem;
+
+    .loading-content {
+      .loading-spinner {
+        margin-bottom: 1.5rem;
+
+        .spinning {
+          font-size: 3rem;
+          color: #6c757d;
+          animation: spin 2s linear infinite;
+        }
+      }
+
+      .loading-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0 0 1rem 0;
+      }
+
+      .loading-message {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  // Footer Info
+  .cards-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+
+      .footer-icon {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .footer-text {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+        line-height: 1.5;
+
+        strong {
+          color: white;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .socials-artist-cards {
+    .artist-cards-grid {
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .socials-artist-cards {
+    padding: 1.5rem;
+
+    .section-header {
+      margin-bottom: 2rem;
+
+      .header-content {
+        .section-title {
+          font-size: 2rem;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          .title-icon {
+            font-size: 2.5rem;
+          }
+        }
+
+        .section-subtitle {
+          font-size: 1rem;
+        }
+      }
+
+      .display-modes {
+        padding: 1rem;
+        gap: 0.5rem;
+
+        .mode-button {
+          padding: 0.5rem 0.75rem;
+          font-size: 0.8rem;
+
+          span {
+            display: none;
+          }
+
+          mat-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+      }
+    }
+
+    .statistics-bar {
+      gap: 1rem;
+      padding: 1rem;
+      flex-wrap: wrap;
+
+      .stat-item {
+        .stat-number {
+          font-size: 1.5rem;
+        }
+
+        .stat-label {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .artist-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+
+      .artist-card {
+        padding: 1.5rem;
+
+        .artist-avatar {
+          .avatar-container {
+            width: 70px;
+            height: 70px;
+          }
+
+          .avatar-glow {
+            width: 100px;
+            height: 100px;
+          }
+        }
+
+        .artist-info {
+          .artist-name {
+            font-size: 1.3rem;
+          }
+
+          .artist-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .socials-artist-cards {
+    padding: 1rem;
+    border-radius: 20px;
+
+    .section-header {
+      .header-content {
+        .section-title {
+          font-size: 1.75rem;
+        }
+      }
+
+      .display-modes {
+        .mode-button {
+          padding: 0.5rem;
+
+          mat-icon {
+            font-size: 0.9rem;
+            width: 0.9rem;
+            height: 0.9rem;
+          }
+        }
+      }
+    }
+
+    .statistics-bar {
+      .stat-item {
+        .stat-number {
+          font-size: 1.25rem;
+        }
+
+        .stat-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .artist-cards-grid {
+      .artist-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+
+        .artist-avatar {
+          .avatar-container {
+            width: 60px;
+            height: 60px;
+          }
+        }
+
+        .artist-info {
+          .artist-name {
+            font-size: 1.2rem;
+          }
+
+          .artist-description {
+            font-size: 0.85rem;
+          }
+        }
+
+        .social-links {
+          .social-links-grid {
+            .social-link {
+              padding: 0.5rem 0.75rem;
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

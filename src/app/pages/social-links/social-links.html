@@ -16,7 +16,7 @@
         <h1 class="title">ARTIST CIRCLES</h1>
         <p class="subtitle">Connect with the creators behind Prismatic Collections</p>
         <p class="description">
-          Explore our artists' social media platforms, follow their journeys, 
+          Explore our artists' social media platforms, follow their journeys,
           and stay updated with their latest musical creations and collaborations.
         </p>
       </div>
@@ -25,56 +25,15 @@
       </div>
     </section>
 
-    <!-- Artists Section -->
+    <!-- Artists Section with New Component -->
     <section class="artists">
-      <h2 class="section-title">Featured Artists</h2>
-      
-      <div class="artists-grid">
-        <div *ngFor="let artist of artists; trackBy: trackByArtistId" 
-             class="artist-card"
-             [class.main-artist]="artist.id === 'deltaether'">
-          
-          <!-- Artist Avatar -->
-          <div class="artist-avatar">
-            <div class="avatar-container">
-              <img [src]="artist.avatar" 
-                   [alt]="artist.name + ' avatar'" 
-                   class="avatar-image"
-                   (error)="onAvatarError($event, artist.name)"
-                   loading="lazy">
-            </div>
-            <div class="avatar-glow"></div>
-          </div>
-          
-          <!-- Artist Info -->
-          <div class="artist-info">
-            <h3 class="artist-name">{{ artist.name }}</h3>
-            <p class="artist-role">{{ artist.role }}</p>
-            <p class="artist-description">{{ artist.description }}</p>
-          </div>
-          
-          <!-- Social Links -->
-          <div class="social-links">
-            <h4 class="links-title">Connect</h4>
-            <div class="social-buttons">
-              <button *ngFor="let link of artist.socialLinks; trackBy: trackByPlatform"
-                      class="social-button"
-                      [style.--social-color]="link.color"
-                      [class.coming-soon]="link.url === '#'"
-                      [attr.data-platform]="link.platform.toLowerCase()"
-                      [title]="link.url === '#' ? link.platform + ' - Coming Soon' : 'Visit ' + link.platform"
-                      (click)="openSocialLink(link.url, link.platform)"
-                      (mouseenter)="onSocialHover(link.platform)">
-                <mat-icon class="social-icon">{{ link.icon }}</mat-icon>
-                <span class="social-platform">{{ link.platform }}</span>
-                <mat-icon class="social-arrow" *ngIf="link.url !== '#'">arrow_forward</mat-icon>
-                <span class="coming-soon-text" *ngIf="link.url === '#'">Soon</span>
-              </button>
-            </div>
-          </div>
-          
-        </div>
-      </div>
+      <app-socials-artist-cards
+        [displayMode]="'all'"
+        [maxVisibleCards]="24"
+        [enableAnimations]="true"
+        [showFilters]="true"
+        [compactMode]="false">
+      </app-socials-artist-cards>
     </section>
 
     <!-- Community Section -->
@@ -82,17 +41,21 @@
       <div class="community-content">
         <h2 class="section-title">Join Our Community</h2>
         <p class="community-text">
-          Be part of the Prismatic Collections community! Follow our artists, 
-          share your thoughts, and discover new music together.
+          Be part of the Prismatic Collections community! Follow our artists,
+          share your thoughts, and discover new music together across both Phantasia projects.
         </p>
         <div class="community-stats">
           <div class="stat">
-            <span class="stat-number">3+</span>
-            <span class="stat-label">Active Artists</span>
+            <span class="stat-number">60+</span>
+            <span class="stat-label">Contributing Artists</span>
           </div>
           <div class="stat">
-            <span class="stat-number">10+</span>
-            <span class="stat-label">Social Platforms</span>
+            <span class="stat-number">34</span>
+            <span class="stat-label">Released Tracks</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">2</span>
+            <span class="stat-label">Phantasia Projects</span>
           </div>
           <div class="stat">
             <span class="stat-number">∞</span>

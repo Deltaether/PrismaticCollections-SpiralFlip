@@ -1,10 +1,13 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
+import { TwitterIntegrationService, Tweet } from '../../services/twitter-integration.service';
 
 interface NewsArticle {
   id: string;
@@ -45,7 +48,7 @@ interface NewsFilter {
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, SiteHeaderComponent, SquaresAnimationComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, HttpClientModule, SiteHeaderComponent, SquaresAnimationComponent],
   templateUrl: './news.html',
   styleUrl: './news.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -145,34 +148,35 @@ export class News implements OnInit, OnDestroy {
     }
   ];
   
-  // Twitter Integration Properties
-  twitterLoading = signal<boolean>(true);
-  twitterError = signal<boolean>(false);
-  twitterEmbedHtml = signal<string>('');
-  
-  // Fallback tweet data when embed fails
-  fallbackTweets = signal<Array<{
-    id: string;
-    content: string;
-    date: Date;
-    url: string;
-    media?: string;
-  }>>([]);
-  
+  // Twitter Integration Service
+  private twitterService = inject(TwitterIntegrationService);
+  private subscriptions = new Set<Subscription>();
+
+  // Twitter state computed from service
+  readonly twitterLoading = computed(() => this.twitterService.loading());
+  readonly twitterError = computed(() => this.twitterService.error());
+  readonly twitterTweets = computed(() => this.twitterService.tweets());
+  readonly twitterUser = computed(() => this.twitterService.user());
+  readonly embedLoaded = computed(() => this.twitterService.embedLoaded());
+
   constructor(public router: Router) {}
   
   ngOnInit(): void {
     console.log('News component initialized');
     // Add body class for global scrolling support
     document.body.classList.add('news-page-active');
-    
+
     this.loadNewsArticles();
-    this.initializeTwitterFeed();
+    this.initializeTwitterIntegration();
   }
-  
+
   ngOnDestroy(): void {
     // Clean up body class when component is destroyed
     document.body.classList.remove('news-page-active');
+
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.clear();
   }
   
   private loadNewsArticles(): void {
@@ -266,117 +270,98 @@ export class News implements OnInit, OnDestroy {
   }
   
   // Twitter Integration Methods
-  private initializeTwitterFeed(): void {
-    // Set loading state
-    this.twitterLoading.set(true);
-    this.twitterError.set(false);
-    
-    // Load fallback tweets immediately
-    this.loadFallbackTweets();
-    
-    // Try to load Twitter embed (simulate API call)
+  private initializeTwitterIntegration(): void {
+    console.log('Initializing Twitter integration...');
+
+    // Try to create embed timeline first (no API key needed)
     setTimeout(() => {
-      try {
-        // In a real implementation, this would call Twitter API or embed script
-        // For now, we'll use fallback tweets with a simulated load
-        this.twitterLoading.set(false);
-        
-        // Simulate occasional network errors for demo
-        if (Math.random() > 0.9) {
-          this.twitterError.set(true);
-        }
-      } catch (error) {
-        this.twitterLoading.set(false);
-        this.twitterError.set(true);
-        console.error('Failed to load Twitter feed:', error);
+      this.twitterService.createEmbedTimeline('twitter-embed-container');
+    }, 1000);
+
+    // Also try to fetch via API if available, or use fallback
+    const tweetsSub = this.twitterService.refreshTweets().subscribe({
+      next: (tweets) => {
+        console.log(`Loaded ${tweets.length} tweets successfully`);
+      },
+      error: (error) => {
+        console.warn('Twitter API fallback used:', error.message);
       }
-    }, 2000); // Simulate 2 second load time
+    });
+
+    this.subscriptions.add(tweetsSub);
   }
   
-  private loadFallbackTweets(): void {
-    const tweets = [
-      {
-        id: '1',
-        content: '🚀 Just launched Project Phantasia 2.0! Experience the future of interactive 3D environments with enhanced performance and stunning visuals. #Phantasia #3D #Launch',
-        date: new Date('2024-01-15'),
-        url: 'https://x.com/prismcollect_/status/1',
-        media: '/assets/videos/phantasia2/album_cover.png'
-      },
-      {
-        id: '2', 
-        content: '🎵 New music release alert! "Ethereal Echoes" is now live on all streaming platforms. Dive into the ethereal soundscapes that inspired our latest collection. #Music #EtherealEchoes #Release',
-        date: new Date('2023-12-20'),
-        url: 'https://x.com/prismcollect_/status/2'
-      },
-      {
-        id: '3',
-        content: '📱 Mobile users, rejoice! Our new touch-optimized interface is rolling out across all Prismatic Collections experiences. Smoother, faster, and more intuitive. #Mobile #UI #Update',
-        date: new Date('2023-12-10'),
-        url: 'https://x.com/prismcollect_/status/3'
-      },
-      {
-        id: '4',
-        content: '⚡ Performance update: We\'ve reduced loading times by 40% and enhanced animation smoothness across all platforms. Better experiences for everyone! #Performance #Optimization #TechnicalUpdate',
-        date: new Date('2023-11-22'),
-        url: 'https://x.com/prismcollect_/status/4'
-      },
-      {
-        id: '5',
-        content: '🌟 Community spotlight! Amazing creations from our talented community members continue to inspire us. Keep sharing your incredible work! #Community #Creativity #Showcase',
-        date: new Date('2023-10-18'),
-        url: 'https://x.com/prismcollect_/status/5'
-      }
-    ];
-    
-    this.fallbackTweets.set(tweets);
-  }
-  
+  // Twitter interaction methods (delegated to service)
   onFollowClick(): void {
-    // Analytics tracking for follow button
     console.log('Follow button clicked - Twitter');
+    window.open(this.twitterService.getTwitterUrl(), '_blank', 'noopener,noreferrer');
   }
-  
+
   retryTwitterLoad(): void {
-    this.initializeTwitterFeed();
+    console.log('Retrying Twitter load...');
+    this.initializeTwitterIntegration();
   }
-  
+
   refreshTwitterFeed(): void {
-    this.initializeTwitterFeed();
+    console.log('Refreshing Twitter feed...');
+    const refreshSub = this.twitterService.refreshTweets().subscribe({
+      next: (tweets) => {
+        console.log(`Refreshed ${tweets.length} tweets`);
+      },
+      error: (error) => {
+        console.warn('Refresh failed, using fallback:', error.message);
+      }
+    });
+    this.subscriptions.add(refreshSub);
   }
-  
-  openTweetUrl(url: string): void {
-    window.open(url, '_blank', 'noopener,noreferrer');
+
+  openTweetUrl(tweetId: string): void {
+    this.twitterService.openTweetUrl(tweetId);
   }
-  
-  shareTweet(tweet: any): void {
-    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this tweet from @prismcollect_: ' + tweet.content.substring(0, 100) + '...')}&url=${encodeURIComponent(tweet.url)}`;
-    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+
+  shareTweet(tweet: Tweet): void {
+    this.twitterService.shareTweet(tweet);
   }
-  
-  formatTweetDate(date: Date): string {
+
+  formatTweetDate(dateString: string): string {
+    const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) {
       const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-      return diffHours > 0 ? `${diffHours}h` : 'now';
+      const diffMinutes = Math.floor(diffTime / (1000 * 60));
+
+      if (diffHours > 0) return `${diffHours}h`;
+      if (diffMinutes > 0) return `${diffMinutes}m`;
+      return 'now';
     } else if (diffDays < 7) {
       return `${diffDays}d`;
     } else {
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   }
-  
+
   formatTweetContent(content: string): string {
-    // Convert hashtags and mentions to styled spans
-    return content
-      .replace(/#(\w+)/g, '<span class="tweet-hashtag">#$1</span>')
-      .replace(/@(\w+)/g, '<span class="tweet-mention">@$1</span>');
+    return this.twitterService.formatTweetContent(content);
   }
-  
-  trackByTweetId(index: number, tweet: any): string {
+
+  trackByTweetId(index: number, tweet: Tweet): string {
     return tweet.id;
+  }
+
+  // Utility methods for Twitter integration
+  getTwitterUsername(): string {
+    return this.twitterService.getTwitterUsername();
+  }
+
+  getTwitterUrl(): string {
+    return this.twitterService.getTwitterUrl();
+  }
+
+  getLastUpdateTime(): string {
+    return this.twitterService.getLastUpdateTime();
   }
   
   formatDate(date: Date): string {

@@ -1,0 +1,219 @@
+<!-- Socials Artist Cards Container -->
+<div class="socials-artist-cards"
+     [@cardsContainer]="cardsAnimationTrigger()"
+     [class.compact-mode]="compactMode"
+     [class.with-filters]="showFilters">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-content">
+      <h2 class="section-title">
+        <mat-icon class="title-icon">people</mat-icon>
+        <span>Featured Artists</span>
+      </h2>
+      <p class="section-subtitle">
+        Discover the talented creators behind Prismatic Collections
+      </p>
+    </div>
+
+    <!-- Display Mode Selector -->
+    <div class="display-modes" *ngIf="showFilters">
+      <button class="mode-button"
+              [class.active]="displayMode === 'all'"
+              (click)="onDisplayModeChange('all')"
+              title="Show all artists with social links">
+        <mat-icon>group</mat-icon>
+        <span>All Artists</span>
+      </button>
+
+      <button class="mode-button"
+              [class.active]="displayMode === 'main'"
+              (click)="onDisplayModeChange('main')"
+              title="Show main artists">
+        <mat-icon>star</mat-icon>
+        <span>Main</span>
+      </button>
+
+      <button class="mode-button"
+              [class.active]="displayMode === 'featured'"
+              (click)="onDisplayModeChange('featured')"
+              title="Show featured artists">
+        <mat-icon>featured_play_list</mat-icon>
+        <span>Featured</span>
+      </button>
+
+      <button class="mode-button"
+              [class.active]="displayMode === 'cross-project'"
+              (click)="onDisplayModeChange('cross-project')"
+              title="Show artists who appear in both projects">
+        <mat-icon>compare_arrows</mat-icon>
+        <span>Both Projects</span>
+      </button>
+
+      <button class="mode-button"
+              [class.active]="displayMode === 'phantasia1'"
+              (click)="onDisplayModeChange('phantasia1')"
+              title="Show Phantasia 1 artists">
+        <mat-icon>album</mat-icon>
+        <span>P1</span>
+      </button>
+
+      <button class="mode-button"
+              [class.active]="displayMode === 'phantasia2'"
+              (click)="onDisplayModeChange('phantasia2')"
+              title="Show Phantasia 2 artists">
+        <mat-icon>library_music</mat-icon>
+        <span>P2</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Bar -->
+  <div class="statistics-bar" *ngIf="projectStatistics$ | async as stats">
+    <div class="stat-item">
+      <span class="stat-number">{{ stats.totalUnique }}</span>
+      <span class="stat-label">Total Artists</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ stats.phantasia1.artists }}</span>
+      <span class="stat-label">Phantasia 1</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ stats.phantasia2.artists }}</span>
+      <span class="stat-label">Phantasia 2</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ stats.crossProject }}</span>
+      <span class="stat-label">Cross-Project</span>
+    </div>
+  </div>
+
+  <!-- Artist Cards Grid -->
+  <div class="artist-cards-grid"
+       *ngIf="(optimizedArtistCards$ | async) as cards">
+
+    <div class="artist-card"
+         *ngFor="let card of cards; trackBy: trackByArtistId"
+         [@cardAnimation]="card.animationState"
+         [ngStyle]="getCardStyle(card)"
+         [class.main-artist]="card.isMainArtist"
+         [class.featured-artist]="card.isFeatured">
+
+      <!-- Artist Avatar -->
+      <div class="artist-avatar">
+        <div class="avatar-container">
+          <img [src]="card.avatar"
+               [alt]="card.displayName + ' avatar'"
+               class="avatar-image"
+               (error)="onAvatarError($event, card.name)"
+               loading="lazy">
+          <div class="avatar-initials">{{ getArtistInitials(card.name) }}</div>
+        </div>
+
+        <!-- Project Badges -->
+        <div class="project-badges" [@projectBadge]="'show'">
+          <div class="project-badge"
+               *ngFor="let badge of getProjectBadges(card)"
+               [style.background-color]="badge.color"
+               [title]="'Phantasia Project ' + (badge.id === 'phantasia1' ? '1' : '2')">
+            {{ badge.name }}
+          </div>
+        </div>
+
+        <div class="avatar-glow" [style.background]="'radial-gradient(circle, ' + card.color + '40 0%, transparent 70%)'"></div>
+      </div>
+
+      <!-- Artist Information -->
+      <div class="artist-info">
+        <h3 class="artist-name">{{ card.displayName }}</h3>
+        <p class="artist-role">{{ getRoleDisplay(card) }}</p>
+        <p class="artist-description">{{ card.description }}</p>
+
+        <!-- Track Count & Bio -->
+        <div class="artist-meta">
+          <div class="track-count" *ngIf="card.trackCount > 0">
+            <mat-icon class="meta-icon">music_note</mat-icon>
+            <span>{{ card.trackCount }} track{{ card.trackCount === 1 ? '' : 's' }}</span>
+          </div>
+          <div class="projects-info" *ngIf="card.projects.length > 1">
+            <mat-icon class="meta-icon">compare_arrows</mat-icon>
+            <span>Cross-project artist</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="social-links"
+           *ngIf="hasSocialLinks(card)"
+           [@socialLinksAnimation]="'show'">
+
+        <h4 class="links-title">Connect</h4>
+        <div class="social-links-grid">
+          <a class="social-link"
+             *ngFor="let link of getVisibleSocialLinks(card)"
+             [href]="link.url"
+             [title]="getSocialPlatformName(link.platform) + ' - ' + card.displayName"
+             target="_blank"
+             rel="noopener noreferrer"
+             (click)="onSocialLinkClick(link.url, link.platform, card.name)">
+
+            <mat-icon class="social-icon">{{ getSocialIcon(link.platform) }}</mat-icon>
+            <span class="social-platform-name">{{ getSocialPlatformName(link.platform) }}</span>
+            <mat-icon class="social-arrow">arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Glow Effect -->
+      <div class="card-glow"
+           [style.background]="'radial-gradient(circle at center, ' + card.color + '15 0%, transparent 70%)'"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state"
+       *ngIf="(optimizedArtistCards$ | async)?.length === 0">
+    <div class="empty-content">
+      <mat-icon class="empty-icon">people_outline</mat-icon>
+      <h3 class="empty-title">No Artists Found</h3>
+      <p class="empty-message">
+        Try changing the display mode or filters to see more artists.
+      </p>
+      <button class="reset-button"
+              (click)="onDisplayModeChange('all')"
+              *ngIf="displayMode !== 'all'">
+        <mat-icon>refresh</mat-icon>
+        Show All Artists
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state"
+       *ngIf="!(optimizedArtistCards$ | async)">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <mat-icon class="spinning">refresh</mat-icon>
+      </div>
+      <h3 class="loading-title">Discovering Artists...</h3>
+      <p class="loading-message">
+        Loading the talented creators behind Prismatic Collections
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer Info -->
+  <div class="cards-footer"
+       *ngIf="(optimizedArtistCards$ | async) as cards">
+    <div *ngIf="cards && cards.length > 0" class="footer-content">
+      <mat-icon class="footer-icon">info</mat-icon>
+      <p class="footer-text">
+        Showing <strong>{{ cards.length }}</strong> artist{{ cards.length === 1 ? '' : 's' }}
+        from the Prismatic Collections projects.
+        <span *ngIf="cards.length === maxVisibleCards">
+          Some artists may be hidden. Use filters to explore more.
+        </span>
+      </p>
+    </div>
+  </div>
+</div>

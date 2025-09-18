@@ -11,15 +11,14 @@ import {
 } from '../../services/x-api';
 
 /**
- * X API Integration Example Component
+ * X API Integration Example Component with OAuth 1.0a
  *
  * Demonstrates proper integration patterns for the new official X API V2 service
- * This replaces all previous Twitter integration components that used proxies,
- * workarounds, or unofficial methods.
+ * with OAuth 1.0a authentication to eliminate CORS issues.
  *
  * Key Features:
  * - Official X API V2 integration
- * - Bearer Token authentication
+ * - OAuth 1.0a authentication (no CORS issues!)
  * - Proper error handling with user feedback
  * - Rate limit awareness
  * - Responsive loading states
@@ -31,6 +30,7 @@ import {
  * 3. Project-specific Tweet Feed
  * 4. Error Handling and Recovery
  * 5. Rate Limit Management
+ * 6. OAuth 1.0a Authentication Demo
  */
 
 interface ComponentState {
@@ -460,17 +460,18 @@ export class XApiIntegrationExampleComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    // Initialize X API service
-    // In a real application, get this from environment variables or secure config
-    const bearerToken = 'YOUR_BEARER_TOKEN_HERE'; // Replace with actual token
+    // X API service with OAuth 1.0a is automatically initialized from environment
+    // No manual initialization needed - OAuth credentials are loaded automatically!
 
-    try {
-      this.xApiService.initialize(bearerToken, {
-        environment: 'development',
-        enableLogging: true
-      });
-    } catch (error: any) {
-      this.updateState({ error: error.message });
+    console.log('🚀 X API Integration Example Component with OAuth 1.0a');
+
+    // Check if service is ready
+    if (this.xApiService.serviceReady()) {
+      console.log('✅ X API service ready with OAuth 1.0a authentication');
+    } else {
+      const status = this.xApiService.status();
+      console.warn('⚠️ X API service not ready:', status.error);
+      this.updateState({ error: status.error || 'OAuth 1.0a authentication not ready' });
     }
 
     // Monitor rate limit status

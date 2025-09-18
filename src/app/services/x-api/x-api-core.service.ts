@@ -1,7 +1,8 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject, timer, EMPTY } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, timer, EMPTY, from } from 'rxjs';
 import { catchError, map, tap, retry, delayWhen, switchMap, finalize } from 'rxjs/operators';
+import { OAuth1aAuthService } from './oauth1a-auth.service';
 
 import {
   XApiUser,
@@ -14,12 +15,13 @@ import {
 } from './interfaces/x-api.interfaces';
 
 /**
- * X API V2 Core Service
+ * X API V2 Core Service with OAuth 1.0a Authentication
  *
  * Official implementation following https://docs.x.com/x-api/introduction
+ * with OAuth 1.0a authentication to eliminate CORS issues.
  *
  * Features:
- * - Bearer Token authentication (OAuth 2.0)
+ * - OAuth 1.0a authentication (eliminates CORS issues)
  * - Official X API V2 endpoints
  * - Proper rate limiting with exponential backoff
  * - Comprehensive error handling
@@ -27,14 +29,15 @@ import {
  * - Real-time rate limit tracking
  *
  * Authentication:
- * Uses Bearer Token authentication as recommended by X API V2 documentation
+ * Uses OAuth 1.0a authentication which allows browser requests to X API
+ * without CORS restrictions, unlike Bearer Token authentication.
  *
- * Rate Limits (Official X API V2):
+ * Rate Limits (Official X API V2 with OAuth 1.0a):
  * - GET /2/users/by/username/{username}: 300 requests per 15-minute window
  * - GET /2/users/{id}/tweets: 1500 requests per 15-minute window
  *
  * @see https://docs.x.com/x-api/introduction
- * @see https://docs.x.com/x-api/authentication/overview
+ * @see https://docs.x.com/x-api/authentication/oauth-1-0a
  */
 
 
@@ -43,11 +46,12 @@ import {
 })
 export class XApiCoreService {
   private readonly http = inject(HttpClient);
+  private readonly oauthAuth = inject(OAuth1aAuthService);
 
   // Official X API V2 Base URL
   private readonly API_BASE_URL = 'https://api.x.com/2';
 
-  // Bearer Token for authentication (should be provided via environment or server)
+  // Legacy Bearer Token (kept for fallback, but OAuth 1.0a is preferred)
   private bearerToken: string | null = null;
 
   // State management with Angular signals
@@ -76,32 +80,48 @@ export class XApiCoreService {
     // Subscribe to state changes
     this.stateSubject.subscribe(state => this.state.set(state));
 
-    console.log('🐦 X API V2 Core Service initialized');
+    // Initialize OAuth authentication
+    this.initializeOAuth();
+
+    console.log('🐦 X API V2 Core Service with OAuth 1.0a initialized');
   }
 
   /**
-   * Initialize service with Bearer Token
+   * Initialize OAuth 1.0a authentication
+   * This is called automatically in constructor
+   */
+  private initializeOAuth(): void {
+    // Check OAuth authentication status
+    if (this.oauthAuth.isReady()) {
+      this.updateState({
+        initialized: true,
+        authenticated: true,
+        error: null
+      });
+      console.log('✅ X API V2 Core Service initialized with OAuth 1.0a');
+    } else {
+      const status = this.oauthAuth.status();
+      this.updateState({
+        initialized: false,
+        authenticated: false,
+        error: status.error || 'OAuth 1.0a authentication not ready'
+      });
+      console.warn('⚠️ X API V2 Core Service: OAuth 1.0a authentication not ready');
+    }
+  }
+
+  /**
+   * Initialize service with Bearer Token (legacy method, kept for compatibility)
    *
    * @param bearerToken - OAuth 2.0 Bearer Token for X API V2
+   * @deprecated Use OAuth 1.0a authentication instead to avoid CORS issues
    */
   initialize(bearerToken: string): void {
-    if (!bearerToken || bearerToken.trim().length === 0) {
-      this.updateState({
-        error: 'Bearer token is required for X API V2 authentication',
-        initialized: false,
-        authenticated: false
-      });
-      return;
-    }
+    console.warn('⚠️ Bearer Token authentication is deprecated. Using OAuth 1.0a instead.');
 
+    // Store bearer token as fallback but use OAuth 1.0a
     this.bearerToken = bearerToken;
-    this.updateState({
-      initialized: true,
-      authenticated: true,
-      error: null
-    });
-
-    console.log('✅ X API V2 Core Service initialized with Bearer Token');
+    this.initializeOAuth();
   }
 
   /**
@@ -149,15 +169,17 @@ export class XApiCoreService {
       );
     }
 
-    const headers = this.createAuthHeaders();
-
     this.updateState({ loading: true, error: null });
 
-    return this.http.get<XApiResponse<XApiUser>>(url, {
-      headers,
-      params,
-      observe: 'response'
-    }).pipe(
+    // Create authorization header using OAuth 1.0a
+    return from(this.createOAuthHeaders('GET', url, params)).pipe(
+      switchMap(headers =>
+        this.http.get<XApiResponse<XApiUser>>(url, {
+          headers,
+          params,
+          observe: 'response'
+        })
+      ),
       tap(response => this.updateRateLimits(endpoint, response.headers)),
       map(response => {
         const userData = response.body?.data || null;
@@ -268,15 +290,17 @@ export class XApiCoreService {
       params = params.set('exclude', options.exclude.join(','));
     }
 
-    const headers = this.createAuthHeaders();
-
     this.updateState({ loading: true, error: null });
 
-    return this.http.get<XApiResponse<XApiTweet[]>>(url, {
-      headers,
-      params,
-      observe: 'response'
-    }).pipe(
+    // Create authorization header using OAuth 1.0a
+    return from(this.createOAuthHeaders('GET', url, params)).pipe(
+      switchMap(headers =>
+        this.http.get<XApiResponse<XApiTweet[]>>(url, {
+          headers,
+          params,
+          observe: 'response'
+        })
+      ),
       tap(response => this.updateRateLimits(endpoint, response.headers)),
       map(response => {
         const body = response.body;
@@ -349,10 +373,55 @@ export class XApiCoreService {
   // Private helper methods
 
   private isAuthenticated(): boolean {
-    return this.bearerToken !== null && this.state().authenticated;
+    return this.oauthAuth.isReady() && this.state().authenticated;
   }
 
+  /**
+   * Create OAuth 1.0a authorization headers
+   * This replaces Bearer Token authentication to eliminate CORS issues
+   */
+  private async createOAuthHeaders(
+    method: string,
+    url: string,
+    params?: HttpParams
+  ): Promise<HttpHeaders> {
+    if (!this.oauthAuth.isReady()) {
+      throw new Error('OAuth 1.0a authentication not ready');
+    }
+
+    // Convert HttpParams to query parameter object
+    const queryParams: Record<string, string> = {};
+    if (params) {
+      params.keys().forEach(key => {
+        const value = params.get(key);
+        if (value) {
+          queryParams[key] = value;
+        }
+      });
+    }
+
+    try {
+      // Generate OAuth 1.0a authorization header
+      const authHeader = await this.oauthAuth.generateAuthHeader(method, url, queryParams);
+
+      return new HttpHeaders({
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+        'User-Agent': 'PrismaticCollections/1.0'
+      });
+
+    } catch (error: any) {
+      throw new Error(`Failed to create OAuth authorization headers: ${error.message}`);
+    }
+  }
+
+  /**
+   * Legacy Bearer Token headers (kept for fallback)
+   * @deprecated Use createOAuthHeaders instead
+   */
   private createAuthHeaders(): HttpHeaders {
+    console.warn('⚠️ Using deprecated Bearer Token authentication');
+
     if (!this.bearerToken) {
       throw new Error('Bearer token not available');
     }

@@ -1,25 +1,22 @@
 /**
- * X API V2 Integration - Barrel Exports
+ * X API V2 Integration with OAuth 1.0a - Barrel Exports
  *
  * Complete Angular implementation for official X API V2 integration
- * following https://docs.x.com/x-api/introduction exactly.
+ * with OAuth 1.0a authentication to eliminate CORS issues.
  *
- * This implementation replaces all proxy services, workarounds, and
- * unofficial methods with proper OAuth 2.0 Bearer Token authentication
- * and official X API V2 endpoints.
+ * This implementation uses OAuth 1.0a instead of Bearer Token to allow
+ * direct browser requests to X API without CORS restrictions.
  *
  * Usage:
  * ```typescript
- * import { XApiService, XApiConfig } from './services/x-api';
+ * import { XApiService } from './services/x-api';
  *
  * // In component or service
  * constructor(private xApiService: XApiService) {}
  *
  * ngOnInit() {
- *   // Initialize with Bearer Token
- *   this.xApiService.initialize('your-bearer-token');
- *
- *   // Get user profile
+ *   // OAuth 1.0a authentication is automatic from environment
+ *   // Get user profile (no CORS issues!)
  *   this.xApiService.getUserProfile('username').subscribe(user => {
  *     console.log(user);
  *   });
@@ -32,6 +29,11 @@ export { XApiService } from './x-api.service';
 export { XApiCoreService } from './x-api-core.service';
 export { XApiConfigService } from './x-api-config.service';
 export { XApiErrorService } from './x-api-error.service';
+
+// OAuth 1.0a authentication exports (NEW - eliminates CORS)
+export { OAuth1aAuthService } from './oauth1a-auth.service';
+export { OAuth1aSignatureService, OAuth1aCredentials } from './oauth1a-signature.service';
+export { CryptoUtilsService } from './crypto-utils.service';
 
 // Interceptor exports
 export { XApiAuthInterceptor } from './interceptors/x-api-auth.interceptor';
@@ -100,7 +102,10 @@ export function provideXApi() {
     XApiService,
     XApiCoreService,
     XApiConfigService,
-    XApiErrorService
+    XApiErrorService,
+    OAuth1aAuthService,
+    OAuth1aSignatureService,
+    CryptoUtilsService
   ];
 }
 

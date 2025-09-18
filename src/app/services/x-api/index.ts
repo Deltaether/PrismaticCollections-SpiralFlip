@@ -30,9 +30,21 @@ export { XApiCoreService } from './x-api-core.service';
 export { XApiConfigService } from './x-api-config.service';
 export { XApiErrorService } from './x-api-error.service';
 
+// Import services for internal use in provider functions
+import { XApiService } from './x-api.service';
+import { XApiCoreService } from './x-api-core.service';
+import { XApiConfigService } from './x-api-config.service';
+import { XApiErrorService } from './x-api-error.service';
+import { OAuth1aAuthService } from './oauth1a-auth.service';
+import { OAuth1aSignatureService } from './oauth1a-signature.service';
+import { CryptoUtilsService } from './crypto-utils.service';
+import { XApiAuthInterceptor } from './interceptors/x-api-auth.interceptor';
+import { XApiRateLimitInterceptor } from './interceptors/x-api-rate-limit.interceptor';
+
 // OAuth 1.0a authentication exports (NEW - eliminates CORS)
 export { OAuth1aAuthService } from './oauth1a-auth.service';
-export { OAuth1aSignatureService, OAuth1aCredentials } from './oauth1a-signature.service';
+export { OAuth1aSignatureService } from './oauth1a-signature.service';
+export type { OAuth1aCredentials } from './oauth1a-signature.service';
 export { CryptoUtilsService } from './crypto-utils.service';
 
 // Interceptor exports
@@ -40,7 +52,7 @@ export { XApiAuthInterceptor } from './interceptors/x-api-auth.interceptor';
 export { XApiRateLimitInterceptor } from './interceptors/x-api-rate-limit.interceptor';
 
 // Interface and type exports
-export {
+export type {
   // Core data objects
   XApiUser,
   XApiTweet,
@@ -71,14 +83,14 @@ export {
 } from './interfaces/x-api.interfaces';
 
 // Error handling exports
-export {
-  XApiErrorCategory,
+export { XApiErrorCategory } from './x-api-error.service';
+export type {
   ProcessedXApiError,
   ErrorStats
 } from './x-api-error.service';
 
 // Configuration exports
-export {
+export type {
   XApiEnvironmentConfig
 } from './x-api-config.service';
 

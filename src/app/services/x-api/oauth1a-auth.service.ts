@@ -93,8 +93,8 @@ export class OAuth1aAuthService {
 
       // Validate credentials
       const credentials: OAuth1aCredentials = {
-        consumerKey: envCredentials.consumerKey,
-        consumerSecret: envCredentials.consumerSecret,
+        consumerKey: envCredentials.apiKey,
+        consumerSecret: envCredentials.apiSecret,
         accessToken: envCredentials.accessToken,
         accessTokenSecret: envCredentials.accessTokenSecret
       };

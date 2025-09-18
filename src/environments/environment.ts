@@ -65,29 +65,26 @@ export const environment = {
     cacheHours: 24
   },
 
-  // X API V2 Configuration (OAuth 1.0a Implementation)
+  // X API V2 Configuration (Bearer Token Implementation)
   xApi: {
-    // OAuth 1.0a Credentials (provided by user)
-    // IMPORTANT: These are real credentials for testing - keep secure!
+    // OAuth 1.0a Credentials (for backward compatibility)
     oauth: {
-      // Consumer Key (API Key) - from X Developer Portal
-      consumerKey: 'OmR8bRNMB7x0KicX8xEFPDy8h',
-      // Consumer Secret (API Secret) - from X Developer Portal
-      consumerSecret: 'YgfnBAxgXOnHCiwFSA0z2f10hQ7kANL4WyG5p1whojz9KlvjW3',
-      // Access Token - provided by user
-      accessToken: '1778792494559350784-25vh673byIY83zdxD6jWctTlIg4bX9',
-      // Access Token Secret - provided by user
-      accessTokenSecret: 'Z5P2oemFmZTLAgkNMWCQNktTXSU1XupBQAe3pWfjl69un'
+      apiKey: 'OmR8bRNMB7x0KicX8xEFPDy8h',
+      apiSecret: 'YgfnBAxgXOnHCiwFSA0z2f10hQ7kANL4WyG5p1whojz9KlvjW3',
+      accessToken: '1778792494559350784-BWL7i22YEKgh5jsvJcH9gCrrwUbS9O',
+      accessTokenSecret: 'giS3XRlGO5VIVCYQcuqehWGNJk6jCGN32zNxPrUddrgoq'
     },
-
-    // Legacy Bearer Token (kept for reference, will be replaced by OAuth 1.0a)
-    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAS/bfXUno6dIrCKYAnt98XEnXmS8=zvCZuOjMkf04fxuTl31G29fCIr1lSszDNRiYS3PAVqcv6a0est',
+    // Bearer Token Authentication (provided by user)
+    // IMPORTANT: This is a real Bearer Token for testing - keep secure!
+    // Fixed: URL-decoded for proper HTTP header usage
+    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAoNT3QogtYZadw6EnYd4rlBcZr3A=oCHXPew0U784oDM1H2I9WzXsiwb6x3jkQPYKHmJ48JE9bRqlNn',
 
     // API Configuration
     baseUrl: 'https://api.x.com/2',
     enabled: true,
     enableLogging: true, // Set to false in production
-    useOAuth1a: true, // NEW: Enable OAuth 1.0a instead of Bearer Token
+    useOAuth1a: false, // DISABLED: OAuth 1.0a causing timing issues
+    useBearerToken: true, // ENABLED: Simple Bearer Token authentication
 
     // Target username for profile and tweets
     username: 'prismcollect_',
@@ -95,12 +92,12 @@ export const environment = {
     // Cache settings
     cacheDuration: 5 * 60 * 1000, // 5 minutes
 
-    // Rate limiting configuration (OAuth 1.0a limits)
+    // Rate limiting configuration (Bearer Token limits)
     rateLimiting: {
       enabled: true,
       warningThreshold: 0.2, // Warning at 20% remaining
       criticalThreshold: 0.1,  // Critical at 10% remaining
-      // OAuth 1.0a specific limits
+      // Bearer Token specific limits (App-only auth)
       userContext: {
         requestsPerWindow: 300,  // GET /2/users/by/username/{username}
         tweetsPerWindow: 1500,   // GET /2/users/{id}/tweets

@@ -32,6 +32,10 @@ export const routes: Routes = [
     path: 'test-home',
     loadComponent: () => import('./pages/test-home/test-home.component').then(m => m.TestHomeComponent)
   },
+  {
+    path: 'x-api-test',
+    loadComponent: () => import('./components/x-api-integration-example/x-api-integration-example.component').then(m => m.XApiIntegrationExampleComponent)
+  },
   
   // Phantasia Layout routes
   {

@@ -53,7 +53,7 @@ interface ComponentState {
         <div class="status-grid">
           <div class="status-item">
             <span class="label">Ready:</span>
-            <span class="value">{{ xApiService.isReady() ? 'Yes' : 'No' }}</span>
+            <span class="value">{{ xApiService.serviceReady() ? 'Yes' : 'No' }}</span>
           </div>
           <div class="status-item">
             <span class="label">Loading:</span>
@@ -78,13 +78,13 @@ interface ComponentState {
         <div class="controls">
           <button
             (click)="loadUserProfile('prismcollect_')"
-            [disabled]="state().loading || !xApiService.isReady()"
+            [disabled]="state().loading || !xApiService.serviceReady()"
             class="load-button">
             Load @prismcollect_ Profile
           </button>
           <button
             (click)="loadUserProfile('elonmusk')"
-            [disabled]="state().loading || !xApiService.isReady()"
+            [disabled]="state().loading || !xApiService.serviceReady()"
             class="load-button">
             Load @elonmusk Profile
           </button>
@@ -123,13 +123,13 @@ interface ComponentState {
         <div class="controls">
           <button
             (click)="loadUserTweets('prismcollect_', 5)"
-            [disabled]="state().loading || !xApiService.isReady()"
+            [disabled]="state().loading || !xApiService.serviceReady()"
             class="load-button">
             Load Recent Tweets (5)
           </button>
           <button
             (click)="loadUserTweets('prismcollect_', 10)"
-            [disabled]="state().loading || !xApiService.isReady()"
+            [disabled]="state().loading || !xApiService.serviceReady()"
             class="load-button">
             Load More Tweets (10)
           </button>
@@ -171,7 +171,7 @@ interface ComponentState {
         <p>Optimized for project accounts like @prismcollect_</p>
         <button
           (click)="loadProjectTweets('prismcollect_')"
-          [disabled]="state().loading || !xApiService.isReady()"
+          [disabled]="state().loading || !xApiService.serviceReady()"
           class="load-button">
           Load Project Updates
         </button>
@@ -437,7 +437,7 @@ interface ComponentState {
   `]
 })
 export class XApiIntegrationExampleComponent implements OnInit, OnDestroy {
-  private readonly xApiService = inject(XApiService);
+  readonly xApiService = inject(XApiService);
   private readonly destroy$ = new Subject<void>();
 
   // Component state management
@@ -455,7 +455,7 @@ export class XApiIntegrationExampleComponent implements OnInit, OnDestroy {
   readonly serviceStatusClass = computed(() => {
     if (this.xApiService.hasError()) return 'error';
     if (this.xApiService.isLoading()) return 'loading';
-    if (this.xApiService.isReady()) return 'ready';
+    if (this.xApiService.serviceReady()) return 'ready';
     return 'loading';
   });
 

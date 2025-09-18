@@ -288,56 +288,51 @@ export class News implements OnInit, OnDestroy {
   }
   
   /**
-   * Initialize X API V2 integration with OAuth 1.0a authentication
-   * This eliminates CORS issues by using proper OAuth instead of Bearer Token
+   * Initialize X API V2 integration with Bearer Token authentication
+   * Simple and reliable authentication method
    */
   private initializeXApi(): void {
-    console.log('🚀 Initializing X API V2 with OAuth 1.0a integration...');
+    console.log('🚀 Initializing X API V2 with Bearer Token integration...');
 
-    // Check if X API is enabled and OAuth 1.0a is configured
+    // Check if X API is enabled
     if (!environment.xApi.enabled) {
       console.warn('⚠️ X API V2 not enabled in environment');
       this.xApiError.set('X API V2 not enabled. Check environment settings.');
       return;
     }
 
-    if (!environment.xApi.useOAuth1a) {
-      console.warn('⚠️ OAuth 1.0a not enabled - falling back to Bearer Token (may cause CORS issues)');
-
-      // Fallback to Bearer Token if OAuth 1.0a is not enabled
-      if (!environment.xApi.bearerToken) {
-        this.xApiError.set('Neither OAuth 1.0a nor Bearer Token configured.');
-        return;
-      }
-
-      try {
-        this.xApiService.initialize(environment.xApi.bearerToken, {
-          enableLogging: environment.xApi.enableLogging,
-          environment: 'development'
-        });
-      } catch (error: any) {
-        console.error('❌ Failed to initialize X API V2 with Bearer Token:', error);
-        this.xApiError.set(`Bearer Token initialization failed: ${error.message}`);
-        return;
-      }
+    // Check if Bearer Token is configured
+    if (!environment.xApi.useBearerToken) {
+      console.warn('⚠️ Bearer Token authentication not enabled in environment');
+      this.xApiError.set('Bearer Token authentication not enabled. Check environment settings.');
+      return;
     }
 
-    // OAuth 1.0a authentication is automatic - check service status
-    if (this.xApiService.serviceReady()) {
+    if (!environment.xApi.bearerToken) {
+      console.error('❌ Bearer Token not configured in environment');
+      this.xApiError.set('Bearer Token not configured. Check environment settings.');
+      return;
+    }
+
+    try {
+      // Initialize with Bearer Token
+      this.xApiService.initialize(environment.xApi.bearerToken, {
+        enableLogging: environment.xApi.enableLogging,
+        environment: 'development'
+      });
+
       this.xApiInitialized.set(true);
-      console.log('✅ X API V2 service ready with OAuth 1.0a authentication');
+      console.log('✅ X API V2 service ready with Bearer Token authentication');
 
       // Load user profile and tweets
       this.loadXApiData();
-    } else {
-      // Check service status for error details
-      const status = this.xApiService.status();
-      const errorMessage = status.error || 'OAuth 1.0a authentication not ready';
 
-      console.error('❌ X API V2 OAuth 1.0a not ready:', errorMessage);
-      this.xApiError.set(`OAuth 1.0a authentication failed: ${errorMessage}`);
+    } catch (error: any) {
+      console.error('❌ Failed to initialize X API V2 with Bearer Token:', error);
+      this.xApiError.set(`Bearer Token initialization failed: ${error.message}`);
 
       // Log diagnostic information
+      const status = this.xApiService.status();
       console.log('🔍 X API Service Diagnostics:', {
         initialized: status.initialized,
         authenticated: status.authenticated,

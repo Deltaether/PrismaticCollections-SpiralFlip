@@ -25,296 +25,33 @@
       </div>
     </section>
 
-    <!-- X API V2 Integration - Live Data -->
-    <section class="filters">
-      <div class="filter-container x-api-integration">
+    <!-- Primary Twitter Timeline Section -->
+    <section class="primary-twitter-timeline">
+      <div class="timeline-container">
 
         <!-- Section Header -->
         <div class="section-header">
           <div class="section-title">
             <mat-icon class="section-icon">alternate_email</mat-icon>
-            <h3>Latest from Prismatic Collections</h3>
-            <span class="x-handle">@{{ getXApiUsername() }}</span>
+            <h2>Latest from Prismatic Collections</h2>
+            <span class="x-handle">@{{ twitterUsername }}</span>
           </div>
           <div class="section-subtitle">
-            <span [ngSwitch]="xApiStatus()">
-              <span *ngSwitchCase="'loading'">Loading X API data...</span>
-              <span *ngSwitchCase="'success'">Live updates from X API V2</span>
-              <span *ngSwitchCase="'error'">X API temporarily unavailable</span>
-              <span *ngSwitchDefault>Connecting to X API V2...</span>
-            </span>
-            <span class="last-update">• Last updated: {{ getLastUpdateTime() }}</span>
+            <span>Live updates and insights from our X/Twitter feed</span>
+          </div>
+          <div class="section-actions">
+            <button class="button primary" (click)="onFollowClick()">
+              <mat-icon class="button-icon">open_in_new</mat-icon>
+              Visit X Profile
+            </button>
           </div>
         </div>
 
-        <!-- Loading State -->
-        <div class="x-api-loading" *ngIf="xApiStatus() === 'loading'">
-          <div class="loading-content">
-            <mat-icon class="loading-icon">sync</mat-icon>
-            <h4 class="loading-title">Loading X API V2 Data</h4>
-            <p class="loading-text">Fetching user profile and latest tweets from @{{ environment.xApi.username }}...</p>
-          </div>
+        <!-- Enhanced Twitter Timeline -->
+        <div class="enhanced-twitter-timeline">
+          <app-twitter-timeline></app-twitter-timeline>
         </div>
 
-        <!-- Error State -->
-        <div class="x-api-error" *ngIf="xApiStatus() === 'error'">
-          <div class="error-content">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h4 class="error-title">X API Unavailable</h4>
-            <p class="error-text">{{ xApiError() }}</p>
-            <div class="error-buttons">
-              <button class="button secondary" (click)="retryXApiLoad()">
-                <mat-icon class="button-icon">refresh</mat-icon>
-                Retry
-              </button>
-              <button class="button primary" (click)="onFollowClick()">
-                <mat-icon class="button-icon">open_in_new</mat-icon>
-                Visit X Profile
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Success State - User Profile and Tweets -->
-        <div class="x-api-content" *ngIf="xApiStatus() === 'success' && hasXApiData()">
-
-          <!-- User Profile Card -->
-          <div class="x-user-profile" *ngIf="xApiUser() as user">
-            <div class="profile-header">
-              <div class="profile-avatar">
-                <img [src]="user.profile_image_url"
-                     [alt]="user.name"
-                     (error)="$event.target.src='/assets/images/default-avatar.svg'">
-                <div class="verified-badge" *ngIf="user.verified">
-                  <mat-icon>verified</mat-icon>
-                </div>
-              </div>
-              <div class="profile-info">
-                <h4 class="profile-name">{{ user.name }}</h4>
-                <span class="profile-username">@{{ user.username }}</span>
-                <p class="profile-description" *ngIf="user.description">{{ user.description }}</p>
-              </div>
-              <div class="profile-actions">
-                <button class="button primary" (click)="onFollowClick()">
-                  <mat-icon class="button-icon">person_add</mat-icon>
-                  Follow
-                </button>
-                <button class="button secondary" (click)="refreshXApiFeed()">
-                  <mat-icon class="button-icon">refresh</mat-icon>
-                  Refresh
-                </button>
-              </div>
-            </div>
-
-            <!-- User Metrics -->
-            <div class="profile-metrics" *ngIf="user.public_metrics">
-              <div class="metric">
-                <span class="metric-value">{{ getUserMetrics().followers | number }}</span>
-                <span class="metric-label">Followers</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">{{ getUserMetrics().following | number }}</span>
-                <span class="metric-label">Following</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">{{ getUserMetrics().tweets | number }}</span>
-                <span class="metric-label">Posts</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Latest Tweets -->
-          <div class="x-tweets-section" *ngIf="xApiTweets().length > 0">
-            <h4 class="tweets-title">
-              <mat-icon>chat_bubble_outline</mat-icon>
-              Latest Posts
-            </h4>
-
-            <div class="tweets-container">
-              <div class="tweet-card"
-                   *ngFor="let tweet of xApiTweets(); trackBy: trackByTweetId; let i = index"
-                   [class.highlighted]="i === 0">
-
-                <!-- Tweet Header -->
-                <div class="tweet-header">
-                  <div class="tweet-meta">
-                    <span class="tweet-date" *ngIf="tweet.created_at">
-                      {{ formatTweetDate(tweet.created_at) }}
-                    </span>
-                    <span class="tweet-separator">•</span>
-                    <a [href]="'https://x.com/' + getXApiUsername() + '/status/' + tweet.id"
-                       target="_blank"
-                       rel="noopener"
-                       class="tweet-link">
-                      View on X
-                      <mat-icon>open_in_new</mat-icon>
-                    </a>
-                  </div>
-                </div>
-
-                <!-- Tweet Content -->
-                <div class="tweet-content">
-                  <p class="tweet-text" [innerHTML]="formatTweetText(tweet)"></p>
-                </div>
-
-                <!-- Tweet Metrics -->
-                <div class="tweet-metrics" *ngIf="tweet.public_metrics">
-                  <div class="metric-item">
-                    <mat-icon>favorite_border</mat-icon>
-                    <span>{{ getTweetMetrics(tweet).likes | number }}</span>
-                  </div>
-                  <div class="metric-item">
-                    <mat-icon>repeat</mat-icon>
-                    <span>{{ getTweetMetrics(tweet).retweets | number }}</span>
-                  </div>
-                  <div class="metric-item">
-                    <mat-icon>chat_bubble_outline</mat-icon>
-                    <span>{{ getTweetMetrics(tweet).replies | number }}</span>
-                  </div>
-                  <div class="metric-item">
-                    <mat-icon>format_quote</mat-icon>
-                    <span>{{ getTweetMetrics(tweet).quotes | number }}</span>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-          <!-- No Tweets Message -->
-          <div class="no-tweets" *ngIf="xApiTweets().length === 0">
-            <mat-icon>chat_bubble_outline</mat-icon>
-            <p>No recent posts available</p>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Featured Articles Section -->
-    <section class="featured-news" *ngIf="featuredArticles().length > 0">
-      <h2 class="section-title">Featured Updates</h2>
-      
-      <div class="featured-grid">
-        <article *ngFor="let article of featuredArticles(); trackBy: trackByArticleId" 
-                 class="featured-article"
-                 (click)="navigateToArticle(article.id)"
-                 (mouseenter)="onArticleHover(article.id)">
-          
-          <!-- Featured Image -->
-          <div class="article-image" *ngIf="article.featuredImage">
-            <img [src]="article.featuredImage" 
-                 [alt]="article.title" 
-                 (error)="$event.target.style.display='none'">
-            <div class="image-overlay"></div>
-          </div>
-          
-          <!-- Article Content -->
-          <div class="article-content">
-            
-            <!-- Article Meta -->
-            <div class="article-meta">
-              <span class="category-badge"
-                    [style.background]="getCategoryGradient(article.category)">
-                <mat-icon class="category-icon">{{ getCategoryIcon(article.category) }}</mat-icon>
-                {{ getCategoryLabel(article.category) }}
-              </span>
-              <span class="publish-date">{{ formatDate(article.publishDate) }}</span>
-              <span class="pinned-indicator" *ngIf="article.isPinned"><mat-icon>push_pin</mat-icon> Pinned</span>
-            </div>
-            
-            <!-- Article Title and Subtitle -->
-            <h3 class="article-title">{{ article.title }}</h3>
-            <p class="article-subtitle">{{ article.subtitle }}</p>
-            <p class="article-excerpt">{{ article.excerpt }}</p>
-            
-            <!-- Author Info -->
-            <div class="author-info">
-              <div class="author-avatar" *ngIf="article.author.avatar">
-                <img [src]="article.author.avatar" [alt]="article.author.name">
-              </div>
-              <div class="author-details">
-                <span class="author-name">{{ article.author.name }}</span>
-                <span class="author-role">{{ article.author.role }}</span>
-              </div>
-            </div>
-            
-            <!-- Tags -->
-            <div class="article-tags">
-              <span *ngFor="let tag of article.tags" class="tag">#{{ tag }}</span>
-            </div>
-            
-            <!-- Read More -->
-            <div class="read-more">
-              <span class="read-more-text">Read Full Article</span>
-              <mat-icon class="read-more-arrow">arrow_forward</mat-icon>
-            </div>
-            
-          </div>
-          
-        </article>
-      </div>
-    </section>
-
-    <!-- Regular News Articles -->
-    <section class="news-articles">
-      <h2 class="section-title" *ngIf="featuredArticles().length > 0">Recent Updates</h2>
-      <h2 class="section-title" *ngIf="featuredArticles().length === 0">All Updates</h2>
-      
-      <!-- No Results Message -->
-      <div class="no-results" *ngIf="regularArticles().length === 0 && featuredArticles().length === 0">
-        <div class="no-results-icon">🔍</div>
-        <h3 class="no-results-title">No articles found</h3>
-        <p class="no-results-text">
-          No news articles are currently available.
-        </p>
-      </div>
-      
-      <!-- Articles Grid -->
-      <div class="articles-grid" *ngIf="regularArticles().length > 0">
-        <article *ngFor="let article of regularArticles(); trackBy: trackByArticleId" 
-                 class="news-article"
-                 (click)="navigateToArticle(article.id)"
-                 (mouseenter)="onArticleHover(article.id)">
-          
-          <!-- Article Meta -->
-          <div class="article-meta">
-            <span class="category-badge small"
-                  [style.background]="getCategoryGradient(article.category)">
-              <span class="category-icon">{{ getCategoryIcon(article.category) }}</span>
-              {{ getCategoryLabel(article.category) }}
-            </span>
-            <span class="publish-date">{{ formatDate(article.publishDate) }}</span>
-          </div>
-          
-          <!-- Article Content -->
-          <div class="article-content">
-            <h3 class="article-title">{{ article.title }}</h3>
-            <p class="article-subtitle" *ngIf="article.subtitle">{{ article.subtitle }}</p>
-            <p class="article-excerpt">{{ article.excerpt }}</p>
-            
-            <!-- Author Info -->
-            <div class="author-info compact">
-              <span class="author-name">{{ article.author.name }}</span>
-              <span class="author-separator">•</span>
-              <span class="author-role">{{ article.author.role }}</span>
-            </div>
-            
-            <!-- Tags -->
-            <div class="article-tags">
-              <span *ngFor="let tag of article.tags.slice(0, 3)" class="tag small">#{{ tag }}</span>
-              <span *ngIf="article.tags.length > 3" class="tag-more">+{{ article.tags.length - 3 }} more</span>
-            </div>
-          </div>
-          
-          <!-- Read More Indicator -->
-          <div class="read-indicator">
-            <span class="read-text">Read More</span>
-            <mat-icon class="read-arrow">arrow_forward</mat-icon>
-          </div>
-          
-        </article>
       </div>
     </section>
 

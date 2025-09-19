@@ -1,0 +1,7 @@
+[project]
+name = "twitter-scraper"
+version = "1.0"
+instance = "twitter_scraper"
+
+[database]
+name = "twitter_scraper"

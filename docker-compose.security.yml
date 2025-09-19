@@ -1,0 +1,136 @@
+# Security-hardened Docker Compose override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.security.yml up
+
+version: '3.8'
+
+services:
+  # EdgeDB with enhanced security
+  edgedb:
+    environment:
+      # Production security settings
+      EDGEDB_SERVER_SECURITY: strict
+      EDGEDB_SERVER_ADMIN_UI: disabled
+      EDGEDB_SERVER_TLS_CERT_MODE: require_file
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+    read_only: false  # Database needs write access
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+  # Backend with security hardening
+  backend:
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    environment:
+      # Security headers and HTTPS enforcement
+      FORCE_HTTPS: "true"
+      SECURE_COOKIES: "true"
+      CSRF_PROTECTION: "true"
+      RATE_LIMIT_ENABLED: "true"
+      SESSION_SECURE: "true"
+      # Disable debug features in production
+      NODE_ENV: production
+      DEBUG: ""
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+  # Frontend with enhanced security
+  frontend:
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETUID
+      - SETGID
+    read_only: false  # Nginx needs write access to cache
+    tmpfs:
+      - /tmp:noexec,nosuid,size=50m
+      - /run:noexec,nosuid,size=10m
+      - /var/cache/nginx:exec,nosuid,size=100m
+
+  # Python fetcher with security restrictions
+  twitter-fetcher:
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_ADMIN  # Only if needed for networking
+    environment:
+      # Security settings
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=50m
+
+  # Prometheus with security
+  prometheus:
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=20m
+
+  # Grafana with security
+  grafana:
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    environment:
+      # Security settings
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_SECURITY_COOKIE_SAMESITE: "strict"
+      GF_SECURITY_STRICT_TRANSPORT_SECURITY: "true"
+      GF_SECURITY_X_CONTENT_TYPE_OPTIONS: "true"
+      GF_SECURITY_X_XSS_PROTECTION: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_USERS_AUTO_ASSIGN_ORG: "true"
+      GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Viewer"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=20m
+
+# Network security
+networks:
+  prismatic-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "false"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+    enable_ipv6: false

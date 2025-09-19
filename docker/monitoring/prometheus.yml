@@ -1,0 +1,60 @@
+# Prometheus configuration for Prismatic Collections monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'prismatic-monitor'
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node.js Backend API
+  - job_name: 'backend-api'
+    static_configs:
+      - targets: ['backend:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Python Twitter Fetcher
+  - job_name: 'twitter-fetcher'
+    static_configs:
+      - targets: ['twitter-fetcher:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Nginx Frontend (if metrics enabled)
+  - job_name: 'nginx-frontend'
+    static_configs:
+      - targets: ['frontend:8080']  # Internal monitoring port
+    metrics_path: '/nginx_status'
+    scrape_interval: 15s
+    scrape_timeout: 5s
+
+  # EdgeDB health monitoring
+  - job_name: 'edgedb-health'
+    static_configs:
+      - targets: ['edgedb:8888']
+    metrics_path: '/server/status'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+# Alerting rules (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Remote write configuration (optional, for external storage)
+# remote_write:
+#   - url: "http://remote-storage:8086/api/v1/prom/write"

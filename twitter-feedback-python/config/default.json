@@ -1,0 +1,15 @@
+{
+  "twitter_bearer_token": "",
+  "database_dsn": null,
+  "log_level": "INFO",
+  "log_dir": "logs",
+  "api_retry_attempts": 3,
+  "api_retry_delay": 1.0,
+  "api_timeout": 30,
+  "respect_rate_limits": true,
+  "rate_limit_buffer": 5,
+  "default_max_tweets": 100,
+  "default_batch_size": 10,
+  "config_dir": "config",
+  "data_dir": "data"
+}

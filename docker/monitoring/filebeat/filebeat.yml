@@ -1,0 +1,56 @@
+# Filebeat configuration for Docker log collection
+
+filebeat.inputs:
+- type: container
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
+  processors:
+    - add_docker_metadata:
+        host: "unix:///var/run/docker.sock"
+    - decode_json_fields:
+        fields: ["message"]
+        target: ""
+        overwrite_keys: true
+
+# Output to Elasticsearch
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST:elasticsearch:9200}"]
+  indices:
+    - index: "prismatic-backend-%{+yyyy.MM.dd}"
+      when.contains:
+        container.name: "prismatic-backend"
+    - index: "prismatic-frontend-%{+yyyy.MM.dd}"
+      when.contains:
+        container.name: "prismatic-frontend"
+    - index: "prismatic-twitter-fetcher-%{+yyyy.MM.dd}"
+      when.contains:
+        container.name: "prismatic-twitter-fetcher"
+    - index: "prismatic-system-%{+yyyy.MM.dd}"
+
+# Kibana dashboard loading
+setup.kibana:
+  host: "${KIBANA_HOST:kibana:5601}"
+
+# Index template
+setup.template:
+  name: "prismatic"
+  pattern: "prismatic-*"
+  enabled: true
+  settings:
+    index.number_of_shards: 1
+    index.number_of_replicas: 0
+
+# Logging configuration
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /usr/share/filebeat/logs
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Monitoring
+monitoring:
+  enabled: true
+  elasticsearch:
+    hosts: ["${ELASTICSEARCH_HOST:elasticsearch:9200}"]

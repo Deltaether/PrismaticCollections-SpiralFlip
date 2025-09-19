@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prismatic Collections - System Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .service-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .service-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-healthy {
+            background-color: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .status-unhealthy {
+            background-color: #f44336;
+            box-shadow: 0 0 10px #f44336;
+        }
+
+        .status-loading {
+            background-color: #ff9800;
+            box-shadow: 0 0 10px #ff9800;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.4; }
+        }
+
+        .service-url {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .service-details {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        .timestamp {
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Prismatic Collections</h1>
+            <p>System Health Monitor</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🌐</div>
+                    <div class="service-name">Frontend (Angular + Nginx)</div>
+                </div>
+                <div class="service-status">
+                    <div class="status-indicator status-loading" id="frontend-status"></div>
+                    <span id="frontend-text">Checking...</span>
+                </div>
+                <div class="service-url">http://localhost:80</div>
+                <div class="service-details" id="frontend-details">
+                    Angular 20 application with nginx reverse proxy
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">⚡</div>
+                    <div class="service-name">Backend API (Node.js)</div>
+                </div>
+                <div class="service-status">
+                    <div class="status-indicator status-loading" id="backend-status"></div>
+                    <span id="backend-text">Checking...</span>
+                </div>
+                <div class="service-url">http://localhost:3001</div>
+                <div class="service-details" id="backend-details">
+                    Express.js server with EdgeDB integration
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🐦</div>
+                    <div class="service-name">Twitter Fetcher (Python)</div>
+                </div>
+                <div class="service-status">
+                    <div class="status-indicator status-loading" id="twitter-status"></div>
+                    <span id="twitter-text">Checking...</span>
+                </div>
+                <div class="service-url">http://localhost:8080</div>
+                <div class="service-details" id="twitter-details">
+                    Scheduled Twitter API v2 data collection
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🗄️</div>
+                    <div class="service-name">EdgeDB Database</div>
+                </div>
+                <div class="service-status">
+                    <div class="status-indicator status-loading" id="edgedb-status"></div>
+                    <span id="edgedb-text">Checking...</span>
+                </div>
+                <div class="service-url">http://localhost:8888 (Admin UI)</div>
+                <div class="service-details" id="edgedb-details">
+                    Graph-relational database with Twitter schema
+                </div>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="checkAllServices()">🔄 Refresh Status</button>
+
+        <div class="footer">
+            <p>Docker Compose Multi-Container Deployment</p>
+            <div class="timestamp" id="last-updated">Last updated: Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        async function checkService(service, url, statusId, textId, detailsId) {
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                const statusElement = document.getElementById(statusId);
+                const textElement = document.getElementById(textId);
+                const detailsElement = document.getElementById(detailsId);
+
+                if (response.ok) {
+                    statusElement.className = 'status-indicator status-healthy';
+                    textElement.textContent = 'Healthy';
+
+                    // Try to get detailed info
+                    try {
+                        const data = await response.json();
+                        if (data.timestamp) {
+                            detailsElement.innerHTML += `<br>Last check: ${new Date(data.timestamp).toLocaleTimeString()}`;
+                        }
+                        if (data.totalTweetsStored) {
+                            detailsElement.innerHTML += `<br>Tweets stored: ${data.totalTweetsStored}`;
+                        }
+                    } catch (e) {
+                        // JSON parsing failed, but service is still healthy
+                    }
+                } else {
+                    statusElement.className = 'status-indicator status-unhealthy';
+                    textElement.textContent = `Error ${response.status}`;
+                    detailsElement.innerHTML += `<br>HTTP ${response.status}: ${response.statusText}`;
+                }
+            } catch (error) {
+                const statusElement = document.getElementById(statusId);
+                const textElement = document.getElementById(textId);
+                const detailsElement = document.getElementById(detailsId);
+
+                statusElement.className = 'status-indicator status-unhealthy';
+                textElement.textContent = 'Unreachable';
+                detailsElement.innerHTML += `<br>Connection failed: ${error.message}`;
+            }
+        }
+
+        async function checkAllServices() {
+            // Reset details
+            document.getElementById('frontend-details').innerHTML = 'Angular 20 application with nginx reverse proxy';
+            document.getElementById('backend-details').innerHTML = 'Express.js server with EdgeDB integration';
+            document.getElementById('twitter-details').innerHTML = 'Scheduled Twitter API v2 data collection';
+            document.getElementById('edgedb-details').innerHTML = 'Graph-relational database with Twitter schema';
+
+            // Set all to loading state
+            ['frontend-status', 'backend-status', 'twitter-status', 'edgedb-status'].forEach(id => {
+                document.getElementById(id).className = 'status-indicator status-loading';
+            });
+            ['frontend-text', 'backend-text', 'twitter-text', 'edgedb-text'].forEach(id => {
+                document.getElementById(id).textContent = 'Checking...';
+            });
+
+            // Check all services
+            await Promise.all([
+                checkService('frontend', '/api/health/frontend', 'frontend-status', 'frontend-text', 'frontend-details'),
+                checkService('backend', '/api/health/backend', 'backend-status', 'backend-text', 'backend-details'),
+                checkService('twitter', '/api/health/twitter-fetcher', 'twitter-status', 'twitter-text', 'twitter-details'),
+                checkService('edgedb', 'http://localhost:8888', 'edgedb-status', 'edgedb-text', 'edgedb-details')
+            ]);
+
+            document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+        }
+
+        // Initial check
+        checkAllServices();
+
+        // Auto-refresh every 30 seconds
+        setInterval(checkAllServices, 30000);
+    </script>
+</body>
+</html>

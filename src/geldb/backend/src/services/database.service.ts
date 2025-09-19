@@ -6,12 +6,26 @@ export class DatabaseService {
   private client: edgedb.Client;
 
   constructor() {
-    // For local development, connect directly to instance
-    this.client = edgedb.createClient({
-      instanceName: 'twitter_scraper',
-      concurrency: 5,
-      tlsSecurity: 'insecure' // Disable TLS verification for local development
-    });
+    // Configure connection based on environment
+    const isDocker = process.env.EDGEDB_HOST;
+
+    if (isDocker) {
+      // Docker environment - connect to containerized EdgeDB
+      this.client = edgedb.createClient({
+        host: process.env.EDGEDB_HOST || 'edgedb',
+        port: parseInt(process.env.EDGEDB_PORT || '5656'),
+        database: process.env.EDGEDB_DATABASE || 'edgedb',
+        concurrency: 5,
+        tlsSecurity: 'insecure'
+      });
+    } else {
+      // Local development - connect to instance
+      this.client = edgedb.createClient({
+        instanceName: 'twitter_scraper',
+        concurrency: 5,
+        tlsSecurity: 'insecure'
+      });
+    }
   }
 
   async connect(): Promise<void> {
@@ -342,7 +356,7 @@ export class DatabaseService {
       `;
 
       const result = await this.client.querySingle(query, {
-        username: sessionData.targetUsername || sessionData.username,
+        username: sessionData.targetUsername,
         status: sessionData.status || 'RUNNING',
         startTime: sessionData.startedAt || new Date(),
         tweetsScraped: sessionData.tweetsCollected || 0,
@@ -478,8 +492,7 @@ export class DatabaseService {
       startedAt: new Date(dbSession.startTime),
       completedAt: dbSession.endTime ? new Date(dbSession.endTime) : undefined,
       targetUsername: dbSession.username,
-      username: dbSession.username,
-      sessionType: 'user_tweets',
+      sessionType: 'manual',
       tweetsCollected: dbSession.tweetsScraped || 0,
       errorsEncountered: dbSession.consecutiveFailures || 0,
       lastTweetIdProcessed: dbSession.lastScrapedTweetId,

@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # EdgeDB Database
+  edgedb:
+    image: edgedb/edgedb:5.10
+    container_name: prismatic-edgedb-test
+    restart: unless-stopped
+    environment:
+      EDGEDB_SERVER_SECURITY: insecure_dev_mode
+      EDGEDB_SERVER_ADMIN_UI: enabled
+      EDGEDB_SERVER_HTTP_ENDPOINT_SECURITY: optional
+      EDGEDB_SERVER_TLS_CERT_MODE: generate_self_signed
+      EDGEDB_SERVER_DEFAULT_DATABASE: edgedb
+      EDGEDB_SERVER_LISTEN_PORT: 5656
+    ports:
+      - "5657:5656"
+      - "8889:8888"
+    volumes:
+      - ./data/edgedb:/var/lib/edgedb/data
+      - ./src/geldb/dbschema:/dbschema:ro
+      - ./src/geldb/backend/edgedb.toml:/app/edgedb.toml:ro
+      - ./data-export:/app/data-export:ro
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "edgedb", "query", "--host", "localhost", "--port", "5656", "--tls-security", "insecure", "SELECT 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # EdgeDB Schema Initialization
+  edgedb-init:
+    image: edgedb/edgedb-cli:latest
+    container_name: prismatic-edgedb-init
+    depends_on:
+      edgedb:
+        condition: service_healthy
+    environment:
+      EDGEDB_HOST: edgedb
+      EDGEDB_PORT: 5656
+      EDGEDB_DATABASE: edgedb
+    volumes:
+      - ./src/geldb/dbschema:/dbschema:ro
+      - ./src/geldb/backend/edgedb.toml:/app/edgedb.toml:ro
+    networks:
+      - test-network
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Waiting for EdgeDB to be ready...' &&
+        sleep 10 &&
+        echo 'Applying EdgeDB schema...' &&
+        edgedb --host edgedb --port 5656 --tls-security insecure --database edgedb migrate --non-interactive ||
+        (echo 'Migration failed, trying to create and apply migrations...' &&
+         edgedb --host edgedb --port 5656 --tls-security insecure --database edgedb migration create --non-interactive &&
+         edgedb --host edgedb --port 5656 --tls-security insecure --database edgedb migrate --non-interactive) &&
+        echo 'Schema initialization completed successfully!'
+      "
+    restart: "no"
+
+  # Node.js Backend
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: prismatic-backend-test
+    restart: unless-stopped
+    depends_on:
+      edgedb:
+        condition: service_healthy
+      edgedb-init:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      EDGEDB_HOST: edgedb
+      EDGEDB_PORT: 5656
+      EDGEDB_DATABASE: edgedb
+    ports:
+      - "3002:3001"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  test-network:
+    driver: bridge

@@ -1,0 +1,58 @@
+2025-09-19 13:14:38,130 - INFO - 🚀 Starting full backup and Docker preparation...
+2025-09-19 13:14:38,146 - INFO - ✅ EdgeDB CLI found: Gel CLI 7.8.1+999d067
+2025-09-19 13:14:38,161 - WARNING - ⚠️  EdgeDB instance 'twitter_scraper' is not running
+2025-09-19 13:14:38,161 - WARNING - ⚠️  EdgeDB instance not running - attempting to start...
+2025-09-19 13:14:38,462 - INFO - ✅ EdgeDB instance started
+2025-09-19 13:14:38,695 - INFO - 📊 Database stats: 3 tweets, 1 users
+2025-09-19 13:14:38,695 - INFO - 📊 Backing up database with 3 tweets and 1 users
+2025-09-19 13:14:38,695 - INFO - 📥 Creating comprehensive data export...
+2025-09-19 13:14:38,696 - INFO - 📦 Creating database dump...
+2025-09-19 13:14:38,761 - ERROR - ❌ Dump failed: [2025-09-19T11:14:38Z WARN  gel::cli::install] `"/home/delta/.local/bin/edgedb"` is the old name for the `gel` executable. Please update your scripts (and muscle memory) to use the new executable at `"/home/delta/.local/bin/gel"`.
+Newer version of gel tool exists 7.9.0+070b371 (current 7.8.1+999d067). To upgrade run `gel cli upgrade`
+gel error: `--format` is reserved for dump using `--all`
+
+2025-09-19 13:14:38,761 - INFO - 📋 Exporting schema files...
+2025-09-19 13:14:38,762 - INFO - ✅ Copied twitter.gel
+2025-09-19 13:14:38,762 - INFO - ✅ Copied default.gel
+2025-09-19 13:14:38,762 - INFO - ✅ Copied scoping.gel
+2025-09-19 13:14:38,763 - INFO - ✅ Copied migration files
+2025-09-19 13:14:38,763 - INFO - ✅ Copied gel.toml
+2025-09-19 13:14:38,763 - INFO - ✅ Schema backup created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/schema_backup_20250919_131438
+2025-09-19 13:14:38,763 - INFO - ✅ Restore script created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/restore_database_20250919_131438.sh
+2025-09-19 13:14:38,763 - INFO - ✅ Docker init script created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/docker_init_20250919_131438.sh
+2025-09-19 13:14:38,960 - INFO - 📊 Database stats: 3 tweets, 1 users
+2025-09-19 13:14:38,964 - INFO - ✅ Compressed export created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/phantasia_db_export_20250919_131438.tar.gz
+2025-09-19 13:14:38,964 - INFO - 📂 Export directory: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/docker_export_20250919_131438
+2025-09-19 13:14:38,964 - INFO - 🐳 Preparing EdgeDB volume for Docker...
+2025-09-19 13:14:38,964 - INFO - 📥 Creating comprehensive data export...
+2025-09-19 13:14:38,964 - INFO - 📦 Creating database dump...
+2025-09-19 13:14:39,029 - ERROR - ❌ Dump failed: [2025-09-19T11:14:38Z WARN  gel::cli::install] `"/home/delta/.local/bin/edgedb"` is the old name for the `gel` executable. Please update your scripts (and muscle memory) to use the new executable at `"/home/delta/.local/bin/gel"`.
+Newer version of gel tool exists 7.9.0+070b371 (current 7.8.1+999d067). To upgrade run `gel cli upgrade`
+gel error: `--format` is reserved for dump using `--all`
+
+2025-09-19 13:14:39,029 - INFO - 📋 Exporting schema files...
+2025-09-19 13:14:39,030 - INFO - ✅ Copied twitter.gel
+2025-09-19 13:14:39,030 - INFO - ✅ Copied default.gel
+2025-09-19 13:14:39,030 - INFO - ✅ Copied scoping.gel
+2025-09-19 13:14:39,031 - INFO - ✅ Copied migration files
+2025-09-19 13:14:39,031 - INFO - ✅ Copied gel.toml
+2025-09-19 13:14:39,031 - INFO - ✅ Schema backup created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/schema_backup_20250919_131438
+2025-09-19 13:14:39,031 - INFO - ✅ Restore script created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/restore_database_20250919_131438.sh
+2025-09-19 13:14:39,031 - INFO - ✅ Docker init script created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/docker_init_20250919_131438.sh
+2025-09-19 13:14:39,222 - INFO - 📊 Database stats: 3 tweets, 1 users
+2025-09-19 13:14:39,226 - INFO - ✅ Compressed export created: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/phantasia_db_export_20250919_131438.tar.gz
+2025-09-19 13:14:39,226 - INFO - 📂 Export directory: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/docker_export_20250919_131438
+2025-09-19 13:14:39,228 - INFO - ✅ Docker volume prepared: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/docker/edgedb/init
+2025-09-19 13:14:39,419 - INFO - 📊 Database stats: 3 tweets, 1 users
+2025-09-19 13:14:39,419 - INFO - ============================================================
+2025-09-19 13:14:39,419 - INFO - 🎉 BACKUP COMPLETED SUCCESSFULLY!
+2025-09-19 13:14:39,419 - INFO - ============================================================
+2025-09-19 13:14:39,419 - INFO - 📂 Export directory: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/backups/docker_export_20250919_131438
+2025-09-19 13:14:39,419 - INFO - 🐳 Docker volume: /home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/docker/edgedb/init
+2025-09-19 13:14:39,419 - INFO - 📊 Data backed up: 3 tweets, 1 users
+2025-09-19 13:14:39,419 - INFO - 
+🚀 Next steps for Docker deployment:
+2025-09-19 13:14:39,419 - INFO -    1. Build your Docker image with the prepared volume
+2025-09-19 13:14:39,419 - INFO -    2. The EdgeDB container will auto-restore on first startup
+2025-09-19 13:14:39,419 - INFO -    3. Verify data integrity after deployment
+2025-09-19 13:14:39,420 - INFO - ✅ Backup process completed successfully

@@ -228,12 +228,12 @@ export class TwitterDataService {
     this.loadFromCache();
 
     // Set up periodic status polling and data loading based on feature flags
-    if (environment.features.twitterScraperEnabled) {
+    if (environment.features.twitterDataEnabled) {
       this.startStatusPolling();
       // Initialize with real data from API
       this.initialize();
     } else {
-      // For development without scraper, load mock data
+      // For development without data service, load mock data
       this.loadMockData();
     }
   }
@@ -418,24 +418,12 @@ export class TwitterDataService {
   }
 
   /**
-   * Trigger manual scraping
+   * Clear current error state
    */
-  triggerManualScrape(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/scraper/trigger`, {
-      username: 'prismcollect_',
-      maxTweets: 50
-    }).pipe(
-      tap(() => {
-        // Start polling for updates
-        this.pollForUpdates();
-      }),
-      retry({ count: 2, delay: 1000 }),
-      catchError(error => {
-        this.handleError('Failed to trigger manual scrape', error);
-        return of({ error: 'Failed to trigger scraping' });
-      })
-    );
+  dismissError(): void {
+    this._error.set(null);
   }
+
 
   // Private methods
 
@@ -475,18 +463,6 @@ export class TwitterDataService {
     });
   }
 
-  private pollForUpdates(): void {
-    // Poll for new tweets for 2 minutes after triggering scrape
-    const pollInterval = timer(5000, 10000).pipe(
-      takeUntil(timer(120000)) // Stop after 2 minutes
-    );
-
-    pollInterval.subscribe(() => {
-      if (!this._scraperStatus().isRunning) {
-        this.refreshTweets().subscribe();
-      }
-    });
-  }
 
   private parseTweetDates(tweets: any[]): Tweet[] {
     return tweets.map(tweet => ({

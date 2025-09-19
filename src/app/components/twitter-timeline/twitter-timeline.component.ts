@@ -79,13 +79,13 @@ import { TweetCardComponent } from './tweet-card.component';
 
       <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredTweets().length === 0 && !loadingState().isLoading">
-        <mat-icon>sentiment_neutral</mat-icon>
-        <h3>No tweets available</h3>
-        <p>We're working on collecting the latest tweets. Check back soon!</p>
-        <button mat-raised-button color="primary" (click)="triggerManualScrape()">
-          <mat-icon>cloud_download</mat-icon>
-          Collect Tweets Now
-        </button>
+        <mat-icon>auto_awesome</mat-icon>
+        <h3>Tweets are updating automatically</h3>
+        <p>Our automated system collects the latest tweets regularly. New content will appear here as it becomes available.</p>
+        <div class="auto-update-info">
+          <mat-icon>schedule</mat-icon>
+          <span>Updates every few minutes</span>
+        </div>
       </div>
 
       <!-- Offline Notice -->
@@ -136,16 +136,6 @@ export class TwitterTimelineComponent implements OnInit, OnDestroy {
     this.twitterService.goToPage(event.pageIndex, event.pageSize).subscribe();
   }
 
-  triggerManualScrape(): void {
-    this.twitterService.triggerManualScrape().subscribe({
-      next: (response) => {
-        console.log('Manual scraping triggered:', response);
-      },
-      error: (error) => {
-        console.error('Failed to trigger manual scraping:', error);
-      }
-    });
-  }
 
   onTweetClick(tweet: Tweet): void {
     // Open tweet on X/Twitter
@@ -160,8 +150,7 @@ export class TwitterTimelineComponent implements OnInit, OnDestroy {
   }
 
   dismissError(): void {
-    // This would need a method on the service to clear errors
-    console.log('Dismiss error - functionality to be implemented');
+    this.twitterService.dismissError();
   }
 
   trackByTweetId = (index: number, tweet: Tweet): string => tweet.tweetId;

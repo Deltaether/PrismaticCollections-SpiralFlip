@@ -77,3 +77,6 @@ image copy*
 twitter-feedback-python/logs/*.log
 twitter-feedback-python/venv/
 twitter-feedback-python/__pycache__/
+twitter-python-fetcher.tar.gz
+deeptesting-site.tar.gz
+phantasia-deploy.tar.gz

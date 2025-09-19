@@ -65,24 +65,12 @@ $phantasia-footer-hover-color: #ffffff;
     }
 
     .footer-logo-image {
-      max-width: 120px;
-      width: 100px;
+      width: clamp(10rem, 15vw + 2rem, 20rem);
       height: auto;
       filter: brightness(0) invert(1); // Convert to white
-      min-width: 80px;
+      min-width: 10rem;
       object-fit: contain;
       transition: opacity 0.3s ease;
-
-      // Responsive breakpoints for logo sizing
-      @media (max-width: 768px) {
-        max-width: 100px;
-        width: 80px;
-      }
-
-      @media (min-width: 1200px) {
-        max-width: 140px;
-        width: 120px;
-      }
 
       // Subtle hover effect
       &:hover {

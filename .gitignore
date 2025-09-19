@@ -73,28 +73,7 @@ image copy*
 # Large audio files
 *.wav
 
-# Browser cache and temporary storage (but keep profile data)
-twitter-scraper-linux/browser-data/Default/Cache/
-twitter-scraper-linux/browser-data/Default/Cache/*
-twitter-scraper-linux/browser-data/Default/Code Cache/
-twitter-scraper-linux/browser-data/Default/GPUCache/
-twitter-scraper-linux/browser-data/Default/DawnWebGPUCache/
-twitter-scraper-linux/browser-data/Default/WebStorage/
-twitter-scraper-linux/browser-data/Default/SharedStorage/
-twitter-scraper-linux/browser-data/Default/Session Storage/
-twitter-scraper-linux/browser-data/Default/Service Worker/
-twitter-scraper-linux/browser-data/Default/optimization_guide_hint_cache_store/
-twitter-scraper-linux/browser-data/Default/Segmentation Platform/
-
-# Keep profile data: Don't ignore these important files
-!twitter-scraper-linux/browser-data/Default/Preferences
-!twitter-scraper-linux/browser-data/Default/Secure Preferences
-!twitter-scraper-linux/browser-data/Default/Cookies
-!twitter-scraper-linux/browser-data/Default/Cookies-journal
-!twitter-scraper-linux/browser-data/Default/Login Data
-!twitter-scraper-linux/browser-data/Default/Login Data-journal
-!twitter-scraper-linux/browser-data/Default/Login Data For Account-journal
-!twitter-scraper-linux/browser-data/Default/History
-!twitter-scraper-linux/browser-data/Default/History-journal
-!twitter-scraper-linux/browser-data/Default/Bookmarks
-!twitter-scraper-linux/browser-data/Default/Local State
+# Python Twitter fetcher logs and temporary files
+twitter-feedback-python/logs/*.log
+twitter-feedback-python/venv/
+twitter-feedback-python/__pycache__/

@@ -1214,7 +1214,7 @@ $transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   max-width: 1000px;
-  margin: 4rem 0;
+  margin: 4rem auto; /* Use automatic horizontal centering */
   padding: 4rem 2rem;
   text-align: center; /* Ensure the entire section is centered */
   display: flex; /* Use flexbox for better control */
@@ -1232,12 +1232,12 @@ $transition: all 0.3s ease;
   
   @include responsive.mobile {
     padding: 2rem 1rem;
-    margin: 2rem 0 6rem 0;
+    margin: 2rem auto 6rem auto; /* Use auto for horizontal centering */
     border-radius: 16px;
   }
-  
+
   @include responsive.tablet {
-    margin: 3rem 0 4rem 0;
+    margin: 3rem auto 4rem auto; /* Use auto for horizontal centering */
   }
   
   .about-content {

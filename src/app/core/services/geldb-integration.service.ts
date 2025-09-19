@@ -417,6 +417,56 @@ export class GelDbIntegrationService {
       genre: 'Special Thanks'
     },
 
+    // ====== PHANTASIA 2 ADDITIONAL PRODUCTION TEAM ======
+    'roər': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: 'roər',
+      color: '#F39C12',
+      genre: 'PRODUCTION TEAM'
+    },
+    'TronC': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: 'TronC',
+      color: '#8E44AD',
+      genre: 'STAINED GLASS ILLUSTRATOR'
+    },
+    'Hototogisu': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: 'Hototogisu',
+      color: '#E74C3C',
+      genre: 'CHIBI ILLUSTRATOR'
+    },
+    'Len_licht': {
+      avatarPath: '/assets/images/artists/Len Licht.png',
+      displayName: 'Len_licht',
+      color: '#5f27cd',
+      genre: 'CO-ORGANISER/VIDEO EDITOR'
+    },
+    'Atelier Magicae': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: 'Atelier Magicae',
+      color: '#9B59B6',
+      genre: 'PRODUCTION TEAM'
+    },
+    '白｡': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: '白｡',
+      color: '#BDC3C7',
+      genre: 'PRODUCTION TEAM'
+    },
+    'Sol': {
+      avatarPath: '/assets/images/artists/default-avatar.svg',
+      displayName: 'Sol',
+      color: '#F1C40F',
+      genre: 'PRODUCTION TEAM'
+    },
+    'Yo Kaze': {
+      avatarPath: '/assets/images/artists/YoKaze.png',
+      displayName: 'Yo Kaze',
+      color: '#16A085',
+      genre: 'PRODUCTION TEAM'
+    },
+
     // ====== PHANTASIA 1 ARTISTS ======
     'Prower': {
       avatarPath: '/assets/images/artists/Prower.png',
@@ -505,7 +555,7 @@ export class GelDbIntegrationService {
    */
   getArtistAvatar(artistName: string): string {
     const artistData = this.artistAvatarMap[artistName];
-    return artistData?.avatarPath || '/assets/images/artists/default-avatar.png';
+    return artistData?.avatarPath || '/assets/images/artists/default-avatar.svg';
   }
 
   /**

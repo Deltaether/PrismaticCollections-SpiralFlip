@@ -1919,12 +1919,24 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     }
 
     .footer-logo img {
-      max-width: clamp(200px, 20vw, 350px); // Responsive footer logo size - bigger than before
-      width: clamp(180px, 18vw, 320px); // Responsive width with minimum size
-      height: auto;
-      filter: brightness(0) invert(1);
-      // Additional responsive enhancement
-      min-width: 180px; // Ensure minimum readable size on all devices
+      max-width: 120px !important; // Force override - responsive footer logo sizing
+      width: 100px !important; // Force override - smaller width for footer context
+      height: auto !important;
+      filter: brightness(0) invert(1) !important;
+      // Responsive footer logo - compact and professional
+      min-width: 80px !important; // Ensure minimum readability
+      object-fit: contain !important; // Ensure proper scaling
+
+      // Responsive breakpoints for different screen sizes
+      @media (max-width: 768px) {
+        max-width: 100px !important;
+        width: 80px !important;
+      }
+
+      @media (min-width: 1200px) {
+        max-width: 140px !important;
+        width: 120px !important;
+      }
     }
 
     .footer-links {

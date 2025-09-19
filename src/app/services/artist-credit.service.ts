@@ -158,7 +158,7 @@ export class ArtistCreditService {
   }> = {
     'SpiralFlip': {
       displayName: 'SpiralFlip',
-      avatar: 'assets/images/artists/SpiralFlip.png',
+      avatar: '/assets/images/artists/SpiralFlip.png',
       color: '#FF6B6B',
       primaryRoles: ['Main Artist', 'Producer', 'Composer'],
       socialLinks: {
@@ -170,7 +170,7 @@ export class ArtistCreditService {
     },
     'eili': {
       displayName: 'eili',
-      avatar: 'assets/images/artists/Eili.png',
+      avatar: '/assets/images/artists/Eili.png',
       color: '#ffffff',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -181,7 +181,7 @@ export class ArtistCreditService {
     },
     'Ariatec': {
       displayName: 'Ariatec',
-      avatar: 'assets/images/artists/Ariatec.png',
+      avatar: '/assets/images/artists/Ariatec.png',
       color: '#45B7D1',
       primaryRoles: ['Composer', 'Sound Designer'],
       socialLinks: {
@@ -192,7 +192,7 @@ export class ArtistCreditService {
     },
     'MB': {
       displayName: 'MBgov',
-      avatar: 'assets/images/artists/MBgov.png',
+      avatar: '/assets/images/artists/MBgov.png',
       color: '#96CEB4',
       primaryRoles: ['Composer', 'Arranger'],
       socialLinks: {
@@ -203,7 +203,7 @@ export class ArtistCreditService {
     },
     'Iku Hoshifuri': {
       displayName: 'Iku Hoshifuri',
-      avatar: 'assets/images/artists/Iku Hoshifuri.png',
+      avatar: '/assets/images/artists/Iku Hoshifuri.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -214,7 +214,7 @@ export class ArtistCreditService {
     },
     'Justin Thornburgh': {
       displayName: 'Justin Thornburgh',
-      avatar: 'assets/images/artists/Justin Thornburgh.png',
+      avatar: '/assets/images/artists/Justin Thornburgh.png',
       color: '#DDA0DD',
       primaryRoles: ['Accordion', 'Instrumentalist'],
       socialLinks: {
@@ -224,7 +224,7 @@ export class ArtistCreditService {
     },
     'v1ris': {
       displayName: 'v1ris',
-      avatar: 'assets/images/artists/v1ris.png',
+      avatar: '/assets/images/artists/v1ris.png',
       color: '#F8B500',
       primaryRoles: ['Violin', 'Instrumentalist'],
       socialLinks: {
@@ -235,7 +235,7 @@ export class ArtistCreditService {
     },
     'Rita Kamishiro': {
       displayName: 'Rita Kamishiro',
-      avatar: 'assets/images/artists/Rita Kamishiro.png',
+      avatar: '/assets/images/artists/Rita Kamishiro.png',
       color: '#E17055',
       primaryRoles: ['Viola', 'Instrumentalist'],
       socialLinks: {
@@ -246,7 +246,7 @@ export class ArtistCreditService {
     },
     'Marcus Ho': {
       displayName: 'Marcus Ho',
-      avatar: 'assets/images/artists/Marcus Ho.png',
+      avatar: '/assets/images/artists/Marcus Ho.png',
       color: '#6C5CE7',
       primaryRoles: ['Cello', 'Instrumentalist'],
       socialLinks: {
@@ -256,7 +256,7 @@ export class ArtistCreditService {
     },
     'AZALI': {
       displayName: 'AZALI',
-      avatar: 'assets/images/artists/AZALI.png',
+      avatar: '/assets/images/artists/AZALI.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -267,7 +267,7 @@ export class ArtistCreditService {
     },
     'Aloysius': {
       displayName: 'Aloysius',
-      avatar: 'assets/images/artists/Aloysius.png',
+      avatar: '/assets/images/artists/Aloysius.png',
       color: '#FD79A8',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -278,7 +278,7 @@ export class ArtistCreditService {
     },
     'potatoTeto': {
       displayName: 'potatoTeto',
-      avatar: 'assets/images/artists/potatoTeto.png',
+      avatar: '/assets/images/artists/potatoTeto.png',
       color: '#00B894',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -289,7 +289,7 @@ export class ArtistCreditService {
     },
     'Artisan': {
       displayName: 'Artisan',
-      avatar: 'assets/images/artists/Artisan.png',
+      avatar: '/assets/images/artists/Artisan.png',
       color: '#E84393',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -300,7 +300,7 @@ export class ArtistCreditService {
     },
     'Mei Naganowa': {
       displayName: 'Mei Naganowa',
-      avatar: 'assets/images/artists/Mei Naganowa.png',
+      avatar: '/assets/images/artists/Mei Naganowa.png',
       color: '#00CEC9',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -321,7 +321,7 @@ export class ArtistCreditService {
     },
     'BilliumMoto': {
       displayName: 'BilliumMoto',
-      avatar: 'assets/images/artists/BilliumMoto.png',
+      avatar: '/assets/images/artists/BilliumMoto.png',
       color: '#74B9FF',
       primaryRoles: ['Producer', 'Composer'],
       socialLinks: {
@@ -332,7 +332,7 @@ export class ArtistCreditService {
     },
     'Elliot Hsu': {
       displayName: 'Elliot Hsu',
-      avatar: 'assets/images/artists/Elliot Hsu.png',
+      avatar: '/assets/images/artists/Elliot Hsu.png',
       color: '#55A3FF',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -343,7 +343,7 @@ export class ArtistCreditService {
     },
     'Yuzuki': {
       displayName: 'Yuzuki',
-      avatar: 'assets/images/artists/Yuzuki.png',
+      avatar: '/assets/images/artists/Yuzuki.png',
       color: '#FF7675',
       primaryRoles: ['Synthesizer V Operator', 'Producer'],
       socialLinks: {
@@ -354,7 +354,7 @@ export class ArtistCreditService {
     },
     'LucaProject': {
       displayName: 'LucaProject',
-      avatar: 'assets/images/artists/LucaProject.png',
+      avatar: '/assets/images/artists/LucaProject.png',
       color: '#6C5CE7',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -366,7 +366,7 @@ export class ArtistCreditService {
     },
     'Koway': {
       displayName: 'Koway',
-      avatar: 'assets/images/artists/Koway.png',
+      avatar: '/assets/images/artists/Koway.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -378,7 +378,7 @@ export class ArtistCreditService {
     },
     '伍一': {
       displayName: '伍一',
-      avatar: 'assets/images/artists/Wu-Yi.png',
+      avatar: '/assets/images/artists/Wu-Yi.png',
       color: '#FFEAA7',
       primaryRoles: ['Vocalist', 'Featured Artist'],
       socialLinks: {
@@ -389,7 +389,7 @@ export class ArtistCreditService {
     },
     'Nstryder': {
       displayName: 'Nstryder',
-      avatar: 'assets/images/artists/Nstryder.png',
+      avatar: '/assets/images/artists/Nstryder.png',
       color: '#E17055',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -400,7 +400,7 @@ export class ArtistCreditService {
     },
     'MoAE': {
       displayName: 'MoAE:.',
-      avatar: 'assets/images/artists/MoAE.png',
+      avatar: '/assets/images/artists/MoAE.png',
       color: '#00B894',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -411,7 +411,7 @@ export class ArtistCreditService {
     },
     'dystopian tanuki': {
       displayName: 'dystopian tanuki',
-      avatar: 'assets/images/artists/dystopian tanuki.png',
+      avatar: '/assets/images/artists/dystopian tanuki.png',
       color: '#636E72',
       primaryRoles: ['Sound Designer', 'Composer'],
       socialLinks: {
@@ -422,7 +422,7 @@ export class ArtistCreditService {
     },
     'Heem': {
       displayName: 'Heem',
-      avatar: 'assets/images/artists/Heem.png',
+      avatar: '/assets/images/artists/Heem.png',
       color: '#FD79A8',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -433,7 +433,7 @@ export class ArtistCreditService {
     },
     'Woojinee': {
       displayName: 'Woojinee',
-      avatar: 'assets/images/artists/Woojinee.png',
+      avatar: '/assets/images/artists/Woojinee.png',
       color: '#E84393',
       primaryRoles: ['Violin', 'Instrumentalist'],
       socialLinks: {
@@ -443,7 +443,7 @@ export class ArtistCreditService {
     },
     'Bigg Milk': {
       displayName: 'Bigg Milk',
-      avatar: 'assets/images/artists/Bigg Milk.png',
+      avatar: '/assets/images/artists/Bigg Milk.png',
       color: '#00CEC9',
       primaryRoles: ['Electronic Producer', 'Composer'],
       socialLinks: {
@@ -454,7 +454,7 @@ export class ArtistCreditService {
     },
     'Gardens': {
       displayName: 'Gardens',
-      avatar: 'assets/images/artists/Gardens.png',
+      avatar: '/assets/images/artists/Gardens.png',
       color: '#00B894',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -465,7 +465,7 @@ export class ArtistCreditService {
     },
     'Sad Keyboard Guy': {
       displayName: 'Sad Keyboard Guy',
-      avatar: 'assets/images/artists/Sad Keyboard Guy.png',
+      avatar: '/assets/images/artists/Sad Keyboard Guy.png',
       color: '#74B9FF',
       primaryRoles: ['Keyboard', 'Composer'],
       socialLinks: {
@@ -476,7 +476,7 @@ export class ArtistCreditService {
     },
     'Futsuunohito': {
       displayName: 'Futsuunohito',
-      avatar: 'assets/images/artists/Futsuunohito.png',
+      avatar: '/assets/images/artists/Futsuunohito.png',
       color: '#A29BFE',
       primaryRoles: ['Electronic Producer', 'Sound Designer'],
       socialLinks: {
@@ -487,7 +487,7 @@ export class ArtistCreditService {
     },
     'shishishiena': {
       displayName: 'shishishiena',
-      avatar: 'assets/images/artists/shishishiena.png',
+      avatar: '/assets/images/artists/shishishiena.png',
       color: '#FFEAA7',
       primaryRoles: ['Voice Actor', 'Vocalist'],
       socialLinks: {
@@ -500,7 +500,7 @@ export class ArtistCreditService {
     // Note: These are excluded from socials display but kept for track accuracy
     'HXVOC': {
       displayName: 'HXVOC',
-      avatar: 'assets/images/artists/HXVOC.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#54C7EC',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -508,7 +508,7 @@ export class ArtistCreditService {
     },
     'Ninezero': {
       displayName: 'Ninezero',
-      avatar: 'assets/images/artists/Ninezero.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#98FB98',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -516,7 +516,7 @@ export class ArtistCreditService {
     },
     'Hanakuma Chifuyu': {
       displayName: 'Hanakuma Chifuyu',
-      avatar: 'assets/images/artists/Hanakuma-Chifuyu.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#DDA0FF',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
@@ -528,7 +528,7 @@ export class ArtistCreditService {
 
     'Prower': {
       displayName: 'Prower',
-      avatar: 'assets/images/artists/Prower.png',
+      avatar: '/assets/images/artists/Prower.png',
       color: '#FF9500',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -538,7 +538,7 @@ export class ArtistCreditService {
     },
     'Seycara': {
       displayName: 'Seycara',
-      avatar: 'assets/images/artists/Seycara.png',
+      avatar: '/assets/images/artists/Seycara.png',
       color: '#A8E6CF',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -549,7 +549,7 @@ export class ArtistCreditService {
     },
     'Qyubey': {
       displayName: 'Qyubey',
-      avatar: 'assets/images/artists/Qyubey.png',
+      avatar: '/assets/images/artists/Qyubey.png',
       color: '#FFB3BA',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -560,7 +560,7 @@ export class ArtistCreditService {
     },
     'Luscinia': {
       displayName: 'Luscinia',
-      avatar: 'assets/images/artists/Luscinia.png',
+      avatar: '/assets/images/artists/Luscinia.png',
       color: '#BFEFFF',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -571,7 +571,7 @@ export class ArtistCreditService {
     },
     'はがね': {
       displayName: 'はがね (Hagane)',
-      avatar: 'assets/images/artists/Hagane.png',
+      avatar: '/assets/images/artists/Hagane.png',
       color: '#C0C0C0',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -582,7 +582,7 @@ export class ArtistCreditService {
     },
     'satella': {
       displayName: 'satella',
-      avatar: 'assets/images/artists/satella.png',
+      avatar: '/assets/images/artists/satella.png',
       color: '#E6E6FA',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -593,7 +593,7 @@ export class ArtistCreditService {
     },
     'sleepy': {
       displayName: 'sleepy',
-      avatar: 'assets/images/artists/Sleepless.png',
+      avatar: '/assets/images/artists/Sleepless.png',
       color: '#B0E0E6',
       primaryRoles: ['Electronic Producer'],
       socialLinks: {
@@ -606,7 +606,7 @@ export class ArtistCreditService {
     // Note: Production roles may differ between projects
     'PliXoR': {
       displayName: 'PliXoR',
-      avatar: 'assets/images/artists/PliXoR.png',
+      avatar: '/assets/images/artists/PliXoR.png',
       color: '#ff6b6b',
       primaryRoles: ['Mastering Engineer'],
       socialLinks: {
@@ -616,7 +616,7 @@ export class ArtistCreditService {
     },
     'NapaL': {
       displayName: '나팔 NapaL',
-      avatar: 'assets/images/artists/NapaL.png',
+      avatar: '/assets/images/artists/NapaL.png',
       color: '#4ecdc4',
       primaryRoles: ['Cover Illustration'],
       socialLinks: {
@@ -626,7 +626,7 @@ export class ArtistCreditService {
     },
     'Elegant Sister': {
       displayName: 'Elegant Sister',
-      avatar: 'assets/images/artists/Elegant Sister.png',
+      avatar: '/assets/images/artists/Elegant Sister.png',
       color: '#f7b733',
       primaryRoles: ['Album Stream MV'],
       socialLinks: {
@@ -636,7 +636,7 @@ export class ArtistCreditService {
     },
     'Len': {
       displayName: 'Len',
-      avatar: 'assets/images/artists/Len Licht.png',
+      avatar: '/assets/images/artists/Len Licht.png',
       color: '#5f27cd',
       primaryRoles: ['Crossfade MV/Live2D'],
       socialLinks: {
@@ -646,7 +646,7 @@ export class ArtistCreditService {
     },
     'Daph': {
       displayName: 'Daph',
-      avatar: 'assets/images/artists/Daph Shoo.png',
+      avatar: '/assets/images/artists/Daph Shoo.png',
       color: '#00d2d3',
       primaryRoles: ['Live2D'],
       socialLinks: {
@@ -658,7 +658,7 @@ export class ArtistCreditService {
     // ====== PHANTASIA 2 SPECIFIC PRODUCTION TEAM ======
     'yy_artwork': {
       displayName: 'yy_artwork',
-      avatar: 'assets/images/artists/yy_artwork.png',
+      avatar: '/assets/images/artists/yy_artwork.png',
       color: '#45b7d1',
       primaryRoles: ['Logo/Jacket Design'],
       socialLinks: {
@@ -668,7 +668,7 @@ export class ArtistCreditService {
     },
     'tikaal': {
       displayName: 'tikaal',
-      avatar: 'assets/images/artists/tikaal.png',
+      avatar: '/assets/images/artists/tikaal.png',
       color: '#FF9F40',
       primaryRoles: ['Bass', 'Instrumentalist'],
       socialLinks: {
@@ -679,7 +679,7 @@ export class ArtistCreditService {
     },
     'TronC': {
       displayName: 'TronC',
-      avatar: 'assets/images/artists/TronC.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#8E44AD',
       primaryRoles: ['Stained Glass Illustrator'],
       socialLinks: {
@@ -689,7 +689,7 @@ export class ArtistCreditService {
     },
     'Hototogisu': {
       displayName: 'Hototogisu',
-      avatar: 'assets/images/artists/Hototogisu.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#E74C3C',
       primaryRoles: ['Chibi Illustrator'],
       socialLinks: {
@@ -699,7 +699,7 @@ export class ArtistCreditService {
     },
     'roər': {
       displayName: 'roər',
-      avatar: 'assets/images/artists/roer.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#F39C12',
       primaryRoles: ['Illustration separator'],
       socialLinks: {
@@ -709,7 +709,7 @@ export class ArtistCreditService {
     },
     'Len_licht': {
       displayName: 'Len_licht',
-      avatar: 'assets/images/artists/Len Licht.png',
+      avatar: '/assets/images/artists/Len Licht.png',
       color: '#5f27cd',
       primaryRoles: ['Co-Organiser/Video Editor'],
       socialLinks: {
@@ -719,7 +719,7 @@ export class ArtistCreditService {
     },
     'Atelier Magicae': {
       displayName: 'Atelier Magicae',
-      avatar: 'assets/images/artists/Atelier-Magicae.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#9B59B6',
       primaryRoles: ['SFX'],
       socialLinks: {
@@ -729,7 +729,7 @@ export class ArtistCreditService {
     },
     '白｡': {
       displayName: '白｡',
-      avatar: 'assets/images/artists/Shiro.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#BDC3C7',
       primaryRoles: ['Special Thanks'],
       socialLinks: {
@@ -739,7 +739,7 @@ export class ArtistCreditService {
     },
     'Sol': {
       displayName: 'Sol',
-      avatar: 'assets/images/artists/Sol.png',
+      avatar: '/assets/images/artists/default-avatar.svg',
       color: '#F1C40F',
       primaryRoles: ['Special Thanks'],
       socialLinks: {
@@ -749,7 +749,7 @@ export class ArtistCreditService {
     },
     'Yo Kaze': {
       displayName: 'Yo Kaze',
-      avatar: 'assets/images/artists/Yo-Kaze.png',
+      avatar: '/assets/images/artists/YoKaze.png',
       color: '#16A085',
       primaryRoles: ['Special Thanks'],
       socialLinks: {
@@ -760,7 +760,7 @@ export class ArtistCreditService {
     // ====== PHANTASIA 1 SPECIFIC CREDITS ======
     'honabai': {
       displayName: 'honabai',
-      avatar: 'assets/images/artists/honabai.png',
+      avatar: '/assets/images/artists/honabai.png',
       color: '#E67E22',
       primaryRoles: ['Special Thanks'],
       socialLinks: {
@@ -770,7 +770,7 @@ export class ArtistCreditService {
     },
     'shironill': {
       displayName: 'shironill',
-      avatar: 'assets/images/artists/shironill.png',
+      avatar: '/assets/images/artists/shironill.png',
       color: '#34495E',
       primaryRoles: ['Special Thanks'],
       socialLinks: {

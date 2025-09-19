@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 import { GelDbIntegrationService } from '../../core/services/geldb-integration.service';
 
 interface SpecialMention {
@@ -52,25 +53,50 @@ export class SpecialMentionsComponent implements OnInit {
     return mentions.slice(halfPoint);
   });
 
-  constructor(private gelDbService: GelDbIntegrationService) {}
+  constructor(
+    private gelDbService: GelDbIntegrationService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadSpecialMentionsFromDatabase();
   }
 
   private loadSpecialMentionsFromDatabase(): void {
-    // List of special mention artist names from the geldb (specialized collaborators)
-    const specialMentionNames = [
+    // Determine current project based on URL
+    const currentUrl = this.router.url;
+    const isPhantasia2 = currentUrl.includes('phantasia2') || currentUrl.includes('/disc-2');
+
+    // Project-specific special mention lists
+    const phantasia1SpecialMentions = [
       'SpiralFlip',     // Organiser
       'PliXoR',         // Mastering Engineer
       'NapaL',          // Cover Illustration
       'yy_artwork',     // Logo/Jacket Design
       'Elegant Sister', // Album Stream MV
       'Len',            // Crossfade MV/Live2D
-      'Daph',           // Live2D
+      'Daph',           // Live2D (Phantasia 1 only)
       'honabai',        // Special Thanks
       'shironill'       // Special Thanks
     ];
+
+    const phantasia2SpecialMentions = [
+      'SpiralFlip',     // Organiser
+      'Len_licht',      // Co-Organiser/Video Editor
+      'NapaL',          // Main Illustrator
+      'TronC',          // Stained Glass Illustrator
+      'Hototogisu',     // Chibi Illustrator
+      'yy_artwork',     // Logo/Jacket Design
+      'roər',           // Illustration separator
+      'PliXoR',         // Mastering Engineer
+      'Atelier Magicae', // SFX
+      '白｡',            // Special Thanks
+      'Sol',            // Special Thanks
+      'Yo Kaze'         // Special Thanks
+    ];
+
+    // Select the appropriate list based on current project
+    const specialMentionNames = isPhantasia2 ? phantasia2SpecialMentions : phantasia1SpecialMentions;
 
     const specialMentionsList: SpecialMention[] = specialMentionNames
       .map(artistName => {

@@ -1,24 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { AuthService } from './services/auth.service';
-import { LoginComponent } from './components/login/login.component';
 
 /**
- * Root application component with authentication gate
- * Shows login screen or main app based on authentication status
- * 【✓】
+ * Root application component
  */
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, LoginComponent],
+  imports: [RouterOutlet],
   template: `
-    @if (authService.isAuthenticated()) {
-      <router-outlet></router-outlet>
-    } @else {
-      <app-login></app-login>
-    }
+    <router-outlet></router-outlet>
   `,
   styles: [`
     :host {
@@ -29,12 +20,4 @@ import { LoginComponent } from './components/login/login.component';
 })
 export class AppComponent {
   title = 'Phantasia Testing Site';
-  
-  constructor(
-    public authService: AuthService
-  ) {}
-  
-  logout(): void {
-    this.authService.logout();
-  }
 } 

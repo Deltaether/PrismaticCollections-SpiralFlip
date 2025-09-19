@@ -9,7 +9,7 @@ import { MockDatabaseService } from './services/mock-database.service';
 // Load environment variables
 dotenv.config();
 
-class SimpleTwitterServer {
+class SimpleTwitterDataServer {
   private app: express.Application;
   private database: MockDatabaseService;
   private server: any;
@@ -118,42 +118,32 @@ class SimpleTwitterServer {
         const totalTweets = await this.database.getTweetCount();
 
         const status = {
-          isRunning: false,
+          isRunning: false, // Python fetcher runs independently
           totalTweetsStored: totalTweets,
           consecutiveFailures: 0,
-          lastScrapedAt: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+          lastScrapedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+          source: 'Python API v2 (Mock Mode)'
         };
 
         res.json(status);
       } catch (error) {
-        console.error('Error getting scraper status:', error);
-        res.status(500).json({ error: 'Failed to get scraper status' });
+        console.error('Error getting system status:', error);
+        res.status(500).json({ error: 'Failed to get system status' });
       }
     });
 
-    this.app.post('/api/twitter/scraper/trigger', async (_req, res) => {
-      try {
-        res.json({
-          message: 'Mock scraping triggered (no actual scraping performed)',
-          status: 'success'
-        });
-      } catch (error) {
-        console.error('Error triggering scraping:', error);
-        res.status(500).json({ error: 'Failed to trigger scraping' });
-      }
-    });
 
     // Root route
     this.app.get('/', (_req, res) => {
       res.json({
-        message: 'Twitter Scraper API (Mock Mode)',
-        version: '1.0.0',
+        message: 'Twitter Data API (Mock Mode)',
+        version: '2.0.0',
+        source: 'Python API v2 (Mock)',
         endpoints: {
           health: '/health',
           tweets: '/api/twitter/tweets',
           user: '/api/twitter/user/:username',
-          status: '/api/twitter/scraper/status',
-          trigger: '/api/twitter/scraper/trigger'
+          status: '/api/twitter/scraper/status'
         }
       });
     });
@@ -183,9 +173,10 @@ class SimpleTwitterServer {
 
       const port = process.env.PORT || 3001;
       this.server = this.app.listen(port, () => {
-        console.log(`🚀 Twitter Scraper API (Mock Mode) started on port ${port}`);
+        console.log(`🚀 Twitter Data API (Mock Mode) started on port ${port}`);
         console.log(`📊 Health check: http://localhost:${port}/health`);
         console.log(`🐦 API endpoints: http://localhost:${port}/api/twitter/*`);
+        console.log(`🔌 Source: Python API v2 (Mock Mode)`);
       });
 
       process.on('SIGTERM', this.shutdown.bind(this));
@@ -219,7 +210,7 @@ class SimpleTwitterServer {
 }
 
 // Start server
-const server = new SimpleTwitterServer();
+const server = new SimpleTwitterDataServer();
 server.start().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);

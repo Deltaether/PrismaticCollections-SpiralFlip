@@ -1,7 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { DatabaseService } from '../services/database.service';
 import { MockDatabaseService } from '../services/mock-database.service';
-import { TwitterScraperService } from '../services/scraper.service';
 import { scraperLogger } from '../utils/logger';
 import path from 'path';
 import fs from 'fs';
@@ -9,12 +8,10 @@ import fs from 'fs';
 export class TwitterRoutes {
   private router: Router;
   private database: DatabaseService | MockDatabaseService;
-  private scraper: TwitterScraperService;
 
-  constructor(database: DatabaseService | MockDatabaseService, scraper: TwitterScraperService) {
+  constructor(database: DatabaseService | MockDatabaseService) {
     this.router = Router();
     this.database = database;
-    this.scraper = scraper;
     this.setupRoutes();
   }
 
@@ -28,16 +25,10 @@ export class TwitterRoutes {
     // Get user profile
     this.router.get('/user/:username', this.getUser.bind(this));
 
-    // Get scraper status
-    this.router.get('/scraper/status', this.getScraperStatus.bind(this));
+    // Get system status (Python fetcher information)
+    this.router.get('/scraper/status', this.getSystemStatus.bind(this));
 
-    // Trigger manual scraping
-    this.router.post('/scraper/trigger', this.triggerScraping.bind(this));
-
-    // Stop scraping
-    this.router.post('/scraper/stop', this.stopScraping.bind(this));
-
-    // Get scraping statistics
+    // Get statistics
     this.router.get('/scraper/stats', this.getStats.bind(this));
 
     // Get profile image for specific user
@@ -125,60 +116,27 @@ export class TwitterRoutes {
     }
   }
 
-  private async getScraperStatus(req: Request, res: Response): Promise<void> {
+  private async getSystemStatus(req: Request, res: Response): Promise<void> {
     try {
-      const activeSession = await this.database.getActiveScrapingSession();
       const totalTweets = await this.database.getTweetCount();
 
       const status = {
-        isRunning: this.scraper.running,
-        lastScrapedAt: activeSession?.startedAt,
+        isRunning: false, // Python fetcher runs independently
+        lastScrapedAt: new Date(), // Would need to track from Python fetcher logs
         totalTweetsStored: totalTweets,
-        currentSession: activeSession,
-        consecutiveFailures: 0 // Would need to track this in database
+        consecutiveFailures: 0,
+        source: 'Python API v2 Fetcher' // Indicates new system
       };
 
       res.json(status);
       scraperLogger.apiRequest(req.method, req.path, res.statusCode);
     } catch (error) {
-      scraperLogger.error('Error getting scraper status', error);
-      res.status(500).json({ error: 'Failed to get scraper status' });
+      scraperLogger.error('Error getting system status', error);
+      res.status(500).json({ error: 'Failed to get system status' });
     }
   }
 
-  private async triggerScraping(req: Request, res: Response): Promise<void> {
-    try {
-      if (this.scraper.running) {
-        res.status(409).json({ error: 'Scraping is already in progress' });
-        return;
-      }
 
-      const { username = 'prismcollect_', maxTweets = 50 } = req.body;
-
-      // Start scraping in background
-      this.startScraping(username, { maxTweets })
-        .catch(error => {
-          scraperLogger.error('Background scraping failed', error);
-        });
-
-      res.json({ message: 'Scraping started', username, maxTweets });
-      scraperLogger.apiRequest(req.method, req.path, res.statusCode);
-    } catch (error) {
-      scraperLogger.error('Error triggering scraping', error);
-      res.status(500).json({ error: 'Failed to trigger scraping' });
-    }
-  }
-
-  private async stopScraping(req: Request, res: Response): Promise<void> {
-    try {
-      await this.scraper.stop();
-      res.json({ message: 'Scraping stop requested' });
-      scraperLogger.apiRequest(req.method, req.path, res.statusCode);
-    } catch (error) {
-      scraperLogger.error('Error stopping scraping', error);
-      res.status(500).json({ error: 'Failed to stop scraping' });
-    }
-  }
 
   private async getStats(req: Request, res: Response): Promise<void> {
     try {
@@ -199,68 +157,15 @@ export class TwitterRoutes {
     }
   }
 
-  private async startScraping(username: string, options: any = {}): Promise<void> {
-    let sessionId: string | null = null;
-
-    try {
-      // Create scraping session
-      sessionId = await this.database.createScrapingSession({
-        targetUsername: username,
-        sessionType: 'manual',
-        startedAt: new Date(),
-        tweetsCollected: 0,
-        status: 'running'
-      });
-
-      scraperLogger.scrapingStart(sessionId, username);
-
-      // Initialize scraper if needed
-      if (!this.scraper.running) {
-        await this.scraper.initialize();
-      }
-
-      // Scrape user profile
-      const user = await this.scraper.scrapeUserProfile(username);
-
-      // Scrape tweets
-      const tweets = await this.scraper.scrapeTweets(username, {
-        maxTweets: options.maxTweets || 50,
-        includeRetweets: true,
-        includeReplies: true
-      });
-
-      // Save to database
-      await this.scraper.saveScrapedData(tweets, user || undefined);
-
-      // Update session
-      await this.database.updateScrapingSession(sessionId, {
-        completedAt: new Date(),
-        tweetsCollected: tweets.length,
-        status: 'completed'
-      });
-
-      scraperLogger.scrapingComplete(sessionId, tweets.length, Date.now());
-    } catch (error) {
-      if (sessionId) {
-        await this.database.updateScrapingSession(sessionId, {
-          status: 'failed',
-          errorMessage: error instanceof Error ? error.message : 'Unknown error'
-        });
-
-        scraperLogger.scrapingError(sessionId, error);
-      }
-
-      throw error;
-    }
-  }
 
   private async getProfileImage(req: Request, res: Response): Promise<void> {
     try {
       const { username } = req.params;
-      const profilePicsPath = path.join(__dirname, '../../../twitter-scraper-linux/twitter-pfps');
+      // Updated path to use assets directory instead of old scraper directory
+      const profilePicsPath = path.join(__dirname, '../../../../src/assets/images/profile-pics');
 
       // Check for various image formats
-      const possibleExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+      const possibleExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
       let imagePath: string | null = null;
 
       for (const ext of possibleExtensions) {
@@ -272,11 +177,19 @@ export class TwitterRoutes {
       }
 
       if (!imagePath) {
-        res.status(404).json({
-          error: 'Profile image not found',
-          username,
-          availableFormats: possibleExtensions
-        });
+        // Return default avatar instead of 404
+        const defaultAvatarPath = path.join(__dirname, '../../../../src/assets/images/default-avatar.svg');
+        if (fs.existsSync(defaultAvatarPath)) {
+          res.setHeader('Content-Type', 'image/svg+xml');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          res.sendFile(defaultAvatarPath);
+        } else {
+          res.status(404).json({
+            error: 'Profile image not found',
+            username,
+            availableFormats: possibleExtensions
+          });
+        }
         return;
       }
 
@@ -287,7 +200,8 @@ export class TwitterRoutes {
         '.jpeg': 'image/jpeg',
         '.png': 'image/png',
         '.webp': 'image/webp',
-        '.gif': 'image/gif'
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml'
       };
 
       const contentType = contentTypeMap[ext] || 'image/jpeg';
@@ -307,9 +221,10 @@ export class TwitterRoutes {
   private async checkProfileImage(req: Request, res: Response): Promise<void> {
     try {
       const { username } = req.params;
-      const profilePicsPath = path.join(__dirname, '../../../twitter-scraper-linux/twitter-pfps');
+      // Updated path to use assets directory instead of old scraper directory
+      const profilePicsPath = path.join(__dirname, '../../../../src/assets/images/profile-pics');
 
-      const possibleExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+      const possibleExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
       let imageExists = false;
 
       for (const ext of possibleExtensions) {
@@ -318,6 +233,12 @@ export class TwitterRoutes {
           imageExists = true;
           break;
         }
+      }
+
+      // Also check if default avatar exists
+      if (!imageExists) {
+        const defaultAvatarPath = path.join(__dirname, '../../../../src/assets/images/default-avatar.svg');
+        imageExists = fs.existsSync(defaultAvatarPath);
       }
 
       if (imageExists) {

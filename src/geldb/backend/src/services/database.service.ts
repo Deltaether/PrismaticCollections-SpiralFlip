@@ -38,78 +38,65 @@ export class DatabaseService {
     try {
       const query = `
         INSERT Tweet {
-          tweet_id := <str>$tweet_id,
+          tweetId := <str>$tweetId,
           text := <str>$text,
-          author_username := <str>$author_username,
-          author_display_name := <str>$author_display_name,
-          author_profile_image_url := <optional str>$author_profile_image_url,
-          author_verified := <bool>$author_verified,
-          created_at := <datetime>$created_at,
-          scraped_at := <datetime>$scraped_at,
-          updated_at := <optional datetime>$updated_at,
-          like_count := <int32>$like_count,
-          retweet_count := <int32>$retweet_count,
-          reply_count := <int32>$reply_count,
-          quote_count := <int32>$quote_count,
-          language := <optional str>$language,
-          is_retweet := <bool>$is_retweet,
-          is_quote := <bool>$is_quote,
-          is_reply := <bool>$is_reply,
-          conversation_id := <optional str>$conversation_id,
-          in_reply_to_user_id := <optional str>$in_reply_to_user_id,
-          in_reply_to_tweet_id := <optional str>$in_reply_to_tweet_id,
-          media_urls := <array<str>>$media_urls,
-          media_types := <array<str>>$media_types,
+          authorUsername := <str>$authorUsername,
+          authorDisplayName := <str>$authorDisplayName,
+          authorProfileImageUrl := <optional str>$authorProfileImageUrl,
+          authorVerified := <bool>$authorVerified,
+          createdAt := <datetime>$createdAt,
+          scrapedAt := <datetime>$scrapedAt,
+          likeCount := <int32>$likeCount,
+          retweetCount := <int32>$retweetCount,
+          replyCount := <int32>$replyCount,
+          quoteCount := <int32>$quoteCount,
+          isRetweet := <bool>$isRetweet,
+          isQuote := <bool>$isQuote,
+          isReply := <bool>$isReply,
+          mediaUrls := <array<str>>$mediaUrls,
+          mediaTypes := <array<str>>$mediaTypes,
           hashtags := <array<str>>$hashtags,
           mentions := <array<str>>$mentions,
           urls := <array<str>>$urls,
-          source_tweet_id := <optional str>$source_tweet_id,
-          source_tweet_text := <optional str>$source_tweet_text,
-          source_author_username := <optional str>$source_author_username,
-          raw_data := <optional json>$raw_data
+          sourceTweetId := <optional str>$sourceTweetId,
+          sourceTweetText := <optional str>$sourceTweetText,
+          sourceAuthorUsername := <optional str>$sourceAuthorUsername
         }
-        UNLESS CONFLICT ON .tweet_id
+        UNLESS CONFLICT ON .tweetId
         ELSE (
           UPDATE Tweet SET {
-            like_count := <int32>$like_count,
-            retweet_count := <int32>$retweet_count,
-            reply_count := <int32>$reply_count,
-            quote_count := <int32>$quote_count,
-            updated_at := <datetime>datetime_current()
+            likeCount := <int32>$likeCount,
+            retweetCount := <int32>$retweetCount,
+            replyCount := <int32>$replyCount,
+            quoteCount := <int32>$quoteCount
           }
         )
       `;
 
       await this.client.query(query, {
-        tweet_id: tweet.tweetId,
+        tweetId: tweet.tweetId,
         text: tweet.text,
-        author_username: tweet.authorUsername,
-        author_display_name: tweet.authorDisplayName,
-        author_profile_image_url: tweet.authorProfileImageUrl || null,
-        author_verified: tweet.authorVerified,
-        created_at: tweet.createdAt,
-        scraped_at: tweet.scrapedAt,
-        updated_at: tweet.updatedAt || null,
-        like_count: tweet.likeCount,
-        retweet_count: tweet.retweetCount,
-        reply_count: tweet.replyCount,
-        quote_count: tweet.quoteCount,
-        language: tweet.language || null,
-        is_retweet: tweet.isRetweet,
-        is_quote: tweet.isQuote,
-        is_reply: tweet.isReply,
-        conversation_id: tweet.conversationId || null,
-        in_reply_to_user_id: tweet.inReplyToUserId || null,
-        in_reply_to_tweet_id: tweet.inReplyToTweetId || null,
-        media_urls: tweet.mediaUrls,
-        media_types: tweet.mediaTypes,
+        authorUsername: tweet.authorUsername,
+        authorDisplayName: tweet.authorDisplayName,
+        authorProfileImageUrl: tweet.authorProfileImageUrl || null,
+        authorVerified: tweet.authorVerified,
+        createdAt: tweet.createdAt,
+        scrapedAt: tweet.scrapedAt,
+        likeCount: tweet.likeCount,
+        retweetCount: tweet.retweetCount,
+        replyCount: tweet.replyCount,
+        quoteCount: tweet.quoteCount,
+        isRetweet: tweet.isRetweet,
+        isQuote: tweet.isQuote,
+        isReply: tweet.isReply,
+        mediaUrls: tweet.mediaUrls,
+        mediaTypes: tweet.mediaTypes,
         hashtags: tweet.hashtags,
         mentions: tweet.mentions,
         urls: tweet.urls,
-        source_tweet_id: tweet.sourceTweetId || null,
-        source_tweet_text: tweet.sourceTweetText || null,
-        source_author_username: tweet.sourceAuthorUsername || null,
-        raw_data: tweet.rawData || null
+        sourceTweetId: tweet.sourceTweetId || null,
+        sourceTweetText: tweet.sourceTweetText || null,
+        sourceAuthorUsername: tweet.sourceAuthorUsername || null
       });
 
       return true;
@@ -188,41 +175,35 @@ export class DatabaseService {
     try {
       const query = `
         SELECT Tweet {
-          tweet_id,
+          tweetId,
           text,
-          author_username,
-          author_display_name,
-          author_profile_image_url,
-          author_verified,
-          created_at,
-          scraped_at,
-          updated_at,
-          like_count,
-          retweet_count,
-          reply_count,
-          quote_count,
-          language,
-          is_retweet,
-          is_quote,
-          is_reply,
-          conversation_id,
-          in_reply_to_user_id,
-          in_reply_to_tweet_id,
-          media_urls,
-          media_types,
+          authorUsername,
+          authorDisplayName,
+          authorProfileImageUrl,
+          authorVerified,
+          createdAt,
+          scrapedAt,
+          likeCount,
+          retweetCount,
+          replyCount,
+          quoteCount,
+          isRetweet,
+          isQuote,
+          isReply,
+          mediaUrls,
+          mediaTypes,
           hashtags,
           mentions,
           urls,
-          source_tweet_id,
-          source_tweet_text,
-          source_author_username,
-          raw_data
+          sourceTweetId,
+          sourceTweetText,
+          sourceAuthorUsername
         }
-        FILTER .tweet_id = <str>$tweet_id
+        FILTER .tweetId = <str>$tweetId
         LIMIT 1
       `;
 
-      const result = await this.client.query(query, { tweet_id: tweetId });
+      const result = await this.client.query(query, { tweetId });
       return result.length > 0 ? this.mapTweetFromDb(result[0]) : null;
     } catch (error) {
       scraperLogger.error(`Failed to get tweet ${tweetId}`, error);
@@ -271,57 +252,44 @@ export class DatabaseService {
     try {
       const query = `
         INSERT TwitterUser {
-          user_id := <str>$user_id,
+          userId := <str>$userId,
           username := <str>$username,
-          display_name := <str>$display_name,
+          displayName := <str>$displayName,
           description := <optional str>$description,
-          profile_image_url := <optional str>$profile_image_url,
-          banner_image_url := <optional str>$banner_image_url,
+          profileImageUrl := <optional str>$profileImageUrl,
           verified := <bool>$verified,
-          followers_count := <int32>$followers_count,
-          following_count := <int32>$following_count,
-          tweet_count := <int32>$tweet_count,
-          created_at := <datetime>$created_at,
-          scraped_at := <datetime>$scraped_at,
-          location := <optional str>$location,
-          website := <optional str>$website,
-          raw_data := <optional json>$raw_data
+          followersCount := <int32>$followersCount,
+          followingCount := <int32>$followingCount,
+          tweetCount := <int32>$tweetCount,
+          createdAt := <datetime>$createdAt,
+          scrapedAt := <datetime>$scrapedAt
         }
         UNLESS CONFLICT ON .username
         ELSE (
           UPDATE TwitterUser SET {
-            display_name := <str>$display_name,
+            displayName := <str>$displayName,
             description := <optional str>$description,
-            profile_image_url := <optional str>$profile_image_url,
-            banner_image_url := <optional str>$banner_image_url,
+            profileImageUrl := <optional str>$profileImageUrl,
             verified := <bool>$verified,
-            followers_count := <int32>$followers_count,
-            following_count := <int32>$following_count,
-            tweet_count := <int32>$tweet_count,
-            updated_at := <datetime>datetime_current(),
-            location := <optional str>$location,
-            website := <optional str>$website,
-            raw_data := <optional json>$raw_data
+            followersCount := <int32>$followersCount,
+            followingCount := <int32>$followingCount,
+            tweetCount := <int32>$tweetCount
           }
         )
       `;
 
       await this.client.query(query, {
-        user_id: user.userId,
+        userId: user.userId,
         username: user.username,
-        display_name: user.displayName,
+        displayName: user.displayName,
         description: user.description || null,
-        profile_image_url: user.profileImageUrl || null,
-        banner_image_url: user.bannerImageUrl || null,
+        profileImageUrl: user.profileImageUrl || null,
         verified: user.verified,
-        followers_count: user.followersCount,
-        following_count: user.followingCount,
-        tweet_count: user.tweetCount,
-        created_at: user.createdAt,
-        scraped_at: user.scrapedAt,
-        location: user.location || null,
-        website: user.website || null,
-        raw_data: user.rawData || null
+        followersCount: user.followersCount,
+        followingCount: user.followingCount,
+        tweetCount: user.tweetCount,
+        createdAt: user.createdAt,
+        scrapedAt: user.scrapedAt
       });
 
       return true;
@@ -364,14 +332,22 @@ export class DatabaseService {
     try {
       const query = `
         INSERT ScrapingSession {
-          target_username := <str>$target_username,
-          session_type := <str>$session_type
+          username := <str>$username,
+          status := <ScrapingStatus>$status,
+          startTime := <datetime>$startTime,
+          tweetsScraped := <int32>$tweetsScraped,
+          tweetsSaved := <int32>$tweetsSaved,
+          consecutiveFailures := <int32>$consecutiveFailures
         }
       `;
 
       const result = await this.client.querySingle(query, {
-        target_username: sessionData.targetUsername,
-        session_type: sessionData.sessionType
+        username: sessionData.targetUsername || sessionData.username,
+        status: sessionData.status || 'RUNNING',
+        startTime: sessionData.startedAt || new Date(),
+        tweetsScraped: sessionData.tweetsCollected || 0,
+        tweetsSaved: sessionData.tweetsCollected || 0,
+        consecutiveFailures: sessionData.errorsEncountered || 0
       });
 
       return result as string;
@@ -384,34 +360,34 @@ export class DatabaseService {
   async updateScrapingSession(sessionId: string, updates: Partial<ScrapingSession>): Promise<boolean> {
     try {
       const fields: string[] = [];
-      const params: any = { session_id: sessionId };
+      const params: any = { sessionId: sessionId };
 
       if (updates.completedAt !== undefined) {
-        fields.push('completed_at := <optional datetime>$completed_at');
-        params.completed_at = updates.completedAt;
+        fields.push('endTime := <optional datetime>$endTime');
+        params.endTime = updates.completedAt;
       }
       if (updates.tweetsCollected !== undefined) {
-        fields.push('tweets_collected := <int32>$tweets_collected');
-        params.tweets_collected = updates.tweetsCollected;
+        fields.push('tweetsScraped := <int32>$tweetsScraped');
+        params.tweetsScraped = updates.tweetsCollected;
       }
       if (updates.status !== undefined) {
-        fields.push('status := <str>$status');
+        fields.push('status := <ScrapingStatus>$status');
         params.status = updates.status;
       }
       if (updates.errorMessage !== undefined) {
-        fields.push('error_message := <optional str>$error_message');
-        params.error_message = updates.errorMessage;
+        fields.push('lastError := <optional str>$lastError');
+        params.lastError = updates.errorMessage;
       }
       if (updates.lastTweetIdProcessed !== undefined) {
-        fields.push('last_tweet_id_processed := <optional str>$last_tweet_id_processed');
-        params.last_tweet_id_processed = updates.lastTweetIdProcessed;
+        fields.push('lastScrapedTweetId := <optional str>$lastScrapedTweetId');
+        params.lastScrapedTweetId = updates.lastTweetIdProcessed;
       }
 
       if (fields.length === 0) return true;
 
       const query = `
         UPDATE ScrapingSession
-        FILTER .session_id = <uuid>$session_id
+        FILTER .sessionId = <str>$sessionId
         SET { ${fields.join(', ')} }
       `;
 
@@ -427,19 +403,19 @@ export class DatabaseService {
     try {
       const query = `
         SELECT ScrapingSession {
-          session_id,
-          started_at,
-          completed_at,
-          target_username,
-          session_type,
-          tweets_collected,
-          errors_encountered,
-          last_tweet_id_processed,
+          sessionId,
+          startTime,
+          endTime,
+          username,
           status,
-          error_message
+          tweetsScraped,
+          tweetsSaved,
+          consecutiveFailures,
+          lastError,
+          lastScrapedTweetId
         }
-        FILTER .status = 'running'
-        ORDER BY .started_at DESC
+        FILTER .status = 'RUNNING'
+        ORDER BY .startTime DESC
         LIMIT 1
       `;
 
@@ -498,16 +474,17 @@ export class DatabaseService {
 
   private mapSessionFromDb(dbSession: any): ScrapingSession {
     return {
-      sessionId: dbSession.session_id,
-      startedAt: new Date(dbSession.started_at),
-      completedAt: dbSession.completed_at ? new Date(dbSession.completed_at) : undefined,
-      targetUsername: dbSession.target_username,
-      sessionType: dbSession.session_type,
-      tweetsCollected: dbSession.tweets_collected,
-      errorsEncountered: dbSession.errors_encountered,
-      lastTweetIdProcessed: dbSession.last_tweet_id_processed,
+      sessionId: dbSession.sessionId,
+      startedAt: new Date(dbSession.startTime),
+      completedAt: dbSession.endTime ? new Date(dbSession.endTime) : undefined,
+      targetUsername: dbSession.username,
+      username: dbSession.username,
+      sessionType: 'user_tweets',
+      tweetsCollected: dbSession.tweetsScraped || 0,
+      errorsEncountered: dbSession.consecutiveFailures || 0,
+      lastTweetIdProcessed: dbSession.lastScrapedTweetId,
       status: dbSession.status,
-      errorMessage: dbSession.error_message
+      errorMessage: dbSession.lastError
     };
   }
 }

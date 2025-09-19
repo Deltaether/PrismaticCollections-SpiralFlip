@@ -4,21 +4,18 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import cron from 'node-cron';
 import path from 'path';
 import { DatabaseService } from './services/database.service';
 import { MockDatabaseService } from './services/mock-database.service';
-import { TwitterScraperService } from './services/scraper.service';
 import { TwitterRoutes } from './routes/twitter.routes';
 import { scraperLogger } from './utils/logger';
 
 // Load environment variables
 dotenv.config();
 
-class TwitterScraperServer {
+class TwitterDataServer {
   private app: express.Application;
   private database: DatabaseService | MockDatabaseService;
-  private scraper: TwitterScraperService;
   private twitterRoutes: TwitterRoutes;
   private server: any;
 
@@ -26,12 +23,10 @@ class TwitterScraperServer {
     this.app = express();
     // Use mock database for testing without EdgeDB
     this.database = process.env.USE_MOCK_DB === 'true' ? new MockDatabaseService() : new DatabaseService();
-    this.scraper = new TwitterScraperService(this.database as any);
-    this.twitterRoutes = new TwitterRoutes(this.database, this.scraper);
+    this.twitterRoutes = new TwitterRoutes(this.database);
 
     this.setupMiddleware();
     this.setupRoutes();
-    this.setupScheduledTasks();
   }
 
   private setupMiddleware(): void {
@@ -65,8 +60,8 @@ class TwitterScraperServer {
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // Static file serving for profile pictures
-    const profilePicsPath = path.join(__dirname, '../../twitter-scraper-linux/twitter-pfps');
+    // Static file serving for profile pictures (updated to use assets directory)
+    const profilePicsPath = path.join(__dirname, '../../../src/assets/images/profile-pics');
     this.app.use('/api/twitter/profile-images', express.static(profilePicsPath, {
       maxAge: '1d', // Cache for 1 day
       etag: true,
@@ -94,8 +89,9 @@ class TwitterScraperServer {
     // Root route
     this.app.get('/', (_req, res) => {
       res.json({
-        message: 'Prismatic Collections Twitter Scraper API',
-        version: '1.0.0',
+        message: 'Prismatic Collections Twitter Data API',
+        version: '2.0.0',
+        source: 'Python API v2 Fetcher',
         documentation: `${apiPrefix}/docs`,
         health: '/health'
       });
@@ -125,126 +121,9 @@ class TwitterScraperServer {
     });
   }
 
-  private setupScheduledTasks(): void {
-    const timezone = process.env.TIMEZONE || 'Asia/Tokyo';
-    const dailyScrapeTime = process.env.DAILY_SCRAPE_TIME || '09:00';
 
-    // Daily scraping task for Japan morning (9 AM JST)
-    const cronExpression = this.convertTimeToCron(dailyScrapeTime);
 
-    scraperLogger.info(`Setting up daily scraping task`, {
-      time: dailyScrapeTime,
-      timezone,
-      cronExpression
-    });
 
-    cron.schedule(cronExpression, async () => {
-      try {
-        scraperLogger.info('Starting scheduled daily scraping');
-
-        if (this.scraper.running) {
-          scraperLogger.warn('Skipping scheduled scraping - another session is running');
-          return;
-        }
-
-        await this.performScheduledScraping();
-      } catch (error) {
-        scraperLogger.error('Scheduled scraping failed', error);
-      }
-    }, {
-      timezone
-    });
-
-    // Regular maintenance task (every 6 hours)
-    cron.schedule('0 */6 * * *', async () => {
-      try {
-        scraperLogger.info('Running maintenance tasks');
-        await this.performMaintenance();
-      } catch (error) {
-        scraperLogger.error('Maintenance task failed', error);
-      }
-    }, {
-      timezone
-    });
-  }
-
-  private convertTimeToCron(time: string): string {
-    const [hours, minutes] = time.split(':').map(Number);
-    return `${minutes} ${hours} * * *`;
-  }
-
-  private async performScheduledScraping(): Promise<void> {
-    const username = process.env.TWITTER_USERNAME || 'prismcollect_';
-    let sessionId: string | null = null;
-
-    try {
-      // Create scraping session
-      sessionId = await this.database.createScrapingSession({
-        targetUsername: username,
-        sessionType: 'scheduled',
-        startedAt: new Date(),
-        tweetsCollected: 0,
-        status: 'running'
-      });
-
-      scraperLogger.scrapingStart(sessionId, username);
-
-      // Initialize scraper
-      await this.scraper.initialize();
-
-      // Get the latest tweet ID to avoid duplicates
-      const latestTweetId = await this.database.getLatestTweetId(username);
-
-      // Scrape user profile
-      const user = await this.scraper.scrapeUserProfile(username);
-
-      // Scrape tweets
-      const tweets = await this.scraper.scrapeTweets(username, {
-        maxTweets: parseInt(process.env.MAX_TWEETS_PER_SESSION || '100'),
-        includeRetweets: true,
-        includeReplies: true,
-        startFromTweetId: latestTweetId || undefined
-      });
-
-      // Save to database
-      await this.scraper.saveScrapedData(tweets, user || undefined);
-
-      // Update session
-      await this.database.updateScrapingSession(sessionId, {
-        completedAt: new Date(),
-        tweetsCollected: tweets.length,
-        status: 'completed'
-      });
-
-      scraperLogger.scrapingComplete(sessionId, tweets.length, Date.now());
-
-      // Close scraper to free resources
-      await this.scraper.close();
-    } catch (error) {
-      if (sessionId) {
-        await this.database.updateScrapingSession(sessionId, {
-          status: 'failed',
-          errorMessage: error instanceof Error ? error.message : 'Unknown error'
-        });
-
-        scraperLogger.scrapingError(sessionId, error);
-      }
-
-      // Try to close scraper even on error
-      try {
-        await this.scraper.close();
-      } catch (closeError) {
-        scraperLogger.error('Error closing scraper after failure', closeError);
-      }
-
-      throw error;
-    }
-  }
-
-  private async performMaintenance(): Promise<void> {
-    // This could include cleanup tasks, statistics updates, etc.
-    scraperLogger.info('Maintenance completed');
-  }
 
   async start(): Promise<void> {
     try {
@@ -254,10 +133,11 @@ class TwitterScraperServer {
       // Start server
       const port = process.env.PORT || 3001;
       this.server = this.app.listen(port, () => {
-        scraperLogger.info(`Twitter Scraper API server started`, {
+        scraperLogger.info(`Twitter Data API server started`, {
           port,
           environment: process.env.NODE_ENV || 'development',
-          corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:4300'
+          corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:4300',
+          source: 'Python API v2 Fetcher'
         });
       });
 
@@ -282,12 +162,6 @@ class TwitterScraperServer {
     scraperLogger.info('Shutting down server...');
 
     try {
-      // Stop scraper
-      if (this.scraper.running) {
-        await this.scraper.stop();
-        await this.scraper.close();
-      }
-
       // Close database connection
       await this.database.disconnect();
 
@@ -308,7 +182,7 @@ class TwitterScraperServer {
 }
 
 // Start server
-const server = new TwitterScraperServer();
+const server = new TwitterDataServer();
 server.start().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);

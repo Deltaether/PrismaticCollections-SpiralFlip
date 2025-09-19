@@ -2,7 +2,7 @@ import winston from 'winston';
 import path from 'path';
 
 const logLevel = process.env.LOG_LEVEL || 'info';
-const logFile = process.env.LOG_FILE || './logs/scraper.log';
+const logFile = process.env.LOG_FILE || './logs/twitter-data.log';
 
 // Create logs directory if it doesn't exist
 import fs from 'fs';
@@ -42,7 +42,7 @@ const fileFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: logLevel,
   format: fileFormat,
-  defaultMeta: { service: 'twitter-scraper' },
+  defaultMeta: { service: 'twitter-data-api' },
   transports: [
     // File transport for all logs
     new winston.transports.File({
@@ -87,60 +87,7 @@ export const scraperLogger = {
   },
   debug: (message: string, meta?: any) => logger.debug(message, meta),
 
-  // Specialized logging for scraping activities
-  scrapingStart: (sessionId: string, username: string) => {
-    logger.info('Scraping session started', {
-      sessionId,
-      username,
-      timestamp: new Date().toISOString()
-    });
-  },
-
-  scrapingComplete: (sessionId: string, tweetsCollected: number, duration: number) => {
-    logger.info('Scraping session completed', {
-      sessionId,
-      tweetsCollected,
-      durationMs: duration,
-      timestamp: new Date().toISOString()
-    });
-  },
-
-  scrapingError: (sessionId: string, error: any, context?: string) => {
-    logger.error('Scraping error occurred', {
-      sessionId,
-      error: error.message || error,
-      stack: error.stack,
-      context,
-      timestamp: new Date().toISOString()
-    });
-  },
-
-  rateLimitHit: (sessionId: string, delayMs: number) => {
-    logger.warn('Rate limit detected, applying delay', {
-      sessionId,
-      delayMs,
-      timestamp: new Date().toISOString()
-    });
-  },
-
-  tweetProcessed: (sessionId: string, tweetId: string, action: 'created' | 'updated' | 'skipped') => {
-    logger.debug('Tweet processed', {
-      sessionId,
-      tweetId,
-      action,
-      timestamp: new Date().toISOString()
-    });
-  },
-
-  browserAction: (sessionId: string, action: string, details?: any) => {
-    logger.debug('Browser action', {
-      sessionId,
-      action,
-      details,
-      timestamp: new Date().toISOString()
-    });
-  },
-
+  // API request logging
   apiRequest: (method: string, endpoint: string, statusCode?: number, duration?: number) => {
     logger.info('API request', {
       method,
@@ -149,7 +96,30 @@ export const scraperLogger = {
       durationMs: duration,
       timestamp: new Date().toISOString()
     });
+  },
+
+  // Data processing logging
+  dataFetch: (source: string, recordCount: number, operation: string) => {
+    logger.info('Data operation', {
+      source,
+      recordCount,
+      operation,
+      timestamp: new Date().toISOString()
+    });
+  },
+
+  // Python fetcher integration logging
+  pythonFetcherStatus: (isRunning: boolean, lastRun?: Date, tweetsStored?: number) => {
+    logger.info('Python fetcher status', {
+      isRunning,
+      lastRun: lastRun?.toISOString(),
+      tweetsStored,
+      source: 'Python API v2',
+      timestamp: new Date().toISOString()
+    });
   }
 };
 
+// Export both the structured logger and raw winston logger
+export { logger };
 export default logger;

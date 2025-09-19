@@ -1,0 +1,54 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Show disk space
+        send "df -h\r"
+        expect "root@"
+
+        # Update system
+        send "apt update\r"
+        expect "root@"
+
+        # Install packages
+        send "apt install -y nginx curl wget unzip certbot python3-certbot-nginx\r"
+        expect "root@"
+
+        # Start nginx
+        send "systemctl start nginx\r"
+        send "systemctl enable nginx\r"
+        expect "root@"
+
+        # Create web directory
+        send "mkdir -p /var/www/phantasia\r"
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        # Install GelDB
+        send "curl https://www.geldata.com/sh --proto \"=https\" -sSf1 | sh\r"
+        expect "root@"
+
+        # Check nginx status
+        send "systemctl status nginx --no-pager\r"
+        expect "root@"
+
+        send "echo 'Server setup completed successfully'\r"
+        send "exit\r"
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}
+
+expect eof

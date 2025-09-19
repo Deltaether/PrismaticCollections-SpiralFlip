@@ -1,0 +1,67 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Install GelDB first
+        send "curl https://www.geldata.com/sh --proto \"=https\" -sSf1 | sh\r"
+        expect "root@"
+
+        # Configure nginx for the subdomain
+        send "cat > /etc/nginx/sites-available/deeptesting.prismaticcollections.com << 'EOF'\r"
+        send "server {\r"
+        send "    listen 80;\r"
+        send "    server_name deeptesting.prismaticcollections.com;\r"
+        send "\r"
+        send "    root /var/www/phantasia;\r"
+        send "    index index.html;\r"
+        send "\r"
+        send "    location / {\r"
+        send "        try_files \$uri \$uri/ /index.html;\r"
+        send "    }\r"
+        send "\r"
+        send "    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {\r"
+        send "        expires 1y;\r"
+        send "        add_header Cache-Control \"public, immutable\";\r"
+        send "    }\r"
+        send "}\r"
+        send "EOF\r"
+        expect "root@"
+
+        # Enable the site
+        send "ln -sf /etc/nginx/sites-available/deeptesting.prismaticcollections.com /etc/nginx/sites-enabled/\r"
+        expect "root@"
+
+        # Remove default site
+        send "rm -f /etc/nginx/sites-enabled/default\r"
+        expect "root@"
+
+        # Test nginx configuration
+        send "nginx -t\r"
+        expect "root@"
+
+        # Reload nginx
+        send "systemctl reload nginx\r"
+        expect "root@"
+
+        # Check if upload file exists and extract it
+        send "if [ -f /tmp/phantasia-website-latest.tar.gz ]; then echo 'Deployment file found'; else echo 'Waiting for deployment file'; fi\r"
+        expect "root@"
+
+        send "echo 'Server configuration completed. Ready for deployment.'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

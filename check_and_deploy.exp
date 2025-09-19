@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Check if the upload completed
+        send "ls -la /tmp/phantasia-website-latest.tar.gz\r"
+        expect "root@"
+
+        # If the file is there, extract it
+        send "if [ -f /tmp/phantasia-website-latest.tar.gz ]; then echo 'Deployment file found, extracting...'; cd /var/www/phantasia && tar -xzf /tmp/phantasia-website-latest.tar.gz && echo 'Extraction complete'; else echo 'Deployment file not found'; fi\r"
+        expect "root@"
+
+        # Set permissions
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        # Test the deployment
+        send "ls -la /var/www/phantasia/\r"
+        expect "root@"
+
+        # Test HTTP response
+        send "curl -I http://localhost\r"
+        expect "root@"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

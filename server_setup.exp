@@ -1,0 +1,45 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # First, let's check the system and install necessary tools
+        send "echo 'Connected to server successfully'\r"
+        send "uname -a\r"
+        send "df -h\r"
+
+        # Update system first
+        send "apt update\r"
+        expect "root@" { send "echo 'System update complete'\r" }
+
+        # Install necessary packages
+        send "apt install -y nginx curl wget unzip\r"
+        expect "root@" { send "echo 'Basic packages installed'\r" }
+
+        # Start and enable nginx
+        send "systemctl start nginx\r"
+        send "systemctl enable nginx\r"
+        send "systemctl status nginx --no-pager\r"
+        expect "root@" { send "echo 'Nginx started'\r" }
+
+        # Create web directory
+        send "mkdir -p /var/www/phantasia\r"
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        send "echo 'Web directory created'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

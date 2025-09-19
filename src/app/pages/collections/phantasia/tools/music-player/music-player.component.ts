@@ -63,6 +63,11 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   // Project-aware audio path
   private currentProject: 'phantasia1' | 'phantasia2' = 'phantasia1';
 
+  // 【✓】 Seek state tracking to prevent false completion triggers
+  private isUserSeeking = false;
+  private lastSeekTime = 0;
+  private seekCooldownMs = 500; // Prevent completion detection for 500ms after seek
+
   // 【✓】 Enhanced state persistence with better error recovery
   private hasUserInteracted = false;
   private lastSuccessfulVolume = 0.5;
@@ -328,11 +333,16 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
+        console.log('[MusicPlayer] Song ended naturally');
         this.isPlaying = false;
-        this.currentTime = 0;
+        // Set current time to full duration to show song completed
+        this.currentTime = this.audio?.duration() || this.duration;
         // Notify centralized state manager
         this.musicStateManager.setPlayingState(false);
-        this.nextTrack();
+        // Small delay before playing next track to ensure UI updates
+        setTimeout(() => {
+          this.nextTrack();
+        }, 50);
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -388,9 +398,14 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
               this.cdr.markForCheck();
             },
             onend: () => {
+              console.log('[MusicPlayer] Song ended naturally (fallback)');
               this.isPlaying = false;
-              this.currentTime = 0;
-              this.nextTrack();
+              // Set current time to full duration to show song completed
+              this.currentTime = this.audio?.duration() || this.duration;
+              // Small delay before playing next track to ensure UI updates
+              setTimeout(() => {
+                this.nextTrack();
+              }, 50);
               this.cdr.markForCheck();
             },
             onloaderror: (fallbackId, fallbackError) => {
@@ -473,9 +488,14 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
+        console.log('[MusicPlayer] Song ended naturally (tryLoadWithUrl)');
         this.isPlaying = false;
-        this.currentTime = 0;
-        this.nextTrack();
+        // Set current time to full duration to show song completed
+        this.currentTime = this.audio?.duration() || this.duration;
+        // Small delay before playing next track to ensure UI updates
+        setTimeout(() => {
+          this.nextTrack();
+        }, 50);
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -534,9 +554,14 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
+        console.log('[MusicPlayer] Song ended naturally (legacy loadTrack)');
         this.isPlaying = false;
-        this.currentTime = 0;
-        this.nextTrack();
+        // Set current time to full duration to show song completed
+        this.currentTime = this.audio?.duration() || this.duration;
+        // Small delay before playing next track to ensure UI updates
+        setTimeout(() => {
+          this.nextTrack();
+        }, 50);
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -562,8 +587,20 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.audio.pause();
         this.isPlaying = false;
       } else {
+        // Validate audio is loaded before playing
+        const duration = this.audio.duration();
+        if (!duration || duration === 0) {
+          console.warn('[MusicPlayer] Cannot play: audio not fully loaded');
+          this.error = 'Audio still loading, please wait...';
+          this.cdr.markForCheck();
+          return;
+        }
+
         // Mark user interaction for audio context policies
         this.hasUserInteracted = true;
+
+        // Clear any previous errors
+        this.error = '';
 
         this.audio.play();
         this.isPlaying = true;
@@ -664,12 +701,44 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 【✓】 Seek to position
+  // 【✓】 Seek to position with proper state tracking and validation
   seek(value: number): void {
-    if (!this.audio) return;
-    this.audio.seek(value);
-    this.currentTime = value;
-    this.cdr.markForCheck();
+    if (!this.audio) {
+      console.warn('[MusicPlayer] Cannot seek: no audio instance');
+      return;
+    }
+
+    // Validate audio is loaded before allowing seek
+    const duration = this.audio.duration();
+    if (!duration || duration === 0) {
+      console.warn('[MusicPlayer] Cannot seek: audio not fully loaded');
+      return;
+    }
+
+    // Validate seek position
+    const seekPosition = Math.max(0, Math.min(duration, Number(value)));
+
+    // Set seeking state to prevent false completion triggers
+    this.isUserSeeking = true;
+    this.lastSeekTime = Date.now();
+
+    try {
+      // Perform the seek
+      this.audio.seek(seekPosition);
+      this.currentTime = seekPosition;
+
+      console.log(`[MusicPlayer] Seeked to ${seekPosition}s / ${duration}s`);
+
+      // Reset seeking state after a brief delay
+      setTimeout(() => {
+        this.isUserSeeking = false;
+      }, 100);
+
+      this.cdr.markForCheck();
+    } catch (error) {
+      console.error('[MusicPlayer] Error during seek:', error);
+      this.isUserSeeking = false;
+    }
   }
 
   // 【✓】 Update subtitle based on filename
@@ -685,23 +754,55 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 【✓】 Update time with proper continuous tracking
+  // 【✓】 Update time with proper continuous tracking and seek-aware completion checking
   private updateTime(): void {
     if (this.audio && this.isPlaying) {
       const seek = this.audio.seek();
       this.currentTime = typeof seek === 'number' ? seek : 0;
+
+      // Check if we're close to the end, but only if user hasn't recently seeked
+      const duration = this.audio.duration();
+      const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+      const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+      // Only trigger completion if:
+      // 1. We're very close to the end (within 0.05 seconds for tighter control)
+      // 2. User hasn't seeked recently (to avoid false triggers from seeks)
+      // 3. Current time is progressing naturally (not from a seek)
+      if (duration &&
+          this.currentTime >= duration - 0.05 &&
+          !isWithinSeekCooldown &&
+          !this.isUserSeeking) {
+
+        console.log('[MusicPlayer] Song naturally reaching end, completing playback');
+        this.currentTime = duration;
+        this.isPlaying = false;
+        this.musicStateManager.setPlayingState(false);
+        this.nextTrack();
+        this.cdr.markForCheck();
+        return;
+      }
+
       this.updateDynamicArtistTime();
       this.cdr.markForCheck();
       requestAnimationFrame(() => this.updateTime());
     }
   }
 
-  // 【✓】 Update dynamic artist service with current playback time
+  // 【✓】 Update dynamic artist service with current playback time (but not during seeks)
   private updateDynamicArtistTime(): void {
-    if (this.currentTrackInfo) {
+    if (this.currentTrackInfo && !this.isUserSeeking) {
+      // Only update dynamic artist time during natural playback, not during user seeks
       // Calculate absolute time from track start time + current position
       const absoluteTime = this.currentTrackInfo.startTime + this.currentTime;
-      this.dynamicArtistService.updateCurrentTime(absoluteTime);
+
+      // Additional safety check: only update if we're within reasonable bounds of the current track
+      const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+      const isRecentSeek = timeSinceLastSeek < this.seekCooldownMs;
+
+      if (!isRecentSeek) {
+        this.dynamicArtistService.updateCurrentTime(absoluteTime);
+      }
     }
   }
 
@@ -709,7 +810,9 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   nextTrack(): void {
     if (this.isLoading || this.allTracks.length === 0) return;
 
-    const wasPlaying = this.isPlaying;
+    // If nextTrack is called from onend, assume we should autoplay (wasPlaying = true)
+    // For manual nextTrack calls, use the current playing state
+    const wasPlaying = this.isPlaying || this.currentTime >= (this.duration - 0.2);
     const nextIndex = (this.currentTrackIndex + 1) % this.allTracks.length;
     const nextTrackInfo = this.allTracks[nextIndex];
 
@@ -741,6 +844,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   previousTrack(): void {
     if (this.isLoading || this.allTracks.length === 0) return;
 
+    // For manual previousTrack calls, preserve the current playing state
     const wasPlaying = this.isPlaying;
     const prevIndex = this.currentTrackIndex === 0
       ? this.allTracks.length - 1

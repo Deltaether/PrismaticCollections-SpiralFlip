@@ -1,0 +1,42 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Install GelDB
+        send "curl https://www.geldata.com/sh --proto \"=https\" -sSf1 | sh\r"
+        expect "root@"
+
+        # Create web directory structure
+        send "mkdir -p /var/www/phantasia\r"
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        # Check if GelDB was installed successfully
+        send "which geldb || echo 'GelDB installation check'\r"
+        expect "root@"
+
+        # Create a temporary upload directory
+        send "mkdir -p /tmp/upload\r"
+        send "cd /tmp/upload\r"
+        expect "root@"
+
+        send "echo 'Ready for file upload. Please upload the deployment package now.'\r"
+        send "echo 'Use: scp phantasia-website-latest.tar.gz root@212.227.85.148:/tmp/upload/'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

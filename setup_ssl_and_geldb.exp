@@ -1,0 +1,61 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # First install GelDB properly
+        send "curl https://www.geldata.com/sh --proto \"=https\" -sSf1 | sh -s -- -y\r"
+        expect {
+            "root@" {
+                send "echo 'GelDB installation completed'\r"
+            }
+            timeout {
+                send "echo 'GelDB installation timeout, continuing...'\r"
+            }
+        }
+        expect "root@"
+
+        # Set up SSL certificate
+        send "certbot --nginx -d deeptesting.prismaticcollections.com --non-interactive --agree-tos --email admin@prismaticcollections.com\r"
+        expect {
+            "root@" {
+                send "echo 'SSL certificate installation completed'\r"
+            }
+            "error" {
+                send "echo 'SSL certificate installation failed, continuing...'\r"
+            }
+            timeout {
+                send "echo 'SSL certificate installation timeout, continuing...'\r"
+            }
+        }
+        expect "root@"
+
+        # Reload nginx
+        send "systemctl reload nginx\r"
+        expect "root@"
+
+        # Test HTTPS
+        send "curl -I https://deeptesting.prismaticcollections.com\r"
+        expect "root@"
+
+        # Test HTTP redirect
+        send "curl -I http://deeptesting.prismaticcollections.com\r"
+        expect "root@"
+
+        send "echo 'SSL and GelDB setup completed'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

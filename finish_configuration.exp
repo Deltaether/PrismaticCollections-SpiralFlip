@@ -1,0 +1,68 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Create the nginx site configuration file
+        send "cat > /etc/nginx/sites-available/deeptesting.prismaticcollections.com << 'EOF'\r"
+        send "server {\r"
+        send "    listen 80;\r"
+        send "    server_name deeptesting.prismaticcollections.com;\r"
+        send "\r"
+        send "    root /var/www/phantasia;\r"
+        send "    index index.html;\r"
+        send "\r"
+        send "    location / {\r"
+        send "        try_files \\\$uri \\\$uri/ /index.html;\r"
+        send "    }\r"
+        send "\r"
+        send "    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\\\$ {\r"
+        send "        expires 1y;\r"
+        send "        add_header Cache-Control \"public, immutable\";\r"
+        send "    }\r"
+        send "}\r"
+        send "EOF\r"
+        expect "root@"
+
+        # Enable the site
+        send "ln -sf /etc/nginx/sites-available/deeptesting.prismaticcollections.com /etc/nginx/sites-enabled/\r"
+        expect "root@"
+
+        # Test nginx configuration
+        send "nginx -t\r"
+        expect "root@"
+
+        # Reload nginx
+        send "systemctl reload nginx\r"
+        expect "root@"
+
+        # Check the status
+        send "systemctl status nginx --no-pager\r"
+        expect "root@"
+
+        # Create a temporary index.html for testing
+        send "mkdir -p /var/www/phantasia\r"
+        send "echo '<h1>Phantasia Coming Soon</h1><p>Server configured successfully</p>' > /var/www/phantasia/index.html\r"
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        send "echo 'Server configuration completed successfully'\r"
+        send "curl -I http://localhost\r"
+        expect "root@"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

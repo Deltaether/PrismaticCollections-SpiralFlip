@@ -1395,14 +1395,14 @@ export class ArtistCreditService {
         releaseYear: 2022,
         youtubeUrl: 'https://youtu.be/IZtd0ABhhpM?si=SHayVNUQ4LdKs_3O',
         streamingUrl: 'https://srsr.li/various-artists-project-phantasia',
-        description: 'A fantasy concept compilation album.'
+        description: 'A journey of self-discovery!'
       },
       {
         id: 'phantasia2',
         displayName: 'Phantasia Project 2',
         totalTracks: 20,
         releaseYear: 2024,
-        description: 'The highly anticipated sequel to the original Phantasia project, featuring 20 tracks with expanded orchestral and electronic collaborations.'
+        description: 'The second instalment to Project: Phantasia.'
       }
     ];
 

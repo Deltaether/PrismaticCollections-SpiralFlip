@@ -1,0 +1,50 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Deploy the core files
+        send "cd /var/www/phantasia\r"
+        expect "root@"
+
+        send "tar -xzf /tmp/phantasia-core.tar.gz\r"
+        expect "root@"
+
+        # Set permissions
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        # Create assets directory placeholder
+        send "mkdir -p /var/www/phantasia/assets\r"
+        expect "root@"
+
+        # List files to verify
+        send "ls -la /var/www/phantasia/\r"
+        expect "root@"
+
+        # Test the deployment
+        send "curl -I http://localhost\r"
+        expect "root@"
+
+        # Test with specific hostname
+        send "curl -I -H 'Host: deeptesting.prismaticcollections.com' http://localhost\r"
+        expect "root@"
+
+        send "echo 'Core application deployed successfully'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

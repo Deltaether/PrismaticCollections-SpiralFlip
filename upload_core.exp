@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+# Upload the core package
+spawn scp -o StrictHostKeyChecking=no phantasia-core.tar.gz root@212.227.85.148:/tmp/
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "100%" {
+        puts "Core upload completed successfully"
+    }
+    timeout {
+        puts "Upload timeout"
+        exit 1
+    }
+}
+
+expect eof

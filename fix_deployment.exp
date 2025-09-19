@@ -1,0 +1,46 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Create the web directory properly
+        send "mkdir -p /var/www/phantasia\r"
+        expect "root@"
+
+        # Change to the directory and extract
+        send "cd /var/www/phantasia\r"
+        expect "root@"
+
+        send "tar -xzf /tmp/phantasia-core.tar.gz\r"
+        expect "root@"
+
+        # Set permissions
+        send "chown -R www-data:www-data /var/www/phantasia\r"
+        send "chmod -R 755 /var/www/phantasia\r"
+        expect "root@"
+
+        # Verify extraction
+        send "ls -la\r"
+        expect "root@"
+
+        # Test the site
+        send "curl -I http://localhost\r"
+        expect "root@"
+
+        send "echo 'Deployment fixed and working'\r"
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

@@ -1,0 +1,58 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+set password "KC361kLC"
+
+# Upload deployment package
+spawn scp -o StrictHostKeyChecking=no phantasia-website-latest.tar.gz root@212.227.85.148:~/
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "100%" {
+        puts "Upload complete"
+    }
+    timeout {
+        puts "Upload timeout"
+        exit 1
+    }
+}
+
+# Wait for upload to finish
+sleep 2
+
+# Connect to server for setup
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        # Server setup commands
+        send "echo 'Connected successfully'\r"
+        send "uname -a\r"
+        send "ls -la ~/phantasia-website-latest.tar.gz\r"
+
+        # Update system
+        send "apt update && apt upgrade -y\r"
+        expect "root@" { send "echo 'System updated'\r" }
+
+        # Install nginx
+        send "apt install -y nginx\r"
+        expect "root@" { send "echo 'Nginx installed'\r" }
+
+        # Start nginx
+        send "systemctl start nginx\r"
+        send "systemctl enable nginx\r"
+        send "systemctl status nginx\r"
+        expect "root@" { send "echo 'Nginx configured'\r" }
+
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set password "KC361kLC"
+
+spawn ssh -o StrictHostKeyChecking=no root@212.227.85.148
+
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    "root@" {
+        interact
+    }
+    timeout {
+        puts "Connection timeout"
+        exit 1
+    }
+}

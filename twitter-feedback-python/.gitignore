@@ -93,5 +93,5 @@ secrets/
 ehthumbs.db
 Thumbs.db
 
-# EdgeDB
-.edgedb/
+# Gel
+.gel/

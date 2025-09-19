@@ -86,10 +86,17 @@ export class ComprehensiveArtistService {
    * Convert artist contributions to socials artist format
    */
   private convertToSocialsArtists(contributions: ArtistContribution[]): SocialsArtist[] {
+    // Filter out Synthesizer V operators (they are not human artists)
+    const synthesizerVOperators = ['HXVOC', 'Ninezero', 'Hanakuma Chifuyu'];
+    const humanArtistContributions = contributions.filter(contribution =>
+      !synthesizerVOperators.includes(contribution.artistName) &&
+      !contribution.role.includes('Synthesizer V Operator')
+    );
+
     // Group contributions by artist name
     const artistMap = new Map<string, ArtistContribution[]>();
 
-    contributions.forEach(contribution => {
+    humanArtistContributions.forEach(contribution => {
       const existing = artistMap.get(contribution.artistName) || [];
       existing.push(contribution);
       artistMap.set(contribution.artistName, existing);

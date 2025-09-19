@@ -1,11 +1,11 @@
 # Twitter Feedback Python Application
 
-A comprehensive Python application for fetching Twitter data using the official Twitter API v2. This application provides a complete solution for collecting, storing, and managing Twitter user information and tweets using EdgeDB as the database backend.
+A comprehensive Python application for fetching Twitter data using the official Twitter API v2. This application provides a complete solution for collecting, storing, and managing Twitter user information and tweets using Gel as the database backend.
 
 ## Features
 
 - **Twitter API v2 Integration**: Full support for official Twitter API v2 endpoints
-- **EdgeDB Storage**: Permanent data storage to avoid wasting API calls
+- **Gel Storage**: Permanent data storage to avoid wasting API calls
 - **Rate Limiting**: Intelligent rate limit handling and respect
 - **Comprehensive Data Model**: Stores users, tweets, media, URLs, hashtags, and mentions
 - **Batch Processing**: Fetch data for multiple users efficiently
@@ -26,7 +26,7 @@ This application follows the official Twitter API v2 documentation:
 ### Prerequisites
 
 - Python 3.8 or higher
-- EdgeDB 5.0 or higher
+- Gel 6.0 or higher
 - Twitter API v2 Bearer Token
 
 ### Setup
@@ -41,11 +41,11 @@ This application follows the official Twitter API v2 documentation:
    pip install -r requirements.txt
    ```
 
-3. **Set up EdgeDB**:
+3. **Set up Gel**:
    ```bash
-   edgedb instance create twitter_feedback
-   edgedb database create twitter_data
-   edgedb migrate
+   gel instance create twitter_feedback_python
+   gel database create gel
+   gel migrate
    ```
 
 4. **Configure authentication**:
@@ -100,7 +100,7 @@ The application supports multiple configuration methods:
 
 ```bash
 export TWITTER_BEARER_TOKEN="your_bearer_token_here"
-export DATABASE_DSN="edgedb://localhost/twitter_data"
+export DATABASE_DSN="gel://localhost/gel"
 export LOG_LEVEL="INFO"
 ```
 
@@ -127,7 +127,7 @@ Place your Twitter Bearer Token in a file named `Twitter-bearer-token` in the pa
 
 ## Database Schema
 
-The application uses EdgeDB with a comprehensive schema that includes:
+The application uses Gel with a comprehensive schema that includes:
 
 ### Core Types
 
@@ -161,7 +161,7 @@ twitter-feedback-python/
 │   │   ├── __init__.py
 │   │   ├── client.py       # Main API client
 │   │   └── exceptions.py   # Custom exceptions
-│   ├── database/           # EdgeDB integration
+│   ├── database/           # Gel integration
 │   │   ├── __init__.py
 │   │   ├── service.py      # Database service
 │   │   └── models.py       # Data models
@@ -170,7 +170,7 @@ twitter-feedback-python/
 │   │   └── settings.py     # Settings class
 │   └── main.py             # Main application
 ├── dbschema/
-│   ├── default.esdl        # EdgeDB schema
+│   ├── default.esdl        # Gel schema
 │   └── migrations/         # Database migrations
 ├── config/
 │   └── default.json        # Default configuration
@@ -182,7 +182,7 @@ twitter-feedback-python/
 ### Key Components
 
 1. **TwitterAPIClient**: Handles all Twitter API v2 interactions
-2. **DatabaseService**: Manages EdgeDB operations and data storage
+2. **DatabaseService**: Manages Gel operations and data storage
 3. **Settings**: Configuration management with multiple sources
 4. **Main Application**: CLI interface and orchestration
 
@@ -258,9 +258,9 @@ mypy src/
    - Check that the token file path is correct
 
 2. **Database Connection Issues**:
-   - Ensure EdgeDB is running: `edgedb instance status`
-   - Verify database exists: `edgedb database list`
-   - Run migrations: `edgedb migrate`
+   - Ensure Gel is running: `gel instance status`
+   - Verify database exists: `gel database list`
+   - Run migrations: `gel migrate`
 
 3. **Rate Limiting**:
    - The application will automatically wait for rate limits
@@ -306,7 +306,7 @@ For issues and questions:
 
 - Initial release
 - Full Twitter API v2 integration
-- EdgeDB database backend
+- Gel database backend
 - CLI interface
 - Comprehensive error handling and logging
 - Rate limiting support

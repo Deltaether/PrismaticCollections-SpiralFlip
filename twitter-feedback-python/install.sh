@@ -22,15 +22,15 @@ python3 -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" || {
 
 echo "✅ Python version check passed"
 
-# Check if EdgeDB is installed
-echo "Checking EdgeDB installation..."
-if command -v edgedb >/dev/null 2>&1; then
-    echo "✅ EdgeDB is installed: $(edgedb --version)"
+# Check if Gel is installed
+echo "Checking Gel installation..."
+if command -v gel >/dev/null 2>&1; then
+    echo "✅ Gel is installed: $(gel --version)"
 else
-    echo "⚠️  EdgeDB is not installed. Installing EdgeDB..."
-    # Install EdgeDB (Linux/macOS)
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.edgedb.com | sh
-    export PATH="$HOME/.edgedb/bin:$PATH"
+    echo "⚠️  Gel is not installed. Installing Gel..."
+    # Install Gel (Linux/macOS)
+    curl --proto '=https' --tlsv1.2 -sSfL https://geldata.com/sh | sh -s -- -y
+    source "$HOME/.config/gel/env"
 fi
 
 # Create virtual environment
@@ -47,22 +47,22 @@ pip install -r requirements.txt
 
 echo "✅ Dependencies installed"
 
-# Set up EdgeDB
-echo "Setting up EdgeDB database..."
+# Set up Gel
+echo "Setting up Gel database..."
 
-# Create EdgeDB instance
-echo "Creating EdgeDB instance..."
-edgedb instance create twitter_feedback || echo "Instance may already exist"
+# Create Gel instance
+echo "Creating Gel instance..."
+gel instance create twitter_feedback_python || echo "Instance may already exist"
 
 # Create database
 echo "Creating database..."
-edgedb -I twitter_feedback database create twitter_data || echo "Database may already exist"
+gel -I twitter_feedback_python database create gel || echo "Database may already exist"
 
 # Run migrations
 echo "Running database migrations..."
-edgedb -I twitter_feedback -d twitter_data migrate
+gel -I twitter_feedback_python migrate
 
-echo "✅ EdgeDB setup complete"
+echo "✅ Gel setup complete"
 
 # Check for bearer token
 echo "Checking for Twitter Bearer Token..."

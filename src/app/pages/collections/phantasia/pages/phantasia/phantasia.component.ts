@@ -917,6 +917,13 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Open YouTube video in new tab
+   */
+  openYouTube(url: string): void {
+    window.open(url, '_blank');
+  }
+
   ngOnDestroy(): void {
     // Clean up two-state scroll event listeners
     if (typeof window !== 'undefined') {

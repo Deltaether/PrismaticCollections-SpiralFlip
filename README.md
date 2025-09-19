@@ -18,7 +18,7 @@ The application displays real-time Twitter data using a modern Python-based fetc
 - **Python Fetcher**: `/twitter-feedback-python/simple_fetcher.py`
 - **Features**: Original posts + retweets in chronological order
 - **Rate Limiting**: Built-in 1-2 second delays
-- **Database**: Single EdgeDB instance (`twitter_scraper`) as source of truth
+- **Database**: Single GelDB instance (`twitter-feedback-python`) as source of truth
 
 ## Development Setup
 
@@ -26,7 +26,7 @@ The application displays real-time Twitter data using a modern Python-based fetc
 
 1. Node.js 18+ and pnpm
 2. Python 3.8+ with pip
-3. EdgeDB instance (`twitter_scraper`)
+3. GelDB instance (`twitter-feedback-python`)
 
 ### Start Development Servers
 
@@ -78,7 +78,7 @@ Twitter API v2 (Bearer Token)
         ↓
 Python Fetcher (simple_fetcher.py)
         ↓
-EdgeDB (twitter_scraper instance)
+GelDB (twitter-feedback-python instance)
         ↓
 Node.js Backend (port 3001)
         ↓
@@ -128,7 +128,7 @@ curl http://localhost:3001/api/twitter/tweets
 curl http://localhost:3001/api/twitter/user/prismcollect_
 
 # Test system status
-curl http://localhost:3001/api/twitter/scraper/status
+curl http://localhost:3001/api/twitter/status
 ```
 
 ## Configuration
@@ -137,7 +137,7 @@ curl http://localhost:3001/api/twitter/scraper/status
 
 - `twitterDataEnabled`: Controls Twitter data integration (default: true)
 - `API_BASE_URL`: Backend API URL (default: http://localhost:3001/api)
-- `EDGEDB_INSTANCE`: EdgeDB instance name (default: twitter_scraper)
+- `GELDB_INSTANCE`: GelDB instance name (default: twitter-feedback-python)
 
 ### Python Fetcher Configuration
 
@@ -145,7 +145,7 @@ Configure the Python fetcher in `twitter-feedback-python/.env`:
 
 ```env
 TWITTER_BEARER_TOKEN=your_bearer_token_here
-EDGEDB_INSTANCE=twitter_scraper
+GELDB_INSTANCE=twitter-feedback-python
 FETCH_DELAY_MIN=1.0
 FETCH_DELAY_MAX=2.0
 ```
@@ -163,7 +163,7 @@ FETCH_DELAY_MAX=2.0
 ### Common Issues
 
 1. **Port conflicts**: Ensure ports 5005 (Angular) and 3001 (backend) are available
-2. **EdgeDB connection**: Verify `twitter_scraper` instance is running
+2. **GelDB connection**: Verify `twitter-feedback-python` instance is running
 3. **Python dependencies**: Install requirements with `pip install -r requirements.txt`
 4. **Twitter API**: Ensure valid Bearer Token in Python fetcher configuration
 

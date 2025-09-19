@@ -16,7 +16,10 @@ export type ArtistRole =
   | 'Crossfade MV/Live2D' | 'Live2D'
   // Specific production roles for Phantasia projects with role differences
   | 'Vocalist, Lyricist' | 'Accordionist' | 'Violinist' | 'Violist' | 'Cellist'
-  | 'Crossfade MV/additional live2d';
+  | 'Crossfade MV/additional live2d'
+  // Phantasia 2 specific roles
+  | 'Stained Glass Illustrator' | 'Chibi Illustrator' | 'Illustration separator'
+  | 'Co-Organiser/Video Editor' | 'SFX' | 'Special Thanks';
 
 export type ParticipationType = 'Primary' | 'Featured' | 'Collaboration' | 'Additional' | 'Technical';
 
@@ -494,14 +497,7 @@ export class ArtistCreditService {
       bio: 'Voice actor and vocal performer'
     },
     // Additional Synthesizer V operators and vocal contributors
-    'Anri Arcane': {
-      displayName: 'Anri Arcane',
-      avatar: 'assets/images/artists/Anri-Arcane.png',
-      color: '#FF9FF3',
-      primaryRoles: ['Synthesizer V Operator'],
-      socialLinks: {},
-      bio: 'Synthesizer V vocal operator'
-    },
+    // Note: These are excluded from socials display but kept for track accuracy
     'HXVOC': {
       displayName: 'HXVOC',
       avatar: 'assets/images/artists/HXVOC.png',
@@ -509,14 +505,6 @@ export class ArtistCreditService {
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
       bio: 'Synthesizer V vocal operator'
-    },
-    'Miyamai Moca': {
-      displayName: 'Miyamai Moca',
-      avatar: 'assets/images/artists/Miyamai-Moca.png',
-      color: '#FFB347',
-      primaryRoles: ['Synthesizer V Operator'],
-      socialLinks: {},
-      bio: 'Synthesizer V'
     },
     'Ninezero': {
       displayName: 'Ninezero',
@@ -688,6 +676,107 @@ export class ArtistCreditService {
         youtube: 'https://www.youtube.com/@tikaal'
       },
       bio: 'Bass guitarist and electronic music producer'
+    },
+    'TronC': {
+      displayName: 'TronC',
+      avatar: 'assets/images/artists/TronC.png',
+      color: '#8E44AD',
+      primaryRoles: ['Stained Glass Illustrator'],
+      socialLinks: {
+        twitter: 'https://x.com/TronC_Art'
+      },
+      bio: 'Stained glass illustration specialist for Phantasia 2'
+    },
+    'Hototogisu': {
+      displayName: 'Hototogisu',
+      avatar: 'assets/images/artists/Hototogisu.png',
+      color: '#E74C3C',
+      primaryRoles: ['Chibi Illustrator'],
+      socialLinks: {
+        twitter: 'https://x.com/Hototogisu_Art'
+      },
+      bio: 'Chibi illustration specialist for Phantasia 2'
+    },
+    'roər': {
+      displayName: 'roər',
+      avatar: 'assets/images/artists/roer.png',
+      color: '#F39C12',
+      primaryRoles: ['Illustration separator'],
+      socialLinks: {
+        twitter: 'https://x.com/roer_art'
+      },
+      bio: 'Illustration separator designer for Phantasia 2'
+    },
+    'Len_licht': {
+      displayName: 'Len_licht',
+      avatar: 'assets/images/artists/Len Licht.png',
+      color: '#5f27cd',
+      primaryRoles: ['Co-Organiser/Video Editor'],
+      socialLinks: {
+        twitter: 'https://x.com/Len_licht'
+      },
+      bio: 'Co-organiser and video editor for Phantasia 2'
+    },
+    'Atelier Magicae': {
+      displayName: 'Atelier Magicae',
+      avatar: 'assets/images/artists/Atelier-Magicae.png',
+      color: '#9B59B6',
+      primaryRoles: ['SFX'],
+      socialLinks: {
+        website: 'https://ateliermagicae.com'
+      },
+      bio: 'Fantasy UI Sound Effects provider for Phantasia 2'
+    },
+    '白｡': {
+      displayName: '白｡',
+      avatar: 'assets/images/artists/Shiro.png',
+      color: '#BDC3C7',
+      primaryRoles: ['Special Thanks'],
+      socialLinks: {
+        twitter: 'https://x.com/shiro_dot'
+      },
+      bio: 'Special thanks contributor to Phantasia 2'
+    },
+    'Sol': {
+      displayName: 'Sol',
+      avatar: 'assets/images/artists/Sol.png',
+      color: '#F1C40F',
+      primaryRoles: ['Special Thanks'],
+      socialLinks: {
+        twitter: 'https://x.com/Sol_Music'
+      },
+      bio: 'Special thanks contributor to Phantasia 2'
+    },
+    'Yo Kaze': {
+      displayName: 'Yo Kaze',
+      avatar: 'assets/images/artists/Yo-Kaze.png',
+      color: '#16A085',
+      primaryRoles: ['Special Thanks'],
+      socialLinks: {
+        twitter: 'https://x.com/YoKaze_Music'
+      },
+      bio: 'Special thanks contributor to Phantasia 2'
+    },
+    // ====== PHANTASIA 1 SPECIFIC CREDITS ======
+    'honabai': {
+      displayName: 'honabai',
+      avatar: 'assets/images/artists/honabai.png',
+      color: '#E67E22',
+      primaryRoles: ['Special Thanks'],
+      socialLinks: {
+        twitter: 'https://x.com/honabai'
+      },
+      bio: 'Special thanks contributor to Phantasia 1'
+    },
+    'shironill': {
+      displayName: 'shironill',
+      avatar: 'assets/images/artists/shironill.png',
+      color: '#34495E',
+      primaryRoles: ['Special Thanks'],
+      socialLinks: {
+        twitter: 'https://x.com/shironill'
+      },
+      bio: 'Special thanks contributor to Phantasia 1'
     }
   };
 
@@ -1044,24 +1133,18 @@ export class ArtistCreditService {
         audioFile: '7. Mei Naganowa - To Defy The Beankeeper.ogg',
         mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80),
         allContributions: [
-          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80, 'Synthesizer V composition and production'),
-          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
+          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 90, 'Synthesizer V composition and production'),
           this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
-          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)'),
           this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5, 'Vocals (Synthesizer V)')
         ],
         featuredArtists: [],
         collaborators: [
-          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5),
           this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5),
-          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5),
           this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5)
         ],
         instrumentalists: [],
         vocalists: [
-          this.createArtistContribution('Anri Arcane', 'Vocalist', 'Additional', 5),
           this.createArtistContribution('HXVOC', 'Vocalist', 'Additional', 5),
-          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Additional', 5),
           this.createArtistContribution('Ninezero', 'Vocalist', 'Additional', 5)
         ],
         technicalCredits: [this.createArtistContribution('Mei Naganowa', 'Producer', 'Primary', 100)]
@@ -1392,7 +1475,7 @@ export class ArtistCreditService {
         releaseYear: 2022,
         youtubeUrl: 'https://youtu.be/IZtd0ABhhpM?si=SHayVNUQ4LdKs_3O',
         streamingUrl: 'https://srsr.li/various-artists-project-phantasia',
-        description: 'The original Phantasia compilation featuring 15 tracks from 16+ amazing electronic artists, showcasing diverse styles and collaborative creativity.'
+        description: 'A fantasy concept compilation album.'
       },
       {
         id: 'phantasia2',
@@ -1440,11 +1523,15 @@ export class ArtistCreditService {
    */
   private getPhantasia1ProductionTeam(): { artistName: string, role: ArtistRole, notes?: string }[] {
     return [
-      { artistName: 'Daph', role: 'Live2D', notes: 'Live2D animation' },
+      { artistName: 'SpiralFlip', role: 'Producer', notes: 'Organiser' },
+      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Mastering Engineer' },
+      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Cover Illustration' },
+      { artistName: 'yy_artwork', role: 'Logo/Jacket Design', notes: 'Logo/Jacket Design' },
+      { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV' },
       { artistName: 'Len', role: 'Crossfade MV/additional live2d', notes: 'Crossfade MV/additional live2d' },
-      { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV creation' },
-      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Cover artwork' },
-      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Audio mastering' }
+      { artistName: 'Daph', role: 'Live2D', notes: 'Live2d: Daph' },
+      { artistName: 'honabai', role: 'Producer', notes: 'Special thanks' },
+      { artistName: 'shironill', role: 'Producer', notes: 'Special thanks' }
     ];
   }
 
@@ -1453,11 +1540,18 @@ export class ArtistCreditService {
    */
   private getPhantasia2ProductionTeam(): { artistName: string, role: ArtistRole, notes?: string }[] {
     return [
-      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Audio mastering' },
-      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Cover artwork' },
-      { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV creation' },
-      { artistName: 'Len', role: 'Crossfade MV/additional live2d', notes: 'Crossfade MV/additional live2d' },
-      { artistName: 'Daph', role: 'Live2D', notes: 'Live2D animation' }
+      { artistName: 'SpiralFlip', role: 'Producer', notes: 'Organiser' },
+      { artistName: 'Len_licht', role: 'Producer', notes: 'Co-Organiser/Video Editor' },
+      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Main Illustrator' },
+      { artistName: 'TronC', role: 'Cover Illustration', notes: 'Stained Glass Illustrator' },
+      { artistName: 'Hototogisu', role: 'Cover Illustration', notes: 'Chibi Illustrator' },
+      { artistName: 'yy_artwork', role: 'Logo/Jacket Design', notes: 'Logo/Jacket Design' },
+      { artistName: 'roər', role: 'Cover Illustration', notes: 'Illustration separator' },
+      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Mastering Engineer' },
+      { artistName: 'Atelier Magicae', role: 'Sound Designer', notes: 'SFX: Fantasy UI Sound Effects' },
+      { artistName: '白｡', role: 'Producer', notes: 'Special Thanks' },
+      { artistName: 'Sol', role: 'Producer', notes: 'Special Thanks' },
+      { artistName: 'Yo Kaze', role: 'Producer', notes: 'Special Thanks' }
     ];
   }
 
@@ -1725,13 +1819,12 @@ export class ArtistCreditService {
         projectDisplayName: 'Phantasia Project 1',
         mainArtist: this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80),
         allContributions: [
-          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 80, 'Electronic production and lyrics'),
-          this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20, 'Vocals (Synthesizer V)')
+          this.createArtistContribution('Mei Naganowa', 'Main Artist', 'Primary', 100, 'Electronic production and lyrics')
         ],
-        featuredArtists: [this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20)],
+        featuredArtists: [],
         collaborators: [],
         instrumentalists: [],
-        vocalists: [this.createArtistContribution('Miyamai Moca', 'Vocalist', 'Featured', 20)],
+        vocalists: [],
         technicalCredits: [this.createArtistContribution('Mei Naganowa', 'Producer', 'Primary', 100)]
       },
       // Track 13: satella - The Traveller

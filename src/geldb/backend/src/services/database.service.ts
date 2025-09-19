@@ -1,27 +1,27 @@
-import * as edgedb from 'edgedb';
+import * as gel from 'gel';
 import { Tweet, TwitterUser, ScrapingSession } from '../models/tweet.model';
 import { scraperLogger } from '../utils/logger';
 
 export class DatabaseService {
-  private client: edgedb.Client;
+  private client: gel.Client;
 
   constructor() {
     // Configure connection based on environment
-    const isDocker = process.env.EDGEDB_HOST;
+    const isDocker = process.env.GEL_HOST;
 
     if (isDocker) {
-      // Docker environment - connect to containerized EdgeDB
-      this.client = edgedb.createClient({
-        host: process.env.EDGEDB_HOST || 'edgedb',
-        port: parseInt(process.env.EDGEDB_PORT || '5656'),
-        database: process.env.EDGEDB_DATABASE || 'edgedb',
+      // Docker environment - connect to containerized Gel
+      this.client = gel.createClient({
+        host: process.env.GEL_HOST || 'geldb',
+        port: parseInt(process.env.GEL_PORT || '5656'),
+        database: process.env.GEL_DATABASE || 'geldb',
         concurrency: 5,
         tlsSecurity: 'insecure'
       });
     } else {
       // Local development - connect to instance
-      this.client = edgedb.createClient({
-        instanceName: 'twitter_scraper',
+      this.client = gel.createClient({
+        instanceName: 'twitter_feedback_python',
         concurrency: 5,
         tlsSecurity: 'insecure'
       });
@@ -30,10 +30,15 @@ export class DatabaseService {
 
   async connect(): Promise<void> {
     try {
+      scraperLogger.info('Attempting to connect to database...', {
+        host: process.env.GEL_HOST || 'localhost',
+        port: process.env.GEL_PORT || '5656',
+        database: process.env.GEL_DATABASE || 'geldb'
+      });
       await this.client.ensureConnected();
-      scraperLogger.info('Connected to EdgeDB successfully');
+      scraperLogger.info('Connected to Gel successfully');
     } catch (error) {
-      scraperLogger.error('Failed to connect to EdgeDB', error);
+      scraperLogger.error('Failed to connect to Gel', error);
       throw error;
     }
   }
@@ -41,9 +46,9 @@ export class DatabaseService {
   async disconnect(): Promise<void> {
     try {
       await this.client.close();
-      scraperLogger.info('Disconnected from EdgeDB');
+      scraperLogger.info('Disconnected from Gel');
     } catch (error) {
-      scraperLogger.error('Error disconnecting from EdgeDB', error);
+      scraperLogger.error('Error disconnecting from Gel', error);
     }
   }
 

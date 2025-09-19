@@ -54,13 +54,15 @@ RUN npm run build && \
 # Final production stage
 FROM node:20-alpine AS production
 
-# Install minimal runtime dependencies
+# Install minimal runtime dependencies and Gel CLI
 RUN apk add --no-cache --update \
     curl \
     dumb-init \
     tini \
+    bash \
     && apk upgrade \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/cache/apk/* \
+    && curl --proto '=https' --tlsv1.2 -sSfL https://geldata.com/sh | sh -s -- -y
 
 # Create app directory
 WORKDIR /app

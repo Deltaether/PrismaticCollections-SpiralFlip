@@ -1,7 +1,7 @@
 [project]
-name = "twitter-scraper"
+name = "twitter-feedback-python"
 version = "1.0"
-instance = "twitter_scraper"
+instance = "twitter-feedback-python"
 
 [database]
-name = "edgedb"
+name = "geldb"

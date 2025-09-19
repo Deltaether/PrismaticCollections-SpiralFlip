@@ -21,13 +21,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **IMPORTANT**: The project has been migrated from Playwright-based scraping to official Twitter API v2:
 
-- **Old System**: Removed Playwright-based TwitterScraperService and related files
+- **Old System**: Removed Playwright-based Twitter scraping service and related files
 - **New System**: Python-based fetcher using Twitter API v2 with Bearer Token authentication
-- **Data Flow**: Python fetcher → EdgeDB → Node.js backend → Angular frontend
+- **Data Flow**: Python fetcher → GelDB → Node.js backend → Angular frontend
 - **Location**: `/twitter-feedback-python/simple_fetcher.py`
 - **Features**: Original posts + retweets, chronological order, rate limiting built-in
 
-All old scraper references have been removed and environment flags updated (`twitterDataEnabled` instead of `twitterScraperEnabled`).
+All old scraping service references have been removed and environment flags updated (`twitterDataEnabled` instead of `twitterScraperEnabled`).
 
 ### Angular CLI
 - `ng generate component component-name` - Generate new component

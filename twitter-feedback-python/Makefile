@@ -11,7 +11,7 @@ help:
 	@echo "  format       - Format code"
 	@echo "  type-check   - Run type checking"
 	@echo "  clean        - Clean up temporary files"
-	@echo "  setup-db     - Set up EdgeDB database"
+	@echo "  setup-db     - Set up Gel database"
 	@echo "  migrate      - Run database migrations"
 	@echo "  reset-db     - Reset database (WARNING: destroys all data)"
 	@echo "  run-user     - Run single user fetch (requires USERNAME variable)"
@@ -43,19 +43,19 @@ clean:
 	rm -rf .pytest_cache/ .coverage htmlcov/ .mypy_cache/ build/ dist/ *.egg-info/
 
 setup-db:
-	@echo "Setting up EdgeDB database..."
-	edgedb instance create twitter_feedback || true
-	edgedb database create twitter_data || true
+	@echo "Setting up Gel database..."
+	gel instance create twitter_feedback_python || true
+	gel database create gel || true
 
 migrate:
 	@echo "Running database migrations..."
-	edgedb migrate
+	gel migrate
 
 reset-db:
 	@echo "WARNING: This will destroy all data in the database!"
 	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 1
-	edgedb database wipe twitter_data
-	edgedb migrate
+	gel database wipe gel
+	gel migrate
 
 run-user:
 	@if [ -z "$(USERNAME)" ]; then \

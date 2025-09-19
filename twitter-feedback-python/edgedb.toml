@@ -1,5 +1,0 @@
-[edgedb]
-server-version = "5.0"
-
-[database]
-user = "edgedb"

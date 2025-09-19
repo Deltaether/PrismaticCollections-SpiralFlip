@@ -63,7 +63,7 @@ Twitter API v2 (Bearer Token)
         ↓
 Python Fetcher (simple_fetcher.py)
         ↓
-EdgeDB (twitter_scraper instance)
+GelDB (twitter-feedback-python instance)
         ↓
 Node.js Backend (port 3001)
         ↓

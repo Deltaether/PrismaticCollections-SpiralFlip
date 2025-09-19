@@ -2,4 +2,4 @@ watch = []
 
 [instance]
 server-version = "6.9"
-name = "twitter_scraper"
+name = "twitter-feedback-python"

@@ -1,0 +1,7 @@
+[project]
+name = "twitter-feedback-python"
+version = "1.0"
+instance = "twitter_feedback_python"
+
+[database]
+name = "gel"

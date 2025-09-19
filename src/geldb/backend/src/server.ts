@@ -21,7 +21,7 @@ class TwitterDataServer {
 
   constructor() {
     this.app = express();
-    // Use mock database for testing without EdgeDB
+    // Use mock database for testing without Gel
     this.database = process.env.USE_MOCK_DB === 'true' ? new MockDatabaseService() : new DatabaseService();
     this.twitterRoutes = new TwitterRoutes(this.database);
 

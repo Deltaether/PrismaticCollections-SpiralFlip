@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import * as edgedb from 'edgedb';
+import * as gel from 'gel';
 
 const app = express();
 
@@ -15,18 +15,18 @@ app.use(cors({
 // Body parsing
 app.use(express.json());
 
-// Connect to EdgeDB
-let client: edgedb.Client;
+// Connect to Gel
+let client: gel.Client;
 
-const initEdgeDB = async () => {
+const initGel = async () => {
   try {
-    client = edgedb.createClient({
-      instanceName: 'twitter_scraper',
+    client = gel.createClient({
+      instanceName: 'twitter-feedback-python',
       tlsSecurity: 'insecure'
     });
-    console.log('✅ Connected to EdgeDB twitter_scraper instance');
+    console.log('✅ Connected to GelDB twitter-feedback-python instance');
   } catch (error) {
-    console.error('❌ Failed to connect to EdgeDB:', error);
+    console.error('❌ Failed to connect to Gel:', error);
     process.exit(1);
   }
 };
@@ -139,7 +139,7 @@ app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    database: 'EdgeDB twitter_scraper instance'
+    database: 'GelDB twitter-feedback-python instance'
   });
 });
 
@@ -160,13 +160,13 @@ app.get('/', (_req, res) => {
 const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
-  await initEdgeDB();
+  await initGel();
 
   app.listen(PORT, () => {
     console.log('🚀 Real Data Server started successfully!');
     console.log(`📡 Port: ${PORT}`);
     console.log(`🌐 CORS: http://localhost:5005`);
-    console.log(`💾 Database: EdgeDB twitter_scraper instance`);
+    console.log(`💾 Database: GelDB twitter-feedback-python instance`);
     console.log(`📊 Visit: http://localhost:${PORT}/api/twitter/tweets`);
   });
 };

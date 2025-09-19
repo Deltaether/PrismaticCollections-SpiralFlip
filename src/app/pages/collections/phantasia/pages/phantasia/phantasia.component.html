@@ -62,8 +62,11 @@
         <div class="album-cover-section">
           <div class="cd-jacket">
             <div class="jacket-3d-container">
-              <div class="jacket-art">
-                <img src="assets/images/covers/phantasia_1_cover_optimized.webp" alt="Phantasia Project Album Cover" class="album-cover">
+              <div class="jacket-art" (click)="openYouTube('https://youtu.be/IZtd0ABhhpM?si=PKwwyi_-4bjHhR8n')">
+                <img src="assets/images/covers/phantasia_1_cover_final.png" alt="Phantasia Project Album Cover" class="album-cover">
+                <div class="youtube-overlay">
+                  <img src="assets/images/icons/youtube-icon.png" alt="Watch on YouTube" class="youtube-icon">
+                </div>
               </div>
             </div>
             <div class="jacket-reflection"></div>
@@ -74,7 +77,7 @@
         <div class="album-content-section">
           <div class="album-info">
             <div class="artist-info">
-              <h3 class="artists">"Where it all began."</h3>
+              <h3 class="artists">"A fantasy concept compilation album."</h3>
               <p class="collaboration-label">{{ projectMetadata?.description || 'The first fantasy compilation album' }}</p>
             </div>
             <div class="album-details">
@@ -91,6 +94,18 @@
                 <span>Ambient Fantasy Orchestral</span>
               </div>
             </div>
+          </div>
+
+          <!-- Streaming Services Section - Right Side -->
+          <div class="streaming-section">
+            <a href="https://push.fm/fl/wrpb1yzt" target="_blank" rel="noopener noreferrer" class="streaming-button">
+              <div class="streaming-details">
+                <div class="detail-item">
+                  <mat-icon>headphones</mat-icon>
+                  <span>Streaming Services</span>
+                </div>
+              </div>
+            </a>
           </div>
 
           <!-- Music Player positioned below album info -->

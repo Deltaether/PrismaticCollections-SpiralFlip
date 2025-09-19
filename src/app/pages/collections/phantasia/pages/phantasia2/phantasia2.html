@@ -62,8 +62,11 @@
         <div class="album-cover-section">
           <div class="cd-jacket">
             <div class="jacket-3d-container">
-              <div class="jacket-art">
-                <img src="assets/videos/phantasia2/album_cover.png" alt="Phantasia Project II Album Cover" class="album-cover">
+              <div class="jacket-art" (click)="openYouTube('https://youtu.be/dq0ArdmhTCQ?si=vd5ChZ7F5jXzy_oK')">
+                <img src="assets/images/covers/phantasia_2_cover_optimized.webp" alt="Phantasia Project II Album Cover" class="album-cover">
+                <div class="youtube-overlay">
+                  <img src="assets/images/icons/youtube-icon.png" alt="Watch on YouTube" class="youtube-icon">
+                </div>
               </div>
             </div>
             <div class="jacket-reflection"></div>
@@ -91,6 +94,18 @@
                 <span>Ambient Fantasy Orchestral</span>
               </div>
             </div>
+          </div>
+
+          <!-- Streaming Services Section - Right Side -->
+          <div class="streaming-section">
+            <a href="https://push.fm/fl/wsbaprsa" target="_blank" rel="noopener noreferrer" class="streaming-button">
+              <div class="streaming-details">
+                <div class="detail-item">
+                  <mat-icon>headphones</mat-icon>
+                  <span>Streaming Services</span>
+                </div>
+              </div>
+            </a>
           </div>
 
           <!-- Music Player positioned below album info -->

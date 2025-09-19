@@ -1,0 +1,230 @@
+/**
+ * Shared Phantasia Footer Component Styles
+ *
+ * Clean, maintainable footer styles without !important declarations.
+ * Uses specific class names to avoid conflicts with parent component styles.
+ * Implements responsive design with mobile-first approach.
+ *
+ * Design Principles:
+ * - No !important declarations - proper CSS specificity management
+ * - Component isolation through specific class naming
+ * - Responsive design with clamp() for fluid scaling
+ * - Professional typography and spacing
+ * - Accessible focus states and color contrast
+ */
+
+// Local color variables for component isolation
+$phantasia-footer-black: rgba(0, 0, 0, 0.9);
+$phantasia-footer-white: #ffffff;
+$phantasia-footer-accent-light: #e9ecef;
+$phantasia-footer-medium-gray: #6c757d;
+$phantasia-footer-hover-color: #ffffff;
+
+/**
+ * Main footer container
+ * Uses specific class name to avoid conflicts with parent styles
+ */
+.phantasia-footer-shared {
+  background-color: $phantasia-footer-black;
+  color: $phantasia-footer-white;
+  padding: clamp(1.5rem, 3vh, 2.5rem) clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vh, 2rem);
+  margin-top: clamp(1.5rem, 3vh, 2.5rem);
+  position: relative;
+  z-index: 10; // Ensure footer appears above other content
+
+  /**
+   * Footer content wrapper with three-column grid layout
+   */
+  .phantasia-footer-content {
+    max-width: calc(100vw - 20vw);
+    width: calc(100vw - 20vw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+
+    // Responsive layout: single column on mobile
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: clamp(1rem, 2vh, 1.5rem);
+    }
+  }
+
+  /**
+   * Logo section styling
+   */
+  .phantasia-footer-logo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
+
+    .footer-logo-image {
+      max-width: 120px;
+      width: 100px;
+      height: auto;
+      filter: brightness(0) invert(1); // Convert to white
+      min-width: 80px;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+
+      // Responsive breakpoints for logo sizing
+      @media (max-width: 768px) {
+        max-width: 100px;
+        width: 80px;
+      }
+
+      @media (min-width: 1200px) {
+        max-width: 140px;
+        width: 120px;
+      }
+
+      // Subtle hover effect
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  /**
+   * Navigation links section
+   */
+  .phantasia-footer-links {
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .footer-link-group {
+      flex: 1;
+
+      .link-group-title {
+        font-size: clamp(0.9rem, 1.3vw, 1.4rem);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: $phantasia-footer-accent-light;
+        margin-top: 0; // Reset default heading margins
+      }
+
+      .link-group-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        .link-item {
+          margin-bottom: 0.5rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .footer-link {
+            color: $phantasia-footer-medium-gray;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: inline-block;
+            font-size: clamp(0.8rem, 1vw, 1.1rem);
+            line-height: 1.4;
+
+            // Focus state for accessibility
+            &:focus {
+              outline: 2px solid $phantasia-footer-accent-light;
+              outline-offset: 2px;
+              border-radius: 2px;
+            }
+
+            // Hover state
+            &:hover {
+              color: $phantasia-footer-hover-color;
+            }
+
+            // Different styles for internal vs external links if needed
+            &--internal {
+              // Specific styles for router links
+            }
+
+            &--external {
+              // Specific styles for external links
+              &[target="_blank"] {
+                // Add visual indicator for external links if desired
+                // &::after {
+                //   content: " ↗";
+                //   font-size: 0.8em;
+                // }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Copyright section
+   */
+  .phantasia-footer-copyright {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
+
+    .copyright-text {
+      font-size: clamp(0.8rem, 1.1vw, 1.2rem);
+      color: $phantasia-footer-medium-gray;
+      line-height: 1.4;
+      text-align: right;
+
+      @media (max-width: 768px) {
+        text-align: center;
+      }
+    }
+  }
+}
+
+/**
+ * Dark theme support (if needed in the future)
+ */
+@media (prefers-color-scheme: dark) {
+  .phantasia-footer-shared {
+    // Footer is already dark, but we could adjust contrast if needed
+  }
+}
+
+/**
+ * High contrast mode support for accessibility
+ */
+@media (prefers-contrast: high) {
+  .phantasia-footer-shared {
+    border-top: 2px solid $phantasia-footer-white;
+
+    .phantasia-footer-links .footer-link-group .link-group-list .link-item .footer-link {
+      &:focus {
+        outline: 3px solid $phantasia-footer-white;
+      }
+    }
+  }
+}
+
+/**
+ * Reduced motion support for accessibility
+ */
+@media (prefers-reduced-motion: reduce) {
+  .phantasia-footer-shared {
+    .phantasia-footer-logo .footer-logo-image,
+    .phantasia-footer-links .footer-link-group .link-group-list .link-item .footer-link {
+      transition: none;
+    }
+  }
+}

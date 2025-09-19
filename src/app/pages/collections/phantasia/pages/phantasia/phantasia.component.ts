@@ -11,6 +11,7 @@ import { SiteHeaderComponent } from '../../../../../shared/components/site-heade
 import { LoadingScreenComponent } from '../../../../../components/loading-screen/loading-screen.component';
 import { DynamicArtistCardsComponent } from '../../../../../components/dynamic-artist-cards/dynamic-artist-cards.component';
 import { SpecialMentionsComponent } from '../../../../../components/special-mentions/special-mentions.component';
+import { PhantasiaFooterComponent, PhantasiaFooterConfig } from '../../../../../shared/components/phantasia-footer/phantasia-footer.component';
 import { AudioService, AudioState } from '../../../../../pages/collections/phantasia/services/audio.service';
 import { DynamicArtistService } from '../../services/dynamic-artist.service';
 import { ArtistCreditService, ProjectMetadata } from '../../../../../services/artist-credit.service';
@@ -39,7 +40,8 @@ export type ScrollIndicatorState = 'visible' | 'hidden';
     SiteHeaderComponent,
     LoadingScreenComponent,
     DynamicArtistCardsComponent,
-    SpecialMentionsComponent
+    SpecialMentionsComponent,
+    PhantasiaFooterComponent
   ],
   templateUrl: './phantasia.component.html',
   styleUrls: ['./phantasia.component.scss'],
@@ -113,6 +115,29 @@ export class PhantasiaComponent implements OnInit, OnDestroy {
 
   // Current year for footer
   readonly currentYear = new Date().getFullYear();
+
+  // Footer configuration for Phantasia 1
+  readonly footerConfig: PhantasiaFooterConfig = {
+    logoSrc: 'assets/images/logos/prismcoll_logox.svg',
+    logoAlt: 'Prismatic Collections',
+    linkGroups: [
+      {
+        title: 'Explore',
+        links: [
+          { label: 'Collections', routerLink: '/collections' },
+          { label: 'About', routerLink: '/phantasia/phantasia' }
+        ]
+      },
+      {
+        title: 'Legal',
+        links: [
+          { label: 'Privacy Policy', href: '#' },
+          { label: 'Terms of Use', href: '#' }
+        ]
+      }
+    ],
+    copyrightText: 'Prismatic Collections. All rights reserved.'
+  };
 
   // Artist display mode management
   artistDisplayMode = signal<'showcase' | 'currently-playing' | 'all'>('showcase');

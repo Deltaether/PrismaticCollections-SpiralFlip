@@ -76,23 +76,15 @@ export class SpecialMentionsComponent implements OnInit {
       'Elegant Sister', // Album Stream MV
       'Len',            // Crossfade MV/Live2D
       'Daph',           // Live2D (Phantasia 1 only)
-      'honabai',        // Special Thanks
-      'shironill'       // Special Thanks
     ];
 
     const phantasia2SpecialMentions = [
       'SpiralFlip',     // Organiser
       'Len_licht',      // Co-Organiser/Video Editor
       'NapaL',          // Main Illustrator
-      'TronC',          // Stained Glass Illustrator
-      'Hototogisu',     // Chibi Illustrator
       'yy_artwork',     // Logo/Jacket Design
       'roər',           // Illustration separator
       'PliXoR',         // Mastering Engineer
-      'Atelier Magicae', // SFX
-      '白｡',            // Special Thanks
-      'Sol',            // Special Thanks
-      'Yo Kaze'         // Special Thanks
     ];
 
     // Select the appropriate list based on current project

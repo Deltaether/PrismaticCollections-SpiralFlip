@@ -129,35 +129,10 @@
       </app-special-mentions>
     </section>
 
-    <!-- Footer Section -->
-    <footer class="phantasia-footer">
-      <div class="footer-content">
-        <div class="footer-logo">
-          <img src="assets/images/logos/prismcoll_logox.svg" alt="Prismatic Collections" />
-        </div>
-        
-        <div class="footer-links">
-          <div class="link-group">
-            <h3>Explore</h3>
-            <ul>
-              <li><a routerLink="/collections">Collections</a></li>
-              <li><a routerLink="/phantasia/phantasia2">About</a></li>
-            </ul>
-          </div>
-          
-          <div class="link-group">
-            <h3>Legal</h3>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Use</a></li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="copyright">
-          © {{ currentYear }} Prismatic Collections. All rights reserved.
-        </div>
-      </div>
-    </footer>
+    <!-- Shared Footer Component -->
+    <app-phantasia-footer
+      [config]="footerConfig"
+      [currentYear]="currentYear">
+    </app-phantasia-footer>
   </div>
 </div>

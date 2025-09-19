@@ -1,0 +1,61 @@
+<!--
+  Shared Phantasia Footer Component
+
+  Professional footer layout with three-column grid design:
+  - Left: Logo with responsive sizing
+  - Center: Navigation link groups
+  - Right: Copyright information
+
+  Features responsive design that collapses to single column on mobile devices.
+-->
+<footer class="phantasia-footer-shared">
+  <div class="phantasia-footer-content">
+    <!-- Logo Section -->
+    <div class="phantasia-footer-logo">
+      <img
+        [src]="activeConfig.logoSrc"
+        [alt]="activeConfig.logoAlt"
+        class="footer-logo-image"
+        loading="lazy">
+    </div>
+
+    <!-- Navigation Links Section -->
+    <div class="phantasia-footer-links">
+      <div
+        class="footer-link-group"
+        *ngFor="let group of activeConfig.linkGroups; trackBy: trackByTitle">
+        <h3 class="link-group-title">{{ group.title }}</h3>
+        <ul class="link-group-list">
+          <li
+            class="link-item"
+            *ngFor="let link of group.links; trackBy: trackByLabel">
+            <!-- Router link for internal navigation -->
+            <a
+              *ngIf="link.routerLink; else externalLink"
+              [routerLink]="link.routerLink"
+              class="footer-link footer-link--internal">
+              {{ link.label }}
+            </a>
+            <!-- External link template -->
+            <ng-template #externalLink>
+              <a
+                [href]="link.href"
+                [target]="link.target || '_self'"
+                [rel]="link.rel || ''"
+                class="footer-link footer-link--external">
+                {{ link.label }}
+              </a>
+            </ng-template>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Copyright Section -->
+    <div class="phantasia-footer-copyright">
+      <span class="copyright-text">
+        © {{ displayYear }} {{ activeConfig.copyrightText || defaultConfig.copyrightText }}
+      </span>
+    </div>
+  </div>
+</footer>

@@ -404,18 +404,6 @@ export class GelDbIntegrationService {
       color: '#00d2d3',
       genre: 'Live2D'
     },
-    'honabai': {
-      avatarPath: '/assets/images/artists/honabai.png',
-      displayName: 'honabai',
-      color: '#ff9ff3',
-      genre: 'Special Thanks'
-    },
-    'shironill': {
-      avatarPath: '/assets/images/artists/shironill.png',
-      displayName: 'shironill',
-      color: '#f368e0',
-      genre: 'Special Thanks'
-    },
 
     // ====== PHANTASIA 2 ADDITIONAL PRODUCTION TEAM ======
     'roər': {
@@ -424,47 +412,11 @@ export class GelDbIntegrationService {
       color: '#F39C12',
       genre: 'PRODUCTION TEAM'
     },
-    'TronC': {
-      avatarPath: '/assets/images/artists/default-avatar.svg',
-      displayName: 'TronC',
-      color: '#8E44AD',
-      genre: 'STAINED GLASS ILLUSTRATOR'
-    },
-    'Hototogisu': {
-      avatarPath: '/assets/images/artists/default-avatar.svg',
-      displayName: 'Hototogisu',
-      color: '#E74C3C',
-      genre: 'CHIBI ILLUSTRATOR'
-    },
     'Len_licht': {
       avatarPath: '/assets/images/artists/Len Licht.png',
       displayName: 'Len_licht',
       color: '#5f27cd',
       genre: 'CO-ORGANISER/VIDEO EDITOR'
-    },
-    'Atelier Magicae': {
-      avatarPath: '/assets/images/artists/default-avatar.svg',
-      displayName: 'Atelier Magicae',
-      color: '#9B59B6',
-      genre: 'PRODUCTION TEAM'
-    },
-    '白｡': {
-      avatarPath: '/assets/images/artists/default-avatar.svg',
-      displayName: '白｡',
-      color: '#BDC3C7',
-      genre: 'PRODUCTION TEAM'
-    },
-    'Sol': {
-      avatarPath: '/assets/images/artists/default-avatar.svg',
-      displayName: 'Sol',
-      color: '#F1C40F',
-      genre: 'PRODUCTION TEAM'
-    },
-    'Yo Kaze': {
-      avatarPath: '/assets/images/artists/YoKaze.png',
-      displayName: 'Yo Kaze',
-      color: '#16A085',
-      genre: 'PRODUCTION TEAM'
     },
 
     // ====== PHANTASIA 1 ARTISTS ======
@@ -610,8 +562,6 @@ export class GelDbIntegrationService {
       'Elegant Sister': { twitter: 'https://x.com/ElegantSister' },
       'Len': { twitter: 'https://x.com/Len_licht' },
       'Daph': { twitter: 'https://x.com/daphshoo' },
-      'honabai': { twitter: 'https://x.com/honabai' },
-      'shironill': { twitter: 'https://x.com/shironill' },
       'Woojinee': { instagram: 'https://www.instagram.com/wooj1nee/?igsh=czUwcXg3aWh6NmM5&utm_source=qr#' },
       'tikaal': { twitter: 'https://x.com/tikaal' },
       'Miyamai Moca': { twitter: 'https://x.com/ReeKDoesDTM' }

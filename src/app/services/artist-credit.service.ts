@@ -18,8 +18,8 @@ export type ArtistRole =
   | 'Vocalist, Lyricist' | 'Accordionist' | 'Violinist' | 'Violist' | 'Cellist'
   | 'Crossfade MV/additional live2d'
   // Phantasia 2 specific roles
-  | 'Stained Glass Illustrator' | 'Chibi Illustrator' | 'Illustration separator'
-  | 'Co-Organiser/Video Editor' | 'SFX' | 'Special Thanks';
+  | 'Illustration separator'
+  | 'Co-Organiser/Video Editor';
 
 export type ParticipationType = 'Primary' | 'Featured' | 'Collaboration' | 'Additional' | 'Technical';
 
@@ -677,26 +677,6 @@ export class ArtistCreditService {
       },
       bio: 'Bass guitarist and electronic music producer'
     },
-    'TronC': {
-      displayName: 'TronC',
-      avatar: '/assets/images/artists/default-avatar.svg',
-      color: '#8E44AD',
-      primaryRoles: ['Stained Glass Illustrator'],
-      socialLinks: {
-        twitter: 'https://x.com/TronC_Art'
-      },
-      bio: 'Stained glass illustration specialist for Phantasia 2'
-    },
-    'Hototogisu': {
-      displayName: 'Hototogisu',
-      avatar: '/assets/images/artists/default-avatar.svg',
-      color: '#E74C3C',
-      primaryRoles: ['Chibi Illustrator'],
-      socialLinks: {
-        twitter: 'https://x.com/Hototogisu_Art'
-      },
-      bio: 'Chibi illustration specialist for Phantasia 2'
-    },
     'roər': {
       displayName: 'roər',
       avatar: '/assets/images/artists/default-avatar.svg',
@@ -717,67 +697,7 @@ export class ArtistCreditService {
       },
       bio: 'Co-organiser and video editor for Phantasia 2'
     },
-    'Atelier Magicae': {
-      displayName: 'Atelier Magicae',
-      avatar: '/assets/images/artists/default-avatar.svg',
-      color: '#9B59B6',
-      primaryRoles: ['SFX'],
-      socialLinks: {
-        website: 'https://ateliermagicae.com'
-      },
-      bio: 'Fantasy UI Sound Effects provider for Phantasia 2'
-    },
-    '白｡': {
-      displayName: '白｡',
-      avatar: '/assets/images/artists/default-avatar.svg',
-      color: '#BDC3C7',
-      primaryRoles: ['Special Thanks'],
-      socialLinks: {
-        twitter: 'https://x.com/shiro_dot'
-      },
-      bio: 'Special thanks contributor to Phantasia 2'
-    },
-    'Sol': {
-      displayName: 'Sol',
-      avatar: '/assets/images/artists/default-avatar.svg',
-      color: '#F1C40F',
-      primaryRoles: ['Special Thanks'],
-      socialLinks: {
-        twitter: 'https://x.com/Sol_Music'
-      },
-      bio: 'Special thanks contributor to Phantasia 2'
-    },
-    'Yo Kaze': {
-      displayName: 'Yo Kaze',
-      avatar: '/assets/images/artists/YoKaze.png',
-      color: '#16A085',
-      primaryRoles: ['Special Thanks'],
-      socialLinks: {
-        twitter: 'https://x.com/YoKaze_Music'
-      },
-      bio: 'Special thanks contributor to Phantasia 2'
-    },
     // ====== PHANTASIA 1 SPECIFIC CREDITS ======
-    'honabai': {
-      displayName: 'honabai',
-      avatar: '/assets/images/artists/honabai.png',
-      color: '#E67E22',
-      primaryRoles: ['Special Thanks'],
-      socialLinks: {
-        twitter: 'https://x.com/honabai'
-      },
-      bio: 'Special thanks contributor to Phantasia 1'
-    },
-    'shironill': {
-      displayName: 'shironill',
-      avatar: '/assets/images/artists/shironill.png',
-      color: '#34495E',
-      primaryRoles: ['Special Thanks'],
-      socialLinks: {
-        twitter: 'https://x.com/shironill'
-      },
-      bio: 'Special thanks contributor to Phantasia 1'
-    }
   };
 
   constructor(private http: HttpClient) {
@@ -1530,8 +1450,6 @@ export class ArtistCreditService {
       { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV' },
       { artistName: 'Len', role: 'Crossfade MV/additional live2d', notes: 'Crossfade MV/additional live2d' },
       { artistName: 'Daph', role: 'Live2D', notes: 'Live2d: Daph' },
-      { artistName: 'honabai', role: 'Producer', notes: 'Special thanks' },
-      { artistName: 'shironill', role: 'Producer', notes: 'Special thanks' }
     ];
   }
 
@@ -1543,15 +1461,9 @@ export class ArtistCreditService {
       { artistName: 'SpiralFlip', role: 'Producer', notes: 'Organiser' },
       { artistName: 'Len_licht', role: 'Producer', notes: 'Co-Organiser/Video Editor' },
       { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Main Illustrator' },
-      { artistName: 'TronC', role: 'Cover Illustration', notes: 'Stained Glass Illustrator' },
-      { artistName: 'Hototogisu', role: 'Cover Illustration', notes: 'Chibi Illustrator' },
       { artistName: 'yy_artwork', role: 'Logo/Jacket Design', notes: 'Logo/Jacket Design' },
       { artistName: 'roər', role: 'Cover Illustration', notes: 'Illustration separator' },
       { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Mastering Engineer' },
-      { artistName: 'Atelier Magicae', role: 'Sound Designer', notes: 'SFX: Fantasy UI Sound Effects' },
-      { artistName: '白｡', role: 'Producer', notes: 'Special Thanks' },
-      { artistName: 'Sol', role: 'Producer', notes: 'Special Thanks' },
-      { artistName: 'Yo Kaze', role: 'Producer', notes: 'Special Thanks' }
     ];
   }
 

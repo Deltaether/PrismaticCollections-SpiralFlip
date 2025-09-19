@@ -15,12 +15,12 @@ export const environment = {
     timeout: 30000
   },
 
-  // Twitter Scraper Configuration
+  // Twitter Data Configuration (Python API v2)
   twitter: {
-    // Account to scrape and display
+    // Account to display
     username: 'prismcollect_',
 
-    // Scraper API configuration
+    // Data API configuration (served from unified backend)
     api: {
       baseUrl: 'http://localhost:3001/api/twitter',
       timeout: 15000,
@@ -34,13 +34,21 @@ export const environment = {
       refreshInterval: 300000, // 5 minutes
       showMediaPreview: true,
       showEngagementMetrics: true
+    },
+
+    // Python fetcher configuration
+    fetcher: {
+      source: 'Python API v2',
+      features: ['original_posts', 'retweets', 'chronological_order'],
+      rateLimiting: true,
+      authentication: 'Bearer Token'
     }
   },
 
   // Feature flags
   features: {
-    // Twitter Scraper integration
-    twitterScraperEnabled: true, // ✅ ACTIVE: Using Playwright-based scraper
+    // Twitter Data integration
+    twitterDataEnabled: true, // ✅ ACTIVE: Using Python API v2 fetcher with unified backend
     realTimeUpdates: true,
     offlineSupport: true,
 
@@ -52,6 +60,7 @@ export const environment = {
   debug: {
     enableLogging: true,
     logLevel: 'debug', // 'error' | 'warn' | 'info' | 'debug'
-    enableNetworkLogging: true
+    enableNetworkLogging: true,
+    showDataSource: true // Shows Python API v2 source in debug info
   }
 };

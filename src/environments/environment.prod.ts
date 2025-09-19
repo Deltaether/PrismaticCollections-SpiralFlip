@@ -9,67 +9,61 @@ export const environment = {
   production: true,
   name: 'production',
 
-  // API Configuration
+  // API Configuration - optimized for production
   api: {
-    baseUrl: 'https://api.prismaticcollections.com',
-    timeout: 30000
+    baseUrl: '/api',      // Use relative URL for production
+    timeout: 10000       // Reduced timeout for better performance
   },
 
-  // Twitter API Configuration
+  // Twitter Data Configuration - using unified backend approach
   twitter: {
-    // Twitter API Bearer Token (for Twitter API v2)
-    // IMPORTANT: Use environment variables in production!
-    // Never commit real API keys to source control
-    bearerToken: 'AAAAAAAAAAAAAAAAAAAAAFAC4QEAAAAAS%2FbfXUno6dIrCKYAnt98XEnXmS8%3DzvCZuOjMkf04fxuTl31G29fCIr1lSszDNRiYS3PAVqcv6a0est', // Twitter API Bearer Token for production
-
-    // Twitter account to monitor
+    // Account to display
     username: 'prismcollect_',
 
-    // API endpoints
-    apiBaseUrl: 'https://api.twitter.com/2',
-
-    // Rate limiting settings (Twitter API v2 limits)
-    rateLimit: {
-      requestsPerWindow: 75,
-      windowDurationMs: 15 * 60 * 1000, // 15 minutes
+    // Data API configuration (served from unified backend)
+    api: {
+      baseUrl: '/api/twitter',  // Relative URL for production
+      timeout: 8000,           // Fast timeout for production
+      retryDelay: 1000        // Quick retry for better UX
     },
 
-    // Cache settings (longer for production)
-    cache: {
-      durationMs: 10 * 60 * 1000, // 10 minutes
-    },
-
-    // Widget configuration for embeds
-    embed: {
+    // Display configuration optimized for production
+    display: {
       theme: 'dark',
-      height: 500,
-      tweetLimit: 10,
-      linkColor: '#1da1f2',
-      borderColor: '#333333'
+      tweetLimit: 20,
+      refreshInterval: 600000, // 10 minutes (reduced server load)
+      showMediaPreview: true,
+      showEngagementMetrics: true
     },
 
-    // OAuth 1.0a Configuration for Twitter API v2
-    oauth: {
-      apiKey: 'OmR8bRNMB7x0KicX8xEFPDy8h',
-      apiSecret: 'YgfnBAxgXOnHCiwFSA0z2f10hQ7kANL4WyG5p1whojz9KlvjW3',
-      accessToken: '1778792494559350784-BWL7i22YEKgh5jsvJcH9gCrrwUbS9O',
-      accessTokenSecret: 'giS3XRlGO5VIVCYQcuqehWGNJk6jCGN32zNxPrUddrgoq'
+    // Python fetcher configuration
+    fetcher: {
+      source: 'Python API v2',
+      features: ['original_posts', 'retweets', 'chronological_order'],
+      rateLimiting: true,
+      authentication: 'Bearer Token'
     }
   },
 
-  // Feature flags
+  // Feature flags - optimized for production
   features: {
-    twitterIntegration: true,
-    twitterApiEnabled: true, // Enabled with Bearer Token authentication
-    twitterEmbedEnabled: true,
-    analytics: true,
-    debugMode: false
+    // Twitter Data integration
+    twitterDataEnabled: true,    // ✅ ACTIVE: Using Python API v2 fetcher
+    realTimeUpdates: true,
+    offlineSupport: false,       // Disabled to reduce bundle size
+
+    // Performance features
+    analytics: true,             // Enable analytics in production
+    debugMode: false,           // Disable debug mode
+    lazyLoading: true,          // Enable lazy loading
+    preloading: false           // Disable preloading to reduce initial bundle
   },
 
-  // Debug settings (minimal for production)
+  // Debug settings - minimal for production
   debug: {
-    enableLogging: false,
-    logLevel: 'error', // Only log errors in production
-    enableNetworkLogging: false
+    enableLogging: false,        // Disable logging in production
+    logLevel: 'error',          // Only log errors
+    enableNetworkLogging: false, // Disable network logging
+    showDataSource: false       // Hide debug info
   }
 };

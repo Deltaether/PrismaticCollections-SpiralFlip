@@ -17,6 +17,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm test` or `ng test` - Run unit tests with Karma
 - Tests use Jasmine framework with Karma test runner
 
+## Twitter Data Integration Update (December 2024)
+
+**IMPORTANT**: The project has been migrated from Playwright-based scraping to official Twitter API v2:
+
+- **Old System**: Removed Playwright-based TwitterScraperService and related files
+- **New System**: Python-based fetcher using Twitter API v2 with Bearer Token authentication
+- **Data Flow**: Python fetcher → EdgeDB → Node.js backend → Angular frontend
+- **Location**: `/twitter-feedback-python/simple_fetcher.py`
+- **Features**: Original posts + retweets, chronological order, rate limiting built-in
+
+All old scraper references have been removed and environment flags updated (`twitterDataEnabled` instead of `twitterScraperEnabled`).
+
 ### Angular CLI
 - `ng generate component component-name` - Generate new component
 - `ng generate --help` - See all available schematics

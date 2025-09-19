@@ -63,5 +63,18 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.3"
-  }
+  },
+  "description": "An Angular 20 application featuring an immersive 3D interactive experience with integrated Twitter data display. This project showcases modern web development with Three.js 3D graphics, real-time data integration, and responsive design.",
+  "main": "test-phantasia-tracks-fixed.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deltaether/PrismaticCollections.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Deltaether/PrismaticCollections/issues"
+  },
+  "homepage": "https://github.com/Deltaether/PrismaticCollections#readme"
 }

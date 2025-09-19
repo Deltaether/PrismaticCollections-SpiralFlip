@@ -64,9 +64,9 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
   private currentProject: 'phantasia1' | 'phantasia2' = 'phantasia1';
 
   // 【✓】 Seek state tracking to prevent false completion triggers
-  private isUserSeeking = false;
+  public isUserSeeking = false;
   private lastSeekTime = 0;
-  private seekCooldownMs = 500; // Prevent completion detection for 500ms after seek
+  private seekCooldownMs = 1000; // Prevent completion detection for 1000ms after seek
 
   // 【✓】 Enhanced state persistence with better error recovery
   private hasUserInteracted = false;
@@ -133,12 +133,15 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     this.initializeAudio();
   }
 
-  // 【✓】 Enhanced cleanup with comprehensive resource management
+  // 【✓】 Enhanced cleanup with comprehensive resource management and seek cleanup
   ngOnDestroy(): void {
     try {
       // Signal destruction to all subscriptions
       this.destroy$.next();
       this.destroy$.complete();
+
+      // 【✓】 Clean up seek-related operations
+      this.cleanupSeekOperations();
 
       // 【✓】 Clean up all audio instances to prevent memory leaks
       this.cleanupAllAudioInstances();
@@ -154,6 +157,26 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
       console.log('[MusicPlayer] Component destroyed and resources cleaned up');
     } catch (error) {
       console.error('[MusicPlayer] Error during cleanup:', error);
+    }
+  }
+
+  // 【✓】 Clean up seek-related operations and timers
+  private cleanupSeekOperations(): void {
+    try {
+      // Clear any pending seek debounce
+      if (this.seekDebounceTimeout) {
+        clearTimeout(this.seekDebounceTimeout);
+        this.seekDebounceTimeout = null;
+      }
+
+      // Reset seek state
+      this.isUserSeeking = false;
+      this.seekPromise = null;
+      this.pendingSeekPosition = null;
+
+      console.log('[MusicPlayer] Seek operations cleaned up');
+    } catch (error) {
+      console.error('[MusicPlayer] Error cleaning up seek operations:', error);
     }
   }
 
@@ -333,16 +356,28 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
-        console.log('[MusicPlayer] Song ended naturally');
+        console.log('[MusicPlayer] 🎵 HOWLER ONEND EVENT (primary)');
         this.isPlaying = false;
         // Set current time to full duration to show song completed
         this.currentTime = this.audio?.duration() || this.duration;
         // Notify centralized state manager
         this.musicStateManager.setPlayingState(false);
-        // Small delay before playing next track to ensure UI updates
-        setTimeout(() => {
-          this.nextTrack();
-        }, 50);
+
+        // Prevent auto-advancing if user just clicked/seeked near the end
+        const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+        const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+        console.log(`[MusicPlayer] 🛡️ ONEND PROTECTION CHECK (primary): isUserSeeking=${this.isUserSeeking}, seekPromise=${!!this.seekPromise}, timeSinceLastSeek=${timeSinceLastSeek}ms, cooldown=${this.seekCooldownMs}ms`);
+
+        if (!this.isUserSeeking && !this.seekPromise && !isWithinSeekCooldown) {
+          console.log('[MusicPlayer] ✅ ONEND AUTO-ADVANCE ALLOWED (primary)');
+          // Small delay before playing next track to ensure UI updates
+          setTimeout(() => {
+            this.nextTrack();
+          }, 50);
+        } else {
+          console.log('[MusicPlayer] ❌ ONEND AUTO-ADVANCE BLOCKED (primary) - recent user interaction detected');
+        }
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -398,14 +433,26 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
               this.cdr.markForCheck();
             },
             onend: () => {
-              console.log('[MusicPlayer] Song ended naturally (fallback)');
+              console.log('[MusicPlayer] 🎵 HOWLER ONEND EVENT (fallback)');
               this.isPlaying = false;
               // Set current time to full duration to show song completed
               this.currentTime = this.audio?.duration() || this.duration;
-              // Small delay before playing next track to ensure UI updates
-              setTimeout(() => {
-                this.nextTrack();
-              }, 50);
+
+              // Prevent auto-advancing if user just clicked/seeked near the end
+              const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+              const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+              console.log(`[MusicPlayer] 🛡️ ONEND PROTECTION CHECK (fallback): isUserSeeking=${this.isUserSeeking}, seekPromise=${!!this.seekPromise}, timeSinceLastSeek=${timeSinceLastSeek}ms, cooldown=${this.seekCooldownMs}ms`);
+
+              if (!this.isUserSeeking && !this.seekPromise && !isWithinSeekCooldown) {
+                console.log('[MusicPlayer] ✅ ONEND AUTO-ADVANCE ALLOWED (fallback)');
+                // Small delay before playing next track to ensure UI updates
+                setTimeout(() => {
+                  this.nextTrack();
+                }, 50);
+              } else {
+                console.log('[MusicPlayer] ❌ ONEND AUTO-ADVANCE BLOCKED (fallback) - recent user interaction detected');
+              }
               this.cdr.markForCheck();
             },
             onloaderror: (fallbackId, fallbackError) => {
@@ -488,14 +535,26 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
-        console.log('[MusicPlayer] Song ended naturally (tryLoadWithUrl)');
+        console.log('[MusicPlayer] 🎵 HOWLER ONEND EVENT (tryLoadWithUrl)');
         this.isPlaying = false;
         // Set current time to full duration to show song completed
         this.currentTime = this.audio?.duration() || this.duration;
-        // Small delay before playing next track to ensure UI updates
-        setTimeout(() => {
-          this.nextTrack();
-        }, 50);
+
+        // Prevent auto-advancing if user just clicked/seeked near the end
+        const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+        const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+        console.log(`[MusicPlayer] 🛡️ ONEND PROTECTION CHECK (tryLoadWithUrl): isUserSeeking=${this.isUserSeeking}, seekPromise=${!!this.seekPromise}, timeSinceLastSeek=${timeSinceLastSeek}ms, cooldown=${this.seekCooldownMs}ms`);
+
+        if (!this.isUserSeeking && !this.seekPromise && !isWithinSeekCooldown) {
+          console.log('[MusicPlayer] ✅ ONEND AUTO-ADVANCE ALLOWED (tryLoadWithUrl)');
+          // Small delay before playing next track to ensure UI updates
+          setTimeout(() => {
+            this.nextTrack();
+          }, 50);
+        } else {
+          console.log('[MusicPlayer] ❌ ONEND AUTO-ADVANCE BLOCKED (tryLoadWithUrl) - recent user interaction detected');
+        }
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -554,14 +613,26 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       onend: () => {
-        console.log('[MusicPlayer] Song ended naturally (legacy loadTrack)');
+        console.log('[MusicPlayer] 🎵 HOWLER ONEND EVENT (legacy)');
         this.isPlaying = false;
         // Set current time to full duration to show song completed
         this.currentTime = this.audio?.duration() || this.duration;
-        // Small delay before playing next track to ensure UI updates
-        setTimeout(() => {
-          this.nextTrack();
-        }, 50);
+
+        // Prevent auto-advancing if user just clicked/seeked near the end
+        const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+        const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+        console.log(`[MusicPlayer] 🛡️ ONEND PROTECTION CHECK (legacy): isUserSeeking=${this.isUserSeeking}, seekPromise=${!!this.seekPromise}, timeSinceLastSeek=${timeSinceLastSeek}ms, cooldown=${this.seekCooldownMs}ms`);
+
+        if (!this.isUserSeeking && !this.seekPromise && !isWithinSeekCooldown) {
+          console.log('[MusicPlayer] ✅ ONEND AUTO-ADVANCE ALLOWED (legacy)');
+          // Small delay before playing next track to ensure UI updates
+          setTimeout(() => {
+            this.nextTrack();
+          }, 50);
+        } else {
+          console.log('[MusicPlayer] ❌ ONEND AUTO-ADVANCE BLOCKED (legacy) - recent user interaction detected');
+        }
         this.cdr.markForCheck();
       },
       onloaderror: (id, error) => {
@@ -701,43 +772,119 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 【✓】 Seek to position with proper state tracking and validation
+  // 【✓】 Enhanced seek method with proper asynchronous handling and state management
+  private seekPromise: Promise<void> | null = null;
+  private pendingSeekPosition: number | null = null;
+  private seekDebounceTimeout: any = null;
+
   seek(value: number): void {
+    const seekPosition = Math.max(0, Math.min(this.duration || 0, Number(value)));
+    const percentageOfTrack = this.duration ? (seekPosition / this.duration) * 100 : 0;
+
+    console.log(`[MusicPlayer] 🎯 SEEK REQUEST: position=${seekPosition}s, percentage=${percentageOfTrack.toFixed(1)}%, duration=${this.duration}s`);
+
+    // Debounce rapid seek operations
+    if (this.seekDebounceTimeout) {
+      clearTimeout(this.seekDebounceTimeout);
+    }
+
+    this.pendingSeekPosition = seekPosition;
+
+    this.seekDebounceTimeout = setTimeout(() => {
+      this.performSeek(this.pendingSeekPosition!);
+      this.pendingSeekPosition = null;
+    }, 50); // 50ms debounce to handle rapid slider movements
+  }
+
+  private async performSeek(seekPosition: number): Promise<void> {
     if (!this.audio) {
       console.warn('[MusicPlayer] Cannot seek: no audio instance');
       return;
     }
 
-    // Validate audio is loaded before allowing seek
+    // Validate audio is loaded and ready
     const duration = this.audio.duration();
     if (!duration || duration === 0) {
       console.warn('[MusicPlayer] Cannot seek: audio not fully loaded');
       return;
     }
 
-    // Validate seek position
-    const seekPosition = Math.max(0, Math.min(duration, Number(value)));
+    // Prevent concurrent seek operations
+    if (this.seekPromise) {
+      console.log('[MusicPlayer] Seek already in progress, queuing new position');
+      return;
+    }
 
-    // Set seeking state to prevent false completion triggers
+    // Validate seek position
+    const clampedPosition = Math.max(0, Math.min(duration, seekPosition));
+    const percentageOfTrack = (clampedPosition / duration) * 100;
+
+    // Set seeking state with enhanced tracking
     this.isUserSeeking = true;
     this.lastSeekTime = Date.now();
 
+    console.log(`[MusicPlayer] 🎯 PERFORMING SEEK: position=${clampedPosition}s (${percentageOfTrack.toFixed(1)}%) / ${duration}s`);
+    console.log(`[MusicPlayer] 🔒 SEEK PROTECTION ACTIVATED: isUserSeeking=true, lastSeekTime=${this.lastSeekTime}`);
+
     try {
-      // Perform the seek
-      this.audio.seek(seekPosition);
-      this.currentTime = seekPosition;
+      // Create seek promise for proper async handling
+      this.seekPromise = new Promise<void>((resolve, reject) => {
+        try {
+          // Perform the actual seek operation
+          this.audio!.seek(clampedPosition);
 
-      console.log(`[MusicPlayer] Seeked to ${seekPosition}s / ${duration}s`);
+          // Update current time immediately for UI responsiveness
+          this.currentTime = clampedPosition;
 
-      // Reset seeking state after a brief delay
+          // Wait for audio to reach the seek position
+          const checkSeekComplete = () => {
+            if (!this.audio) {
+              reject(new Error('Audio instance lost during seek'));
+              return;
+            }
+
+            const actualPosition = this.audio.seek();
+            const tolerance = 0.1; // 100ms tolerance
+
+            if (Math.abs(actualPosition - clampedPosition) <= tolerance) {
+              // Seek completed successfully
+              console.log(`[MusicPlayer] ✅ SEEK COMPLETED: target=${clampedPosition}s, actual=${actualPosition}s`);
+              resolve();
+            } else {
+              // Still seeking, check again
+              setTimeout(checkSeekComplete, 10);
+            }
+          };
+
+          // Start checking for seek completion
+          setTimeout(checkSeekComplete, 10);
+
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      // Wait for seek to complete
+      await this.seekPromise;
+
+      // Update dynamic artist time after successful seek
+      this.updateDynamicArtistTime();
+
+      // Trigger change detection
+      this.cdr.markForCheck();
+
+    } catch (error) {
+      console.error('[MusicPlayer] Error during seek operation:', error);
+      this.error = 'Seek operation failed';
+    } finally {
+      // CRITICAL FIX: Reset seeking state with cooldown that matches seekCooldownMs
       setTimeout(() => {
         this.isUserSeeking = false;
-      }, 100);
+        console.log(`[MusicPlayer] 🔓 SEEK PROTECTION DEACTIVATED: isUserSeeking=false after ${this.seekCooldownMs}ms cooldown`);
+      }, this.seekCooldownMs); // Use the same cooldown period as completion detection!
 
-      this.cdr.markForCheck();
-    } catch (error) {
-      console.error('[MusicPlayer] Error during seek:', error);
-      this.isUserSeeking = false;
+      // Clear seek promise
+      this.seekPromise = null;
     }
   }
 
@@ -754,60 +901,124 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 【✓】 Update time with proper continuous tracking and seek-aware completion checking
+  // 【✓】 Enhanced time update method with proper seek state awareness and throttling
+  private lastTimeUpdate = 0;
+  private readonly TIME_UPDATE_THROTTLE = 16; // ~60fps for smooth updates
+
   private updateTime(): void {
-    if (this.audio && this.isPlaying) {
-      const seek = this.audio.seek();
-      this.currentTime = typeof seek === 'number' ? seek : 0;
-
-      // Check if we're close to the end, but only if user hasn't recently seeked
-      const duration = this.audio.duration();
-      const timeSinceLastSeek = Date.now() - this.lastSeekTime;
-      const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
-
-      // Only trigger completion if:
-      // 1. We're very close to the end (within 0.05 seconds for tighter control)
-      // 2. User hasn't seeked recently (to avoid false triggers from seeks)
-      // 3. Current time is progressing naturally (not from a seek)
-      if (duration &&
-          this.currentTime >= duration - 0.05 &&
-          !isWithinSeekCooldown &&
-          !this.isUserSeeking) {
-
-        console.log('[MusicPlayer] Song naturally reaching end, completing playback');
-        this.currentTime = duration;
-        this.isPlaying = false;
-        this.musicStateManager.setPlayingState(false);
-        this.nextTrack();
-        this.cdr.markForCheck();
-        return;
-      }
-
-      this.updateDynamicArtistTime();
-      this.cdr.markForCheck();
-      requestAnimationFrame(() => this.updateTime());
+    if (!this.audio || !this.isPlaying) {
+      return;
     }
+
+    // Throttle updates for better performance
+    const now = Date.now();
+    if (now - this.lastTimeUpdate < this.TIME_UPDATE_THROTTLE) {
+      requestAnimationFrame(() => this.updateTime());
+      return;
+    }
+    this.lastTimeUpdate = now;
+
+    // Only update current time if not actively seeking
+    if (!this.isUserSeeking && !this.seekPromise) {
+      const seek = this.audio.seek();
+      const newTime = typeof seek === 'number' ? seek : 0;
+
+      // Only update if time has actually changed (prevent unnecessary updates)
+      if (Math.abs(newTime - this.currentTime) > 0.01) {
+        this.currentTime = newTime;
+      }
+    }
+
+    // FIXED: Enhanced completion detection with proper safeguards
+    const duration = this.audio.duration();
+    const timeSinceLastSeek = Date.now() - this.lastSeekTime;
+    const isWithinSeekCooldown = timeSinceLastSeek < this.seekCooldownMs;
+
+    // CRITICAL FIX: Completion detection only at EXACTLY 100% of track duration - no early triggering
+    if (duration &&
+        this.currentTime >= duration && // Must be at exactly 100% completion
+        !isWithinSeekCooldown &&
+        !this.isUserSeeking &&
+        !this.seekPromise &&
+        this.isPlaying) { // Only trigger completion if actually playing
+
+      console.log(`[MusicPlayer] 🏁 NATURAL COMPLETION DETECTED: currentTime=${this.currentTime}s, duration=${duration}s`);
+      console.log(`[MusicPlayer] 🛡️ PROTECTION CHECK: isUserSeeking=${this.isUserSeeking}, seekPromise=${!!this.seekPromise}, timeSinceLastSeek=${timeSinceLastSeek}ms, cooldown=${this.seekCooldownMs}ms`);
+      this.handleTrackCompletion(duration);
+      return;
+    }
+
+    // Update dependent services only if not seeking
+    if (!this.isUserSeeking && !this.seekPromise) {
+      this.updateDynamicArtistTime();
+    }
+
+    this.cdr.markForCheck();
+    requestAnimationFrame(() => this.updateTime());
+  }
+
+  // 【✓】 Separate method for handling track completion
+  private handleTrackCompletion(duration: number): void {
+    this.currentTime = duration;
+    this.isPlaying = false;
+    this.musicStateManager.setPlayingState(false);
+
+    // Small delay before auto-advancing to ensure UI updates
+    setTimeout(() => {
+      this.nextTrack();
+    }, 100);
+
+    this.cdr.markForCheck();
   }
 
   // 【✓】 Update dynamic artist service with current playback time (but not during seeks)
   private updateDynamicArtistTime(): void {
     if (this.currentTrackInfo && !this.isUserSeeking) {
       // Only update dynamic artist time during natural playback, not during user seeks
-      // Calculate absolute time from track start time + current position
-      const absoluteTime = this.currentTrackInfo.startTime + this.currentTime;
-
-      // Additional safety check: only update if we're within reasonable bounds of the current track
       const timeSinceLastSeek = Date.now() - this.lastSeekTime;
       const isRecentSeek = timeSinceLastSeek < this.seekCooldownMs;
+      const trackDuration = this.duration || 0;
 
-      if (!isRecentSeek) {
+      // CRITICAL FIX: Clamp current time to prevent spilling into next track's time range
+      // Use the minimum of currentTime and trackDuration to ensure we never exceed the track bounds
+      const clampedCurrentTime = Math.min(this.currentTime, trackDuration);
+
+      // Calculate absolute time with clamped position to prevent track overflow
+      const absoluteTime = this.currentTrackInfo.startTime + clampedCurrentTime;
+
+      // BULLETPROOF PROTECTION: Check if we're approaching track boundary
+      const percentageComplete = trackDuration > 0 ? (clampedCurrentTime / trackDuration) : 0;
+      const isNearTrackEnd = percentageComplete > 0.90; // Within 10% of track end
+
+      // FINAL FIX: Never allow dynamic time updates when near track end if user recently seeked
+      // This completely prevents the time-based track switching issue
+      const shouldSkipUpdate = isRecentSeek ||
+                               (isNearTrackEnd && timeSinceLastSeek < (this.seekCooldownMs * 10)) || // Extended protection for 10 seconds
+                               (percentageComplete > 0.98); // Never update in last 2% of track regardless
+
+      console.log(`[MusicPlayer] 🕒 Dynamic time update check: isRecentSeek=${isRecentSeek}, isNearEnd=${isNearTrackEnd}, percentage=${(percentageComplete * 100).toFixed(1)}%, clampedTime=${clampedCurrentTime}s/${trackDuration}s, absoluteTime=${absoluteTime}s`);
+
+      if (!shouldSkipUpdate) {
+        console.log(`[MusicPlayer] ✅ Updating dynamic time to ${absoluteTime}s (clamped from ${this.currentTime}s)`);
         this.dynamicArtistService.updateCurrentTime(absoluteTime);
+      } else {
+        console.log(`[MusicPlayer] ❌ BULLETPROOF PROTECTION: Skipping dynamic time update (nearEnd=${isNearTrackEnd}, recentSeek=${isRecentSeek}, percentage=${(percentageComplete * 100).toFixed(1)}%)`);
       }
     }
   }
 
   // 【✓】 Next track for Phantasia 2 with proper state synchronization
   nextTrack(): void {
+    console.log('[MusicPlayer] 🎵 NEXT TRACK CALLED');
+    console.log('[MusicPlayer] 📊 Current state:', {
+      isLoading: this.isLoading,
+      allTracksLength: this.allTracks.length,
+      currentTime: this.currentTime,
+      duration: this.duration,
+      isPlaying: this.isPlaying,
+      currentTrackIndex: this.currentTrackIndex
+    });
+
     if (this.isLoading || this.allTracks.length === 0) return;
 
     // If nextTrack is called from onend, assume we should autoplay (wasPlaying = true)
@@ -1080,6 +1291,21 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
    */
   get savedVolumeBeforeMute(): number {
     return this._savedVolumeBeforeMute;
+  }
+
+  // 【✓】 Enhanced seek event handlers for better user interaction
+  public onSeekStart(): void {
+    const percentageOfTrack = this.duration ? (this.currentTime / this.duration) * 100 : 0;
+    console.log(`[MusicPlayer] 🖱️ USER SEEK START: currentTime=${this.currentTime}s (${percentageOfTrack.toFixed(1)}%), duration=${this.duration}s`);
+    this.isUserSeeking = true;
+    this.lastSeekTime = Date.now();
+  }
+
+  public onSeekEnd(): void {
+    const percentageOfTrack = this.duration ? (this.currentTime / this.duration) * 100 : 0;
+    console.log(`[MusicPlayer] 🖱️ USER SEEK END: currentTime=${this.currentTime}s (${percentageOfTrack.toFixed(1)}%), duration=${this.duration}s`);
+    // Don't immediately reset isUserSeeking - let the seek operation complete
+    // The flag will be reset in the performSeek method
   }
 
   /**

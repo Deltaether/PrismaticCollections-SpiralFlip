@@ -48,16 +48,24 @@
       <div class="progress-container">
         <div class="progress-track">
           <div class="progress-fill" [style.width.%]="(currentTime / duration) * 100"></div>
-          <input 
-            type="range" 
-            [min]="0" 
-            [max]="duration" 
+          <input
+            type="range"
+            [min]="0"
+            [max]="duration"
             [step]="0.01"
             [value]="currentTime"
             (input)="seek($any($event.target).value)"
+            (mousedown)="onSeekStart()"
+            (mouseup)="onSeekEnd()"
+            (touchstart)="onSeekStart()"
+            (touchend)="onSeekEnd()"
             class="progress-slider"
             [disabled]="isLoading"
-            aria-label="Seek"
+            aria-label="Seek to position in track"
+            [attr.aria-valuenow]="currentTime"
+            [attr.aria-valuemin]="0"
+            [attr.aria-valuemax]="duration"
+            [attr.aria-valuetext]="'Current position: ' + formatTime(currentTime) + ' of ' + formatTime(duration)"
           >
         </div>
       </div>

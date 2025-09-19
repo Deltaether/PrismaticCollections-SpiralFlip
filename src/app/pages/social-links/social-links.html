@@ -37,7 +37,7 @@
     </section>
 
     <!-- Community Section -->
-    <section class="community">
+    <section class="community" id="community">
       <div class="community-content">
         <h2 class="section-title">Join Our Community</h2>
         <p class="community-text">
@@ -64,7 +64,13 @@
         </div>
       </div>
     </section>
-    
+
   </main>
-  
+
+  <!-- Phantasia Footer -->
+  <app-phantasia-footer
+    [config]="footerConfig"
+    [currentYear]="currentYear">
+  </app-phantasia-footer>
+
 </div>

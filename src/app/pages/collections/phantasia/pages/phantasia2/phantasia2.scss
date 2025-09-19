@@ -97,7 +97,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   &::-webkit-scrollbar {
     width: clamp(8px, 1.5vw, 16px);
     background: rgba(0, 0, 0, 0.9);
-    margin-top: 90px;
+    margin-top: 89px; // Exact header height positioning
 
     @media (max-width: 767px) {
       margin-top: 70px;
@@ -107,7 +107,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
   &::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.9);
     border-radius: clamp(4px, 0.75vw, 8px);
-    margin-top: 90px;
+    margin-top: 89px; // Exact header height positioning
 
     @media (max-width: 767px) {
       margin-top: 70px;

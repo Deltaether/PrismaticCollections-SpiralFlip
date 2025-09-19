@@ -7,7 +7,7 @@ $light-bg: #242424;
 $accent-color: #ff7e5f;
 $transition-duration: 0.3s;
 $content-max-width: 1200px;
-$header-height: 90px; // Height of the site-header
+$header-height: 89px; // Height of the site-header - consistent with content calculations
 
 // Main layout container
 .phantasia-layout {
@@ -154,22 +154,22 @@ $header-height: 90px; // Height of the site-header
       text-align: center;
       
       img {
-        max-width: 120px !important; // Force override - responsive footer logo sizing
-        width: 100px !important; // Force override - smaller width for footer context
+        max-width: 180px !important; // Force override - responsive footer logo sizing
+        width: 150px !important; // Force override - larger width for footer context
         height: auto !important; // Maintain aspect ratio
         filter: brightness(0) invert(1) !important; // White logo on dark footer
-        min-width: 80px !important; // Ensure minimum readability
+        min-width: 120px !important; // Ensure minimum readability
         object-fit: contain !important; // Ensure proper scaling
 
         // Responsive breakpoints for different screen sizes
         @media (max-width: 768px) {
-          max-width: 100px !important;
-          width: 80px !important;
+          max-width: 140px !important;
+          width: 120px !important;
         }
 
         @media (min-width: 1200px) {
-          max-width: 140px !important;
-          width: 120px !important;
+          max-width: 200px !important;
+          width: 180px !important;
         }
       }
     }

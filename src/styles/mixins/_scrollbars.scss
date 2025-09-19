@@ -143,11 +143,13 @@
     width: $width;
     height: $width;
     background: rgba(0, 0, 0, 0.3);
+    margin-top: 89px; // Ensure scrollbar starts below 89px header
   }
 
   ::-webkit-scrollbar-track {
     background: linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.1));
     border-radius: calc($width / 2);
+    margin-top: 89px; // Ensure track also respects header space
   }
 
   ::-webkit-scrollbar-thumb {

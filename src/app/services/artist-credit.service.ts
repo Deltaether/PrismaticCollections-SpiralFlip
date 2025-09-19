@@ -14,8 +14,9 @@ export type ArtistRole =
   | 'Piano' | 'Keyboard' | 'Guitar' | 'Bass' | 'Drums' | 'Electronic Producer'
   | 'Cover Illustration' | 'Logo/Jacket Design' | 'Album Stream MV'
   | 'Crossfade MV/Live2D' | 'Live2D'
-  // Specific production roles for Phantasia 2
-  | 'Vocalist, Lyricist' | 'Accordionist' | 'Violinist' | 'Violist' | 'Cellist';
+  // Specific production roles for Phantasia projects with role differences
+  | 'Vocalist, Lyricist' | 'Accordionist' | 'Violinist' | 'Violist' | 'Cellist'
+  | 'Crossfade MV/additional live2d';
 
 export type ParticipationType = 'Primary' | 'Featured' | 'Collaboration' | 'Additional' | 'Technical';
 
@@ -515,7 +516,7 @@ export class ArtistCreditService {
       color: '#FFB347',
       primaryRoles: ['Synthesizer V Operator'],
       socialLinks: {},
-      bio: 'Synthesizer V vocal operator'
+      bio: 'Synthesizer V'
     },
     'Ninezero': {
       displayName: 'Ninezero',
@@ -613,7 +614,8 @@ export class ArtistCreditService {
       bio: 'Collaborative electronic producer - Phantasia 1'
     },
 
-    // ====== SPECIAL MENTIONS - PRODUCTION TEAM ======
+    // ====== PHANTASIA 1 PRODUCTION TEAM ======
+    // Note: Production roles may differ between projects
     'PliXoR': {
       displayName: 'PliXoR',
       avatar: 'assets/images/artists/PliXoR.png',
@@ -622,7 +624,7 @@ export class ArtistCreditService {
       socialLinks: {
         twitter: 'https://x.com/plixormusic'
       },
-      bio: 'Professional mastering engineer for Phantasia projects'
+      bio: 'Professional mastering engineer for both Phantasia projects'
     },
     'NapaL': {
       displayName: '나팔 NapaL',
@@ -632,17 +634,7 @@ export class ArtistCreditService {
       socialLinks: {
         twitter: 'https://x.com/Ve_Xillum'
       },
-      bio: 'Cover illustration artist for Phantasia albums'
-    },
-    'yy_artwork': {
-      displayName: 'yy_artwork',
-      avatar: 'assets/images/artists/yy_artwork.png',
-      color: '#45b7d1',
-      primaryRoles: ['Logo/Jacket Design'],
-      socialLinks: {
-        twitter: 'https://x.com/yy_artwork'
-      },
-      bio: 'Logo and jacket design specialist'
+      bio: 'Cover illustration artist for both Phantasia albums'
     },
     'Elegant Sister': {
       displayName: 'Elegant Sister',
@@ -652,7 +644,7 @@ export class ArtistCreditService {
       socialLinks: {
         twitter: 'https://x.com/ElegantSister'
       },
-      bio: 'Music video creator for album streams'
+      bio: 'Music video creator for album streams - both Phantasia projects'
     },
     'Len': {
       displayName: 'Len',
@@ -662,7 +654,7 @@ export class ArtistCreditService {
       socialLinks: {
         twitter: 'https://x.com/Len_licht'
       },
-      bio: 'Crossfade MV and additional Live2D specialist'
+      bio: 'Phantasia 1: Crossfade MV/additional live2d | Phantasia 2: Crossfade MV/Live2D'
     },
     'Daph': {
       displayName: 'Daph',
@@ -672,7 +664,19 @@ export class ArtistCreditService {
       socialLinks: {
         twitter: 'https://x.com/daphshoo'
       },
-      bio: 'Live2D animation specialist'
+      bio: 'Live2D animation specialist for both Phantasia projects'
+    },
+
+    // ====== PHANTASIA 2 SPECIFIC PRODUCTION TEAM ======
+    'yy_artwork': {
+      displayName: 'yy_artwork',
+      avatar: 'assets/images/artists/yy_artwork.png',
+      color: '#45b7d1',
+      primaryRoles: ['Logo/Jacket Design'],
+      socialLinks: {
+        twitter: 'https://x.com/yy_artwork'
+      },
+      bio: 'Logo and jacket design specialist for Phantasia 2'
     },
     'tikaal': {
       displayName: 'tikaal',
@@ -680,7 +684,8 @@ export class ArtistCreditService {
       color: '#FF9F40',
       primaryRoles: ['Bass', 'Instrumentalist'],
       socialLinks: {
-        twitter: 'https://x.com/tikaal'
+        twitter: 'https://x.com/tikaal_coto',
+        youtube: 'https://www.youtube.com/@tikaal'
       },
       bio: 'Bass guitarist and electronic music producer'
     }
@@ -1415,6 +1420,62 @@ export class ArtistCreditService {
 
     const allTracks = [...phantasia1Tracks, ...phantasia2Tracks];
     this.allProjectTracksSubject.next(allTracks);
+  }
+
+  /**
+   * Get production team credits for specific project
+   */
+  getProductionTeam(projectId: ProjectType): ArtistContribution[] {
+    const productionTeamMembers = projectId === 'phantasia1'
+      ? this.getPhantasia1ProductionTeam()
+      : this.getPhantasia2ProductionTeam();
+
+    return productionTeamMembers.map(member =>
+      this.createArtistContribution(member.artistName, member.role, 'Technical', 100, member.notes)
+    );
+  }
+
+  /**
+   * Get Phantasia 1 production team with specific roles
+   */
+  private getPhantasia1ProductionTeam(): { artistName: string, role: ArtistRole, notes?: string }[] {
+    return [
+      { artistName: 'Daph', role: 'Live2D', notes: 'Live2D animation' },
+      { artistName: 'Len', role: 'Crossfade MV/additional live2d', notes: 'Crossfade MV/additional live2d' },
+      { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV creation' },
+      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Cover artwork' },
+      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Audio mastering' }
+    ];
+  }
+
+  /**
+   * Get Phantasia 2 production team with specific roles
+   */
+  private getPhantasia2ProductionTeam(): { artistName: string, role: ArtistRole, notes?: string }[] {
+    return [
+      { artistName: 'PliXoR', role: 'Mastering Engineer', notes: 'Audio mastering' },
+      { artistName: 'NapaL', role: 'Cover Illustration', notes: 'Cover artwork' },
+      { artistName: 'Elegant Sister', role: 'Album Stream MV', notes: 'Album Stream MV creation' },
+      { artistName: 'Len', role: 'Crossfade MV/additional live2d', notes: 'Crossfade MV/additional live2d' },
+      { artistName: 'Daph', role: 'Live2D', notes: 'Live2D animation' }
+    ];
+  }
+
+  /**
+   * Get artist role differences between projects
+   */
+  getArtistRoleDifferences(artistName: string): { phantasia1?: ArtistRole[], phantasia2?: ArtistRole[] } {
+    const roleDifferences: Record<string, { phantasia1?: ArtistRole[], phantasia2?: ArtistRole[] }> = {
+      'Len': {
+        phantasia1: ['Crossfade MV/additional live2d'], // Same role in both projects
+        phantasia2: ['Crossfade MV/additional live2d']  // Same role in both projects
+      },
+      'yy_artwork': {
+        phantasia2: ['Logo/Jacket Design'] // Only appears in Phantasia 2
+      }
+    };
+
+    return roleDifferences[artistName] || {};
   }
 
   /**

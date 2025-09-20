@@ -223,6 +223,15 @@ body.social-links-page-active {
   position: relative !important;
 }
 
+/* Legal pages (Privacy Policy, Terms of Use) - enable scrolling with visible scrollbars */
+body.legal-page-active {
+  overflow-y: auto !important; /* Enable vertical scrolling with visible scrollbars */
+  overflow-x: hidden !important; /* Prevent horizontal scrolling */
+  height: auto !important; /* Allow body to expand with content */
+  min-height: 100vh !important; /* Ensure minimum viewport height */
+  position: relative !important;
+}
+
 /* ENHANCED: Global mobile scrollbar support for all pages */
 @media (hover: none) and (pointer: coarse) {
   * {

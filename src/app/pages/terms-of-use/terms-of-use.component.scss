@@ -22,6 +22,10 @@ $transition: all 0.3s ease;
 
 /* Clean header visibility */
 :host {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+
   ::ng-deep {
     app-site-header {
       display: block !important;
@@ -29,17 +33,27 @@ $transition: all 0.3s ease;
       opacity: 1 !important;
       pointer-events: auto !important;
     }
+
+    /* Force proper scrolling for legal pages */
+    html, body {
+      height: auto !important;
+      max-height: none !important;
+      overflow-y: auto !important;
+    }
   }
 }
 
 /* Terms of Use Page Container */
 .terms-of-use-page {
-  min-height: calc(100vh - 89px);
+  min-height: 100vh;
+  height: auto;
+  max-height: none;
   color: $text-color;
-  position: relative;
+  position: static;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   margin-top: 89px;
+  padding-bottom: 2rem;
   scroll-behavior: smooth;
 
   /* iOS Safari specific fixes */

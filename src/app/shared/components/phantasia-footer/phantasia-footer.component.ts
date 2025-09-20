@@ -19,6 +19,7 @@ export interface FooterLink {
   href?: string;
   target?: string;
   rel?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -82,6 +83,7 @@ export class PhantasiaFooterComponent {
   /**
    * Default footer configuration for Phantasia pages
    * This provides a fallback configuration if no config is provided
+   * NOTE: Links are disabled by default to prevent navigation during development
    */
   get defaultConfig(): PhantasiaFooterConfig {
     return {
@@ -91,17 +93,17 @@ export class PhantasiaFooterComponent {
         {
           title: 'Navigate',
           links: [
-            { label: 'Home', routerLink: '/home' },
-            { label: 'Collections', routerLink: '/collections' },
-            { label: 'Social Links', routerLink: '/socials' },
-            { label: 'News', routerLink: '/news' }
+            { label: 'Home', disabled: true },
+            { label: 'Collections', disabled: true },
+            { label: 'Social Links', disabled: true },
+            { label: 'News', disabled: true }
           ]
         },
         {
           title: 'Legal',
           links: [
-            { label: 'Privacy Policy', routerLink: '/privacy-policy' },
-            { label: 'Terms of Use', routerLink: '/terms-of-use' }
+            { label: 'Privacy Policy', disabled: true },
+            { label: 'Terms of Use', disabled: true }
           ]
         }
       ],

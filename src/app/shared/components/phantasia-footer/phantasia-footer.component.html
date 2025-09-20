@@ -29,22 +29,31 @@
           <li
             class="link-item"
             *ngFor="let link of group.links; trackBy: trackByLabel">
-            <!-- Router link for internal navigation -->
-            <a
-              *ngIf="link.routerLink; else externalLink"
-              [routerLink]="link.routerLink"
-              class="footer-link footer-link--internal">
+            <!-- Disabled link (no navigation) -->
+            <span
+              *ngIf="link.disabled; else activeLink"
+              class="footer-link footer-link--disabled">
               {{ link.label }}
-            </a>
-            <!-- External link template -->
-            <ng-template #externalLink>
+            </span>
+            <!-- Active link template -->
+            <ng-template #activeLink>
+              <!-- Router link for internal navigation -->
               <a
-                [href]="link.href"
-                [target]="link.target || '_self'"
-                [rel]="link.rel || ''"
-                class="footer-link footer-link--external">
+                *ngIf="link.routerLink; else externalLink"
+                [routerLink]="link.routerLink"
+                class="footer-link footer-link--internal">
                 {{ link.label }}
               </a>
+              <!-- External link template -->
+              <ng-template #externalLink>
+                <a
+                  [href]="link.href"
+                  [target]="link.target || '_self'"
+                  [rel]="link.rel || ''"
+                  class="footer-link footer-link--external">
+                  {{ link.label }}
+                </a>
+              </ng-template>
             </ng-template>
           </li>
         </ul>

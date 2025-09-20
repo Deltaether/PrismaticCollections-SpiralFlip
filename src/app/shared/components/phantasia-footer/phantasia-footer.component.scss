@@ -150,6 +150,17 @@ $phantasia-footer-hover-color: #ffffff;
                 // }
               }
             }
+
+            // Disabled link styles
+            &--disabled {
+              color: rgba($phantasia-footer-medium-gray, 0.5);
+              cursor: default;
+              pointer-events: none;
+
+              &:hover {
+                color: rgba($phantasia-footer-medium-gray, 0.5);
+              }
+            }
           }
         }
       }

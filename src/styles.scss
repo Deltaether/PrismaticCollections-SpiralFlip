@@ -229,7 +229,35 @@ body.legal-page-active {
   overflow-x: hidden !important; /* Prevent horizontal scrolling */
   height: auto !important; /* Allow body to expand with content */
   min-height: 100vh !important; /* Ensure minimum viewport height */
+  max-height: none !important; /* Remove any height constraints */
   position: relative !important;
+}
+
+/* AGGRESSIVE: Force legal pages to scroll properly */
+body.legal-page-active,
+html.legal-page-active {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: auto !important;
+}
+
+/* Override app-root constraints for legal pages */
+body.legal-page-active app-root {
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: auto !important;
+}
+
+/* Override main content constraints for legal pages */
+body.legal-page-active app-root > * {
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: auto !important;
 }
 
 /* ENHANCED: Global mobile scrollbar support for all pages */

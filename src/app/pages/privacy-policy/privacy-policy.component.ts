@@ -34,17 +34,17 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       {
         title: 'Navigate',
         links: [
-          { label: 'Home', routerLink: '/' },
-          { label: 'Collections', routerLink: '/collections' },
-          { label: 'Social Links', routerLink: '/socials' },
-          { label: 'News', routerLink: '/news' }
+          { label: 'Home', disabled: true },
+          { label: 'Collections', disabled: true },
+          { label: 'Social Links', disabled: true },
+          { label: 'News', disabled: true }
         ]
       },
       {
         title: 'Legal',
         links: [
-          { label: 'Privacy Policy', routerLink: '/privacy-policy' },
-          { label: 'Terms of Use', routerLink: '/terms-of-use' }
+          { label: 'Privacy Policy', disabled: true },
+          { label: 'Terms of Use', disabled: true }
         ]
       }
     ],

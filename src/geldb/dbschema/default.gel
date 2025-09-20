@@ -25,6 +25,7 @@ module default {
         website: str;
         avatar: str;
         color: str;
+        total_tracks: int16;
         social_links: SocialLinks;
         created_at: datetime {
             default := datetime_current();

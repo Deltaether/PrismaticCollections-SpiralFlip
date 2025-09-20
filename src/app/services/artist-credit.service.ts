@@ -843,7 +843,7 @@ export class ArtistCreditService {
 
     allTracks.forEach(track => {
       track.allContributions.forEach(contribution => {
-        const key = `${contribution.artistName}-${track.projectId}`;
+        const key = `${contribution.artistName}-${track.projectId}-${track.id}`;
         if (!allArtists.has(key)) {
           allArtists.set(key, {
             ...contribution,

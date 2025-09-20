@@ -40,7 +40,7 @@ The Phantasia 2 project features **31 unique artists** across **20 tracks**, wit
 22. **Futsuunohito** - Cinematic electronic composer (Track 20)
 
 ### Vocalists & Featured Artists
-23. **eili** - Featured vocalist (Tracks 1, 19) - 2 appearances
+23. **eili** - Featured vocalist (Tracks 1, 19) + Phantasia 1 - 3 total tracks
 24. **Iku Hoshifuri** - Japanese vocalist (Track 3)
 25. **伍一** - Chinese vocalist (Track 13)
 26. **shishishiena** - Voice actor/narrator (Track 20)

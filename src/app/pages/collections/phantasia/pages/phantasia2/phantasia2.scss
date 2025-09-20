@@ -216,6 +216,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
     .bg-video {
       min-height: 100vh;
+      transform: translate(-45%, -50%); // Move video slightly to the right
     }
   }
 
@@ -225,6 +226,7 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
 
     .bg-video {
       min-height: 100vh;
+      transform: translate(-40%, -50%); // Move video more to the right on smaller screens
     }
   }
 }
@@ -333,9 +335,8 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
     @media (max-width: 480px) {
       // Further reduced size with automatic responsive units to prevent overflow
       width: clamp(50vw, 60vw, 70vw); // Further reduced from 70-85vw
-      height: clamp(20vh, 25vh, 30vh); // Further reduced from 30-50vh
       max-width: 70vw; // Ensure it doesn't exceed viewport
-      transform: scale(0.6); // Further reduced scaling from 0.8 to 0.6
+      transform: scale(0.8); // Further reduced scaling from 0.8 to 0.6
       object-fit: contain; // Ensure video fits within bounds
       margin: 0 auto; // Center the video
     }

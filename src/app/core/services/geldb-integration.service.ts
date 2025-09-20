@@ -539,7 +539,7 @@ export class GelDbIntegrationService {
   getArtistSocialLinks(artistName: string): GelDbSocialLinks | null {
     // Social media links mapping - consolidated from services
     const socialLinksMap: Record<string, Partial<GelDbSocialLinks>> = {
-      'SpiralFlip': { youtube: 'https://www.youtube.com/@SpiralFlip', carrd: 'https://spiralflip.carrd.co/' },
+      'SpiralFlip': { twitter: 'https://x.com/SpiralFlip', youtube: 'https://www.youtube.com/@SpiralFlip', carrd: 'https://spiralflip.carrd.co/' },
       'eili': { youtube: 'https://www.youtube.com/@EiliYT', twitter: 'https://x.com/frenlize' },
       'Ariatec': { youtube: 'https://www.youtube.com/@musicbyariatec', reelcrafter: 'https://play.reelcrafter.com/KLSound/port' },
       'MB': { youtube: 'https://www.youtube.com/@MBMichael', twitter: 'https://x.com/MBgov1133' },
@@ -561,6 +561,8 @@ export class GelDbIntegrationService {
       'yy_artwork': { twitter: 'https://x.com/yy_artwork' },
       'Elegant Sister': { twitter: 'https://x.com/ElegantSister' },
       'Len': { twitter: 'https://x.com/Len_licht' },
+      'Len_licht': { twitter: 'https://x.com/Len_licht' },
+      'roər': { youtube: 'https://www.youtube.com/@roer-music' },
       'Daph': { twitter: 'https://x.com/daphshoo' },
       'Woojinee': { instagram: 'https://www.instagram.com/wooj1nee/?igsh=czUwcXg3aWh6NmM5&utm_source=qr#' },
       'tikaal': { twitter: 'https://x.com/tikaal' },

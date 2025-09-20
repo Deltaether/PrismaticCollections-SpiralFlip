@@ -40,13 +40,18 @@
             </div>
 
             <!-- Social Links -->
-            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram">
+            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram || mention.socialLinks.youtube">
               <button class="social-btn"
                       mat-icon-button
                       [attr.aria-label]="mention.name + ' social link'"
-                      (click)="mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) : onSocialLinkClick(mention.socialLinks.instagram!, $event)">
-                <span *ngIf="mention.socialLinks.twitter" class="twitter-x-icon">𝕏</span>
-                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter" class="instagram-icon">📷</span>
+                      (click)="(mention.name === 'roər') ? onSocialLinkClick(mention.socialLinks.youtube!, $event) :
+                               mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) :
+                               mention.socialLinks.youtube ? onSocialLinkClick(mention.socialLinks.youtube!, $event) :
+                               onSocialLinkClick(mention.socialLinks.instagram!, $event)">
+                <span *ngIf="mention.name === 'roər'" class="youtube-icon">▶</span>
+                <span *ngIf="mention.socialLinks.twitter && mention.name !== 'roər'" class="twitter-x-icon">𝕏</span>
+                <span *ngIf="mention.socialLinks.youtube && !mention.socialLinks.twitter && mention.name !== 'roər'" class="youtube-icon">▶</span>
+                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter && !mention.socialLinks.youtube" class="instagram-icon">📷</span>
               </button>
             </div>
 
@@ -96,13 +101,18 @@
             </div>
 
             <!-- Social Links -->
-            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram">
+            <div class="compact-social" *ngIf="mention.socialLinks.twitter || mention.socialLinks.instagram || mention.socialLinks.youtube">
               <button class="social-btn"
                       mat-icon-button
                       [attr.aria-label]="mention.name + ' social link'"
-                      (click)="mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) : onSocialLinkClick(mention.socialLinks.instagram!, $event)">
-                <span *ngIf="mention.socialLinks.twitter" class="twitter-x-icon">𝕏</span>
-                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter" class="instagram-icon">📷</span>
+                      (click)="(mention.name === 'roər') ? onSocialLinkClick(mention.socialLinks.youtube!, $event) :
+                               mention.socialLinks.twitter ? onSocialLinkClick(mention.socialLinks.twitter!, $event) :
+                               mention.socialLinks.youtube ? onSocialLinkClick(mention.socialLinks.youtube!, $event) :
+                               onSocialLinkClick(mention.socialLinks.instagram!, $event)">
+                <span *ngIf="mention.name === 'roər'" class="youtube-icon">▶</span>
+                <span *ngIf="mention.socialLinks.twitter && mention.name !== 'roər'" class="twitter-x-icon">𝕏</span>
+                <span *ngIf="mention.socialLinks.youtube && !mention.socialLinks.twitter && mention.name !== 'roər'" class="youtube-icon">▶</span>
+                <span *ngIf="mention.socialLinks.instagram && !mention.socialLinks.twitter && !mention.socialLinks.youtube" class="instagram-icon">📷</span>
               </button>
             </div>
 

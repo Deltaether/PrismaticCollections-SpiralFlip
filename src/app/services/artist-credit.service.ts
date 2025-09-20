@@ -683,7 +683,7 @@ export class ArtistCreditService {
       color: '#F39C12',
       primaryRoles: ['Illustration separator'],
       socialLinks: {
-        twitter: 'https://x.com/roer_art'
+        youtube: 'https://www.youtube.com/@roer-music'
       },
       bio: 'Illustration separator designer for Phantasia 2'
     },

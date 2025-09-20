@@ -133,6 +133,14 @@ echo "Extracting new website files..."
 cd "$WEB_ROOT"
 tar -xzf "$PACKAGE_FILE"
 
+# Fix Angular 17+ browser subdirectory issue
+if [ -d "browser" ] && [ -f "browser/index.html" ]; then
+    echo "Moving files from browser/ subdirectory to web root..."
+    mv browser/* .
+    rmdir browser
+    echo "✅ Files moved from browser/ to web root"
+fi
+
 # Set proper permissions
 echo "Setting permissions..."
 chown -R www-data:www-data "$WEB_ROOT"

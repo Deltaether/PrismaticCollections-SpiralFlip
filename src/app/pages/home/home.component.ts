@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SiteHeaderComponent } from '../../shared/components/site-header/site-header.component';
 import { SquaresAnimationComponent } from '../../shared/components/squares-animation/squares-animation.component';
+import { PhantasiaFooterComponent, PhantasiaFooterConfig } from '../../shared/components/phantasia-footer/phantasia-footer.component';
 import { ResponsiveService } from '../../shared/services/responsive.service';
 
 /**
@@ -16,10 +17,11 @@ import { ResponsiveService } from '../../shared/services/responsive.service';
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    SiteHeaderComponent, 
-    SquaresAnimationComponent
+    CommonModule,
+    RouterModule,
+    SiteHeaderComponent,
+    SquaresAnimationComponent,
+    PhantasiaFooterComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
@@ -28,6 +30,37 @@ import { ResponsiveService } from '../../shared/services/responsive.service';
 export class HomeComponent implements OnInit, OnDestroy {
   // Cleanup subject
   private readonly destroy$ = new Subject<void>();
+
+  /**
+   * Footer configuration for the home page
+   */
+  footerConfig: PhantasiaFooterConfig = {
+    logoSrc: 'assets/images/logos/prismcoll_logox.svg',
+    logoAlt: 'Prismatic Collections',
+    linkGroups: [
+      {
+        title: 'Explore',
+        links: [
+          { label: 'Collections', routerLink: '/collections' },
+          { label: 'Phantasia', routerLink: '/phantasia' },
+          { label: 'Social Links', routerLink: '/social-links' }
+        ]
+      },
+      {
+        title: 'Legal',
+        links: [
+          { label: 'Privacy Policy', href: '#' },
+          { label: 'Terms of Use', href: '#' }
+        ]
+      }
+    ],
+    copyrightText: 'Prismatic Collections. All rights reserved.'
+  };
+
+  /**
+   * Current year for copyright display
+   */
+  currentYear = new Date().getFullYear();
   
   // Flag for debug logging
   private readonly isDebugMode = false;

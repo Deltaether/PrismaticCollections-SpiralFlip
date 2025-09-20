@@ -507,3 +507,4 @@ Before finalizing PRs with visual changes
 Needing comprehensive accessibility and responsiveness testing
 
 the ng serve port is by default at 5005 and redirected to 5006
+- dont ever mention edgedb as that doesnt exist anymore, it's "gel" edgedb is deprecated

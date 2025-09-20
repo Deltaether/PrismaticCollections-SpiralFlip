@@ -4,9 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4300",
-    "build": "ng build",
+    "build": "ng build --configuration production",
+    "build:analyze": "ng build --configuration production --stats-json && npx webpack-bundle-analyzer dist/phantasia/stats.json",
+    "build:fast": "ng build --configuration production --optimization=false",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "preload": "ng build --configuration production --named-chunks --output-hashing=all"
   },
   "packageManager": "pnpm@10.15.0",
   "private": true,
@@ -21,11 +24,14 @@
     "@angular/platform-browser": "^20.1.4",
     "@angular/platform-browser-dynamic": "^20.1.4",
     "@angular/router": "^20.1.4",
+    "@angular/service-worker": "^20.1.4",
+    "@juggle/resize-observer": "^3.4.0",
     "@playwright/test": "^1.55.0",
     "@types/dat.gui": "^0.7.13",
     "@types/howler": "^2.2.12",
     "@types/matter-js": "^0.20.0",
     "compression": "^1.8.1",
+    "core-js": "^3.38.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "dat.gui": "^0.7.9",
@@ -35,6 +41,7 @@
     "gsap": "^3.13.0",
     "helmet": "^8.1.0",
     "howler": "^2.2.4",
+    "intersection-observer": "^0.12.2",
     "matter-js": "^0.20.0",
     "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
@@ -42,6 +49,7 @@
     "rxjs": "~7.8.2",
     "three": "^0.179.1",
     "tslib": "^2.8.1",
+    "web-animations-js": "^2.3.2",
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
@@ -62,7 +70,8 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "webpack-bundle-analyzer": "^4.10.1"
   },
   "description": "An Angular 20 application featuring an immersive 3D interactive experience with integrated Twitter data display. This project showcases modern web development with Three.js 3D graphics, real-time data integration, and responsive design.",
   "main": "test-phantasia-tracks-fixed.js",

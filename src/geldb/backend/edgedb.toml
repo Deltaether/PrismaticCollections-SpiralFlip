@@ -1,7 +1,0 @@
-[project]
-name = "twitter-feedback-python"
-version = "1.0"
-instance = "twitter-feedback-python"
-
-[database]
-name = "geldb"

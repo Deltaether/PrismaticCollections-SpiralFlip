@@ -111,8 +111,19 @@
   font-size: 0.8rem;
   color: #707070;
   
-  .copyright, .version {
+  .copyright, .version, .developer-credit {
     margin: 0.2rem 0;
+  }
+
+  .developer-credit {
+    font-style: italic;
+    color: #888;
+
+    strong {
+      color: #ccc;
+      font-weight: 600;
+      font-style: normal;
+    }
   }
 }
 

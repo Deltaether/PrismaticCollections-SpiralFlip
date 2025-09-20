@@ -1619,12 +1619,21 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
             transition: all 0.3s ease;
 
             mat-icon {
-              color: rgba(255, 255, 255, 0.9);
-              font-size: clamp(20px, 1.2vw, 24px);
-              width: clamp(20px, 1.2vw, 24px);
-              height: clamp(20px, 1.2vw, 24px);
-              flex-shrink: 0;
-              filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+              color: rgba(255, 255, 255, 0.9) !important;
+              font-size: clamp(20px, 1.2vw, 24px) !important;
+              width: clamp(20px, 1.2vw, 24px) !important;
+              height: clamp(20px, 1.2vw, 24px) !important;
+              flex-shrink: 0 !important;
+              filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) !important;
+              vertical-align: baseline !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              line-height: 1 !important;
+              margin-top: 5px !important;
+              transform: translateY(4px) !important;
+              position: relative !important;
+              top: 3px !important;
             }
 
             span {
@@ -1892,6 +1901,15 @@ $dark-to-black: linear-gradient(135deg, #343a40, #212529, #000000);
       }
     }
   }
+}
+
+// CRITICAL: Force icon alignment override for streaming details
+.streaming-section .streaming-button .streaming-details .detail-item mat-icon {
+  margin-top: 5px !important;
+  transform: translateY(4px) !important;
+  position: relative !important;
+  top: 3px !important;
+  vertical-align: baseline !important;
 }
 
 /* ===== ANIMATIONS AND KEYFRAMES =====

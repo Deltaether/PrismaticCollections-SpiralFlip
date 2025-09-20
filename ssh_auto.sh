@@ -4,7 +4,7 @@
 # Usage: ./ssh_auto.sh "command to run"
 # Example: ./ssh_auto.sh "ls -la"
 
-SERVER_IP="212.227.85.148"
+SERVER_IP="216.225.206.85"
 SERVER_USER="root"
 SERVER_PASSWORD="KC361kLC"
 

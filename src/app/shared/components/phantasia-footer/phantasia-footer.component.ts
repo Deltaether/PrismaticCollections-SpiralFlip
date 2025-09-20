@@ -89,10 +89,12 @@ export class PhantasiaFooterComponent {
       logoAlt: 'Prismatic Collections',
       linkGroups: [
         {
-          title: 'Explore',
+          title: 'Navigate',
           links: [
+            { label: 'Home', routerLink: '/home' },
             { label: 'Collections', routerLink: '/collections' },
-            { label: 'About', routerLink: '/phantasia' }
+            { label: 'Social Links', routerLink: '/socials' },
+            { label: 'News', routerLink: '/news' }
           ]
         },
         {

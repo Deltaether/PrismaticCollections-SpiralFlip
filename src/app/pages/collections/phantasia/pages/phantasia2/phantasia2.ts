@@ -135,10 +135,18 @@ export class Phantasia2Component implements OnInit, OnDestroy {
     logoAlt: 'Prismatic Collections',
     linkGroups: [
       {
-        title: 'Explore',
+        title: 'Navigate',
         links: [
+          { label: 'Home', routerLink: '/home' },
           { label: 'Collections', routerLink: '/collections' },
-          { label: 'About', routerLink: '/phantasia/phantasia2' }
+          { label: 'Social Links', routerLink: '/socials' },
+          { label: 'News', routerLink: '/news' }
+        ]
+      },
+      {
+        title: 'Phantasia',
+        links: [
+          { label: 'Disc One', routerLink: '/phantasia/phantasia' }
         ]
       },
       {

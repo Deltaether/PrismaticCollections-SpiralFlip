@@ -28,18 +28,11 @@ export class SocialLinksComponent implements OnInit, OnDestroy {
     logoAlt: 'Prismatic Collections',
     linkGroups: [
       {
-        title: 'Explore',
+        title: 'Navigate',
         links: [
+          { label: 'Home', routerLink: '/home' },
           { label: 'Collections', routerLink: '/collections' },
-          { label: 'Projects', routerLink: '/phantasia' },
           { label: 'News', routerLink: '/news' }
-        ]
-      },
-      {
-        title: 'Connect',
-        links: [
-          { label: 'Artist Circles', routerLink: '/socials' },
-          { label: 'Community', href: '#community' }
         ]
       },
       {

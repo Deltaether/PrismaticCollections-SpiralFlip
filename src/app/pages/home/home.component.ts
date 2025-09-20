@@ -39,11 +39,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     logoAlt: 'Prismatic Collections',
     linkGroups: [
       {
-        title: 'Explore',
+        title: 'Navigate',
         links: [
           { label: 'Collections', routerLink: '/collections' },
-          { label: 'Phantasia', routerLink: '/phantasia' },
-          { label: 'Social Links', routerLink: '/social-links' }
+          { label: 'Social Links', routerLink: '/socials' },
+          { label: 'News', routerLink: '/news' }
         ]
       },
       {

@@ -38,8 +38,8 @@ export class SocialLinksComponent implements OnInit, OnDestroy {
       {
         title: 'Legal',
         links: [
-          { label: 'Privacy Policy', routerLink: '/privacy-policy' },
-          { label: 'Terms of Use', routerLink: '/terms-of-use' }
+          { label: 'Privacy Policy', disabled: true },
+          { label: 'Terms of Use', disabled: true }
         ]
       }
     ],

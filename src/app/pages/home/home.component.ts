@@ -42,15 +42,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         title: 'Navigate',
         links: [
           { label: 'Collections', routerLink: '/collections' },
-          { label: 'Social Links', routerLink: '/socials' },
+          { label: 'Social Links', routerLink: '/social-links' },
           { label: 'News', routerLink: '/news' }
         ]
       },
       {
         title: 'Legal',
         links: [
-          { label: 'Privacy Policy', routerLink: '/privacy-policy' },
-          { label: 'Terms of Use', routerLink: '/terms-of-use' }
+          { label: 'Privacy Policy', disabled: true },
+          { label: 'Terms of Use', disabled: true }
         ]
       }
     ],

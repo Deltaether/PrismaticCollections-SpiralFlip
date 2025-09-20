@@ -29,6 +29,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/news/news').then(m => m.News)
   },
   {
+    path: 'privacy-policy',
+    loadComponent: () => import('./pages/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+  },
+  {
+    path: 'terms-of-use',
+    loadComponent: () => import('./pages/terms-of-use/terms-of-use.component').then(m => m.TermsOfUseComponent)
+  },
+  {
     path: 'test-home',
     loadComponent: () => import('./pages/test-home/test-home.component').then(m => m.TestHomeComponent)
   },

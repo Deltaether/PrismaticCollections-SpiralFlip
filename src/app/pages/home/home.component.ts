@@ -49,8 +49,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       {
         title: 'Legal',
         links: [
-          { label: 'Privacy Policy', href: '#' },
-          { label: 'Terms of Use', href: '#' }
+          { label: 'Privacy Policy', routerLink: '/privacy-policy' },
+          { label: 'Terms of Use', routerLink: '/terms-of-use' }
         ]
       }
     ],

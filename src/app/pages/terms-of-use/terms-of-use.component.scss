@@ -1,0 +1,354 @@
+/* Import responsive design system and modern fluid typography */
+@use '../../shared/styles/responsive-system.scss' as responsive;
+@use '../../shared/styles/fluid-typography-system.scss' as fluid;
+@use '../../shared/styles/typography-system.scss' as typo;
+@use '../../shared/styles/enhanced-color-system.scss' as colors;
+@use '../../shared/styles/accessibility-enhancements.scss' as a11y;
+@use '../../../styles/mixins' as mixins;
+
+/* Variables - Professional Design System */
+$primary-color: #ffffff;
+$secondary-color: #1a1a1a;
+$text-color: #333333;
+$text-light: #666666;
+$accent-color: #4a90e2;
+$background-color: #f8f9fa;
+$card-background: rgba(255, 255, 255, 0.95);
+$border-color: rgba(0, 0, 0, 0.1);
+$border-radius: 12px;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
+
+/* Clean header visibility */
+:host {
+  ::ng-deep {
+    app-site-header {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  }
+}
+
+/* Terms of Use Page Container */
+.terms-of-use-page {
+  min-height: calc(100vh - 89px);
+  color: $text-color;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-top: 89px;
+  scroll-behavior: smooth;
+
+  /* iOS Safari specific fixes */
+  -webkit-overflow-scrolling: touch;
+
+  /* Use responsive performance optimizations */
+  @include responsive.mobile-performance-optimizations;
+
+  /* Professional gradient background */
+  background:
+    radial-gradient(ellipse at 15% 25%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(255, 255, 255, 0.8) 0%, transparent 45%),
+    linear-gradient(180deg,
+      $primary-color 0%,
+      $background-color 25%,
+      #f5f5f5 50%,
+      #f0f0f0 75%,
+      #eeeeee 100%
+    );
+
+  @include responsive.retina-optimizations;
+
+  /* Subtle texture overlay */
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(0, 0, 0, 0.01) 1px, transparent 1px),
+      radial-gradient(circle at 90% 90%, rgba(100, 100, 100, 0.015) 1px, transparent 1px);
+    background-size: 120px 120px, 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Main Content Container */
+.terms-main {
+  position: relative;
+  z-index: 2;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+
+  @include responsive.responsive-container;
+  @include responsive.responsive-padding(4);
+
+  @include responsive.mobile {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  @include responsive.desktop-large-up {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: clamp(3rem, 6vw, 4rem);
+  padding: clamp(2rem, 4vw, 3rem);
+  background: $card-background;
+  backdrop-filter: blur(15px);
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  box-shadow: $box-shadow;
+
+  .page-title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: $text-color;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+
+    @include fluid.accessible-typography;
+  }
+
+  .page-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+    color: $text-light;
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.4;
+
+    @include fluid.accessible-typography;
+    @include fluid.mobile-optimized-typography;
+  }
+
+  .last-updated {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    color: $accent-color;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+  }
+}
+
+/* Terms Content Container */
+.terms-content {
+  background: $card-background;
+  backdrop-filter: blur(15px);
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  box-shadow: $box-shadow;
+  padding: clamp(2rem, 4vw, 3rem);
+
+  @include responsive.mobile {
+    padding: 1.5rem;
+  }
+}
+
+/* Terms Sections */
+.terms-section {
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: $text-color;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    line-height: 1.2;
+    border-bottom: 2px solid rgba(74, 144, 226, 0.2);
+    padding-bottom: 0.5rem;
+
+    @include fluid.accessible-typography;
+  }
+
+  h3 {
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+    color: $text-color;
+    margin: clamp(1.5rem, 3vw, 2rem) 0 clamp(0.75rem, 1.5vw, 1rem) 0;
+    line-height: 1.3;
+
+    @include fluid.accessible-typography;
+  }
+
+  p {
+    font-size: clamp(1rem, 2vw, 1.1rem);
+    line-height: 1.6;
+    color: $text-color;
+    margin-bottom: clamp(1rem, 2vw, 1.25rem);
+
+    @include fluid.accessible-typography;
+    @include fluid.mobile-optimized-typography;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: clamp(1rem, 2vw, 1.25rem) 0;
+
+    li {
+      font-size: clamp(1rem, 2vw, 1.1rem);
+      line-height: 1.6;
+      color: $text-color;
+      margin-bottom: 0.75rem;
+      padding-left: 1.5rem;
+      position: relative;
+
+      @include fluid.accessible-typography;
+      @include fluid.mobile-optimized-typography;
+
+      &::before {
+        content: '•';
+        color: $accent-color;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 1.2em;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        font-weight: 600;
+        color: $text-color;
+      }
+    }
+  }
+
+  a {
+    color: $accent-color;
+    text-decoration: none;
+    font-weight: 500;
+    transition: $transition;
+
+    &:hover {
+      color: darken($accent-color, 10%);
+      text-decoration: underline;
+    }
+
+    @include responsive.touch-device {
+      &:active {
+        color: darken($accent-color, 15%);
+      }
+    }
+  }
+}
+
+/* Contact Information */
+.contact-info {
+  background: rgba(74, 144, 226, 0.05);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border-radius: $border-radius;
+  border-left: 4px solid $accent-color;
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+
+  p {
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      font-weight: 600;
+      color: $text-color;
+    }
+  }
+
+  a {
+    color: $accent-color;
+    text-decoration: none;
+    font-weight: 500;
+    transition: $transition;
+
+    &:hover {
+      color: darken($accent-color, 10%);
+      text-decoration: underline;
+    }
+
+    @include responsive.touch-device {
+      &:active {
+        color: darken($accent-color, 15%);
+      }
+    }
+  }
+}
+
+/* Enhanced Responsive Optimizations */
+@include responsive.mobile {
+  .terms-of-use-page {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(74, 144, 226, 0.03) 0%, transparent 60%),
+      linear-gradient(180deg, $primary-color 0%, $background-color 50%, #f5f5f5 100%);
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+  }
+
+  .terms-content {
+    border-radius: 8px;
+  }
+}
+
+@include responsive.mobile-xs {
+  .terms-of-use-page {
+    background: linear-gradient(180deg, $primary-color 0%, $background-color 50%, #f5f5f5 100%);
+  }
+}
+
+/* Accessibility Enhancements */
+/* Focus states for keyboard navigation */
+:focus-visible {
+  outline: 2px solid $accent-color;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .page-header,
+  .terms-content {
+    border: 2px solid $text-color;
+  }
+
+  .terms-section h2 {
+    border-bottom-color: $text-color;
+  }
+
+  .contact-info {
+    border-left-color: $text-color;
+  }
+}

@@ -8,12 +8,14 @@ set -e
 # Server configuration (updated for current server)
 SERVER_IP="216.225.206.85"
 SERVER_KEY="/home/delta/Projects/PrismaticCollections(SpiralFlip_Site)/id_rsa_prismatic"
+PROJECT_ROOT="/home/delta/Projects/PrismaticCollections(SpiralFlip_Site)"
 
 echo "======================================================================"
-echo "🚀 OPTIMIZED PHANTASIA DEPLOYMENT"
+echo "🚀 OPTIMIZED PHANTASIA DEPLOYMENT TO DEV"
 echo "======================================================================"
 echo "Server: root@$SERVER_IP"
-echo "Target: /var/www/phantasia/"
+echo "Target: /var/www/phantasia-dev/"
+echo "Project: $PROJECT_ROOT"
 echo ""
 
 # Colors
@@ -39,6 +41,9 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Change to project root directory
+cd "$PROJECT_ROOT"
+
 # 1. Clean previous builds
 print_status "🧹 Cleaning previous builds..."
 rm -rf dist/phantasia
@@ -53,8 +58,8 @@ pnpm run build
 # 3. Apply additional optimizations
 print_status "⚡ Applying additional optimizations..."
 
-# Compress all JavaScript files further
-cd dist/phantasia
+# Compress all JavaScript files further (actual build is in browser subdirectory)
+cd "$PROJECT_ROOT/dist/phantasia/browser"
 find . -name "*.js" -exec gzip -k9 {} \;
 find . -name "*.css" -exec gzip -k9 {} \;
 
@@ -65,7 +70,7 @@ rm -f *.map
 print_status "📦 Creating optimized package..."
 tar -czf /tmp/phantasia-website-optimized.tar.gz *
 
-cd - > /dev/null
+cd "$PROJECT_ROOT"
 
 PACKAGE_SIZE=$(ls -lh /tmp/phantasia-website-optimized.tar.gz | awk '{print $5}')
 print_success "Package created: $PACKAGE_SIZE"
@@ -82,16 +87,16 @@ ssh -o StrictHostKeyChecking=no -i "$SERVER_KEY" root@$SERVER_IP << 'DEPLOY_SCRI
 
 echo "🔧 Starting optimized deployment..."
 
-# Backup existing website
-if [ -d "/var/www/phantasia" ]; then
-    echo "📋 Backing up existing website..."
-    mv /var/www/phantasia /var/www/phantasia.backup.$(date +%Y%m%d_%H%M%S)
+# Backup existing dev website
+if [ -d "/var/www/phantasia-dev" ]; then
+    echo "📋 Backing up existing dev website..."
+    mv /var/www/phantasia-dev /var/www/phantasia-dev.backup.$(date +%Y%m%d_%H%M%S)
 fi
 
-# Create fresh directory
-echo "📁 Creating fresh website directory..."
-mkdir -p /var/www/phantasia
-cd /var/www/phantasia
+# Create fresh dev directory
+echo "📁 Creating fresh dev website directory..."
+mkdir -p /var/www/phantasia-dev
+cd /var/www/phantasia-dev
 
 # Extract optimized package
 echo "📦 Extracting optimized website..."
@@ -99,8 +104,8 @@ tar -xzf /tmp/phantasia-website-optimized.tar.gz
 
 # Set optimal permissions
 echo "🔐 Setting optimal permissions..."
-chown -R www-data:www-data /var/www/phantasia
-chmod -R 755 /var/www/phantasia
+chown -R www-data:www-data /var/www/phantasia-dev
+chmod -R 755 /var/www/phantasia-dev
 
 # Verify critical files
 echo "✅ Verifying deployment..."
@@ -112,8 +117,8 @@ else
 fi
 
 # Count files and show size
-FILE_COUNT=$(find /var/www/phantasia -type f | wc -l)
-TOTAL_SIZE=$(du -sh /var/www/phantasia | cut -f1)
+FILE_COUNT=$(find /var/www/phantasia-dev -type f | wc -l)
+TOTAL_SIZE=$(du -sh /var/www/phantasia-dev | cut -f1)
 echo "📊 Deployed: $FILE_COUNT files, $TOTAL_SIZE total"
 
 # Test nginx configuration
@@ -165,7 +170,7 @@ echo "   ✅ Gzip pre-compression"
 echo "   ✅ Source map removal"
 echo "   ✅ Maximum compression packaging"
 echo ""
-echo "📁 Deployed to: /var/www/phantasia/"
+echo "📁 Deployed to: /var/www/phantasia-dev/"
 echo "⚙️ Nginx: Reloaded with zero downtime"
 echo "🔒 SSL: Active with Cloudflare certificates"
 echo "======================================================================"

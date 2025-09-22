@@ -31,7 +31,7 @@
     "@playwright/test": "^1.55.0",
     "@types/dat.gui": "^0.7.13",
     "@types/howler": "^2.2.12",
-    "@types/matter-js": "^0.20.0",
+    "@types/matter-js": "^0.20.2",
     "compression": "^1.8.1",
     "core-js": "^3.38.1",
     "cors": "^2.8.5",
